@@ -25,6 +25,8 @@ const Brands = lazy(() => import("./pages/Brands"));
 const Calendar = lazy(() => import("./pages/Calendar"));
 const Assets = lazy(() => import("./pages/Assets"));
 const Analytics = lazy(() => import("./pages/Analytics"));
+const BrandIntake = lazy(() => import("./pages/BrandIntake"));
+const BrandSnapshot = lazy(() => import("./pages/BrandSnapshot"));
 
 const queryClient = new QueryClient();
 
@@ -97,6 +99,26 @@ function AppRoutes() {
                   <Analytics />
                 </Suspense>
               </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/brand-intake"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<Loading fullScreen text="Loading brand intake..." />}>
+                <BrandIntake />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/brand-snapshot"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<Loading fullScreen text="Loading brand snapshot..." />}>
+                <BrandSnapshot />
+              </Suspense>
             </ProtectedRoute>
           }
         />
