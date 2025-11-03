@@ -4,12 +4,18 @@ import { supabase, Asset } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FolderOpen, Plus, Search, Image, FileText, Video, File } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
+import { AssetGridSkeleton } from '@/components/ui/skeletons';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Assets() {
-  const { currentBrand } = useBrand();
+  const { currentBrand, loading: brandLoading } = useBrand();
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const { toast } = useToast();
 
   useEffect(() => {
     if (currentBrand) {
@@ -20,16 +26,26 @@ export default function Assets() {
   const fetchAssets = async () => {
     if (!currentBrand) return;
 
+    setLoading(true);
+    setError(null);
+
     try {
-      const { data } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('assets')
         .select('*')
         .eq('brand_id', currentBrand.id)
         .order('created_at', { ascending: false });
 
+      if (fetchError) throw fetchError;
       setAssets(data || []);
-    } catch (error) {
-      console.error('Error fetching assets:', error);
+    } catch (err: any) {
+      console.error('Error fetching assets:', err);
+      setError(err.message || 'Failed to load asset library');
+      toast({
+        title: 'Error loading assets',
+        description: 'We couldn\'t load your assets. Please try again.',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
@@ -39,16 +55,39 @@ export default function Assets() {
     asset.file_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  if (brandLoading || (loading && assets.length === 0)) {
+    return (
+      <div className="p-8 space-y-8">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="h-9 w-48 bg-muted animate-pulse rounded" />
+            <div className="h-5 w-80 bg-muted animate-pulse rounded" />
+          </div>
+        </div>
+        <AssetGridSkeleton />
+      </div>
+    );
+  }
+
   if (!currentBrand) {
     return (
       <div className="flex h-full items-center justify-center p-8">
-        <div className="text-center max-w-md">
-          <FolderOpen className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <h2 className="text-xl font-semibold mb-2">No brand selected</h2>
-          <p className="text-muted-foreground">
-            Select a brand to view its asset library.
-          </p>
-        </div>
+        <EmptyState
+          icon={FolderOpen}
+          title="No brand selected"
+          description="Select a brand from the sidebar to view and manage its asset library."
+        />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8">
+        <ErrorState
+          message={error}
+          onRetry={fetchAssets}
+        />
       </div>
     );
   }
@@ -79,17 +118,24 @@ export default function Assets() {
         </div>
       </div>
 
-      {loading ? (
-        <div className="text-center py-12">Loading...</div>
-      ) : filteredAssets.length === 0 ? (
-        <div className="text-center py-12 border rounded-xl bg-card">
-          <FolderOpen className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No assets yet</h3>
-          <p className="text-muted-foreground mb-4">
-            Upload your first asset to organize brand files
-          </p>
-          <Button>Upload Asset</Button>
-        </div>
+      {filteredAssets.length === 0 ? (
+        searchQuery ? (
+          <EmptyState
+            icon={Search}
+            title="No results found"
+            description={`No assets match "${searchQuery}". Try a different search term or upload new assets.`}
+          />
+        ) : (
+          <EmptyState
+            icon={FolderOpen}
+            title="No assets yet"
+            description="Upload your first asset to organize brand files, images, and templates in one place."
+            action={{
+              label: "Upload First Asset",
+              onClick: () => toast({ title: 'Asset upload coming soon!' }),
+            }}
+          />
+        )
       ) : (
         <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {filteredAssets.map((asset) => (

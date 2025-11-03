@@ -5,11 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, Plus, CheckCircle2, Clock, XCircle, Eye } from 'lucide-react';
 import { format } from 'date-fns';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
+import { CalendarSkeleton } from '@/components/ui/skeletons';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Calendar() {
-  const { currentBrand } = useBrand();
+  const { currentBrand, loading: brandLoading } = useBrand();
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (currentBrand) {
@@ -19,32 +25,55 @@ export default function Calendar() {
 
   const fetchContent = async () => {
     if (!currentBrand) return;
-    
+
+    setLoading(true);
+    setError(null);
+
     try {
-      const { data } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('content_items')
         .select('*')
         .eq('brand_id', currentBrand.id)
         .order('scheduled_for', { ascending: true });
 
+      if (fetchError) throw fetchError;
       setContentItems(data || []);
-    } catch (error) {
-      console.error('Error fetching content:', error);
+    } catch (err: any) {
+      console.error('Error fetching content:', err);
+      setError(err.message || 'Failed to load content calendar');
+      toast({
+        title: 'Error loading calendar',
+        description: 'We couldn\'t load your content. Please try again.',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  if (brandLoading || (loading && contentItems.length === 0)) {
+    return <CalendarSkeleton />;
+  }
+
   if (!currentBrand) {
     return (
       <div className="flex h-full items-center justify-center p-8">
-        <div className="text-center max-w-md">
-          <CalendarDays className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <h2 className="text-xl font-semibold mb-2">No brand selected</h2>
-          <p className="text-muted-foreground">
-            Select a brand to view its content calendar.
-          </p>
-        </div>
+        <EmptyState
+          icon={CalendarDays}
+          title="No brand selected"
+          description="Select a brand from the sidebar to view and manage its content calendar."
+        />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8">
+        <ErrorState
+          message={error}
+          onRetry={fetchContent}
+        />
       </div>
     );
   }
@@ -64,17 +93,16 @@ export default function Calendar() {
       </div>
 
       <div className="grid gap-6">
-        {loading ? (
-          <div className="text-center py-12">Loading...</div>
-        ) : contentItems.length === 0 ? (
-          <div className="text-center py-12 border rounded-xl bg-card">
-            <CalendarDays className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No content scheduled</h3>
-            <p className="text-muted-foreground mb-4">
-              Create your first content item or let our AI agents generate content for you
-            </p>
-            <Button>Create Content</Button>
-          </div>
+        {contentItems.length === 0 ? (
+          <EmptyState
+            icon={CalendarDays}
+            title="No content scheduled"
+            description="Create your first content item or let our AI agents generate on-brand content for you. Get started in seconds."
+            action={{
+              label: "Create First Post",
+              onClick: () => toast({ title: 'Content creator coming soon!' }),
+            }}
+          />
         ) : (
           contentItems.map((item) => (
             <ContentCard key={item.id} item={item} />

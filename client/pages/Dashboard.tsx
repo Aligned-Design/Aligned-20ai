@@ -1,23 +1,30 @@
 import { useBrand } from '@/contexts/BrandContext';
 import { Button } from '@/components/ui/button';
-import { FileText, Image, TrendingUp, Calendar, ArrowRight, Sparkles } from 'lucide-react';
+import { FileText, Image, TrendingUp, Calendar, ArrowRight, Sparkles, Plus } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
+import { DashboardSkeleton } from '@/components/ui/skeletons';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
-  const { currentBrand } = useBrand();
+  const { currentBrand, loading } = useBrand();
+  const navigate = useNavigate();
+
+  if (loading) {
+    return <DashboardSkeleton />;
+  }
 
   if (!currentBrand) {
     return (
       <div className="flex h-full items-center justify-center p-8">
-        <div className="text-center max-w-md">
-          <Sparkles className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <h2 className="text-xl font-semibold mb-2">No brand selected</h2>
-          <p className="text-muted-foreground mb-4">
-            Create or select a brand to get started with Aligned AI.
-          </p>
-          <Button asChild>
-            <a href="/brands">Manage Brands</a>
-          </Button>
-        </div>
+        <EmptyState
+          icon={Sparkles}
+          title="No brand selected"
+          description="Create or select a brand to get started with Aligned AI and unlock intelligent content automation."
+          action={{
+            label: "Create Your First Brand",
+            onClick: () => navigate('/brands'),
+          }}
+        />
       </div>
     );
   }
