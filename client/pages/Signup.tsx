@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -20,11 +21,32 @@ export default function Signup() {
     setLoading(true);
     try {
       await signUp(email, password);
+
+      const { data: authData } = await supabase.auth.getSession();
+      const userId = authData.session?.user?.id;
+
+      if (userId) {
+        const brandIds = [
+          '11111111-1111-1111-1111-111111111111',
+          '22222222-2222-2222-2222-222222222222',
+          '33333333-3333-3333-3333-333333333333',
+        ];
+
+        const memberships = brandIds.map((brandId) => ({
+          brand_id: brandId,
+          user_id: userId,
+          role: 'admin',
+        }));
+
+        await supabase.from('brand_members').insert(memberships);
+      }
+
       toast({
-        title: 'Account created',
-        description: 'Please check your email to confirm your account.',
+        title: 'Account created!',
+        description: 'Welcome to Aligned AI. Demo brands have been added to your account.',
       });
-      navigate('/login');
+
+      navigate('/dashboard');
     } catch (error: any) {
       toast({
         title: 'Signup failed',
