@@ -185,8 +185,7 @@ export default function Brands() {
           {brands.map((brand) => (
             <div
               key={brand.id}
-              className="group rounded-xl border bg-card p-6 hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => setCurrentBrand(brand)}
+              className="group rounded-xl border bg-card p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between mb-4">
                 <div
@@ -212,8 +211,37 @@ export default function Brands() {
                 <p className="text-sm text-muted-foreground mb-2">{brand.industry}</p>
               )}
               {brand.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2">{brand.description}</p>
+                <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{brand.description}</p>
               )}
+              <div className="flex gap-2 mt-4">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setCurrentBrand(brand)}
+                  className="flex-1"
+                >
+                  Select Brand
+                </Button>
+                {!brand.intake_completed && (
+                  <Button
+                    size="sm"
+                    onClick={() => navigate(`/brand-intake?brandId=${brand.id}`)}
+                    className="flex-1"
+                  >
+                    Complete Intake
+                  </Button>
+                )}
+                {brand.intake_completed && (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => navigate(`/brand-snapshot?brandId=${brand.id}`)}
+                    className="flex-1"
+                  >
+                    View Profile
+                  </Button>
+                )}
+              </div>
             </div>
           ))}
         </div>
