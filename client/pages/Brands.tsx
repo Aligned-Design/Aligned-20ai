@@ -15,11 +15,13 @@ import { Plus, ExternalLink, Palette } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 export default function Brands() {
-  const { brands, refreshBrands, setCurrentBrand } = useBrand();
+  const { brands, refreshBrands, setCurrentBrand, loading } = useBrand();
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
