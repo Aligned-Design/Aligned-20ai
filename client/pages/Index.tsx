@@ -76,6 +76,7 @@ export default function Index() {
       {/* Intelligent Brand Kits & Features */}
       <section id="features" className="relative border-y bg-gradient-to-b from-accent/30 to-background">
         <div className="container mx-auto grid gap-8 px-4 py-16 md:gap-12 md:py-24">
+          <span id="security" className="absolute -top-16 block h-1 w-1 opacity-0"/>
           <div className="mx-auto max-w-3xl text-center">
             <h3 className="text-2xl font-bold md:text-3xl">Intelligent Brand Kits and seamless workflows</h3>
             <p className="mt-2 text-muted-foreground">Upload once. Aligned AI learns your tone, style, and compliance rules—then keeps every asset on‑brand.</p>
