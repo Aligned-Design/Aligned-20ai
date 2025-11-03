@@ -1,9 +1,13 @@
 import { ArrowRight, BarChart3, CheckCircle2, FileText, LayoutGrid, LinkIcon, Lock, Shield, Sparkles, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SiteHeader from "@/components/site/SiteHeader";
+import SiteFooter from "@/components/site/SiteFooter";
 
 export default function Index() {
   return (
-    <div className="bg-background text-foreground">
+    <>
+      <SiteHeader />
+      <div className="bg-background text-foreground">
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 -z-10">
@@ -143,7 +147,9 @@ export default function Index() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+      <SiteFooter />
+    </>
   );
 }
 
