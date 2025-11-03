@@ -19,7 +19,7 @@ const AnalyticsPortal = lazy(() => import("./pages/AnalyticsPortal"));
 const Settings = lazy(() => import("./pages/Settings"));
 const ClientPortal = lazy(() => import("./pages/ClientPortal"));
 
-// Additional missing pages
+// Additional pages
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Brands = lazy(() => import("./pages/Brands"));
 const Calendar = lazy(() => import("./pages/Calendar"));
@@ -202,7 +202,7 @@ function AppContent() {
         </Suspense>
       } />
 
-      {/* Catch-all route */}
+      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
