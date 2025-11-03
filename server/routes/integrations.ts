@@ -1,163 +1,399 @@
-import express from "express";
-import { Request, Response } from "express";
+import { Router, RequestHandler } from "express";
+import { Integration, SyncEvent, WebhookEvent, IntegrationType } from "@shared/integrations";
 
-const router = express.Router();
+const router = Router();
 
-router.post("/oauth/connect/:provider", async (req: Request, res: Response) => {
-  const { provider } = req.params;
-  const { brand_id } = req.body;
+// Mock data for integrations
+const mockIntegrations: Integration[] = [
+  {
+    id: 'int_slack_1',
+    type: 'slack',
+    name: 'Team Workspace',
+    brandId: 'brand_1',
+    status: 'connected',
+    credentials: {
+      accessToken: 'xoxb-***',
+      refreshToken: 'xoxr-***',
+      expiresAt: '2024-12-31T23:59:59Z'
+    },
+    settings: {
+      syncEnabled: true,
+      syncFrequency: 'realtime',
+      syncDirection: 'bidirectional',
+      autoSync: true,
+      filterRules: [
+        { field: 'channel', operator: 'in', value: ['#marketing', '#approvals'] }
+      ]
+    },
+    permissions: ['channels:read', 'chat:write', 'files:read'],
+    lastSyncAt: '2024-01-15T10:30:00Z',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-15T10:30:00Z'
+  }
+];
 
+// Get all integrations for a brand
+router.get("/", (async (req, res) => {
   try {
-    const authUrl = getOAuthUrl(provider, brand_id);
+    const { brandId } = req.query;
+    
+    if (!brandId) {
+      return res.status(400).json({ error: 'brandId required' });
+    }
 
+    const integrations = mockIntegrations.filter(int => int.brandId === brandId);
+    res.json(integrations);
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to fetch integrations'
+    });
+  }
+}) as RequestHandler);
+
+// Get available integration templates
+router.get("/templates", (async (req, res) => {
+  try {
+    const templates = [
+      {
+        type: 'slack',
+        name: 'Slack',
+        description: 'Real-time notifications and approval workflows',
+        logoUrl: '/integrations/slack.png',
+        category: 'productivity',
+        features: ['Real-time notifications', 'Approval workflows', 'Content sharing'],
+        authType: 'oauth2',
+        requiredScopes: ['channels:read', 'chat:write', 'files:read'],
+        endpoints: {
+          auth: 'https://slack.com/oauth/v2/authorize',
+          api: 'https://slack.com/api',
+          webhook: '/api/webhooks/slack'
+        },
+        rateLimits: { requests: 1200, period: 'minute' }
+      },
+      {
+        type: 'hubspot',
+        name: 'HubSpot',
+        description: 'Sync contacts, campaigns, and analytics',
+        logoUrl: '/integrations/hubspot.png',
+        category: 'crm',
+        features: ['Contact sync', 'Campaign tracking', 'Lead scoring'],
+        authType: 'oauth2',
+        requiredScopes: ['contacts', 'content', 'social'],
+        endpoints: {
+          auth: 'https://app.hubspot.com/oauth/authorize',
+          api: 'https://api.hubapi.com',
+          webhook: '/api/webhooks/hubspot'
+        },
+        rateLimits: { requests: 100, period: '10s' }
+      },
+      {
+        type: 'meta',
+        name: 'Meta Business',
+        description: 'Manage Facebook and Instagram business accounts',
+        logoUrl: '/integrations/meta.png',
+        category: 'social',
+        features: ['Post publishing', 'Analytics sync', 'Ad management'],
+        authType: 'oauth2',
+        requiredScopes: ['pages_manage_posts', 'pages_read_engagement', 'ads_management'],
+        endpoints: {
+          auth: 'https://www.facebook.com/v18.0/dialog/oauth',
+          api: 'https://graph.facebook.com/v18.0',
+          webhook: '/api/webhooks/meta'
+        },
+        rateLimits: { requests: 200, period: 'hour' }
+      },
+      {
+        type: 'google_business',
+        name: 'Google Business Profile',
+        description: 'Manage Google Business listings and reviews',
+        logoUrl: '/integrations/google.png',
+        category: 'social',
+        features: ['Profile management', 'Review monitoring', 'Post publishing'],
+        authType: 'oauth2',
+        requiredScopes: ['business.manage'],
+        endpoints: {
+          auth: 'https://accounts.google.com/oauth/authorize',
+          api: 'https://mybusinessbusinessinformation.googleapis.com',
+          webhook: '/api/webhooks/google'
+        },
+        rateLimits: { requests: 1000, period: 'day' }
+      },
+      {
+        type: 'zapier',
+        name: 'Zapier',
+        description: 'Automate workflows with 5000+ apps',
+        logoUrl: '/integrations/zapier.png',
+        category: 'automation',
+        features: ['Workflow automation', 'Data sync', 'Trigger actions'],
+        authType: 'webhook',
+        requiredScopes: [],
+        endpoints: {
+          api: 'https://hooks.zapier.com',
+          webhook: '/api/webhooks/zapier'
+        },
+        rateLimits: { requests: 100, period: 'minute' }
+      }
+    ];
+
+    res.json(templates);
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to fetch templates'
+    });
+  }
+}) as RequestHandler);
+
+// Start OAuth flow
+router.post("/oauth/start", (async (req, res) => {
+  try {
+    const { type, brandId, redirectUrl } = req.body;
+
+    if (!type || !brandId) {
+      return res.status(400).json({ error: 'type and brandId required' });
+    }
+
+    // Generate OAuth URL based on integration type
+    const authUrl = generateOAuthUrl(type as IntegrationType, brandId, redirectUrl);
+    
     res.json({ authUrl });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to start OAuth flow'
+    });
   }
-});
+}) as RequestHandler);
 
-router.get("/oauth/callback/:provider", async (req: Request, res: Response) => {
-  const { provider } = req.params;
-  const { code, state } = req.query;
-
+// Complete OAuth flow
+router.post("/oauth/callback", (async (req, res) => {
   try {
-    const tokens = await exchangeCodeForTokens(provider, code as string);
-    const accountInfo = await getAccountInfo(provider, tokens.access_token);
+    const { type, code, state, brandId } = req.body;
 
-    res.redirect(`/integrations?success=true&provider=${provider}`);
-  } catch (error: any) {
-    res.redirect(`/integrations?error=${encodeURIComponent(error.message)}`);
-  }
-});
-
-router.post(
-  "/connections/:connectionId/refresh",
-  async (req: Request, res: Response) => {
-    const { connectionId } = req.params;
-
-    try {
-      res.json({ message: "Token refreshed successfully" });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    if (!type || !code || !brandId) {
+      return res.status(400).json({ error: 'type, code, and brandId required' });
     }
-  },
-);
 
-router.post("/posts/publish", async (req: Request, res: Response) => {
-  const { postId } = req.body;
+    // Exchange code for tokens
+    const credentials = await exchangeCodeForTokens(type as IntegrationType, code);
+    
+    // Create integration record
+    const integration: Integration = {
+      id: `int_${type}_${Date.now()}`,
+      type: type as IntegrationType,
+      name: `${type} Integration`,
+      brandId,
+      status: 'connected',
+      credentials,
+      settings: {
+        syncEnabled: true,
+        syncFrequency: 'realtime',
+        syncDirection: 'bidirectional',
+        autoSync: true
+      },
+      permissions: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
 
-  try {
-    res.json({ message: "Post published successfully" });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    // TODO: Save to database
+    mockIntegrations.push(integration);
+
+    // Start initial sync
+    await initiateSync(integration);
+
+    res.json({ success: true, integration });
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to complete OAuth'
+    });
   }
-});
+}) as RequestHandler);
 
-router.get("/reviews/sync/:brandId", async (req: Request, res: Response) => {
-  const { brandId } = req.params;
-
+// Trigger manual sync
+router.post("/:integrationId/sync", (async (req, res) => {
   try {
-    res.json({ message: "Reviews synced successfully" });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    const { integrationId } = req.params;
+    const { type } = req.body;
 
-router.post(
-  "/reviews/:reviewId/respond",
-  async (req: Request, res: Response) => {
-    const { reviewId } = req.params;
-    const { response_text } = req.body;
-
-    try {
-      res.json({ message: "Response posted successfully" });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    const integration = mockIntegrations.find(int => int.id === integrationId);
+    if (!integration) {
+      return res.status(404).json({ error: 'Integration not found' });
     }
-  },
-);
 
-router.post("/events/publish", async (req: Request, res: Response) => {
-  const { eventId } = req.body;
-
-  try {
-    res.json({ message: "Event published successfully" });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    const syncEvent = await triggerSync(integration, type);
+    
+    res.json({ success: true, syncEvent });
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to trigger sync'
+    });
   }
-});
+}) as RequestHandler);
 
-function getOAuthUrl(provider: string, brandId: string): string {
-  const configs: Record<string, any> = {
-    facebook: {
-      authUrl: "https://www.facebook.com/v18.0/dialog/oauth",
-      clientId: process.env.FACEBOOK_APP_ID,
-      redirectUri: `${process.env.APP_URL}/api/integrations/oauth/callback/facebook`,
-      scope:
-        "pages_show_list,pages_read_engagement,pages_manage_posts,instagram_basic,instagram_content_publish",
-    },
-    instagram: {
-      authUrl: "https://www.facebook.com/v18.0/dialog/oauth",
-      clientId: process.env.FACEBOOK_APP_ID,
-      redirectUri: `${process.env.APP_URL}/api/integrations/oauth/callback/instagram`,
-      scope: "instagram_basic,instagram_content_publish",
-    },
-    linkedin: {
-      authUrl: "https://www.linkedin.com/oauth/v2/authorization",
-      clientId: process.env.LINKEDIN_CLIENT_ID,
-      redirectUri: `${process.env.APP_URL}/api/integrations/oauth/callback/linkedin`,
-      scope: "w_member_social,r_liteprofile",
-    },
-    twitter: {
-      authUrl: "https://twitter.com/i/oauth2/authorize",
-      clientId: process.env.TWITTER_CLIENT_ID,
-      redirectUri: `${process.env.APP_URL}/api/integrations/oauth/callback/twitter`,
-      scope: "tweet.read tweet.write users.read offline.access",
-    },
-    google_business: {
-      authUrl: "https://accounts.google.com/o/oauth2/v2/auth",
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      redirectUri: `${process.env.APP_URL}/api/integrations/oauth/callback/google_business`,
-      scope: "https://www.googleapis.com/auth/business.manage",
-    },
+// Update integration settings
+router.put("/:integrationId", (async (req, res) => {
+  try {
+    const { integrationId } = req.params;
+    const updates = req.body;
+
+    const integrationIndex = mockIntegrations.findIndex(int => int.id === integrationId);
+    if (integrationIndex === -1) {
+      return res.status(404).json({ error: 'Integration not found' });
+    }
+
+    mockIntegrations[integrationIndex] = {
+      ...mockIntegrations[integrationIndex],
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+
+    res.json({ success: true, integration: mockIntegrations[integrationIndex] });
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to update integration'
+    });
+  }
+}) as RequestHandler);
+
+// Delete integration
+router.delete("/:integrationId", (async (req, res) => {
+  try {
+    const { integrationId } = req.params;
+
+    const integrationIndex = mockIntegrations.findIndex(int => int.id === integrationId);
+    if (integrationIndex === -1) {
+      return res.status(404).json({ error: 'Integration not found' });
+    }
+
+    // TODO: Revoke tokens and cleanup
+    mockIntegrations.splice(integrationIndex, 1);
+
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to delete integration'
+    });
+  }
+}) as RequestHandler);
+
+// Get sync events
+router.get("/:integrationId/sync-events", (async (req, res) => {
+  try {
+    const { integrationId } = req.params;
+    const { limit = '50', offset = '0' } = req.query;
+
+    // TODO: Fetch from database
+    const syncEvents: SyncEvent[] = [];
+
+    res.json({
+      events: syncEvents,
+      total: syncEvents.length,
+      hasMore: false
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to fetch sync events'
+    });
+  }
+}) as RequestHandler);
+
+// Webhook handlers
+router.post("/webhooks/:type", (async (req, res) => {
+  try {
+    const { type } = req.params;
+    const payload = req.body;
+    const signature = req.headers['x-webhook-signature'] as string;
+
+    // Verify webhook signature
+    if (!verifyWebhookSignature(type as IntegrationType, payload, signature)) {
+      return res.status(401).json({ error: 'Invalid signature' });
+    }
+
+    // Process webhook
+    const event: WebhookEvent = {
+      id: `webhook_${Date.now()}`,
+      integrationId: `int_${type}_1`, // TODO: Get from mapping
+      source: type as IntegrationType,
+      eventType: payload.type || 'unknown',
+      payload,
+      signature,
+      receivedAt: new Date().toISOString(),
+      status: 'pending'
+    };
+
+    // Queue for processing
+    await processWebhookEvent(event);
+
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to process webhook'
+    });
+  }
+}) as RequestHandler);
+
+// Helper functions
+function generateOAuthUrl(type: IntegrationType, brandId: string, redirectUrl?: string): string {
+  const baseUrls = {
+    slack: 'https://slack.com/oauth/v2/authorize',
+    hubspot: 'https://app.hubspot.com/oauth/authorize',
+    meta: 'https://www.facebook.com/v18.0/dialog/oauth',
+    google_business: 'https://accounts.google.com/oauth/authorize'
   };
 
-  const config = configs[provider];
-  if (!config) {
-    throw new Error(`Provider ${provider} not supported`);
-  }
+  const scopes = {
+    slack: 'channels:read,chat:write,files:read',
+    hubspot: 'contacts,content,social',
+    meta: 'pages_manage_posts,pages_read_engagement',
+    google_business: 'business.manage'
+  };
 
   const params = new URLSearchParams({
-    client_id: config.clientId,
-    redirect_uri: config.redirectUri,
-    scope: config.scope,
-    response_type: "code",
-    state: brandId,
+    client_id: process.env[`${type.toUpperCase()}_CLIENT_ID`] || 'demo',
+    redirect_uri: redirectUrl || `${process.env.FRONTEND_URL}/integrations/callback`,
+    scope: scopes[type] || '',
+    state: `${type}:${brandId}`,
+    response_type: 'code'
   });
 
-  return `${config.authUrl}?${params.toString()}`;
+  return `${baseUrls[type]}?${params.toString()}`;
 }
 
-async function exchangeCodeForTokens(
-  provider: string,
-  code: string,
-): Promise<any> {
+async function exchangeCodeForTokens(type: IntegrationType, code: string) {
+  // Mock token exchange - in production, make actual API calls
   return {
-    access_token: "mock_access_token",
-    refresh_token: "mock_refresh_token",
-    expires_in: 3600,
+    accessToken: `${type}_access_token_${Date.now()}`,
+    refreshToken: `${type}_refresh_token_${Date.now()}`,
+    expiresAt: new Date(Date.now() + 3600 * 1000).toISOString()
   };
 }
 
-async function getAccountInfo(
-  provider: string,
-  accessToken: string,
-): Promise<any> {
+async function initiateSync(integration: Integration) {
+  // TODO: Start background sync process
+  console.log(`Starting sync for ${integration.type} integration`);
+}
+
+async function triggerSync(integration: Integration, syncType: string): Promise<SyncEvent> {
   return {
-    id: "mock_account_id",
-    username: "mock_username",
-    name: "Mock Account",
+    id: `sync_${Date.now()}`,
+    integrationId: integration.id,
+    type: syncType as any,
+    action: 'sync',
+    sourceId: integration.id,
+    data: {},
+    status: 'pending',
+    attempts: 0,
+    scheduledAt: new Date().toISOString()
   };
+}
+
+function verifyWebhookSignature(type: IntegrationType, payload: any, signature: string): boolean {
+  // TODO: Implement proper signature verification for each platform
+  return true;
+}
+
+async function processWebhookEvent(event: WebhookEvent) {
+  // TODO: Queue webhook event for processing
+  console.log(`Processing webhook event: ${event.eventType} from ${event.source}`);
 }
 
 export default router;

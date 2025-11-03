@@ -26,6 +26,7 @@ import {
   PenSquare,
   MessageSquare,
   CalendarPlus,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +40,7 @@ const navItems = [
   { to: "/integrations", icon: Plug, label: "Integrations" },
   { to: "/reviews", icon: MessageSquare, label: "Reviews" },
   { to: "/events", icon: CalendarPlus, label: "Events" },
+  { to: "/review-queue", icon: Shield, label: "Review Queue" },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {

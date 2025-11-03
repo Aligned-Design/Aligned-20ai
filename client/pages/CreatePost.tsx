@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DashboardSkeleton } from "@/components/ui/skeletons";
 import { HelpTooltip } from "@/components/ui/help-tooltip";
+import { AgentGenerationPanel } from "@/components/ai-agents/AgentGenerationPanel";
 import {
   PenSquare,
   Image as ImageIcon,
@@ -45,6 +46,21 @@ export default function CreatePost() {
     platforms: [],
     hashtags: [],
   });
+
+  const handleAIContentGenerated = (content: {
+    title?: string;
+    caption: string;
+    hashtags: string[];
+    cta_text?: string;
+  }) => {
+    setFormData(prev => ({
+      ...prev,
+      title: content.title || prev.title,
+      caption: content.caption,
+      hashtags: content.hashtags,
+      cta_text: content.cta_text || prev.cta_text
+    }));
+  };
 
   useEffect(() => {
     if (currentBrand?.id) {
@@ -323,6 +339,13 @@ export default function CreatePost() {
         </div>
 
         <div className="space-y-6">
+          {/* AI Generation Panel */}
+          <AgentGenerationPanel
+            onContentGenerated={handleAIContentGenerated}
+            platform={selectedPlatforms[0] || "instagram"}
+            contentType={formData.content_type}
+          />
+
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Select Platforms</CardTitle>
