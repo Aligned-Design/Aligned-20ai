@@ -167,9 +167,13 @@ const App = () => (
   </QueryClientProvider>
 );
 
-// Prevent double-mounting during HMR in development
+// Store root instance for HMR compatibility
 const rootElement = document.getElementById("root")!;
-if (!rootElement.hasAttribute("data-root-initialized")) {
-  rootElement.setAttribute("data-root-initialized", "true");
-  createRoot(rootElement).render(<App />);
+let root = (window as any).__react_root__;
+
+if (!root) {
+  root = createRoot(rootElement);
+  (window as any).__react_root__ = root;
 }
+
+root.render(<App />);
