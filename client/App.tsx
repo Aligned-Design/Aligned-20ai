@@ -203,7 +203,7 @@ function AppContent() {
       } />
 
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-      <Route path="*" element={<NotFound />} />
+      <Route path="*" element={<div className="p-8 text-center">Page Not Found</div>} />
     </Routes>
   );
 }

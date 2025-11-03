@@ -49,6 +49,7 @@ import {
   getWorkflowNotifications,
 } from "./routes/workflow";
 import { generateContent, getProviderStatus } from "./routes/ai";
+import { serverEnv } from '@shared/env';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1027,43 +1028,42 @@ export function createServer() {
   app.post("/api/ai/generate", generateContent);
   app.get("/api/ai/providers", getProviderStatus);
 }
-} from "./routes/analytics";
-import {
-  getWhiteLabelConfig,
-  getConfigByDomain,
-  updateWhiteLabelConfig,
-} from "./routes/white-label";
-import {
-  getClientDashboard,
-  approveContent,
-  addContentComment,
-  uploadClientMedia,
-} from "./routes/client-portal";
-import {
-  getWorkflowTemplates,
-  createWorkflowTemplate,
-  startWorkflow,
-  processWorkflowAction,
-  getWorkflowNotifications,
-} from "./routes/workflow";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import express from 'express';
+import cors from 'cors';
 
 export function createServer() {
   const app = express();
-  const PORT = process.env.PORT || 8080;
-  const isDev = process.env.NODE_ENV !== 'production';
 
-  // Middleware
-  app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:8080'
-  }));
-  
+  app.use(cors());
   app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
 
-  // Health check
+  // Required API endpoints per AGENTS.md
+  app.get('/api/ping', (req, res) => {
+    res.json({ message: 'pong', timestamp: new Date().toISOString() });
+  });
+
+  app.get('/api/demo', (req, res) => {
+    res.json({ 
+      message: 'Demo endpoint working',
+      environment: process.env.NODE_ENV || 'development',
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  return app;
+}
+
+// Start server if running directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const app = createServer();
+  const port = parseInt(process.env.PORT || '3001', 10);
+  
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}
+}
+}
   app.get("/api/health", (_req, res) => {
     res.json({
       status: "healthy",
@@ -1995,4 +1995,67 @@ export function createServer() {
             id: 'tact_1',
             type: 'content_optimization',
             title: 'Increase Behind-the-Scenes Content',
-           
+            description: 'Share more about your sustainable practices and team stories.',
+            impact: 'medium',
+            effort: 'low',
+            timeframe: '1-2 months',
+            expectedOutcome: '15% increase in engagement on Instagram',
+            reasoning: 'Behind-the-scenes content performs well.'
+          },
+          {
+            id: 'tact_2',
+            type: 'hashtag_strategy',
+            title: 'Optimize Hashtag Usage',
+            description: 'Use a mix of trending and niche hashtags for better reach.',
+            impact: 'medium',
+            effort: 'medium',
+            timeframe: '1 month',
+            expectedOutcome: '10% increase in post reach',
+            reasoning: 'Hashtags significantly impact discoverability.'
+          }
+        ]
+      }
+    };
+
+    res.json(intelligence);
+  });
+
+  // New AI routes
+  app.post("/api/ai/generate", generateContent);
+  app.get("/api/ai/providers", getProviderStatus);
+}
+import express from 'express';
+import cors from 'cors';
+
+export function createServer() {
+  const app = express();
+
+  // Middleware
+  app.use(cors());
+  app.use(express.json());
+
+  // Required API endpoints per AGENTS.md
+  app.get('/api/ping', (req, res) => {
+    res.json({ message: 'pong', timestamp: new Date().toISOString() });
+  });
+
+  app.get('/api/demo', (req, res) => {
+    res.json({ 
+      message: 'Demo endpoint working',
+      environment: process.env.NODE_ENV || 'development',
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  return app;
+}
+
+// Start server if running directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const app = createServer();
+  const port = parseInt(process.env.PORT || '3001', 10);
+  
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}

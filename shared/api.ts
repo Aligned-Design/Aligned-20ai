@@ -16,6 +16,7 @@ import {
  */
 export interface DemoResponse {
   message: string;
+  environment: string;
   timestamp: string;
 }
 
@@ -217,4 +218,17 @@ export interface AIProviderStatus {
 export interface ErrorResponse {
   error: string;
   details?: string;
+}
+
+// Shared API interfaces for type safety between client and server
+
+export interface PingResponse {
+  message: string;
+  timestamp: string;
+}
+
+export interface DemoResponse {
+  message: string;
+  environment: string;
+  timestamp: string;
 }

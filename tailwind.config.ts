@@ -1,10 +1,17 @@
 import type { Config } from "tailwindcss";
 
-const config: Config = {
+export default {
   content: [
     "./client/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
     extend: {
       colors: {
         border: "hsl(var(--border))",
@@ -49,40 +56,7 @@ const config: Config = {
     },
   },
   plugins: [],
-};
-
-export default config;
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
-        },
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-        xl: "calc(var(--radius) + 4px)",
-        "2xl": "calc(var(--radius) + 8px)",
-      },
-      spacing: {
-        18: "4.5rem",
-        22: "5.5rem",
-      },
-      boxShadow: {
-        glow: "0 0 20px -5px rgba(139, 92, 246, 0.3)",
-        "glow-coral": "0 0 20px -5px rgba(255, 107, 107, 0.3)",
-        "glow-mint": "0 0 20px -5px rgba(16, 185, 129, 0.3)",
-        "glow-azure": "0 0 20px -5px rgba(59, 130, 246, 0.3)",
+} satisfies Config;
         soft: "0 2px 8px -2px rgba(0, 0, 0, 0.05)",
       },
       keyframes: {
@@ -117,6 +91,32 @@ export default config;
             opacity: "0.5",
           },
           "50%": {
+            opacity: "0.8",
+          },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.5s ease-out",
+        glow: "glow 3s ease-in-out infinite",
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")],
+} satisfies Config;
+
+export default config;
+        "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.5s ease-out",
+        glow: "glow 3s ease-in-out infinite",
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")],
+} satisfies Config;
+
+export default config;
             opacity: "0.8",
           },
         },
