@@ -7,13 +7,22 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: {
+        DEFAULT: "1.5rem",
+        sm: "2rem",
+        lg: "3rem",
+        xl: "4rem",
+      },
       screens: {
         "2xl": "1400px",
       },
     },
     extend: {
       colors: {
+        coral: "hsl(var(--coral))",
+        mint: "hsl(var(--mint))",
+        azure: "hsl(var(--azure))",
+        violet: "hsl(var(--violet))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -62,6 +71,19 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "calc(var(--radius) + 4px)",
+        "2xl": "calc(var(--radius) + 8px)",
+      },
+      spacing: {
+        18: "4.5rem",
+        22: "5.5rem",
+      },
+      boxShadow: {
+        'glow': '0 0 20px -5px rgba(139, 92, 246, 0.3)',
+        'glow-coral': '0 0 20px -5px rgba(255, 107, 107, 0.3)',
+        'glow-mint': '0 0 20px -5px rgba(16, 185, 129, 0.3)',
+        'glow-azure': '0 0 20px -5px rgba(59, 130, 246, 0.3)',
+        'soft': '0 2px 8px -2px rgba(0, 0, 0, 0.05)',
       },
       keyframes: {
         "accordion-down": {
@@ -80,10 +102,30 @@ export default {
             height: "0",
           },
         },
+        "fade-in": {
+          from: {
+            opacity: "0",
+            transform: "translateY(8px)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "glow": {
+          "0%, 100%": {
+            opacity: "0.5",
+          },
+          "50%": {
+            opacity: "0.8",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.5s ease-out",
+        "glow": "glow 3s ease-in-out infinite",
       },
     },
   },

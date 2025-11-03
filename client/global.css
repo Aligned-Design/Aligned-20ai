@@ -1,5 +1,5 @@
 /** @import must precede all other statements */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -12,48 +12,61 @@
    * A different format will require also updating the theme in tailwind.config.ts.
   */
   :root {
+    /* Apple-inspired: Clean whites and soft grays */
     --background: 0 0% 100%;
-    --foreground: 223 47% 7%;
+    --foreground: 0 0% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 223 47% 7%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 223 47% 7%;
+    --popover-foreground: 0 0% 9%;
 
-    /* Aligned AI brand: violet/fuchsia gradient accents */
-    --primary: 262 83% 55%;
+    /* Bright, optimistic accent - violet as primary option */
+    --primary: 262 80% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 255 40% 96%;
-    --secondary-foreground: 262 60% 20%;
+    /* Soft secondary tones */
+    --secondary: 0 0% 97%;
+    --secondary-foreground: 0 0% 20%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 10% 40%;
+    /* Muted backgrounds - very subtle */
+    --muted: 0 0% 98%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 292 84% 90%;
-    --accent-foreground: 262 60% 20%;
+    /* Accent for highlights - soft glow */
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 9%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 90%;
-    --input: 220 13% 90%;
-    --ring: 262 83% 55%;
+    /* Borders - barely there */
+    --border: 0 0% 93%;
+    --input: 0 0% 93%;
+    --ring: 262 80% 60%;
 
-    --radius: 0.75rem;
+    /* More rounded for Apple aesthetic */
+    --radius: 0.875rem;
 
-    /* Dynamic brand color (hex format) - updates when brand switches */
+    /* Dynamic brand color (hex format) */
     --brand-primary: #8B5CF6;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 262 83% 55%;
+    /* Bright accent palette */
+    --coral: 6 78% 57%;
+    --mint: 160 84% 39%;
+    --azure: 217 91% 60%;
+    --violet: 262 80% 60%;
+
+    /* Sidebar - minimal and breathable */
+    --sidebar-background: 0 0% 99%;
+    --sidebar-foreground: 0 0% 20%;
+    --sidebar-primary: 262 80% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 255 40% 96%;
-    --sidebar-accent-foreground: 262 60% 20%;
-    --sidebar-border: 220 13% 90%;
-    --sidebar-ring: 262 83% 55%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 95%;
+    --sidebar-ring: 262 80% 60%;
   }
 
   .dark {
@@ -102,11 +115,36 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
   }
 
   :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
     overflow-wrap: anywhere;
     word-break: break-word;
+  }
+
+  /* Smooth transitions for Apple feel */
+  * {
+    @apply transition-colors duration-200;
+  }
+
+  /* Button and interactive element polish */
+  button, a {
+    @apply transition-all duration-200;
+  }
+
+  /* Typography refinements */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+    letter-spacing: -0.02em;
+  }
+
+  /* Gentle focus states */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary/20 ring-offset-2;
   }
 
   pre,
