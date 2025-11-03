@@ -48,6 +48,7 @@ import {
   processWorkflowAction,
   getWorkflowNotifications,
 } from "./routes/workflow";
+import { generateContent, getProviderStatus } from "./routes/ai";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -997,36 +998,35 @@ export function createServer() {
             id: 'tact_1',
             type: 'content_optimization',
             title: 'Increase Behind-the-Scenes Content',
-           import express from 'express';
-import cors from 'cors';
-import { createServer } from 'vite';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { handleDemo } from "./routes/demo";
-import integrationsRouter from "./routes/integrations";
-import agentsRouter from "./routes/agents";
-import {
-  uploadMedia,
-  listMedia,
-  getStorageUsage,
-  getAssetUrl,
-  checkDuplicateAsset,
-  generateSEOMetadataRoute,
-  trackAssetUsage,
-} from "./routes/media";
-import {
-  getAnalytics,
-  getInsights,
-  getForecast,
-  processVoiceQuery,
-  provideFeedback,
-  getGoals,
-  createGoal,
-  syncPlatformData,
-  addOfflineMetric,
-  getEngagementHeatmap,
-  getAlerts,
-  acknowledgeAlert,
+            description: 'Share more about your sustainable practices and team stories.',
+            impact: 'medium',
+            effort: 'low',
+            timeframe: '1-2 months',
+            expectedOutcome: '15% increase in engagement on Instagram',
+            reasoning: 'Behind-the-scenes content performs well.'
+          },
+          {
+            id: 'tact_2',
+            type: 'hashtag_strategy',
+            title: 'Optimize Hashtag Usage',
+            description: 'Use a mix of trending and niche hashtags for better reach.',
+            impact: 'medium',
+            effort: 'medium',
+            timeframe: '1 month',
+            expectedOutcome: '10% increase in post reach',
+            reasoning: 'Hashtags significantly impact discoverability.'
+          }
+        ]
+      }
+    };
+
+    res.json(intelligence);
+  });
+
+  // New AI routes
+  app.post("/api/ai/generate", generateContent);
+  app.get("/api/ai/providers", getProviderStatus);
+}
 } from "./routes/analytics";
 import {
   getWhiteLabelConfig,

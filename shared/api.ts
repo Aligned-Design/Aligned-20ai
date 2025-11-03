@@ -194,3 +194,27 @@ export interface OnboardingCompletion {
   userType: 'agency' | 'client';
   completedSteps: string[];
 }
+
+// Shared API types between client and server
+
+export interface AIGenerationRequest {
+  prompt: string;
+  agentType: "doc" | "design" | "advisor";
+  provider?: "openai" | "claude";
+}
+
+export interface AIGenerationResponse {
+  content: string;
+  provider: string;
+  agentType: string;
+}
+
+export interface AIProviderStatus {
+  available: string[];
+  default: string;
+}
+
+export interface ErrorResponse {
+  error: string;
+  details?: string;
+}

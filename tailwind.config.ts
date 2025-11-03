@@ -1,28 +1,12 @@
 import type { Config } from "tailwindcss";
 
-export default {
-  darkMode: ["class"],
-  content: ["./client/**/*.{ts,tsx}"],
-  prefix: "",
+const config: Config = {
+  content: [
+    "./client/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
-    container: {
-      center: true,
-      padding: {
-        DEFAULT: "1.5rem",
-        sm: "2rem",
-        lg: "3rem",
-        xl: "4rem",
-      },
-      screens: {
-        "2xl": "1400px",
-      },
-    },
     extend: {
       colors: {
-        coral: "hsl(var(--coral))",
-        mint: "hsl(var(--mint))",
-        azure: "hsl(var(--azure))",
-        violet: "hsl(var(--violet))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -52,6 +36,22 @@ export default {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
         },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",

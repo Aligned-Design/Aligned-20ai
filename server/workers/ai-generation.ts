@@ -13,35 +13,45 @@ import { join } from "path";
 
 export type AIProvider = "openai" | "claude";
 
-// Lazy initialization to prevent config-time issues
-let openai: OpenAI | null = null;
-let anthropic: Anthropic | null = null;
+// Initialize clients only when needed and API keys are available
+let openaiClient: OpenAI | null = null;
+let anthropicClient: Anthropic | null = null;
 
 function getOpenAI(): OpenAI | null {
-  if (openai === null && process.env.OPENAI_API_KEY) {
+  if (openaiClient === null && process.env.OPENAI_API_KEY) {
     try {
-      openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      openaiClient = new OpenAI({ 
+        apiKey: process.env.OPENAI_API_KEY,
+        timeout: 30000,
+      });
     } catch (error) {
       console.warn("Failed to initialize OpenAI client:", error);
+      return null;
     }
   }
-  return openai;
+  return openaiClient;
 }
 
 function getAnthropic(): Anthropic | null {
-  if (anthropic === null && process.env.ANTHROPIC_API_KEY) {
+  if (anthropicClient === null && process.env.ANTHROPIC_API_KEY) {
     try {
-      anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+      anthropicClient = new Anthropic({ 
+        apiKey: process.env.ANTHROPIC_API_KEY,
+        timeout: 30000,
+      });
     } catch (error) {
       console.warn("Failed to initialize Anthropic client:", error);
+      return null;
     }
   }
-  return anthropic;
+  return anthropicClient;
 }
 
 // Default to OpenAI, fallback to Claude
 function getDefaultProvider(): AIProvider {
-  return getOpenAI() ? "openai" : "claude";
+  if (process.env.OPENAI_API_KEY) return "openai";
+  if (process.env.ANTHROPIC_API_KEY) return "claude";
+  return "openai"; // fallback
 }
 
 /**
@@ -50,104 +60,122 @@ function getDefaultProvider(): AIProvider {
 export async function generateWithAI(
   prompt: string, 
   agentType: "doc" | "design" | "advisor",
-  provider: AIProvider = getDefaultProvider()
+  provider?: AIProvider
 ): Promise<string> {
+  const selectedProvider = provider || getDefaultProvider();
+  
   try {
-    if (provider === "openai" && getOpenAI()) {
-      return await generateWithOpenAI(prompt, agentType);
-    } else if (provider === "claude" && getAnthropic()) {
-      return await generateWithClaude(prompt, agentType);
-    } else {
-      // Fallback to available provider
-      if (getOpenAI()) {
-        console.warn(`${provider} not available, falling back to OpenAI`);
-        return await generateWithOpenAI(prompt, agentType);
-      } else if (anthropic) {
-        console.warn(`${provider} not available, falling back to Claude`);
-        return await generateWithClaude(prompt, agentType);
-      } else {
-        throw new Error("No AI providers configured. Please set OPENAI_API_KEY or ANTHROPIC_API_KEY");
+    if (selectedProvider === "openai") {
+      const client = getOpenAI();
+      if (!client) {
+        throw new Error("OpenAI client not available - check OPENAI_API_KEY");
       }
+      return await generateWithOpenAI(prompt, agentType, client);
+    } else if (selectedProvider === "claude") {
+      const client = getAnthropic();
+      if (!client) {
+        throw new Error("Anthropic client not available - check ANTHROPIC_API_KEY");
+      }
+      return await generateWithClaude(prompt, agentType, client);
+    } else {
+      throw new Error(`Unknown provider: ${selectedProvider}`);
     }
   } catch (error) {
-    console.error(`AI generation failed with ${provider}:`, error);
+    console.error(`AI generation failed with ${selectedProvider}:`, error);
     
-    // Try fallback provider if available
-    const fallbackProvider = provider === "openai" ? "claude" : "openai";
-    if (fallbackProvider === "openai" && openai) {
-      console.log("Retrying with OpenAI...");
-      return await generateWithOpenAI(prompt, agentType);
-    } else if (fallbackProvider === "claude" && anthropic) {
-      console.log("Retrying with Claude...");
-      return await generateWithClaude(prompt, agentType);
+    // Try fallback provider only if the error isn't a configuration issue
+    if (error instanceof Error && !error.message.includes("not available")) {
+      const fallbackProvider = selectedProvider === "openai" ? "claude" : "openai";
+      
+      try {
+        if (fallbackProvider === "openai") {
+          const client = getOpenAI();
+          if (client) {
+            console.log("Retrying with OpenAI...");
+            return await generateWithOpenAI(prompt, agentType, client);
+          }
+        } else {
+          const client = getAnthropic();
+          if (client) {
+            console.log("Retrying with Claude...");
+            return await generateWithClaude(prompt, agentType, client);
+          }
+        }
+      } catch (fallbackError) {
+        console.error(`Fallback also failed:`, fallbackError);
+      }
     }
     
-    throw error;
+    throw new Error(`AI generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
 /**
  * Generate content using OpenAI
  */
-async function generateWithOpenAI(prompt: string, agentType: string): Promise<string> {
-  const client = getOpenAI();
-  if (!client) {
-    throw new Error("OpenAI API key not configured");
-  }
-
+async function generateWithOpenAI(prompt: string, agentType: string, client: OpenAI): Promise<string> {
   const model = getOpenAIModel(agentType);
   
-  const response = await client.chat.completions.create({
-    model,
-    messages: [
-      {
-        role: "system",
-        content: prompt
-      }
-    ],
-    temperature: getTemperature(agentType),
-    max_tokens: getMaxTokens(agentType),
-    presence_penalty: 0.1,
-    frequency_penalty: 0.1
-  });
+  try {
+    const response = await client.chat.completions.create({
+      model,
+      messages: [
+        {
+          role: "system",
+          content: prompt
+        }
+      ],
+      temperature: getTemperature(agentType),
+      max_tokens: getMaxTokens(agentType),
+      presence_penalty: 0.1,
+      frequency_penalty: 0.1
+    });
 
-  const content = response.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error("No content generated by OpenAI");
+    const content = response.choices[0]?.message?.content;
+    if (!content) {
+      throw new Error("No content generated by OpenAI");
+    }
+
+    return content;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`OpenAI API error: ${error.message}`);
+    }
+    throw error;
   }
-
-  return content;
 }
 
 /**
  * Generate content using Claude
  */
-async function generateWithClaude(prompt: string, agentType: string): Promise<string> {
-  const client = getAnthropic();
-  if (!client) {
-    throw new Error("Anthropic API key not configured");
-  }
-
+async function generateWithClaude(prompt: string, agentType: string, client: Anthropic): Promise<string> {
   const model = getClaudeModel(agentType);
   
-  const response = await client.messages.create({
-    model,
-    max_tokens: getMaxTokens(agentType),
-    temperature: getTemperature(agentType),
-    messages: [
-      {
-        role: "user",
-        content: prompt
-      }
-    ]
-  });
+  try {
+    const response = await client.messages.create({
+      model,
+      max_tokens: getMaxTokens(agentType),
+      temperature: getTemperature(agentType),
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ]
+    });
 
-  const content = response.content[0];
-  if (content.type !== "text") {
-    throw new Error("Unexpected response type from Claude");
+    const content = response.content[0];
+    if (!content || content.type !== "text") {
+      throw new Error("Unexpected response type from Claude");
+    }
+
+    return content.text;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Anthropic API error: ${error.message}`);
+    }
+    throw error;
   }
-
-  return content.text;
 }
 
 /**
@@ -328,13 +356,29 @@ Generate your response as JSON with these fields:
 export function getAvailableProviders(): AIProvider[] {
   const providers: AIProvider[] = [];
   
-  if (openai) providers.push("openai");
-  if (anthropic) providers.push("claude");
+  if (process.env.OPENAI_API_KEY) {
+    providers.push("openai");
+  }
+  
+  if (process.env.ANTHROPIC_API_KEY) {
+    providers.push("claude");
+  }
   
   return providers;
 }
 
 /**
- * Get the default provider based on availability
+ * Validate that at least one AI provider is configured
  */
+export function validateAIProviders(): boolean {
+  const providers = getAvailableProviders();
+  if (providers.length === 0) {
+    console.error("No AI providers configured. Please set OPENAI_API_KEY or ANTHROPIC_API_KEY");
+    return false;
+  }
+  console.log(`AI providers available: ${providers.join(", ")}`);
+  return true;
+}
+
+// Export getDefaultProvider for use in other modules
 export { getDefaultProvider };
