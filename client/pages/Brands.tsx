@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { useBrand } from '@/contexts/BrandContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useState } from "react";
+import { useBrand } from "@/contexts/BrandContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -10,12 +10,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Plus, ExternalLink, Palette } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+} from "@/components/ui/dialog";
+import { Plus, ExternalLink, Palette } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function Brands() {
   const { brands, refreshBrands, setCurrentBrand, loading } = useBrand();
@@ -24,12 +24,12 @@ export default function Brands() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    slug: '',
-    website_url: '',
-    industry: '',
-    description: '',
-    primary_color: '#8B5CF6',
+    name: "",
+    slug: "",
+    website_url: "",
+    industry: "",
+    description: "",
+    primary_color: "#8B5CF6",
   });
 
   const handleCreate = async () => {
@@ -37,11 +37,12 @@ export default function Brands() {
 
     try {
       const { data: brandData, error: brandError } = await supabase
-        .from('brands')
+        .from("brands")
         .insert([
           {
             ...formData,
-            slug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-'),
+            slug:
+              formData.slug || formData.name.toLowerCase().replace(/\s+/g, "-"),
           },
         ])
         .select()
@@ -49,34 +50,34 @@ export default function Brands() {
 
       if (brandError) throw brandError;
 
-      await supabase.from('brand_members').insert([
+      await supabase.from("brand_members").insert([
         {
           brand_id: brandData.id,
           user_id: user.id,
-          role: 'owner',
+          role: "owner",
         },
       ]);
 
       toast({
-        title: 'Brand created',
+        title: "Brand created",
         description: `${formData.name} has been created successfully.`,
       });
 
       setOpen(false);
       setFormData({
-        name: '',
-        slug: '',
-        website_url: '',
-        industry: '',
-        description: '',
-        primary_color: '#8B5CF6',
+        name: "",
+        slug: "",
+        website_url: "",
+        industry: "",
+        description: "",
+        primary_color: "#8B5CF6",
       });
       refreshBrands();
     } catch (error: any) {
       toast({
-        title: 'Error creating brand',
+        title: "Error creating brand",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -109,7 +110,9 @@ export default function Brands() {
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   placeholder="TechFlow Solutions"
                 />
               </div>
@@ -118,7 +121,9 @@ export default function Brands() {
                 <Input
                   id="slug"
                   value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, slug: e.target.value })
+                  }
                   placeholder="techflow"
                 />
               </div>
@@ -127,7 +132,9 @@ export default function Brands() {
                 <Input
                   id="website"
                   value={formData.website_url}
-                  onChange={(e) => setFormData({ ...formData, website_url: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, website_url: e.target.value })
+                  }
                   placeholder="https://techflow.com"
                 />
               </div>
@@ -136,7 +143,9 @@ export default function Brands() {
                 <Input
                   id="industry"
                   value={formData.industry}
-                  onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, industry: e.target.value })
+                  }
                   placeholder="Technology"
                 />
               </div>
@@ -145,7 +154,9 @@ export default function Brands() {
                 <Input
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   placeholder="Brief description"
                 />
               </div>
@@ -156,12 +167,22 @@ export default function Brands() {
                     id="color"
                     type="color"
                     value={formData.primary_color}
-                    onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        primary_color: e.target.value,
+                      })
+                    }
                     className="w-16 h-10"
                   />
                   <Input
                     value={formData.primary_color}
-                    onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        primary_color: e.target.value,
+                      })
+                    }
                     placeholder="#8B5CF6"
                   />
                 </div>
@@ -208,10 +229,14 @@ export default function Brands() {
               </div>
               <h3 className="text-lg font-semibold mb-1">{brand.name}</h3>
               {brand.industry && (
-                <p className="text-sm text-muted-foreground mb-2">{brand.industry}</p>
+                <p className="text-sm text-muted-foreground mb-2">
+                  {brand.industry}
+                </p>
               )}
               {brand.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{brand.description}</p>
+                <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                  {brand.description}
+                </p>
               )}
               <div className="flex gap-2 mt-4">
                 <Button
@@ -225,7 +250,9 @@ export default function Brands() {
                 {!brand.intake_completed && (
                   <Button
                     size="sm"
-                    onClick={() => navigate(`/brand-intake?brandId=${brand.id}`)}
+                    onClick={() =>
+                      navigate(`/brand-intake?brandId=${brand.id}`)
+                    }
                     className="flex-1"
                   >
                     Complete Intake
@@ -235,7 +262,9 @@ export default function Brands() {
                   <Button
                     size="sm"
                     variant="secondary"
-                    onClick={() => navigate(`/brand-snapshot?brandId=${brand.id}`)}
+                    onClick={() =>
+                      navigate(`/brand-snapshot?brandId=${brand.id}`)
+                    }
                     className="flex-1"
                   >
                     View Profile

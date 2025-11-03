@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { supabase, Brand } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import { Loading } from '@/components/ui/loading';
-import { ErrorState } from '@/components/ui/error-state';
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { supabase, Brand } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+import { Loading } from "@/components/ui/loading";
+import { ErrorState } from "@/components/ui/error-state";
 import {
   CheckCircle2,
   Palette,
@@ -14,11 +14,11 @@ import {
   Shield,
   Sparkles,
   ArrowRight,
-} from 'lucide-react';
+} from "lucide-react";
 
 export default function BrandSnapshot() {
   const [searchParams] = useSearchParams();
-  const brandId = searchParams.get('brandId');
+  const brandId = searchParams.get("brandId");
   const navigate = useNavigate();
   const { toast } = useToast();
   const [brand, setBrand] = useState<Brand | null>(null);
@@ -27,7 +27,7 @@ export default function BrandSnapshot() {
 
   useEffect(() => {
     if (!brandId) {
-      navigate('/brands');
+      navigate("/brands");
       return;
     }
 
@@ -39,9 +39,9 @@ export default function BrandSnapshot() {
 
     try {
       const { data, error: fetchError } = await supabase
-        .from('brands')
-        .select('*')
-        .eq('id', brandId)
+        .from("brands")
+        .select("*")
+        .eq("id", brandId)
         .single();
 
       if (fetchError) throw fetchError;
@@ -49,9 +49,9 @@ export default function BrandSnapshot() {
     } catch (err: any) {
       setError(err.message);
       toast({
-        title: 'Error loading brand',
+        title: "Error loading brand",
         description: err.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -65,7 +65,7 @@ export default function BrandSnapshot() {
   if (error || !brand) {
     return (
       <div className="p-8">
-        <ErrorState message={error || 'Brand not found'} onRetry={fetchBrand} />
+        <ErrorState message={error || "Brand not found"} onRetry={fetchBrand} />
       </div>
     );
   }
@@ -81,10 +81,12 @@ export default function BrandSnapshot() {
           <div className="inline-flex items-center gap-2 mb-4">
             <CheckCircle2 className="h-12 w-12 text-green-600" />
           </div>
-          <h1 className="text-4xl font-bold mb-4">Here's Your Brand Snapshot</h1>
+          <h1 className="text-4xl font-bold mb-4">
+            Here's Your Brand Snapshot
+          </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Your brand profile is complete! Our AI agents are now trained on your unique voice,
-            style, and preferences.
+            Your brand profile is complete! Our AI agents are now trained on
+            your unique voice, style, and preferences.
           </p>
         </div>
       </div>
@@ -120,12 +122,20 @@ export default function BrandSnapshot() {
                 </div>
               </div>
               <div>
-                <p className="font-medium text-muted-foreground">Writing Style</p>
-                <p className="mt-1">{brandKit.writingStyle || 'Not specified'}</p>
+                <p className="font-medium text-muted-foreground">
+                  Writing Style
+                </p>
+                <p className="mt-1">
+                  {brandKit.writingStyle || "Not specified"}
+                </p>
               </div>
               <div>
-                <p className="font-medium text-muted-foreground">Primary Audience</p>
-                <p className="mt-1">{brandKit.primaryAudience || 'Not specified'}</p>
+                <p className="font-medium text-muted-foreground">
+                  Primary Audience
+                </p>
+                <p className="mt-1">
+                  {brandKit.primaryAudience || "Not specified"}
+                </p>
               </div>
             </div>
           </div>
@@ -139,7 +149,9 @@ export default function BrandSnapshot() {
             </div>
             <div className="space-y-3 text-sm">
               <div>
-                <p className="font-medium text-muted-foreground">Brand Colors</p>
+                <p className="font-medium text-muted-foreground">
+                  Brand Colors
+                </p>
                 <div className="flex gap-2 mt-2">
                   {brandKit.primaryColor && (
                     <div className="flex items-center gap-2">
@@ -163,10 +175,12 @@ export default function BrandSnapshot() {
               </div>
               <div>
                 <p className="font-medium text-muted-foreground">Font Family</p>
-                <p className="mt-1">{brandKit.fontFamily || 'Nourd'}</p>
+                <p className="mt-1">{brandKit.fontFamily || "Nourd"}</p>
               </div>
               <div>
-                <p className="font-medium text-muted-foreground">Font Weights</p>
+                <p className="font-medium text-muted-foreground">
+                  Font Weights
+                </p>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {brandKit.fontWeights?.map((weight: string) => (
                     <Badge key={weight} variant="secondary">
@@ -197,17 +211,27 @@ export default function BrandSnapshot() {
                 </div>
               </div>
               <div>
-                <p className="font-medium text-muted-foreground">Post Frequency</p>
-                <p className="mt-1">{brandKit.postFrequency || 'Not specified'}</p>
+                <p className="font-medium text-muted-foreground">
+                  Post Frequency
+                </p>
+                <p className="mt-1">
+                  {brandKit.postFrequency || "Not specified"}
+                </p>
               </div>
               <div>
-                <p className="font-medium text-muted-foreground">Content Types</p>
+                <p className="font-medium text-muted-foreground">
+                  Content Types
+                </p>
                 <div className="flex flex-wrap gap-1 mt-1">
-                  {brandKit.preferredContentTypes?.slice(0, 3).map((type: string) => (
-                    <Badge key={type} variant="secondary">
-                      {type}
-                    </Badge>
-                  )) || <p className="text-muted-foreground">Not specified</p>}
+                  {brandKit.preferredContentTypes
+                    ?.slice(0, 3)
+                    .map((type: string) => (
+                      <Badge key={type} variant="secondary">
+                        {type}
+                      </Badge>
+                    )) || (
+                    <p className="text-muted-foreground">Not specified</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -222,17 +246,25 @@ export default function BrandSnapshot() {
             </div>
             <div className="space-y-3 text-sm">
               <div>
-                <p className="font-medium text-muted-foreground">Approval Workflow</p>
-                <p className="mt-1">{brandKit.approvalWorkflow || 'Not configured'}</p>
-              </div>
-              <div>
-                <p className="font-medium text-muted-foreground">Words to Avoid</p>
-                <p className="mt-1 text-muted-foreground">
-                  {brandKit.wordsToAvoid || 'None specified'}
+                <p className="font-medium text-muted-foreground">
+                  Approval Workflow
+                </p>
+                <p className="mt-1">
+                  {brandKit.approvalWorkflow || "Not configured"}
                 </p>
               </div>
               <div>
-                <p className="font-medium text-muted-foreground">Social Handles</p>
+                <p className="font-medium text-muted-foreground">
+                  Words to Avoid
+                </p>
+                <p className="mt-1 text-muted-foreground">
+                  {brandKit.wordsToAvoid || "None specified"}
+                </p>
+              </div>
+              <div>
+                <p className="font-medium text-muted-foreground">
+                  Social Handles
+                </p>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {brandKit.socialHandles?.map((handle: string) => (
                     <Badge key={handle} variant="secondary">
@@ -249,13 +281,13 @@ export default function BrandSnapshot() {
           <Sparkles className="mx-auto h-12 w-12 text-primary mb-4" />
           <h3 className="text-2xl font-bold mb-2">Your AI Agents Are Ready!</h3>
           <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Doc Agent, Design Agent, and Advisor Agent have been trained on your brand profile.
-            They're ready to generate on-brand content, create visuals, and provide data-driven
-            recommendations.
+            Doc Agent, Design Agent, and Advisor Agent have been trained on your
+            brand profile. They're ready to generate on-brand content, create
+            visuals, and provide data-driven recommendations.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button
-              onClick={() => navigate('/calendar')}
+              onClick={() => navigate("/calendar")}
               size="lg"
               className="bg-gradient-to-r from-primary to-fuchsia-500 min-h-[44px]"
             >
@@ -263,7 +295,7 @@ export default function BrandSnapshot() {
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <Button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate("/dashboard")}
               size="lg"
               variant="outline"
               className="min-h-[44px]"

@@ -5,7 +5,13 @@ import { createRoot } from "react-dom/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BrandProvider } from "@/contexts/BrandContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
@@ -32,7 +38,7 @@ const queryClient = new QueryClient();
 
 function AppRoutes() {
   const location = useLocation();
-  const isAuthRoute = ['/login', '/signup', '/'].includes(location.pathname);
+  const isAuthRoute = ["/login", "/signup", "/"].includes(location.pathname);
 
   return (
     <>
@@ -47,7 +53,9 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <AppLayout>
-                <Suspense fallback={<Loading fullScreen text="Loading dashboard..." />}>
+                <Suspense
+                  fallback={<Loading fullScreen text="Loading dashboard..." />}
+                >
                   <Dashboard />
                 </Suspense>
               </AppLayout>
@@ -59,7 +67,9 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <AppLayout>
-                <Suspense fallback={<Loading fullScreen text="Loading brands..." />}>
+                <Suspense
+                  fallback={<Loading fullScreen text="Loading brands..." />}
+                >
                   <Brands />
                 </Suspense>
               </AppLayout>
@@ -71,7 +81,9 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <AppLayout>
-                <Suspense fallback={<Loading fullScreen text="Loading calendar..." />}>
+                <Suspense
+                  fallback={<Loading fullScreen text="Loading calendar..." />}
+                >
                   <Calendar />
                 </Suspense>
               </AppLayout>
@@ -83,7 +95,9 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <AppLayout>
-                <Suspense fallback={<Loading fullScreen text="Loading assets..." />}>
+                <Suspense
+                  fallback={<Loading fullScreen text="Loading assets..." />}
+                >
                   <Assets />
                 </Suspense>
               </AppLayout>
@@ -95,7 +109,9 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <AppLayout>
-                <Suspense fallback={<Loading fullScreen text="Loading analytics..." />}>
+                <Suspense
+                  fallback={<Loading fullScreen text="Loading analytics..." />}
+                >
                   <Analytics />
                 </Suspense>
               </AppLayout>
@@ -106,7 +122,9 @@ function AppRoutes() {
           path="/brand-intake"
           element={
             <ProtectedRoute>
-              <Suspense fallback={<Loading fullScreen text="Loading brand intake..." />}>
+              <Suspense
+                fallback={<Loading fullScreen text="Loading brand intake..." />}
+              >
                 <BrandIntake />
               </Suspense>
             </ProtectedRoute>
@@ -116,7 +134,11 @@ function AppRoutes() {
           path="/brand-snapshot"
           element={
             <ProtectedRoute>
-              <Suspense fallback={<Loading fullScreen text="Loading brand snapshot..." />}>
+              <Suspense
+                fallback={
+                  <Loading fullScreen text="Loading brand snapshot..." />
+                }
+              >
                 <BrandSnapshot />
               </Suspense>
             </ProtectedRoute>

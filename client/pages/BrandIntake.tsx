@@ -1,44 +1,48 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
-import { BrandIntakeFormData } from '@/types/brand-intake';
-import { AutosaveIndicator } from '@/components/ui/autosave-indicator';
-import { useAutosave } from '@/hooks/use-autosave';
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+import { BrandIntakeFormData } from "@/types/brand-intake";
+import { AutosaveIndicator } from "@/components/ui/autosave-indicator";
+import { useAutosave } from "@/hooks/use-autosave";
 
-import Section1BrandBasics from '@/components/brand-intake/Section1BrandBasics';
-import Section2VoiceMessaging from '@/components/brand-intake/Section2VoiceMessaging';
-import Section3VisualIdentity from '@/components/brand-intake/Section3VisualIdentity';
-import Section4ContentPreferences from '@/components/brand-intake/Section4ContentPreferences';
-import Section5Operational from '@/components/brand-intake/Section5Operational';
-import Section6AITraining from '@/components/brand-intake/Section6AITraining';
+import Section1BrandBasics from "@/components/brand-intake/Section1BrandBasics";
+import Section2VoiceMessaging from "@/components/brand-intake/Section2VoiceMessaging";
+import Section3VisualIdentity from "@/components/brand-intake/Section3VisualIdentity";
+import Section4ContentPreferences from "@/components/brand-intake/Section4ContentPreferences";
+import Section5Operational from "@/components/brand-intake/Section5Operational";
+import Section6AITraining from "@/components/brand-intake/Section6AITraining";
 
 const SECTIONS = [
-  { number: 1, title: 'Brand Basics', component: Section1BrandBasics },
-  { number: 2, title: 'Voice & Messaging', component: Section2VoiceMessaging },
-  { number: 3, title: 'Visual Identity', component: Section3VisualIdentity },
-  { number: 4, title: 'Content Preferences', component: Section4ContentPreferences },
-  { number: 5, title: 'Operational', component: Section5Operational },
-  { number: 6, title: 'AI Training', component: Section6AITraining },
+  { number: 1, title: "Brand Basics", component: Section1BrandBasics },
+  { number: 2, title: "Voice & Messaging", component: Section2VoiceMessaging },
+  { number: 3, title: "Visual Identity", component: Section3VisualIdentity },
+  {
+    number: 4,
+    title: "Content Preferences",
+    component: Section4ContentPreferences,
+  },
+  { number: 5, title: "Operational", component: Section5Operational },
+  { number: 6, title: "AI Training", component: Section6AITraining },
 ];
 
 export default function BrandIntake() {
   const [searchParams] = useSearchParams();
-  const brandId = searchParams.get('brandId');
+  const brandId = searchParams.get("brandId");
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<Partial<BrandIntakeFormData>>({
-    primaryColor: '#8B5CF6',
-    secondaryColor: '#F0F7F7',
-    accentColor: '#EC4899',
-    fontFamily: 'Nourd',
+    primaryColor: "#8B5CF6",
+    secondaryColor: "#F0F7F7",
+    accentColor: "#EC4899",
+    fontFamily: "Nourd",
     brandPersonality: [],
     toneKeywords: [],
     fontWeights: [],
@@ -58,18 +62,29 @@ export default function BrandIntake() {
   const [submitting, setSubmitting] = useState(false);
 
   // Auto-save functionality
-  const { saving, lastSaved, error: autosaveError } = useAutosave({
+  const {
+    saving,
+    lastSaved,
+    error: autosaveError,
+  } = useAutosave({
     data: formData,
     onSave: async (data) => {
       if (!brandId) return;
-      
+
       // Save non-file fields to brand_kit JSON
-      const { logoFiles, brandImageryFiles, textReferenceFiles, visualReferenceFiles, previousContentFiles, ...dataToSave } = data;
-      
+      const {
+        logoFiles,
+        brandImageryFiles,
+        textReferenceFiles,
+        visualReferenceFiles,
+        previousContentFiles,
+        ...dataToSave
+      } = data;
+
       await supabase
-        .from('brands')
+        .from("brands")
         .update({ brand_kit: dataToSave })
-        .eq('id', brandId);
+        .eq("id", brandId);
     },
     interval: 5000,
     enabled: !!brandId,
@@ -78,18 +93,18 @@ export default function BrandIntake() {
   useEffect(() => {
     if (!brandId) {
       toast({
-        title: 'No brand selected',
-        description: 'Please create or select a brand first.',
-        variant: 'destructive',
+        title: "No brand selected",
+        description: "Please create or select a brand first.",
+        variant: "destructive",
       });
-      navigate('/brands');
+      navigate("/brands");
     }
   }, [brandId, navigate, toast]);
 
   const handleFieldChange = (field: keyof BrandIntakeFormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
@@ -97,11 +112,13 @@ export default function BrandIntake() {
     const newErrors: Record<string, string> = {};
 
     if (currentStep === 1) {
-      if (!formData.brandName?.trim()) newErrors.brandName = 'Brand name is required';
-      if (!formData.shortDescription?.trim()) newErrors.shortDescription = 'Description is required';
-      if (!formData.industry) newErrors.industry = 'Please select an industry';
+      if (!formData.brandName?.trim())
+        newErrors.brandName = "Brand name is required";
+      if (!formData.shortDescription?.trim())
+        newErrors.shortDescription = "Description is required";
+      if (!formData.industry) newErrors.industry = "Please select an industry";
       if (formData.websiteUrl && !formData.websiteUrl.match(/^https?:\/\/.+/)) {
-        newErrors.websiteUrl = 'Please enter a valid URL';
+        newErrors.websiteUrl = "Please enter a valid URL";
       }
     }
 
@@ -113,7 +130,7 @@ export default function BrandIntake() {
     if (validateCurrentStep()) {
       if (currentStep < SECTIONS.length) {
         setCurrentStep(currentStep + 1);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
     }
   };
@@ -121,7 +138,7 @@ export default function BrandIntake() {
   const handleBack = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -131,32 +148,40 @@ export default function BrandIntake() {
     setSubmitting(true);
     try {
       // Save final form data
-      const { logoFiles, brandImageryFiles, textReferenceFiles, visualReferenceFiles, previousContentFiles, ...dataToSave } = formData;
-      
+      const {
+        logoFiles,
+        brandImageryFiles,
+        textReferenceFiles,
+        visualReferenceFiles,
+        previousContentFiles,
+        ...dataToSave
+      } = formData;
+
       await supabase
-        .from('brands')
+        .from("brands")
         .update({
           brand_kit: dataToSave,
           intake_completed: true,
           intake_completed_at: new Date().toISOString(),
         })
-        .eq('id', brandId);
+        .eq("id", brandId);
 
       // TODO: Upload files to Supabase Storage
       // TODO: Trigger website crawling worker
       // TODO: Generate voice_summary and visual_summary
 
       toast({
-        title: 'Brand intake completed!',
-        description: 'Your brand profile is being processed. Redirecting to summary...',
+        title: "Brand intake completed!",
+        description:
+          "Your brand profile is being processed. Redirecting to summary...",
       });
 
       navigate(`/brand-snapshot?brandId=${brandId}`);
     } catch (error: any) {
       toast({
-        title: 'Error saving brand intake',
+        title: "Error saving brand intake",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setSubmitting(false);
@@ -174,10 +199,17 @@ export default function BrandIntake() {
             <div>
               <h1 className="text-2xl font-bold">Brand Intake Form</h1>
               <p className="text-sm text-muted-foreground">
-                Step {currentStep} of {SECTIONS.length}: {SECTIONS[currentStep - 1].title}
+                Step {currentStep} of {SECTIONS.length}:{" "}
+                {SECTIONS[currentStep - 1].title}
               </p>
             </div>
-            {brandId && <AutosaveIndicator saving={saving} lastSaved={lastSaved} error={autosaveError} />}
+            {brandId && (
+              <AutosaveIndicator
+                saving={saving}
+                lastSaved={lastSaved}
+                error={autosaveError}
+              />
+            )}
           </div>
           <Progress value={progress} className="h-2" />
         </div>
@@ -194,10 +226,10 @@ export default function BrandIntake() {
                 onClick={() => setCurrentStep(section.number)}
                 className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors ${
                   currentStep > section.number
-                    ? 'border-primary bg-primary text-primary-foreground'
+                    ? "border-primary bg-primary text-primary-foreground"
                     : currentStep === section.number
-                    ? 'border-primary bg-background text-primary'
-                    : 'border-muted bg-background text-muted-foreground'
+                      ? "border-primary bg-background text-primary"
+                      : "border-muted bg-background text-muted-foreground"
                 }`}
                 aria-label={`Go to ${section.title}`}
               >
@@ -244,13 +276,14 @@ export default function BrandIntake() {
               disabled={submitting}
               className="min-h-[44px] bg-gradient-to-r from-primary to-fuchsia-500"
             >
-              {submitting ? 'Processing...' : 'Complete Brand Intake'}
+              {submitting ? "Processing..." : "Complete Brand Intake"}
             </Button>
           )}
         </div>
 
         <div className="mt-4 text-center text-sm text-muted-foreground">
-          You can skip optional fields and return later. All progress is auto-saved.
+          You can skip optional fields and return later. All progress is
+          auto-saved.
         </div>
       </div>
     </div>

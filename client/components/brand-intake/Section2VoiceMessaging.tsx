@@ -1,19 +1,23 @@
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
-import { HelpTooltip } from '@/components/ui/help-tooltip';
-import { BrandIntakeFormData, BRAND_PERSONALITIES, WRITING_STYLES } from '@/types/brand-intake';
-import { X } from 'lucide-react';
-import { useState } from 'react';
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
+import {
+  BrandIntakeFormData,
+  BRAND_PERSONALITIES,
+  WRITING_STYLES,
+} from "@/types/brand-intake";
+import { X } from "lucide-react";
+import { useState } from "react";
 
 interface Section2Props {
   data: Partial<BrandIntakeFormData>;
@@ -21,29 +25,36 @@ interface Section2Props {
   errors: Record<string, string>;
 }
 
-export default function Section2VoiceMessaging({ data, onChange, errors }: Section2Props) {
-  const [newToneKeyword, setNewToneKeyword] = useState('');
-  const [newPhrase, setNewPhrase] = useState('');
+export default function Section2VoiceMessaging({
+  data,
+  onChange,
+  errors,
+}: Section2Props) {
+  const [newToneKeyword, setNewToneKeyword] = useState("");
+  const [newPhrase, setNewPhrase] = useState("");
 
   const togglePersonality = (personality: string) => {
     const current = data.brandPersonality || [];
     const updated = current.includes(personality)
       ? current.filter((p) => p !== personality)
       : [...current, personality];
-    onChange('brandPersonality', updated);
+    onChange("brandPersonality", updated);
   };
 
   const addToneKeyword = () => {
     if (newToneKeyword.trim()) {
       const current = data.toneKeywords || [];
-      onChange('toneKeywords', [...current, newToneKeyword.trim()]);
-      setNewToneKeyword('');
+      onChange("toneKeywords", [...current, newToneKeyword.trim()]);
+      setNewToneKeyword("");
     }
   };
 
   const removeToneKeyword = (keyword: string) => {
     const current = data.toneKeywords || [];
-    onChange('toneKeywords', current.filter((k) => k !== keyword));
+    onChange(
+      "toneKeywords",
+      current.filter((k) => k !== keyword),
+    );
   };
 
   return (
@@ -88,7 +99,7 @@ export default function Section2VoiceMessaging({ data, onChange, errors }: Secti
               value={newToneKeyword}
               onChange={(e) => setNewToneKeyword(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === "Enter") {
                   e.preventDefault();
                   addToneKeyword();
                 }
@@ -119,7 +130,10 @@ export default function Section2VoiceMessaging({ data, onChange, errors }: Secti
             <Label htmlFor="writingStyle">Writing Style</Label>
             <HelpTooltip content="The overall tone of your written content." />
           </div>
-          <Select value={data.writingStyle || ''} onValueChange={(value) => onChange('writingStyle', value)}>
+          <Select
+            value={data.writingStyle || ""}
+            onValueChange={(value) => onChange("writingStyle", value)}
+          >
             <SelectTrigger className="min-h-[44px]">
               <SelectValue placeholder="Select writing style" />
             </SelectTrigger>
@@ -139,7 +153,9 @@ export default function Section2VoiceMessaging({ data, onChange, errors }: Secti
             <Checkbox
               id="faithValues"
               checked={data.faithValuesIntegration || false}
-              onCheckedChange={(checked) => onChange('faithValuesIntegration', !!checked)}
+              onCheckedChange={(checked) =>
+                onChange("faithValuesIntegration", !!checked)
+              }
             />
             <Label htmlFor="faithValues" className="font-normal cursor-pointer">
               Include faith or values-based messaging
@@ -147,8 +163,8 @@ export default function Section2VoiceMessaging({ data, onChange, errors }: Secti
           </div>
           {data.faithValuesIntegration && (
             <Textarea
-              value={data.faithValuesDetails || ''}
-              onChange={(e) => onChange('faithValuesDetails', e.target.value)}
+              value={data.faithValuesDetails || ""}
+              onChange={(e) => onChange("faithValuesDetails", e.target.value)}
               placeholder="Describe how faith or values should be integrated..."
               rows={3}
             />
@@ -162,8 +178,8 @@ export default function Section2VoiceMessaging({ data, onChange, errors }: Secti
           </div>
           <Textarea
             id="wordsToAvoid"
-            value={data.wordsToAvoid || ''}
-            onChange={(e) => onChange('wordsToAvoid', e.target.value)}
+            value={data.wordsToAvoid || ""}
+            onChange={(e) => onChange("wordsToAvoid", e.target.value)}
             placeholder="e.g., guaranteed, cheap, free, etc."
             rows={3}
           />
@@ -176,8 +192,8 @@ export default function Section2VoiceMessaging({ data, onChange, errors }: Secti
           </div>
           <Textarea
             id="commonPhrases"
-            value={data.commonPhrases || ''}
-            onChange={(e) => onChange('commonPhrases', e.target.value)}
+            value={data.commonPhrases || ""}
+            onChange={(e) => onChange("commonPhrases", e.target.value)}
             placeholder="Enter common phrases (one per line)"
             rows={4}
           />

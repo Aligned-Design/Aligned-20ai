@@ -1,10 +1,10 @@
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { HelpTooltip } from '@/components/ui/help-tooltip';
-import { BrandIntakeFormData } from '@/types/brand-intake';
-import { Upload, FileText, Image, FolderArchive } from 'lucide-react';
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
+import { BrandIntakeFormData } from "@/types/brand-intake";
+import { Upload, FileText, Image, FolderArchive } from "lucide-react";
 
 interface Section6Props {
   data: Partial<BrandIntakeFormData>;
@@ -12,8 +12,15 @@ interface Section6Props {
   errors: Record<string, string>;
 }
 
-export default function Section6AITraining({ data, onChange, errors }: Section6Props) {
-  const handleFileChange = (field: keyof BrandIntakeFormData, files: FileList | null) => {
+export default function Section6AITraining({
+  data,
+  onChange,
+  errors,
+}: Section6Props) {
+  const handleFileChange = (
+    field: keyof BrandIntakeFormData,
+    files: FileList | null,
+  ) => {
     if (files) {
       const fileArray = Array.from(files);
       onChange(field, fileArray);
@@ -25,7 +32,8 @@ export default function Section6AITraining({ data, onChange, errors }: Section6P
       <div>
         <h2 className="text-2xl font-bold mb-2">AI Training Assets</h2>
         <p className="text-muted-foreground">
-          Upload reference materials to train AI agents on your brand voice and style
+          Upload reference materials to train AI agents on your brand voice and
+          style
         </p>
       </div>
 
@@ -41,7 +49,9 @@ export default function Section6AITraining({ data, onChange, errors }: Section6P
               type="file"
               accept=".pdf,.doc,.docx,.txt"
               multiple
-              onChange={(e) => handleFileChange('textReferenceFiles', e.target.files)}
+              onChange={(e) =>
+                handleFileChange("textReferenceFiles", e.target.files)
+              }
               className="hidden"
             />
             <label
@@ -72,7 +82,9 @@ export default function Section6AITraining({ data, onChange, errors }: Section6P
               type="file"
               accept="image/*,video/*"
               multiple
-              onChange={(e) => handleFileChange('visualReferenceFiles', e.target.files)}
+              onChange={(e) =>
+                handleFileChange("visualReferenceFiles", e.target.files)
+              }
               className="hidden"
             />
             <label
@@ -102,7 +114,9 @@ export default function Section6AITraining({ data, onChange, errors }: Section6P
               id="previousContent"
               type="file"
               accept=".zip"
-              onChange={(e) => handleFileChange('previousContentFiles', e.target.files)}
+              onChange={(e) =>
+                handleFileChange("previousContentFiles", e.target.files)
+              }
               className="hidden"
             />
             <label
@@ -129,8 +143,8 @@ export default function Section6AITraining({ data, onChange, errors }: Section6P
           </div>
           <Textarea
             id="aiNotes"
-            value={data.aiNotes || ''}
-            onChange={(e) => onChange('aiNotes', e.target.value)}
+            value={data.aiNotes || ""}
+            onChange={(e) => onChange("aiNotes", e.target.value)}
             placeholder="e.g., Always include a call-to-action, avoid industry jargon, prefer short paragraphs..."
             rows={6}
           />

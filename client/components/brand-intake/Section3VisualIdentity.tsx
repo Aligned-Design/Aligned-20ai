@@ -1,19 +1,23 @@
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { HelpTooltip } from '@/components/ui/help-tooltip';
-import { BrandIntakeFormData, FONT_FAMILIES, FONT_WEIGHTS } from '@/types/brand-intake';
-import { Upload, X, Image } from 'lucide-react';
-import { useState } from 'react';
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
+import {
+  BrandIntakeFormData,
+  FONT_FAMILIES,
+  FONT_WEIGHTS,
+} from "@/types/brand-intake";
+import { Upload, X, Image } from "lucide-react";
+import { useState } from "react";
 
 interface Section3Props {
   data: Partial<BrandIntakeFormData>;
@@ -21,31 +25,41 @@ interface Section3Props {
   errors: Record<string, string>;
 }
 
-export default function Section3VisualIdentity({ data, onChange, errors }: Section3Props) {
-  const [newReferenceLink, setNewReferenceLink] = useState('');
+export default function Section3VisualIdentity({
+  data,
+  onChange,
+  errors,
+}: Section3Props) {
+  const [newReferenceLink, setNewReferenceLink] = useState("");
 
   const toggleFontWeight = (weight: string) => {
     const current = data.fontWeights || [];
     const updated = current.includes(weight)
       ? current.filter((w) => w !== weight)
       : [...current, weight];
-    onChange('fontWeights', updated);
+    onChange("fontWeights", updated);
   };
 
   const addReferenceLink = () => {
     if (newReferenceLink.trim() && newReferenceLink.match(/^https?:\/\/.+/)) {
       const current = data.referenceMaterialLinks || [];
-      onChange('referenceMaterialLinks', [...current, newReferenceLink.trim()]);
-      setNewReferenceLink('');
+      onChange("referenceMaterialLinks", [...current, newReferenceLink.trim()]);
+      setNewReferenceLink("");
     }
   };
 
   const removeReferenceLink = (link: string) => {
     const current = data.referenceMaterialLinks || [];
-    onChange('referenceMaterialLinks', current.filter((l) => l !== link));
+    onChange(
+      "referenceMaterialLinks",
+      current.filter((l) => l !== link),
+    );
   };
 
-  const handleFileChange = (field: keyof BrandIntakeFormData, files: FileList | null) => {
+  const handleFileChange = (
+    field: keyof BrandIntakeFormData,
+    files: FileList | null,
+  ) => {
     if (files) {
       const fileArray = Array.from(files);
       onChange(field, fileArray);
@@ -72,13 +86,13 @@ export default function Section3VisualIdentity({ data, onChange, errors }: Secti
               <Input
                 id="primaryColor"
                 type="color"
-                value={data.primaryColor || '#8B5CF6'}
-                onChange={(e) => onChange('primaryColor', e.target.value)}
+                value={data.primaryColor || "#8B5CF6"}
+                onChange={(e) => onChange("primaryColor", e.target.value)}
                 className="w-16 h-12 p-1"
               />
               <Input
-                value={data.primaryColor || '#8B5CF6'}
-                onChange={(e) => onChange('primaryColor', e.target.value)}
+                value={data.primaryColor || "#8B5CF6"}
+                onChange={(e) => onChange("primaryColor", e.target.value)}
                 placeholder="#8B5CF6"
                 className="min-h-[44px]"
               />
@@ -94,13 +108,13 @@ export default function Section3VisualIdentity({ data, onChange, errors }: Secti
               <Input
                 id="secondaryColor"
                 type="color"
-                value={data.secondaryColor || '#F0F7F7'}
-                onChange={(e) => onChange('secondaryColor', e.target.value)}
+                value={data.secondaryColor || "#F0F7F7"}
+                onChange={(e) => onChange("secondaryColor", e.target.value)}
                 className="w-16 h-12 p-1"
               />
               <Input
-                value={data.secondaryColor || '#F0F7F7'}
-                onChange={(e) => onChange('secondaryColor', e.target.value)}
+                value={data.secondaryColor || "#F0F7F7"}
+                onChange={(e) => onChange("secondaryColor", e.target.value)}
                 placeholder="#F0F7F7"
                 className="min-h-[44px]"
               />
@@ -116,13 +130,13 @@ export default function Section3VisualIdentity({ data, onChange, errors }: Secti
               <Input
                 id="accentColor"
                 type="color"
-                value={data.accentColor || '#EC4899'}
-                onChange={(e) => onChange('accentColor', e.target.value)}
+                value={data.accentColor || "#EC4899"}
+                onChange={(e) => onChange("accentColor", e.target.value)}
                 className="w-16 h-12 p-1"
               />
               <Input
-                value={data.accentColor || '#EC4899'}
-                onChange={(e) => onChange('accentColor', e.target.value)}
+                value={data.accentColor || "#EC4899"}
+                onChange={(e) => onChange("accentColor", e.target.value)}
                 placeholder="#EC4899"
                 className="min-h-[44px]"
               />
@@ -135,7 +149,10 @@ export default function Section3VisualIdentity({ data, onChange, errors }: Secti
             <Label htmlFor="fontFamily">Font Family</Label>
             <HelpTooltip content="Primary typeface for your brand." />
           </div>
-          <Select value={data.fontFamily || 'Nourd'} onValueChange={(value) => onChange('fontFamily', value)}>
+          <Select
+            value={data.fontFamily || "Nourd"}
+            onValueChange={(value) => onChange("fontFamily", value)}
+          >
             <SelectTrigger className="min-h-[44px]">
               <SelectValue placeholder="Select font" />
             </SelectTrigger>
@@ -180,7 +197,7 @@ export default function Section3VisualIdentity({ data, onChange, errors }: Secti
               id="logoUpload"
               type="file"
               accept=".png,.svg,.jpg,.jpeg"
-              onChange={(e) => handleFileChange('logoFiles', e.target.files)}
+              onChange={(e) => handleFileChange("logoFiles", e.target.files)}
               className="hidden"
             />
             <label
@@ -211,7 +228,9 @@ export default function Section3VisualIdentity({ data, onChange, errors }: Secti
               type="file"
               accept="image/*"
               multiple
-              onChange={(e) => handleFileChange('brandImageryFiles', e.target.files)}
+              onChange={(e) =>
+                handleFileChange("brandImageryFiles", e.target.files)
+              }
               className="hidden"
             />
             <label
@@ -243,7 +262,7 @@ export default function Section3VisualIdentity({ data, onChange, errors }: Secti
               value={newReferenceLink}
               onChange={(e) => setNewReferenceLink(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === "Enter") {
                   e.preventDefault();
                   addReferenceLink();
                 }
@@ -254,7 +273,10 @@ export default function Section3VisualIdentity({ data, onChange, errors }: Secti
           </div>
           <div className="flex flex-col gap-2 mt-2">
             {(data.referenceMaterialLinks || []).map((link) => (
-              <div key={link} className="flex items-center gap-2 p-2 border rounded">
+              <div
+                key={link}
+                className="flex items-center gap-2 p-2 border rounded"
+              >
                 <a
                   href={link}
                   target="_blank"

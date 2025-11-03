@@ -1,18 +1,18 @@
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { HelpTooltip } from '@/components/ui/help-tooltip';
-import { BrandIntakeFormData, APPROVAL_WORKFLOWS } from '@/types/brand-intake';
-import { X } from 'lucide-react';
-import { useState } from 'react';
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
+import { BrandIntakeFormData, APPROVAL_WORKFLOWS } from "@/types/brand-intake";
+import { X } from "lucide-react";
+import { useState } from "react";
 
 interface Section5Props {
   data: Partial<BrandIntakeFormData>;
@@ -20,21 +20,30 @@ interface Section5Props {
   errors: Record<string, string>;
 }
 
-export default function Section5Operational({ data, onChange, errors }: Section5Props) {
-  const [newHandle, setNewHandle] = useState('');
+export default function Section5Operational({
+  data,
+  onChange,
+  errors,
+}: Section5Props) {
+  const [newHandle, setNewHandle] = useState("");
 
   const addSocialHandle = () => {
     if (newHandle.trim()) {
-      const handle = newHandle.trim().startsWith('@') ? newHandle.trim() : `@${newHandle.trim()}`;
+      const handle = newHandle.trim().startsWith("@")
+        ? newHandle.trim()
+        : `@${newHandle.trim()}`;
       const current = data.socialHandles || [];
-      onChange('socialHandles', [...current, handle]);
-      setNewHandle('');
+      onChange("socialHandles", [...current, handle]);
+      setNewHandle("");
     }
   };
 
   const removeSocialHandle = (handle: string) => {
     const current = data.socialHandles || [];
-    onChange('socialHandles', current.filter((h) => h !== handle));
+    onChange(
+      "socialHandles",
+      current.filter((h) => h !== handle),
+    );
   };
 
   return (
@@ -52,7 +61,10 @@ export default function Section5Operational({ data, onChange, errors }: Section5
             <Label htmlFor="approvalWorkflow">Approval Workflow</Label>
             <HelpTooltip content="How content should be reviewed before publishing." />
           </div>
-          <Select value={data.approvalWorkflow || ''} onValueChange={(value) => onChange('approvalWorkflow', value)}>
+          <Select
+            value={data.approvalWorkflow || ""}
+            onValueChange={(value) => onChange("approvalWorkflow", value)}
+          >
             <SelectTrigger className="min-h-[44px]">
               <SelectValue placeholder="Select workflow" />
             </SelectTrigger>
@@ -73,8 +85,8 @@ export default function Section5Operational({ data, onChange, errors }: Section5
           </div>
           <Textarea
             id="disclaimers"
-            value={data.requiredDisclaimers || ''}
-            onChange={(e) => onChange('requiredDisclaimers', e.target.value)}
+            value={data.requiredDisclaimers || ""}
+            onChange={(e) => onChange("requiredDisclaimers", e.target.value)}
             placeholder="Enter required disclaimers..."
             rows={4}
           />
@@ -87,8 +99,8 @@ export default function Section5Operational({ data, onChange, errors }: Section5
           </div>
           <Textarea
             id="restrictions"
-            value={data.contentRestrictions || ''}
-            onChange={(e) => onChange('contentRestrictions', e.target.value)}
+            value={data.contentRestrictions || ""}
+            onChange={(e) => onChange("contentRestrictions", e.target.value)}
             placeholder="e.g., No medical claims, no competitor mentions..."
             rows={4}
           />
@@ -104,7 +116,7 @@ export default function Section5Operational({ data, onChange, errors }: Section5
             value={newHandle}
             onChange={(e) => setNewHandle(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 e.preventDefault();
                 addSocialHandle();
               }
