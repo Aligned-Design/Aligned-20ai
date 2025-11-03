@@ -61,6 +61,16 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
     fetchBrands();
   }, [user]);
 
+  // Inject brand primary color into CSS variables for dynamic theming
+  useEffect(() => {
+    if (currentBrand?.primary_color) {
+      document.documentElement.style.setProperty('--brand-primary', currentBrand.primary_color);
+    } else {
+      // Reset to default primary color when no brand is selected
+      document.documentElement.style.setProperty('--brand-primary', '#8B5CF6');
+    }
+  }, [currentBrand]);
+
   return (
     <BrandContext.Provider
       value={{

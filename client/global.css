@@ -43,6 +43,9 @@
 
     --radius: 0.75rem;
 
+    /* Dynamic brand color (hex format) - updates when brand switches */
+    --brand-primary: #8B5CF6;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 262 83% 55%;
