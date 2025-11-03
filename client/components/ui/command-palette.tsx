@@ -117,9 +117,14 @@ export default function CommandPalette() {
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
-      <CommandInput placeholder="Type a command or search..." />
+      <CommandInput placeholder="Type a command or search... (⌘K to toggle)" />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandEmpty>
+          <div className="py-6 text-center text-sm">
+            <p className="text-muted-foreground mb-2">No results found.</p>
+            <p className="text-xs text-muted-foreground">Try searching for navigation, actions, or brand names</p>
+          </div>
+        </CommandEmpty>
         {commands.map((group) => (
           <CommandGroup key={group.group} heading={group.group}>
             {group.items.map((item) => {

@@ -4,6 +4,7 @@ import { FileText, Image, TrendingUp, Calendar, ArrowRight, Sparkles, Plus } fro
 import { EmptyState } from '@/components/ui/empty-state';
 import { DashboardSkeleton } from '@/components/ui/skeletons';
 import { useNavigate } from 'react-router-dom';
+import { HelpTooltip } from '@/components/ui/help-tooltip';
 
 export default function Dashboard() {
   const { currentBrand, loading } = useBrand();
@@ -32,7 +33,10 @@ export default function Dashboard() {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <HelpTooltip content="Your dashboard shows a real-time overview of content performance, AI agent activity, and upcoming posts. All metrics update automatically." />
+        </div>
         <p className="text-muted-foreground mt-1">
           Welcome back! Here's what's happening with {currentBrand.name}.
         </p>
@@ -96,7 +100,10 @@ export default function Dashboard() {
         </div>
 
         <div className="rounded-xl border bg-card p-6">
-          <h3 className="text-lg font-semibold mb-4">AI Agent Status</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className="text-lg font-semibold">AI Agent Status</h3>
+            <HelpTooltip content="Three specialized AI agents work together: Doc Agent writes content, Design Agent creates visuals, and Advisor Agent provides data-driven recommendations." />
+          </div>
           <div className="space-y-4">
             <AgentStatus
               name="Doc Agent"
