@@ -29,10 +29,10 @@ export default function SiteHeader() {
 
         <div className="flex items-center gap-2">
           <Button asChild variant="ghost" className="hidden md:inline-flex">
-            <a href="#how-it-works">How it works</a>
+            <Link to="/login">Sign in</Link>
           </Button>
           <Button asChild className="bg-gradient-to-r from-primary to-fuchsia-500 text-primary-foreground shadow-md shadow-fuchsia-500/20 hover:opacity-90">
-            <a href="#contact">Request a demo</a>
+            <Link to="/signup">Get started</Link>
           </Button>
         </div>
       </div>
