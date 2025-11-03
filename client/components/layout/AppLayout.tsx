@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useBrand } from '@/contexts/BrandContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import MobileNav from './MobileNav';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,7 +47,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const userInitials = user?.email?.slice(0, 2).toUpperCase() || 'U';
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <>
+      <MobileNav />
+      <div className="flex h-screen overflow-hidden bg-background pt-16 md:pt-0">
       <aside className="hidden w-64 flex-col border-r bg-card md:flex">
         <div className="flex h-16 items-center gap-2 border-b px-4">
           <div className="relative inline-flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-primary to-fuchsia-500 text-primary-foreground">
@@ -147,5 +150,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="flex-1 overflow-y-auto">{children}</div>
       </main>
     </div>
+    </>
   );
 }
