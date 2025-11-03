@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { BrandIntakeFormData } from "@/types/brand-intake";
 import { AutosaveIndicator } from "@/components/ui/autosave-indicator";
 import { useAutosave } from "@/hooks/use-autosave";
+import { uploadBrandFiles } from "@/lib/fileUpload";
 
 import Section1BrandBasics from "@/components/brand-intake/Section1BrandBasics";
 import Section2VoiceMessaging from "@/components/brand-intake/Section2VoiceMessaging";
@@ -60,6 +61,8 @@ export default function BrandIntake() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState('');
 
   // Auto-save functionality
   const {
@@ -142,11 +145,114 @@ export default function BrandIntake() {
     }
   };
 
+  const handleImportFromWebsite = async () => {
+    if (!brandId || !formData.websiteUrl) {
+      toast({
+        title: "Website URL required",
+        description: "Please enter a website URL in Brand Basics",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setImporting(true);
+    setImportProgress('Crawling website...');
+
+    try {
+      // Call Edge Function to process brand intake
+      const { data: { session } } = await supabase.auth.getSession();
+
+      const response = await fetch(
+        `${supabase.supabaseUrl}/functions/v1/process-brand-intake`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`
+          },
+          body: JSON.stringify({
+            brandId,
+            websiteUrl: formData.websiteUrl
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to import from website');
+      }
+
+      const result = await response.json();
+
+      setImportProgress('Processing complete!');
+
+      // Update form data with imported values
+      setFormData((prev) => ({
+        ...prev,
+        primaryColor: result.brandKit.colors?.primary || prev.primaryColor,
+        secondaryColor: result.brandKit.colors?.secondary || prev.secondaryColor,
+        accentColor: result.brandKit.colors?.accent || prev.accentColor,
+        toneKeywords: result.brandKit.voice_summary?.tone || prev.toneKeywords,
+        brandPersonality: result.brandKit.voice_summary?.personality || prev.brandPersonality,
+        shortDescription: result.brandKit.about_blurb || prev.shortDescription,
+      }));
+
+      toast({
+        title: "Import successful!",
+        description: "Website data has been imported. Review and adjust as needed.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Import failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setImporting(false);
+      setImportProgress('');
+    }
+  };
+
   const handleSubmit = async () => {
     if (!validateCurrentStep() || !brandId || !user) return;
 
     setSubmitting(true);
     try {
+      // Upload all files
+      const uploadPromises: Promise<any>[] = [];
+
+      if (formData.logoFiles?.length) {
+        uploadPromises.push(
+          uploadBrandFiles(formData.logoFiles, brandId, 'logos', 'logo')
+        );
+      }
+
+      if (formData.brandImageryFiles?.length) {
+        uploadPromises.push(
+          uploadBrandFiles(formData.brandImageryFiles, brandId, 'imagery', 'imagery')
+        );
+      }
+
+      if (formData.textReferenceFiles?.length) {
+        uploadPromises.push(
+          uploadBrandFiles(formData.textReferenceFiles, brandId, 'references', 'text_reference')
+        );
+      }
+
+      if (formData.visualReferenceFiles?.length) {
+        uploadPromises.push(
+          uploadBrandFiles(formData.visualReferenceFiles, brandId, 'references', 'visual_reference')
+        );
+      }
+
+      if (formData.previousContentFiles?.length) {
+        uploadPromises.push(
+          uploadBrandFiles(formData.previousContentFiles, brandId, 'content', 'previous_content')
+        );
+      }
+
+      await Promise.all(uploadPromises);
+
       // Save final form data
       const {
         logoFiles,
@@ -166,14 +272,10 @@ export default function BrandIntake() {
         })
         .eq("id", brandId);
 
-      // TODO: Upload files to Supabase Storage
-      // TODO: Trigger website crawling worker
-      // TODO: Generate voice_summary and visual_summary
-
       toast({
         title: "Brand intake completed!",
         description:
-          "Your brand profile is being processed. Redirecting to summary...",
+          "Your brand profile has been saved. Redirecting to summary...",
       });
 
       navigate(`/brand-snapshot?brandId=${brandId}`);
@@ -216,6 +318,36 @@ export default function BrandIntake() {
       </div>
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {currentStep === 1 && formData.websiteUrl && (
+          <div className="mb-6 rounded-xl border border-border/50 bg-card p-6 shadow-soft">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="font-semibold mb-1">Import from Website</h3>
+                <p className="text-sm text-muted-foreground">
+                  Automatically extract brand colors, voice, and keywords from your website.
+                </p>
+              </div>
+              <Button
+                onClick={handleImportFromWebsite}
+                disabled={importing || !formData.websiteUrl}
+                variant="outline"
+                className="shrink-0"
+              >
+                {importing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {importProgress}
+                  </>
+                ) : (
+                  <>
+                    <Download className="mr-2 h-4 w-4" />
+                    Import from Website
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
         <div className="mb-8 flex justify-between">
           {SECTIONS.map((section) => (
             <div
