@@ -3,26 +3,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
 import { 
   Brain, 
   Target, 
   TrendingUp, 
   Users, 
-  Clock, 
   Lightbulb,
-  BarChart3,
-  Eye,
-  Heart,
-  Share2,
   ThumbsUp,
   ThumbsDown,
   RefreshCw,
   Zap,
   Award,
-  AlertTriangle
+  AlertTriangle,
+  Heart
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { cn } from '@/lib/utils';
 import { BrandIntelligence, StrategicRecommendation, ContentSuggestion } from '@shared/brand-intelligence';
 
@@ -30,6 +25,7 @@ export default function BrandIntelligencePage() {
   const [intelligence, setIntelligence] = useState<BrandIntelligence | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadBrandIntelligence();
@@ -38,13 +34,18 @@ export default function BrandIntelligencePage() {
   const loadBrandIntelligence = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await fetch('/api/brand-intelligence/brand_1');
-      if (response.ok) {
-        const data = await response.json();
-        setIntelligence(data);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+      
+      const data = await response.json();
+      setIntelligence(data);
     } catch (error) {
       console.error('Failed to load brand intelligence:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load data');
     } finally {
       setLoading(false);
     }
@@ -52,118 +53,207 @@ export default function BrandIntelligencePage() {
 
   const handleRecommendationFeedback = async (recommendationId: string, action: 'accepted' | 'rejected') => {
     try {
-      await fetch('/api/brand-intelligence/feedback', {
+      const response = await fetch('/api/brand-intelligence/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ recommendationId, action })
       });
-      // Refresh intelligence data
+      
+      if (!response.ok) {
+        throw new Error('Failed to submit feedback');
+      }
+      
       await loadBrandIntelligence();
     } catch (error) {
       console.error('Failed to submit feedback:', error);
+      setError('Failed to submit feedback. Please try again.');
     }
   };
 
+  // Loading state with skeleton
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="space-y-6 p-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="h-8 w-64 bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 w-96 bg-gray-200 rounded animate-pulse" />
+          </div>
+          <div className="h-10 w-32 bg-gray-200 rounded animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }
 
+  // Error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center space-y-4">
+          <AlertTriangle className="h-12 w-12 text-red-500 mx-auto" />
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Something went wrong</h3>
+            <p className="text-gray-600 mt-1">{error}</p>
+            <Button onClick={loadBrandIntelligence} className="mt-4">
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state
   if (!intelligence) {
-    return <div>Failed to load brand intelligence</div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center space-y-4">
+          <Brain className="h-12 w-12 text-gray-400 mx-auto" />
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">No intelligence data available</h3>
+            <p className="text-gray-600 mt-1">We're analyzing your brand data. Please check back later.</p>
+            <Button onClick={loadBrandIntelligence} className="mt-4">
+              Refresh
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Brain className="h-8 w-8 text-blue-600" />
-            Brand Intelligence
-          </h1>
-          <p className="text-gray-600">AI-powered insights to optimize your brand strategy</p>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <Badge variant="outline" className="bg-green-100 text-green-800">
-            Confidence: {Math.round(intelligence.confidenceScore * 100)}%
-          </Badge>
-          <Button onClick={loadBrandIntelligence} variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-        </div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        {/* Header - Improved spacing and hierarchy */}
+        <header className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
+                <Brain className="h-10 w-10 text-blue-600" />
+                Brand Intelligence
+              </h1>
+              <p className="text-lg text-gray-600">AI-powered insights to optimize your brand strategy</p>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <Badge 
+                variant="outline" 
+                className={cn(
+                  "text-sm font-medium",
+                  intelligence.confidenceScore >= 0.8 ? "bg-green-50 text-green-700 border-green-200" :
+                  intelligence.confidenceScore >= 0.6 ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
+                  "bg-red-50 text-red-700 border-red-200"
+                )}
+              >
+                Confidence: {Math.round(intelligence.confidenceScore * 100)}%
+              </Badge>
+              <Button onClick={loadBrandIntelligence} variant="outline" size="sm" className="gap-2">
+                <RefreshCw className="h-4 w-4" />
+                Refresh
+              </Button>
+            </div>
+          </div>
+
+          {/* Key Insights Summary - Improved layout */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <InsightCard
+              title="Brand Differentiation"
+              value={`${intelligence.brandProfile.differentiators.length} key factors`}
+              icon={<Target className="h-5 w-5" />}
+              color="blue"
+            />
+            <InsightCard
+              title="Competitive Opportunities"
+              value={`${intelligence.competitorInsights.gapAnalysis.opportunityAreas.length} identified`}
+              icon={<TrendingUp className="h-5 w-5" />}
+              color="green"
+            />
+            <InsightCard
+              title="Content Insights"
+              value={`${intelligence.audienceInsights.contentPreferences.topPerformingTypes.length} top types`}
+              icon={<Users className="h-5 w-5" />}
+              color="purple"
+            />
+            <InsightCard
+              title="Active Recommendations"
+              value={`${intelligence.recommendations.strategic.length + intelligence.recommendations.tactical.length} total`}
+              icon={<Lightbulb className="h-5 w-5" />}
+              color="orange"
+            />
+          </div>
+        </header>
+
+        {/* Main Content Tabs - Improved accessibility */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5 h-auto p-1 bg-gray-100">
+            <TabsTrigger 
+              value="overview" 
+              className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-3 text-sm font-medium"
+            >
+              🎯 Overview
+            </TabsTrigger>
+            <TabsTrigger 
+              value="competitors" 
+              className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-3 text-sm font-medium"
+            >
+              📊 Competitors
+            </TabsTrigger>
+            <TabsTrigger 
+              value="audience" 
+              className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-3 text-sm font-medium"
+            >
+              👥 Audience
+            </TabsTrigger>
+            <TabsTrigger 
+              value="content" 
+              className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-3 text-sm font-medium"
+            >
+              📝 Content
+            </TabsTrigger>
+            <TabsTrigger 
+              value="recommendations" 
+              className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-3 text-sm font-medium"
+            >
+              💡 Recommendations
+            </TabsTrigger>
+          </TabsList>
+
+          <div className="bg-white rounded-lg shadow-sm border">
+            <TabsContent value="overview" className="m-0 p-6">
+              <BrandOverview intelligence={intelligence} />
+            </TabsContent>
+
+            <TabsContent value="competitors" className="m-0 p-6">
+              <MemoizedCompetitorAnalysis intelligence={intelligence} />
+            </TabsContent>
+
+            <TabsContent value="audience" className="m-0 p-6">
+              <MemoizedAudienceInsights intelligence={intelligence} />
+            </TabsContent>
+
+            <TabsContent value="content" className="m-0 p-6">
+              <MemoizedContentIntelligence intelligence={intelligence} />
+            </TabsContent>
+
+            <TabsContent value="recommendations" className="m-0 p-6">
+              <RecommendationsPanel 
+                intelligence={intelligence}
+                onFeedback={handleRecommendationFeedback}
+              />
+            </TabsContent>
+          </div>
+        </Tabs>
       </div>
-
-      {/* Key Insights Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <InsightCard
-          title="Brand Differentiation"
-          value={`${intelligence.brandProfile.differentiators.length} key factors`}
-          icon={<Target className="h-6 w-6" />}
-          color="blue"
-        />
-        <InsightCard
-          title="Competitor Advantage"
-          value={`${intelligence.competitorInsights.gapAnalysis.opportunityAreas.length} opportunities`}
-          icon={<TrendingUp className="h-6 w-6" />}
-          color="green"
-        />
-        <InsightCard
-          title="Audience Insights"
-          value={`${intelligence.audienceInsights.contentPreferences.topPerformingTypes.length} content types`}
-          icon={<Users className="h-6 w-6" />}
-          color="purple"
-        />
-        <InsightCard
-          title="Recommendations"
-          value={`${intelligence.recommendations.strategic.length + intelligence.recommendations.tactical.length} active`}
-          icon={<Lightbulb className="h-6 w-6" />}
-          color="orange"
-        />
-      </div>
-
-      {/* Main Content Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview">🎯 Overview</TabsTrigger>
-          <TabsTrigger value="competitors">📊 Competitors</TabsTrigger>
-          <TabsTrigger value="audience">👥 Audience</TabsTrigger>
-          <TabsTrigger value="content">📝 Content</TabsTrigger>
-          <TabsTrigger value="recommendations">💡 Recommendations</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <BrandOverview intelligence={intelligence} />
-        </TabsContent>
-
-        <TabsContent value="competitors" className="space-y-6">
-          <CompetitorAnalysis intelligence={intelligence} />
-        </TabsContent>
-
-        <TabsContent value="audience" className="space-y-6">
-          <AudienceInsights intelligence={intelligence} />
-        </TabsContent>
-
-        <TabsContent value="content" className="space-y-6">
-          <ContentIntelligence intelligence={intelligence} />
-        </TabsContent>
-
-        <TabsContent value="recommendations" className="space-y-6">
-          <RecommendationsPanel 
-            intelligence={intelligence}
-            onFeedback={handleRecommendationFeedback}
-          />
-        </TabsContent>
-      </Tabs>
     </div>
   );
 }
 
+// Improved InsightCard component
 function InsightCard({ title, value, icon, color }: {
   title: string;
   value: string;
@@ -171,23 +261,23 @@ function InsightCard({ title, value, icon, color }: {
   color: 'blue' | 'green' | 'purple' | 'orange';
 }) {
   const colorClasses = {
-    blue: 'text-blue-600 bg-blue-100',
-    green: 'text-green-600 bg-green-100',
-    purple: 'text-purple-600 bg-purple-100',
-    orange: 'text-orange-600 bg-orange-100'
+    blue: 'text-blue-600 bg-blue-50 border-blue-200',
+    green: 'text-green-600 bg-green-50 border-green-200',
+    purple: 'text-purple-600 bg-purple-50 border-purple-200',
+    orange: 'text-orange-600 bg-orange-50 border-orange-200'
   };
 
   return (
-    <Card>
+    <Card className="hover:shadow-md transition-shadow border">
       <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className={cn("p-3 rounded-full", colorClasses[color])}>
+        <div className="flex items-center gap-4 mb-3">
+          <div className={cn("p-2 rounded-lg border", colorClasses[color])}>
             {icon}
           </div>
-        </div>
-        <div>
-          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
+            <p className="text-lg font-bold text-gray-900">{value}</p>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -611,6 +701,11 @@ function ContentSuggestionCard({ suggestion, onFeedback }: {
     </div>
   );
 }
+
+// Memoize expensive chart components
+const MemoizedContentIntelligence = React.memo(ContentIntelligence);
+const MemoizedCompetitorAnalysis = React.memo(CompetitorAnalysis);
+const MemoizedAudienceInsights = React.memo(AudienceInsights);
 
 function formatNumber(num: number): string {
   if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
