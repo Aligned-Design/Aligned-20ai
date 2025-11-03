@@ -172,49 +172,59 @@ export default function Brands() {
         </Dialog>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {brands.map((brand) => (
-          <div
-            key={brand.id}
-            className="group rounded-xl border bg-card p-6 hover:shadow-md transition-shadow cursor-pointer"
-            onClick={() => setCurrentBrand(brand)}
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div
-                className="h-12 w-12 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: brand.primary_color }}
-              >
-                <Palette className="h-6 w-6 text-white" />
-              </div>
-              {brand.website_url && (
-                <a
-                  href={brand.website_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground"
-                  onClick={(e) => e.stopPropagation()}
+      {loading ? (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, i) => (
+            <CardSkeleton key={i} />
+          ))}
+        </div>
+      ) : brands.length > 0 ? (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {brands.map((brand) => (
+            <div
+              key={brand.id}
+              className="group rounded-xl border bg-card p-6 hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => setCurrentBrand(brand)}
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div
+                  className="h-12 w-12 rounded-lg flex items-center justify-center"
+                  style={{ backgroundColor: brand.primary_color }}
                 >
-                  <ExternalLink className="h-4 w-4" />
-                </a>
+                  <Palette className="h-6 w-6 text-white" />
+                </div>
+                {brand.website_url && (
+                  <a
+                    href={brand.website_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-foreground"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                )}
+              </div>
+              <h3 className="text-lg font-semibold mb-1">{brand.name}</h3>
+              {brand.industry && (
+                <p className="text-sm text-muted-foreground mb-2">{brand.industry}</p>
+              )}
+              {brand.description && (
+                <p className="text-sm text-muted-foreground line-clamp-2">{brand.description}</p>
               )}
             </div>
-            <h3 className="text-lg font-semibold mb-1">{brand.name}</h3>
-            {brand.industry && (
-              <p className="text-sm text-muted-foreground mb-2">{brand.industry}</p>
-            )}
-            {brand.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2">{brand.description}</p>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {brands.length === 0 && (
-        <div className="text-center py-12 border rounded-xl bg-card">
-          <Palette className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No brands yet</h3>
-          <p className="text-muted-foreground mb-4">Create your first brand to get started</p>
+          ))}
         </div>
+      ) : (
+        <EmptyState
+          icon={Palette}
+          title="No brands yet"
+          description="Create your first brand to unlock AI-powered content generation, automated scheduling, and intelligent analytics."
+          action={{
+            label: "Create Your First Brand",
+            onClick: () => setOpen(true),
+          }}
+        />
       )}
     </div>
   );
