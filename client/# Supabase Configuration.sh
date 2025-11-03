@@ -1,8 +1,8 @@
-# Supabase Configuration (Required)
+# Supabase Configuration
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 
-# AI Provider Configuration (Required for AI features)
+# AI Provider Configuration
 OPENAI_API_KEY=your-openai-api-key
 ANTHROPIC_API_KEY=your-anthropic-api-key
 AI_PROVIDER=openai
@@ -14,9 +14,3 @@ VITE_APP_URL=http://localhost:8080
 # Optional: Analytics & Monitoring
 VITE_ANALYTICS_ID=your-analytics-id
 SENTRY_DSN=your-sentry-dsn
-
-# Web Crawling Configuration
-CRAWL_MAX_PAGES=50
-CRAWL_TIMEOUT_MS=30000
-CRAWL_USER_AGENT=AlignedAIBot/1.0 (+contact: hello@aligned-by-design.com)
-NODE_ENV=development

@@ -14,9 +14,3 @@ VITE_APP_URL=http://localhost:8080
 # Optional: Analytics & Monitoring
 VITE_ANALYTICS_ID=your-analytics-id
 SENTRY_DSN=your-sentry-dsn
-
-# Web Crawling Configuration
-CRAWL_MAX_PAGES=50
-CRAWL_TIMEOUT_MS=30000
-CRAWL_USER_AGENT=AlignedAIBot/1.0 (+contact: hello@aligned-by-design.com)
-NODE_ENV=development

@@ -1,6 +1,9 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import { createServer } from "vite";
+import path from "path";
+import { fileURLToPath } from "url";
 import { handleDemo } from "./routes/demo";
 import integrationsRouter from "./routes/integrations";
 import agentsRouter from "./routes/agents";
@@ -46,8 +49,13 @@ import {
   getWorkflowNotifications,
 } from "./routes/workflow";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export function createServer() {
   const app = express();
+  const PORT = process.env.PORT || 8080;
+  const isDev = process.env.NODE_ENV !== 'production';
 
   // Middleware
   app.use(cors({
@@ -106,8 +114,10 @@ export function createServer() {
 
   // Enhanced Preferences routes
   app.get("/api/preferences", (req, res) => {
+    // TODO: Get user from auth context
     const userId = 'current-user';
     
+    // Mock comprehensive user preferences
     res.json({
       id: 'pref_1',
       userId,
@@ -218,8 +228,8 @@ export function createServer() {
   app.put("/api/preferences", (req, res) => {
     const preferences = req.body;
     
-    // Basic validation
-    const errors: Array<{ field: string; message: string }> = [];
+    // Validate preferences
+    const errors = [];
     if (preferences.aiSettings?.creativityLevel && !['conservative', 'balanced', 'creative', 'experimental'].includes(preferences.aiSettings.creativityLevel)) {
       errors.push({ field: 'creativityLevel', message: 'Invalid creativity level' });
     }
@@ -233,6 +243,9 @@ export function createServer() {
       return res.status(400).json({ success: false, errors });
     }
     
+    // TODO: Save to database with proper validation
+    // TODO: Create audit log entry
+    
     res.json({ 
       success: true, 
       message: 'Preferences updated successfully',
@@ -240,12 +253,82 @@ export function createServer() {
     });
   });
 
+  app.post("/api/preferences/validate", (req, res) => {
+    const { section, updates } = req.body;
+    
+    const errors = [];
+    const warnings = [];
+    
+    if (section === 'aiSettings') {
+      if (updates.creativityLevel === 'experimental') {
+        warnings.push({
+          field: 'creativityLevel',
+          message: 'Experimental mode may produce unpredictable results'
+        });
+      }
+      if (updates.maxContentLength) {
+        Object.entries(updates.maxContentLength).forEach(([platform, length]) => {
+          if (typeof length !== 'number' || length <= 0) {
+            errors.push({ field: `maxContentLength.${platform}`, message: 'Content length must be a positive number' });
+          }
+        });
+      }
+    }
+    
+    if (section === 'publishing') {
+      if (updates.autoApproval?.rules?.autoPublishScore > 95) {
+        warnings.push({
+          field: 'autoPublishScore',
+          message: 'Very high auto-publish scores may reduce content quality control'
+        });
+      }
+    }
+
+    res.json({
+      valid: errors.length === 0,
+      errors,
+      warnings
+    });
+  });
+
+  app.post("/api/preferences/reset", (req, res) => {
+    // TODO: Reset preferences to default values
+    // TODO: Create audit log entry
+    
+    res.json({ 
+      success: true, 
+      message: 'Preferences reset to defaults' 
+    });
+  });
+
+  app.get("/api/preferences/audit", (req, res) => {
+    // TODO: Return audit log for preference changes
+    res.json([
+      {
+        id: 'audit_1',
+        userId: 'current-user',
+        action: 'update',
+        section: 'aiSettings',
+        changes: [
+          {
+            field: 'creativityLevel',
+            oldValue: 'conservative',
+            newValue: 'balanced'
+          }
+        ],
+        timestamp: new Date().toISOString(),
+        userAgent: req.get('User-Agent'),
+        ipAddress: req.ip
+      }
+    ]);
+  });
+
   // White-label routes
   app.get("/api/white-label/config", getWhiteLabelConfig);
   app.get("/api/white-label/by-domain", getConfigByDomain);
   app.put("/api/white-label/config", updateWhiteLabelConfig);
 
-  // Client portal routes
+  // Client portal routes (read-only access for clients)
   app.get("/api/client/dashboard", getClientDashboard);
   app.post("/api/client/content/:contentId/approve", approveContent);
   app.post("/api/client/content/:contentId/comments", addContentComment);
@@ -258,10 +341,126 @@ export function createServer() {
   app.post("/api/workflow/action", processWorkflowAction);
   app.get("/api/workflow/notifications", getWorkflowNotifications);
 
+  // Client portal workflow routes
+  app.post("/api/client/workflow/action", processWorkflowAction);
+
+  // Onboarding routes
+  app.get("/api/onboarding/progress", (req, res) => {
+    const userId = req.query.userId || 'current-user';
+    
+    res.json({
+      userId,
+      currentStep: 'welcome',
+      completedSteps: [],
+      skippedSteps: [],
+      startedAt: new Date().toISOString(),
+      totalSteps: 6,
+      progressPercentage: 0,
+      userType: req.query.userType || 'agency'
+    });
+  });
+
+  app.post("/api/onboarding/complete", (req, res) => {
+    const { userId, completedSteps } = req.body;
+    
+    // TODO: Save onboarding completion to database
+    res.json({ 
+      success: true,
+      userId,
+      completedAt: new Date().toISOString(),
+      completedSteps: completedSteps || []
+    });
+  });
+
+  app.post("/api/onboarding/skip-step", (req, res) => {
+    const { userId, stepId } = req.body;
+    
+    // TODO: Save skipped step to database
+    res.json({ 
+      success: true,
+      userId,
+      skippedStep: stepId
+    });
+  });
+
+  // Trial and subscription routes
+  app.post("/api/trial/start", (req, res) => {
+    const { email, brandCount = 1 } = req.body;
+    
+    // TODO: Create trial user and subscription
+    res.json({ 
+      success: true, 
+      trialId: `trial_${Date.now()}`,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      brandCount,
+      features: [
+        'AI Content Generation',
+        'Multi-platform Publishing',
+        'Basic Analytics',
+        'Client Approval Workflows',
+        'Email Support'
+      ]
+    });
+  });
+
+  app.get("/api/trial/status", (req, res) => {
+    const { userId } = req.query;
+    
+    res.json({
+      isActive: true,
+      daysRemaining: 5,
+      expiresAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+      featuresUsed: {
+        contentGenerated: 23,
+        postsPublished: 12,
+        analyticsViewed: true
+      },
+      limits: {
+        maxContent: 50,
+        maxPosts: 25,
+        maxBrands: 1
+      }
+    });
+  });
+
+  app.get("/api/pricing/calculate", (req, res) => {
+    const { brands, yearly } = req.query;
+    const brandCount = parseInt(brands as string) || 1;
+    const isYearly = yearly === 'true';
+
+    // Calculate pricing based on tiers
+    let pricePerBrand = 199; // Default starter price
+    let tierName = 'starter';
+    
+    if (brandCount >= 20) {
+      pricePerBrand = 99;
+      tierName = 'enterprise';
+    } else if (brandCount >= 10) {
+      pricePerBrand = 149;
+      tierName = 'growth';
+    }
+
+    const monthlyTotal = pricePerBrand * brandCount;
+    const yearlyTotal = monthlyTotal * 12;
+    const yearlySavings = isYearly ? monthlyTotal * 2 : 0;
+
+    res.json({
+      brandCount,
+      pricePerBrand,
+      monthlyTotal,
+      yearlyTotal: yearlyTotal - yearlySavings,
+      yearlySavings,
+      tier: tierName,
+      features: getTierFeatures(tierName),
+      savings: brandCount >= 10 ? `Save $${(199 - pricePerBrand) * brandCount}/month` : null
+    });
+  });
+
   // Content Production Dashboard routes
   app.get("/api/content/dashboard", (req, res) => {
     const { brandId } = req.query;
     
+    // Mock production dashboard data with real-time status
     res.json({
       summary: {
         total: 45,
@@ -292,293 +491,102 @@ export function createServer() {
             wordCount: 150,
             imageCount: 1,
             hashtags: ['#summer', '#fashion', '#style']
+          },
+          preview: {
+            thumbnail: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400',
+            fullContent: 'Discover the perfect summer vibes with our latest collection...',
+            variations: []
+          }
+        },
+        {
+          id: 'content_2',
+          brandId: brandId || 'brand_1',
+          title: 'Product Showcase Video',
+          content: 'Behind the scenes of our latest product photoshoot...',
+          platform: 'tiktok',
+          status: 'generating',
+          priority: 'medium',
+          createdAt: new Date(Date.now() - 30000).toISOString(),
+          updatedAt: new Date().toISOString(),
+          generationJob: {
+            id: 'job_2',
+            status: 'running',
+            progress: 65,
+            retryCount: 0,
+            estimatedCompletion: new Date(Date.now() + 120000).toISOString()
+          },
+          metadata: {
+            generationType: 'ai',
+            wordCount: 0,
+            imageCount: 0,
+            hashtags: ['#bts', '#product', '#video']
+          }
+        },
+        {
+          id: 'content_3',
+          brandId: brandId || 'brand_1',
+          title: 'Holiday Promotion',
+          content: 'Failed to generate content due to API rate limit...',
+          platform: 'facebook',
+          status: 'error',
+          priority: 'high',
+          createdAt: new Date(Date.now() - 300000).toISOString(),
+          updatedAt: new Date(Date.now() - 60000).toISOString(),
+          generationJob: {
+            id: 'job_3',
+            status: 'failed',
+            progress: 0,
+            error: 'API rate limit exceeded. Please try again in 5 minutes.',
+            retryCount: 2
+          },
+          metadata: {
+            generationType: 'ai',
+            wordCount: 0,
+            imageCount: 0,
+            hashtags: []
           }
         }
       ],
-      upcomingDeadlines: [],
-      erroredItems: [],
-      queuedItems: []
+      upcomingDeadlines: [
+        {
+          id: 'content_4',
+          title: 'Black Friday Campaign',
+          platform: 'instagram',
+          status: 'queued',
+          scheduledFor: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+          priority: 'high'
+        }
+      ],
+      erroredItems: [
+        {
+          id: 'content_3',
+          title: 'Holiday Promotion',
+          platform: 'facebook',
+          status: 'error',
+          generationJob: {
+            error: 'API rate limit exceeded. Please try again in 5 minutes.',
+            retryCount: 2
+          }
+        }
+      ],
+      queuedItems: [
+        {
+          id: 'content_5',
+          title: 'Weekly Newsletter Content',
+          platform: 'linkedin',
+          status: 'queued',
+          priority: 'low',
+          queuePosition: 1
+        }
+      ]
     });
   });
 
   app.post("/api/content/:contentId/retry", (req, res) => {
     const { contentId } = req.params;
     
+    // TODO: Retry content generation
     res.json({ 
-      success: true, 
-      message: 'Content retry initiated',
-      contentId,
-      newJobId: `job_${Date.now()}`,
-      estimatedCompletion: new Date(Date.now() + 180000).toISOString()
-    });
-  });
-
-  app.post("/api/content/batch", (req, res) => {
-    const { action, contentIds } = req.body;
-    
-    res.json({ 
-      success: true, 
-      message: `Batch ${action || 'operation'} completed successfully`,
-      processedCount: contentIds?.length || 0,
-      batchId: `batch_${Date.now()}`
-    });
-  });
-
-  // Analytics Portal routes
-  app.get("/api/analytics-portal/:brandId", (req, res) => {
-    const { brandId } = req.params;
-    const { period = 'month' } = req.query;
-    
-    res.json({
-      brandInfo: {
-        name: 'Nike',
-        logo: '👟',
-        colors: {
-          primary: '#000000',
-          secondary: '#FF6B35'
-        }
-      },
-      timeRange: {
-        start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        end: new Date().toISOString(),
-        period
-      },
-      metrics: {
-        reach: { current: 125847, previous: 98234, change: 28.1 },
-        engagement: { current: 8934, previous: 7123, change: 25.4 },
-        conversions: { current: 234, previous: 189, change: 23.8 },
-        contentVolume: { current: 24, previous: 20, change: 20.0 },
-        engagementRate: { current: 7.1, previous: 7.3, change: -2.7 }
-      },
-      charts: {
-        reachOverTime: Array.from({ length: 30 }, (_, i) => ({
-          date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          value: Math.floor(Math.random() * 5000) + 3000
-        })),
-        engagementByPlatform: [
-          { platform: 'Instagram', value: 4234 },
-          { platform: 'Facebook', value: 2890 },
-          { platform: 'LinkedIn', value: 1810 }
-        ],
-        topContent: [
-          { id: 'content_1', title: 'Summer Collection Launch', engagement: 1205, reach: 15420 }
-        ],
-        audienceGrowth: Array.from({ length: 30 }, (_, i) => ({
-          date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          followers: 52000 + Math.floor(Math.random() * 100) + i * 10
-        }))
-      },
-      contentPerformance: [
-        {
-          id: 'content_1',
-          title: 'Summer Collection Launch',
-          platform: 'Instagram',
-          publishedAt: '2024-01-15T09:00:00Z',
-          metrics: { reach: 15420, engagement: 1205, clicks: 234, saves: 89 },
-          canProvideFeedback: true
-        }
-      ]
-    });
-  });
-
-  // Brand Intelligence routes
-  app.get("/api/brand-intelligence/:brandId", (req, res) => {
-    const { brandId } = req.params;
-    
-    if (!brandId) {
-      return res.status(400).json({ error: 'brandId required' });
-    }
-
-    res.json({
-      id: `intel_${brandId}`,
-      brandId,
-      brandProfile: {
-        usp: [
-          'Sustainable fashion with 80% recycled materials',
-          'Direct-to-consumer pricing without retail markup'
-        ],
-        differentiators: [
-          'Only fashion brand with 100% transparent supply chain',
-          'Proprietary fabric technology from ocean plastic'
-        ],
-        coreValues: ['sustainability', 'transparency', 'quality'],
-        targetAudience: {
-          demographics: {
-            age: '25-45',
-            income: '$50,000-$120,000',
-            location: 'Urban and suburban areas'
-          },
-          psychographics: ['Environmentally conscious', 'Values authenticity'],
-          painPoints: ['Finding truly sustainable fashion'],
-          interests: ['sustainability', 'fashion', 'wellness']
-        },
-        brandPersonality: {
-          traits: ['authentic', 'innovative', 'responsible'],
-          tone: 'friendly and educational',
-          voice: 'expert but not preachy',
-          communicationStyle: 'conversational with purpose'
-        },
-        visualIdentity: {
-          colorPalette: ['#2E7D32', '#66BB6A'],
-          typography: ['Modern sans-serif'],
-          imageStyle: ['Natural lighting', 'Lifestyle-focused'],
-          logoGuidelines: 'Minimal, nature-inspired design'
-        }
-      },
-      competitorInsights: {
-        primaryCompetitors: [
-          {
-            id: 'comp_1',
-            name: 'Patagonia',
-            handle: '@patagonia',
-            platform: 'instagram',
-            followers: 4200000,
-            avgEngagement: 3.2,
-            postingFrequency: 5,
-            contentThemes: ['outdoor adventure', 'activism'],
-            strengths: ['Strong brand loyalty'],
-            weaknesses: ['Higher price point'],
-            lastAnalyzed: new Date().toISOString()
-          }
-        ],
-        benchmarks: {
-          avgEngagementRate: 3.0,
-          avgPostingFrequency: 6,
-          topContentThemes: ['sustainability', 'transparency'],
-          bestPostingTimes: {
-            instagram: ['10:00', '14:00', '19:00']
-          }
-        },
-        gapAnalysis: {
-          contentGaps: ['Limited behind-the-scenes content'],
-          opportunityAreas: ['Micro-influencer partnerships'],
-          differentiationOpportunities: ['Emphasize local manufacturing']
-        }
-      },
-      audienceInsights: {
-        activityPatterns: {
-          instagram: {
-            peakHours: ['10:00', '14:00', '19:00'],
-            peakDays: ['Tuesday', 'Wednesday', 'Thursday'],
-            timezone: 'America/New_York',
-            engagementHeatmap: Array.from({ length: 168 }, (_, i) => ({
-              hour: i % 24,
-              day: Math.floor(i / 24),
-              score: Math.random() * 0.8 + 0.2
-            }))
-          }
-        },
-        contentPreferences: {
-          topPerformingTypes: ['behind-the-scenes', 'educational'],
-          engagementTriggers: ['questions', 'polls'],
-          preferredLength: 150,
-          hashtagEffectiveness: {
-            '#sustainability': 1.4
-          }
-        },
-        growthDrivers: {
-          followerGrowthTriggers: ['viral sustainability content'],
-          viralContentPatterns: ['educational carousels'],
-          engagementBoosterTactics: ['ask questions']
-        }
-      },
-      contentIntelligence: {
-        performanceCorrelations: {
-          timeVsEngagement: [
-            { time: '10:00', avgEngagement: 4.2 },
-            { time: '14:00', avgEngagement: 3.8 },
-            { time: '19:00', avgEngagement: 4.5 }
-          ],
-          contentTypeVsGrowth: [
-            { type: 'behind-the-scenes', growthImpact: 1.8 }
-          ],
-          hashtagVsReach: [
-            { hashtag: '#sustainability', reachMultiplier: 1.4 }
-          ]
-        },
-        successPatterns: {
-          topPerformingContent: [
-            {
-              id: 'pattern_1',
-              contentType: 'behind-the-scenes',
-              platform: 'instagram',
-              avgEngagement: 4.5,
-              reachMultiplier: 1.8,
-              successFactors: ['authentic storytelling'],
-              examples: ['Ocean plastic processing video']
-            }
-          ],
-          failurePatterns: [],
-          improvementOpportunities: ['Add more educational value']
-        }
-      },
-      recommendations: {
-        strategic: [
-          {
-            id: 'strat_1',
-            type: 'differentiation',
-            title: 'Emphasize Local Manufacturing Advantage',
-            description: 'Highlight your unique local manufacturing network.',
-            impact: 'high',
-            effort: 'medium',
-            timeframe: '2-3 months',
-            expectedOutcome: '25% increase in brand differentiation awareness',
-            reasoning: 'Competitor analysis shows opportunity.'
-          }
-        ],
-        tactical: [
-          {
-            id: 'tact_1',
-            type: 'content_optimization',
-            title: 'Increase Behind-the-Scenes Content',
-            action: 'Post 2-3 behind-the-scenes videos per week',
-            expectedImpact: '40% increase in engagement rate',
-            platform: 'instagram',
-            priority: 'high'
-          }
-        ],
-        contentSuggestions: [
-          {
-            id: 'content_1',
-            contentType: 'video',
-            platform: 'instagram',
-            suggestedTopic: 'Ocean Plastic Transformation Process',
-            angle: 'Show the journey from ocean waste to beautiful fabric',
-            reasoning: 'Behind-the-scenes content performs 80% better than average',
-            expectedEngagement: 4.2,
-            bestPostingTime: '19:00',
-            recommendedHashtags: ['#oceanplastic', '#sustainability']
-          }
-        ],
-        timingOptimization: [
-          {
-            platform: 'instagram',
-            optimalTimes: ['10:00', '14:00', '19:00'],
-            timezone: 'America/New_York',
-            reasoning: 'Analysis shows 35% higher engagement at these times',
-            expectedUplift: 1.35
-          }
-        ]
-      },
-      lastAnalyzed: new Date().toISOString(),
-      nextAnalysis: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      confidenceScore: 0.87
-    });
-  });
-
-  app.post("/api/brand-intelligence/feedback", (req, res) => {
-    const { recommendationId, action } = req.body;
-    
-    res.json({
-      success: true,
-      message: 'Feedback recorded successfully',
-      recommendationId,
-      action
-    });
-  });
-
-  return app;
-}
       success: true, 
       message: 'Content retry initiated',
       contentId,
@@ -989,9 +997,11 @@ export function createServer() {
             id: 'tact_1',
             type: 'content_optimization',
             title: 'Increase Behind-the-Scenes Content',
-           import "dotenv/config";
-import express from "express";
-import cors from "cors";
+           import express from 'express';
+import cors from 'cors';
+import { createServer } from 'vite';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { handleDemo } from "./routes/demo";
 import integrationsRouter from "./routes/integrations";
 import agentsRouter from "./routes/agents";
@@ -1037,8 +1047,13 @@ import {
   getWorkflowNotifications,
 } from "./routes/workflow";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export function createServer() {
   const app = express();
+  const PORT = process.env.PORT || 8080;
+  const isDev = process.env.NODE_ENV !== 'production';
 
   // Middleware
   app.use(cors({
