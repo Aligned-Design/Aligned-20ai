@@ -167,4 +167,9 @@ const App = () => (
   </QueryClientProvider>
 );
 
-createRoot(document.getElementById("root")!).render(<App />);
+// Prevent double-mounting during HMR in development
+const rootElement = document.getElementById("root")!;
+if (!rootElement.hasAttribute("data-root-initialized")) {
+  rootElement.setAttribute("data-root-initialized", "true");
+  createRoot(rootElement).render(<App />);
+}
