@@ -1,8 +1,8 @@
 /**
  * Performance Adjustment Engine
- * 
+ *
  * Automatically adjusts posting frequency based on performance metrics
- * 
+ *
  * Rules:
  * - Engagement ↑ > 25% → Add +1 post/week on top 2 channels
  * - Engagement ↓ > 20% → Reduce by 1 post/week; focus quality
@@ -15,7 +15,7 @@ import {
   PERFORMANCE_ADJUSTMENT_RULES,
   BrandPostingConfig,
   Platform,
-} from '../../client/types/content-quota';
+} from "../../client/types/content-quota";
 
 interface PerformanceData {
   brand_id: string;
@@ -54,34 +54,39 @@ interface AdjustmentResult {
  */
 export async function analyzePerformance(
   performanceData: PerformanceData[],
-  currentConfig: BrandPostingConfig
+  currentConfig: BrandPostingConfig,
 ): Promise<AdjustmentResult> {
-  const adjustments: AdjustmentResult['adjustments'] = [];
+  const adjustments: AdjustmentResult["adjustments"] = [];
 
   for (const data of performanceData) {
     // Rule 1: Engagement Up > 25%
     const engagementChange =
-      (data.current_month.avg_engagement_rate - data.previous_month.avg_engagement_rate) /
+      (data.current_month.avg_engagement_rate -
+        data.previous_month.avg_engagement_rate) /
       Math.max(data.previous_month.avg_engagement_rate, 0.001);
 
     if (engagementChange > 0.25) {
       adjustments.push({
-        condition: 'engagement_up',
-        action: 'increase_frequency',
+        condition: "engagement_up",
+        action: "increase_frequency",
         platform: data.platform,
         details: `${data.platform}: Engagement up ${Math.round(engagementChange * 100)}% → Add +1 post/week`,
-        new_posts_per_week: getPlatformPostsPerWeek(currentConfig, data.platform) + 1,
+        new_posts_per_week:
+          getPlatformPostsPerWeek(currentConfig, data.platform) + 1,
       });
     }
 
     // Rule 2: Engagement Down > 20%
-    if (engagementChange < -0.20) {
+    if (engagementChange < -0.2) {
       adjustments.push({
-        condition: 'engagement_down',
-        action: 'decrease_frequency',
+        condition: "engagement_down",
+        action: "decrease_frequency",
         platform: data.platform,
         details: `${data.platform}: Engagement down ${Math.abs(Math.round(engagementChange * 100))}% → Reduce by 1 post/week; focus quality`,
-        new_posts_per_week: Math.max(getPlatformPostsPerWeek(currentConfig, data.platform) - 1, 1),
+        new_posts_per_week: Math.max(
+          getPlatformPostsPerWeek(currentConfig, data.platform) - 1,
+          1,
+        ),
       });
     }
 
@@ -93,19 +98,19 @@ export async function analyzePerformance(
       Math.abs(data.two_months_ago.follower_growth) < 10
     ) {
       adjustments.push({
-        condition: 'growth_flat',
-        action: 'shift_mix',
+        condition: "growth_flat",
+        action: "shift_mix",
         platform: data.platform,
         details: `${data.platform}: Follower growth flat for 2+ months → Shift mix to 60% awareness, 40% conversion`,
-        new_funnel_mix: { top: 0.60, mid: 0.00, bottom: 0.40 },
+        new_funnel_mix: { top: 0.6, mid: 0.0, bottom: 0.4 },
       });
     }
 
     // Rule 4: Failed Posts > 2x/month
     if (data.current_month.failed_posts > 2) {
       adjustments.push({
-        condition: 'failed_posts',
-        action: 'audit_integrations',
+        condition: "failed_posts",
+        action: "audit_integrations",
         platform: data.platform,
         details: `${data.platform}: ${data.current_month.failed_posts} failed posts this month → Auto-audit integration and flag for review`,
       });
@@ -116,10 +121,12 @@ export async function analyzePerformance(
   const topPerformers = performanceData
     .sort((a, b) => {
       const aChange =
-        (a.current_month.avg_engagement_rate - a.previous_month.avg_engagement_rate) /
+        (a.current_month.avg_engagement_rate -
+          a.previous_month.avg_engagement_rate) /
         Math.max(a.previous_month.avg_engagement_rate, 0.001);
       const bChange =
-        (b.current_month.avg_engagement_rate - b.previous_month.avg_engagement_rate) /
+        (b.current_month.avg_engagement_rate -
+          b.previous_month.avg_engagement_rate) /
         Math.max(b.previous_month.avg_engagement_rate, 0.001);
       return bChange - aChange;
     })
@@ -128,7 +135,7 @@ export async function analyzePerformance(
 
   // Apply adjustments only to top 2 performers for frequency increases
   const filteredAdjustments = adjustments.filter((adj) => {
-    if (adj.action === 'increase_frequency') {
+    if (adj.action === "increase_frequency") {
       return adj.platform && topPerformers.includes(adj.platform);
     }
     return true; // Keep all other adjustments
@@ -145,27 +152,43 @@ export async function analyzePerformance(
  */
 export function applyAdjustments(
   currentConfig: BrandPostingConfig,
-  adjustments: AdjustmentResult['adjustments']
+  adjustments: AdjustmentResult["adjustments"],
 ): BrandPostingConfig {
   const newConfig = { ...currentConfig };
 
   for (const adjustment of adjustments) {
-    if (adjustment.action === 'increase_frequency' && adjustment.platform && adjustment.new_posts_per_week) {
+    if (
+      adjustment.action === "increase_frequency" &&
+      adjustment.platform &&
+      adjustment.new_posts_per_week
+    ) {
       // Update platform schedule to add more posts
-      updatePlatformFrequency(newConfig, adjustment.platform, adjustment.new_posts_per_week);
+      updatePlatformFrequency(
+        newConfig,
+        adjustment.platform,
+        adjustment.new_posts_per_week,
+      );
     }
 
-    if (adjustment.action === 'decrease_frequency' && adjustment.platform && adjustment.new_posts_per_week) {
+    if (
+      adjustment.action === "decrease_frequency" &&
+      adjustment.platform &&
+      adjustment.new_posts_per_week
+    ) {
       // Update platform schedule to reduce posts
-      updatePlatformFrequency(newConfig, adjustment.platform, adjustment.new_posts_per_week);
+      updatePlatformFrequency(
+        newConfig,
+        adjustment.platform,
+        adjustment.new_posts_per_week,
+      );
     }
 
-    if (adjustment.action === 'shift_mix' && adjustment.new_funnel_mix) {
+    if (adjustment.action === "shift_mix" && adjustment.new_funnel_mix) {
       // Update funnel mix (stored in monthly content plan, not config)
       // This would be passed to Advisor Agent for next month's plan
     }
 
-    if (adjustment.action === 'audit_integrations') {
+    if (adjustment.action === "audit_integrations") {
       // Flag for user review (create notification/task)
       // This would trigger an integration health check
     }
@@ -177,7 +200,10 @@ export function applyAdjustments(
 /**
  * Get current posts per week for a platform
  */
-function getPlatformPostsPerWeek(config: BrandPostingConfig, platform: Platform): number {
+function getPlatformPostsPerWeek(
+  config: BrandPostingConfig,
+  platform: Platform,
+): number {
   const schedule = config.publish_schedule[platform];
   if (!schedule) return 3; // Default
 
@@ -191,7 +217,7 @@ function getPlatformPostsPerWeek(config: BrandPostingConfig, platform: Platform)
 function updatePlatformFrequency(
   config: BrandPostingConfig,
   platform: Platform,
-  newPostsPerWeek: number
+  newPostsPerWeek: number,
 ): void {
   // Get current schedule
   const currentSchedule = config.publish_schedule[platform] || [];
@@ -199,13 +225,21 @@ function updatePlatformFrequency(
   if (newPostsPerWeek > currentSchedule.length) {
     // Add more posts (distribute evenly across week)
     const daysToAdd = newPostsPerWeek - currentSchedule.length;
-    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const daysOfWeek = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ];
     const usedDays = new Set(currentSchedule.map((s) => s.day));
 
     for (let i = 0; i < daysToAdd; i++) {
       const nextDay = daysOfWeek.find((day) => !usedDays.has(day));
       if (nextDay) {
-        currentSchedule.push({ day: nextDay, time: '18:00' }); // Default to 6pm
+        currentSchedule.push({ day: nextDay, time: "18:00" }); // Default to 6pm
         usedDays.add(nextDay);
       }
     }
@@ -227,24 +261,24 @@ export function generateSuggestedActions(
     posts_awaiting_approval: number;
     reach_change_pct: number;
     engagement_change_pct: number;
-  }
+  },
 ): Array<{ action: string; label: string; count?: number }> {
   const actions: Array<{ action: string; label: string; count?: number }> = [];
 
   // If engagement is up, suggest generating more similar content
-  if (weeklyData.engagement_change_pct > 0.10) {
+  if (weeklyData.engagement_change_pct > 0.1) {
     actions.push({
-      action: 'generate_more',
-      label: 'Generate More Like These',
+      action: "generate_more",
+      label: "Generate More Like These",
       count: 5,
     });
   }
 
   // If reach is down, suggest regenerating low performers
-  if (weeklyData.reach_change_pct < -0.10) {
+  if (weeklyData.reach_change_pct < -0.1) {
     actions.push({
-      action: 'regenerate_low',
-      label: 'Regenerate Low-Performers',
+      action: "regenerate_low",
+      label: "Regenerate Low-Performers",
       count: 3,
     });
   }
@@ -252,16 +286,16 @@ export function generateSuggestedActions(
   // If posts are waiting for approval, suggest reviewing
   if (weeklyData.posts_awaiting_approval > 5) {
     actions.push({
-      action: 'review_pending',
-      label: 'Review Pending Approvals',
+      action: "review_pending",
+      label: "Review Pending Approvals",
       count: weeklyData.posts_awaiting_approval,
     });
   }
 
   // Always suggest rebalancing (adaptive planning)
   actions.push({
-    action: 'rebalance_plan',
-    label: 'Rebalance This Week\'s Plan',
+    action: "rebalance_plan",
+    label: "Rebalance This Week's Plan",
   });
 
   return actions;
@@ -278,7 +312,7 @@ export function calculateSuccessMetrics(
   totalScheduled: number,
   totalPublishedOnTime: number,
   previousEngagement: number,
-  currentEngagement: number
+  currentEngagement: number,
 ): {
   auto_generation_rate: number;
   approval_without_edit_rate: number;
@@ -288,10 +322,14 @@ export function calculateSuccessMetrics(
 } {
   return {
     auto_generation_rate: totalPlanned > 0 ? totalGenerated / totalPlanned : 0,
-    approval_without_edit_rate: totalGenerated > 0 ? totalApprovedWithoutEdit / totalGenerated : 0,
+    approval_without_edit_rate:
+      totalGenerated > 0 ? totalApprovedWithoutEdit / totalGenerated : 0,
     avg_bfs_score: avgBfsScore,
-    on_time_publication_rate: totalScheduled > 0 ? totalPublishedOnTime / totalScheduled : 0,
+    on_time_publication_rate:
+      totalScheduled > 0 ? totalPublishedOnTime / totalScheduled : 0,
     mom_engagement_growth:
-      previousEngagement > 0 ? (currentEngagement - previousEngagement) / previousEngagement : 0,
+      previousEngagement > 0
+        ? (currentEngagement - previousEngagement) / previousEngagement
+        : 0,
   };
 }

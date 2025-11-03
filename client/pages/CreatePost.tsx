@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
-import { useBrand } from '@/contexts/BrandContext';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { EmptyState } from '@/components/ui/empty-state';
-import { DashboardSkeleton } from '@/components/ui/skeletons';
-import { HelpTooltip } from '@/components/ui/help-tooltip';
+import { useState, useEffect } from "react";
+import { useBrand } from "@/contexts/BrandContext";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { EmptyState } from "@/components/ui/empty-state";
+import { DashboardSkeleton } from "@/components/ui/skeletons";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 import {
   PenSquare,
   Image as ImageIcon,
@@ -16,30 +16,32 @@ import {
   Send,
   Save,
   CheckCircle2,
-} from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
 import {
   PLATFORM_CONFIGS,
   PlatformConnection,
   PlatformProvider,
   ContentType,
   CreatePostFormData,
-} from '@/types/integrations';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Checkbox } from '@/components/ui/checkbox';
-import { cn } from '@/lib/utils';
+} from "@/types/integrations";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
 export default function CreatePost() {
   const { currentBrand, loading: brandLoading } = useBrand();
   const { toast } = useToast();
   const [connections, setConnections] = useState<PlatformConnection[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedPlatforms, setSelectedPlatforms] = useState<PlatformProvider[]>([]);
+  const [selectedPlatforms, setSelectedPlatforms] = useState<
+    PlatformProvider[]
+  >([]);
   const [formData, setFormData] = useState<CreatePostFormData>({
-    caption: '',
-    content_type: 'post',
+    caption: "",
+    content_type: "post",
     platforms: [],
     hashtags: [],
   });
@@ -55,19 +57,19 @@ export default function CreatePost() {
 
     try {
       const { data, error } = await supabase
-        .from('platform_connections')
-        .select('*')
-        .eq('brand_id', currentBrand.id)
-        .eq('status', 'connected')
-        .order('created_at', { ascending: false });
+        .from("platform_connections")
+        .select("*")
+        .eq("brand_id", currentBrand.id)
+        .eq("status", "connected")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setConnections(data || []);
     } catch (error: any) {
       toast({
-        title: 'Error loading connections',
+        title: "Error loading connections",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -75,29 +77,29 @@ export default function CreatePost() {
   };
 
   const togglePlatform = (provider: PlatformProvider) => {
-    setSelectedPlatforms(prev =>
+    setSelectedPlatforms((prev) =>
       prev.includes(provider)
-        ? prev.filter(p => p !== provider)
-        : [...prev, provider]
+        ? prev.filter((p) => p !== provider)
+        : [...prev, provider],
     );
   };
 
   const handleSaveDraft = async () => {
     if (!currentBrand?.id || selectedPlatforms.length === 0) {
       toast({
-        title: 'Validation Error',
-        description: 'Please select at least one platform',
-        variant: 'destructive',
+        title: "Validation Error",
+        description: "Please select at least one platform",
+        variant: "destructive",
       });
       return;
     }
 
     try {
       const connectionIds = connections
-        .filter(c => selectedPlatforms.includes(c.provider))
-        .map(c => c.id);
+        .filter((c) => selectedPlatforms.includes(c.provider))
+        .map((c) => c.id);
 
-      const { error } = await supabase.from('social_posts').insert({
+      const { error } = await supabase.from("social_posts").insert({
         brand_id: currentBrand.id,
         connection_ids: connectionIds,
         title: formData.title,
@@ -107,35 +109,35 @@ export default function CreatePost() {
         hashtags: formData.hashtags,
         cta_text: formData.cta_text,
         cta_url: formData.cta_url,
-        status: 'draft',
+        status: "draft",
       });
 
       if (error) throw error;
 
       toast({
-        title: 'Draft Saved',
-        description: 'Your post has been saved as a draft',
+        title: "Draft Saved",
+        description: "Your post has been saved as a draft",
       });
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
 
   const handleSchedule = async () => {
     toast({
-      title: 'Schedule Post',
-      description: 'Opening scheduler...',
+      title: "Schedule Post",
+      description: "Opening scheduler...",
     });
   };
 
   const handlePublish = async () => {
     toast({
-      title: 'Publishing',
-      description: 'Your post will be published to selected platforms...',
+      title: "Publishing",
+      description: "Your post will be published to selected platforms...",
     });
   };
 
@@ -155,9 +157,11 @@ export default function CreatePost() {
     );
   }
 
-  const connectedPlatforms = Array.from(new Set(connections.map(c => c.provider)));
+  const connectedPlatforms = Array.from(
+    new Set(connections.map((c) => c.provider)),
+  );
   const tier1Platforms = connectedPlatforms.filter(
-    p => PLATFORM_CONFIGS[p]?.tier === 1
+    (p) => PLATFORM_CONFIGS[p]?.tier === 1,
   );
 
   if (connectedPlatforms.length === 0) {
@@ -168,19 +172,20 @@ export default function CreatePost() {
           title="No platforms connected"
           description="Connect at least one platform to start creating posts"
           action={{
-            label: 'Go to Integrations',
-            onClick: () => window.location.href = '/integrations',
+            label: "Go to Integrations",
+            onClick: () => (window.location.href = "/integrations"),
           }}
         />
       </div>
     );
   }
 
-  const maxCaptionLength = Math.min(
-    ...selectedPlatforms
-      .map(p => PLATFORM_CONFIGS[p]?.maxCaptionLength)
-      .filter(Boolean) as number[]
-  ) || 2200;
+  const maxCaptionLength =
+    Math.min(
+      ...(selectedPlatforms
+        .map((p) => PLATFORM_CONFIGS[p]?.maxCaptionLength)
+        .filter(Boolean) as number[]),
+    ) || 2200;
 
   return (
     <div className="p-10 space-y-10">
@@ -206,8 +211,10 @@ export default function CreatePost() {
                 <Input
                   id="title"
                   placeholder="Post title for LinkedIn articles, blog posts..."
-                  value={formData.title || ''}
-                  onChange={e => setFormData({ ...formData, title: e.target.value })}
+                  value={formData.title || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
                 />
               </div>
 
@@ -223,7 +230,9 @@ export default function CreatePost() {
                   placeholder="Write your post content..."
                   className="min-h-[200px] resize-y"
                   value={formData.caption}
-                  onChange={e => setFormData({ ...formData, caption: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, caption: e.target.value })
+                  }
                   maxLength={maxCaptionLength}
                 />
               </div>
@@ -233,12 +242,12 @@ export default function CreatePost() {
                 <Input
                   id="hashtags"
                   placeholder="#marketing #socialmedia #content"
-                  value={formData.hashtags?.join(' ') || ''}
-                  onChange={e => {
+                  value={formData.hashtags?.join(" ") || ""}
+                  onChange={(e) => {
                     const tags = e.target.value
                       .split(/\s+/)
-                      .filter(tag => tag.startsWith('#'))
-                      .map(tag => tag.slice(1));
+                      .filter((tag) => tag.startsWith("#"))
+                      .map((tag) => tag.slice(1));
                     setFormData({ ...formData, hashtags: tags });
                   }}
                 />
@@ -250,8 +259,10 @@ export default function CreatePost() {
                   <Input
                     id="cta-text"
                     placeholder="Learn More"
-                    value={formData.cta_text || ''}
-                    onChange={e => setFormData({ ...formData, cta_text: e.target.value })}
+                    value={formData.cta_text || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, cta_text: e.target.value })
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -260,8 +271,10 @@ export default function CreatePost() {
                     id="cta-url"
                     type="url"
                     placeholder="https://..."
-                    value={formData.cta_url || ''}
-                    onChange={e => setFormData({ ...formData, cta_url: e.target.value })}
+                    value={formData.cta_url || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, cta_url: e.target.value })
+                    }
                   />
                 </div>
               </div>
@@ -282,11 +295,19 @@ export default function CreatePost() {
           </Card>
 
           <div className="flex gap-3">
-            <Button variant="outline" className="flex-1" onClick={handleSaveDraft}>
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={handleSaveDraft}
+            >
               <Save className="h-4 w-4 mr-2" />
               Save Draft
             </Button>
-            <Button variant="outline" className="flex-1" onClick={handleSchedule}>
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={handleSchedule}
+            >
               <Calendar className="h-4 w-4 mr-2" />
               Schedule
             </Button>
@@ -312,17 +333,19 @@ export default function CreatePost() {
                   No Tier 1 platforms connected
                 </p>
               ) : (
-                tier1Platforms.map(provider => {
+                tier1Platforms.map((provider) => {
                   const platform = PLATFORM_CONFIGS[provider];
                   const isSelected = selectedPlatforms.includes(provider);
-                  const platformConnections = connections.filter(c => c.provider === provider);
+                  const platformConnections = connections.filter(
+                    (c) => c.provider === provider,
+                  );
 
                   return (
                     <div key={provider}>
                       <div
                         className={cn(
-                          'flex items-center gap-3 p-3 rounded-lg border border-border/50 cursor-pointer transition-all hover:bg-accent/5',
-                          isSelected && 'bg-accent/10 border-violet'
+                          "flex items-center gap-3 p-3 rounded-lg border border-border/50 cursor-pointer transition-all hover:bg-accent/5",
+                          isSelected && "bg-accent/10 border-violet",
                         )}
                         onClick={() => togglePlatform(provider)}
                       >
@@ -333,14 +356,18 @@ export default function CreatePost() {
                         <div className="flex items-center gap-2 flex-1">
                           <span className="text-xl">{platform.icon}</span>
                           <div className="flex-1">
-                            <p className="font-medium text-sm">{platform.name}</p>
+                            <p className="font-medium text-sm">
+                              {platform.name}
+                            </p>
                             <p className="text-xs text-muted-foreground">
                               {platformConnections.length} account
-                              {platformConnections.length !== 1 ? 's' : ''}
+                              {platformConnections.length !== 1 ? "s" : ""}
                             </p>
                           </div>
                         </div>
-                        {isSelected && <CheckCircle2 className="h-4 w-4 text-violet" />}
+                        {isSelected && (
+                          <CheckCircle2 className="h-4 w-4 text-violet" />
+                        )}
                       </div>
                     </div>
                   );
@@ -355,22 +382,29 @@ export default function CreatePost() {
                 <CardTitle className="text-lg">Platform Rules</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {selectedPlatforms.map(provider => {
+                {selectedPlatforms.map((provider) => {
                   const platform = PLATFORM_CONFIGS[provider];
                   return (
                     <div key={provider} className="space-y-1">
                       <div className="flex items-center gap-2">
                         <span className="text-sm">{platform.icon}</span>
-                        <span className="text-sm font-medium">{platform.name}</span>
+                        <span className="text-sm font-medium">
+                          {platform.name}
+                        </span>
                       </div>
                       <div className="pl-6 space-y-0.5 text-xs text-muted-foreground">
                         {platform.maxCaptionLength && (
-                          <p>• Max caption: {platform.maxCaptionLength} chars</p>
+                          <p>
+                            • Max caption: {platform.maxCaptionLength} chars
+                          </p>
                         )}
                         {platform.maxHashtags && (
                           <p>• Max hashtags: {platform.maxHashtags}</p>
                         )}
-                        <p>• Supports: {platform.supportedContentTypes.join(', ')}</p>
+                        <p>
+                          • Supports:{" "}
+                          {platform.supportedContentTypes.join(", ")}
+                        </p>
                       </div>
                     </div>
                   );

@@ -692,18 +692,18 @@
 
 ## Quick Navigation Map
 
-| I want to... | Go to... |
-|--------------|----------|
-| See performance overview | **Dashboard** |
-| Create a social post | **Create Post** |
-| Schedule content | **Calendar** |
-| Upload images/videos | **Assets** |
-| Set up a new brand | **Brand Kit** |
-| Connect Instagram | **Integrations** |
-| Respond to reviews | **Reviews** |
-| Create an event | **Events** |
-| View analytics | **Analytics** |
-| Send an email campaign | **Emails** *(planned)* |
-| Manage team members | **Settings → Team & Roles** |
-| Change my password | **Settings → Profile** |
-| View system health | **Admin Tools** *(admin only)* |
+| I want to...             | Go to...                       |
+| ------------------------ | ------------------------------ |
+| See performance overview | **Dashboard**                  |
+| Create a social post     | **Create Post**                |
+| Schedule content         | **Calendar**                   |
+| Upload images/videos     | **Assets**                     |
+| Set up a new brand       | **Brand Kit**                  |
+| Connect Instagram        | **Integrations**               |
+| Respond to reviews       | **Reviews**                    |
+| Create an event          | **Events**                     |
+| View analytics           | **Analytics**                  |
+| Send an email campaign   | **Emails** _(planned)_         |
+| Manage team members      | **Settings → Team & Roles**    |
+| Change my password       | **Settings → Profile**         |
+| View system health       | **Admin Tools** _(admin only)_ |

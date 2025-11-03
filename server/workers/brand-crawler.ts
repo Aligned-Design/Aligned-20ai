@@ -1,6 +1,6 @@
 /**
  * Brand Crawler Worker
- * 
+ *
  * Crawls brand websites to extract:
  * - Voice/tone from content
  * - Color palette from visuals
@@ -8,17 +8,17 @@
  * - AI-generated summaries and embeddings
  */
 
-import { chromium, Browser, Page } from 'playwright';
-import Vibrant from 'node-vibrant';
-import robotsParser from 'robots-parser';
-import OpenAI from 'openai';
-import crypto from 'crypto';
+import { chromium, Browser, Page } from "playwright";
+import Vibrant from "node-vibrant";
+import robotsParser from "robots-parser";
+import OpenAI from "openai";
+import crypto from "crypto";
 
 // Environment configuration
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const CRAWL_MAX_PAGES = parseInt(process.env.CRAWL_MAX_PAGES || '50', 10);
-const CRAWL_TIMEOUT_MS = parseInt(process.env.CRAWL_TIMEOUT_MS || '30000', 10);
-const CRAWL_USER_AGENT = process.env.CRAWL_USER_AGENT || 'AlignedAIBot/1.0';
+const CRAWL_MAX_PAGES = parseInt(process.env.CRAWL_MAX_PAGES || "50", 10);
+const CRAWL_TIMEOUT_MS = parseInt(process.env.CRAWL_TIMEOUT_MS || "30000", 10);
+const CRAWL_USER_AGENT = process.env.CRAWL_USER_AGENT || "AlignedAIBot/1.0";
 const MAX_DEPTH = 3;
 const CRAWL_DELAY_MS = 1000;
 
@@ -62,7 +62,7 @@ interface BrandKitData {
 export async function processBrandIntake(
   brandId: string,
   websiteUrl: string,
-  supabase: any
+  supabase: any,
 ): Promise<BrandKitData> {
   console.log(`[Brand Crawler] Starting intake for brand ${brandId}`);
 
@@ -84,7 +84,9 @@ export async function processBrandIntake(
       await createEmbeddings(brandId, brandKit, crawlResults, supabase);
       console.log(`[Brand Crawler] Created embeddings`);
     } else {
-      console.warn('[Brand Crawler] OPENAI_API_KEY not set, skipping embeddings');
+      console.warn(
+        "[Brand Crawler] OPENAI_API_KEY not set, skipping embeddings",
+      );
     }
 
     return brandKit;
@@ -104,21 +106,21 @@ export async function processBrandIntake(
 export async function crawlWebsite(startUrl: string): Promise<CrawlResult[]> {
   const baseUrl = new URL(startUrl);
   const baseDomain = baseUrl.hostname;
-  
+
   const visited = new Set<string>();
   const results: CrawlResult[] = [];
   const queue: { url: string; depth: number }[] = [{ url: startUrl, depth: 0 }];
-  
+
   // Check robots.txt
   const robotsTxt = await fetchRobotsTxt(startUrl);
   const robots = robotsParser(robotsTxt.url, robotsTxt.content);
-  
+
   let browser: Browser | null = null;
 
   try {
     browser = await chromium.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
 
     while (queue.length > 0 && results.length < CRAWL_MAX_PAGES) {
@@ -137,12 +139,12 @@ export async function crawlWebsite(startUrl: string): Promise<CrawlResult[]> {
 
       try {
         const page = await browser.newPage({
-          userAgent: CRAWL_USER_AGENT
+          userAgent: CRAWL_USER_AGENT,
         });
 
         await page.goto(url, {
           timeout: CRAWL_TIMEOUT_MS,
-          waitUntil: 'networkidle'
+          waitUntil: "networkidle",
         });
 
         // Extract content
@@ -151,8 +153,8 @@ export async function crawlWebsite(startUrl: string): Promise<CrawlResult[]> {
 
         // Find same-domain links for next crawl
         if (depth < MAX_DEPTH) {
-          const links = await page.$$eval('a[href]', (anchors) =>
-            anchors.map((a) => (a as HTMLAnchorElement).href)
+          const links = await page.$$eval("a[href]", (anchors) =>
+            anchors.map((a) => (a as HTMLAnchorElement).href),
           );
 
           for (const link of links) {
@@ -186,50 +188,67 @@ export async function crawlWebsite(startUrl: string): Promise<CrawlResult[]> {
 /**
  * Fetch robots.txt for the domain
  */
-async function fetchRobotsTxt(url: string): Promise<{ url: string; content: string }> {
-  const robotsUrl = new URL('/robots.txt', url).toString();
-  
+async function fetchRobotsTxt(
+  url: string,
+): Promise<{ url: string; content: string }> {
+  const robotsUrl = new URL("/robots.txt", url).toString();
+
   try {
     const response = await fetch(robotsUrl);
-    const content = response.ok ? await response.text() : '';
+    const content = response.ok ? await response.text() : "";
     return { url: robotsUrl, content };
   } catch {
-    return { url: robotsUrl, content: '' };
+    return { url: robotsUrl, content: "" };
   }
 }
 
 /**
  * Extract content from a single page
  */
-async function extractPageContent(page: Page, url: string): Promise<CrawlResult> {
+async function extractPageContent(
+  page: Page,
+  url: string,
+): Promise<CrawlResult> {
   // Extract title
   const title = await page.title();
 
   // Extract meta description
-  const metaDescription = await page.$eval(
-    'meta[name="description"]',
-    (el) => el.getAttribute('content') || ''
-  ).catch(() => '');
+  const metaDescription = await page
+    .$eval('meta[name="description"]', (el) => el.getAttribute("content") || "")
+    .catch(() => "");
 
   // Extract headings
-  const h1 = await page.$$eval('h1', (els) => els.map((el) => el.textContent?.trim() || ''));
-  const h2 = await page.$$eval('h2', (els) => els.map((el) => el.textContent?.trim() || ''));
-  const h3 = await page.$$eval('h3', (els) => els.map((el) => el.textContent?.trim() || ''));
+  const h1 = await page.$$eval("h1", (els) =>
+    els.map((el) => el.textContent?.trim() || ""),
+  );
+  const h2 = await page.$$eval("h2", (els) =>
+    els.map((el) => el.textContent?.trim() || ""),
+  );
+  const h3 = await page.$$eval("h3", (els) =>
+    els.map((el) => el.textContent?.trim() || ""),
+  );
 
   // Extract body text (excluding nav, footer, script, style)
   const bodyText = await page.evaluate(() => {
-    const excludeSelectors = ['nav', 'footer', 'script', 'style', 'noscript', 'iframe'];
+    const excludeSelectors = [
+      "nav",
+      "footer",
+      "script",
+      "style",
+      "noscript",
+      "iframe",
+    ];
     const clone = document.body.cloneNode(true) as HTMLElement;
-    
+
     excludeSelectors.forEach((selector) => {
       clone.querySelectorAll(selector).forEach((el) => el.remove());
     });
 
-    return clone.textContent?.trim() || '';
+    return clone.textContent?.trim() || "";
   });
 
   // Create hash for deduplication
-  const hash = crypto.createHash('md5').update(bodyText).digest('hex');
+  const hash = crypto.createHash("md5").update(bodyText).digest("hex");
 
   return {
     url,
@@ -239,7 +258,7 @@ async function extractPageContent(page: Page, url: string): Promise<CrawlResult>
     h2,
     h3,
     bodyText,
-    hash
+    hash,
   };
 }
 
@@ -252,7 +271,10 @@ export async function extractColors(url: string): Promise<ColorPalette> {
   try {
     browser = await chromium.launch({ headless: true });
     const page = await browser.newPage({ userAgent: CRAWL_USER_AGENT });
-    await page.goto(url, { timeout: CRAWL_TIMEOUT_MS, waitUntil: 'networkidle' });
+    await page.goto(url, {
+      timeout: CRAWL_TIMEOUT_MS,
+      waitUntil: "networkidle",
+    });
 
     // Take screenshot
     const screenshot = await page.screenshot({ fullPage: false });
@@ -261,22 +283,22 @@ export async function extractColors(url: string): Promise<ColorPalette> {
     const palette = await Vibrant.from(screenshot).getPalette();
 
     const colors: ColorPalette = {
-      primary: palette.Vibrant?.hex || '#8B5CF6',
-      secondary: palette.LightVibrant?.hex || '#F0F7F7',
-      accent: palette.DarkVibrant?.hex || '#EC4899',
-      confidence: palette.Vibrant?.population || 0
+      primary: palette.Vibrant?.hex || "#8B5CF6",
+      secondary: palette.LightVibrant?.hex || "#F0F7F7",
+      accent: palette.DarkVibrant?.hex || "#EC4899",
+      confidence: palette.Vibrant?.population || 0,
     };
 
     await browser.close();
     return colors;
   } catch (error) {
-    console.error('[Crawler] Error extracting colors:', error);
+    console.error("[Crawler] Error extracting colors:", error);
     // Fallback to default colors
     return {
-      primary: '#8B5CF6',
-      secondary: '#F0F7F7',
-      accent: '#EC4899',
-      confidence: 0
+      primary: "#8B5CF6",
+      secondary: "#F0F7F7",
+      accent: "#EC4899",
+      confidence: 0,
     };
   } finally {
     if (browser) await browser.close();
@@ -289,15 +311,15 @@ export async function extractColors(url: string): Promise<ColorPalette> {
 async function generateBrandKit(
   crawlResults: CrawlResult[],
   colors: ColorPalette,
-  sourceUrl: string
+  sourceUrl: string,
 ): Promise<BrandKitData> {
   // Dedupe by hash
   const uniqueResults = deduplicateResults(crawlResults);
-  
+
   // Combine text
   const combinedText = uniqueResults
     .map((r) => `${r.title}\n${r.metaDescription}\n${r.bodyText}`)
-    .join('\n\n')
+    .join("\n\n")
     .slice(0, 10000); // Limit to 10k chars
 
   if (OPENAI_API_KEY) {
@@ -325,7 +347,7 @@ function deduplicateResults(results: CrawlResult[]): CrawlResult[] {
 async function generateBrandKitWithAI(
   text: string,
   colors: ColorPalette,
-  sourceUrl: string
+  sourceUrl: string,
 ): Promise<BrandKitData> {
   const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
@@ -354,30 +376,34 @@ Respond in JSON format:
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' },
-      temperature: 0.3
+      model: "gpt-4-turbo-preview",
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+      temperature: 0.3,
     });
 
-    const aiResult = JSON.parse(response.choices[0].message.content || '{}');
+    const aiResult = JSON.parse(response.choices[0].message.content || "{}");
 
     return {
       voice_summary: {
         tone: aiResult.tone || [],
-        style: aiResult.style || 'conversational',
+        style: aiResult.style || "conversational",
         avoid: aiResult.avoid || [],
-        audience: aiResult.audience || '',
-        personality: aiResult.personality || []
+        audience: aiResult.audience || "",
+        personality: aiResult.personality || [],
       },
       keyword_themes: aiResult.keyword_themes || [],
-      about_blurb: aiResult.about_blurb || '',
+      about_blurb: aiResult.about_blurb || "",
       colors,
-      source_urls: [sourceUrl]
+      source_urls: [sourceUrl],
     };
   } catch (error) {
-    console.error('[AI] Error generating brand kit:', error);
-    return generateBrandKitFallback([{ bodyText: text } as CrawlResult], colors, sourceUrl);
+    console.error("[AI] Error generating brand kit:", error);
+    return generateBrandKitFallback(
+      [{ bodyText: text } as CrawlResult],
+      colors,
+      sourceUrl,
+    );
   }
 }
 
@@ -387,21 +413,32 @@ Respond in JSON format:
 function generateBrandKitFallback(
   results: CrawlResult[],
   colors: ColorPalette,
-  sourceUrl: string
+  sourceUrl: string,
 ): Promise<BrandKitData> {
-  const allText = results.map((r) => r.bodyText).join(' ');
+  const allText = results.map((r) => r.bodyText).join(" ");
 
   // Simple keyword extraction (top words by frequency)
-  const words = allText
-    .toLowerCase()
-    .match(/\b[a-z]{4,}\b/g) || [];
-  
-  const wordFreq = words.reduce((acc, word) => {
-    acc[word] = (acc[word] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const words = allText.toLowerCase().match(/\b[a-z]{4,}\b/g) || [];
 
-  const stopWords = new Set(['that', 'this', 'with', 'from', 'have', 'will', 'your', 'their', 'about']);
+  const wordFreq = words.reduce(
+    (acc, word) => {
+      acc[word] = (acc[word] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  const stopWords = new Set([
+    "that",
+    "this",
+    "with",
+    "from",
+    "have",
+    "will",
+    "your",
+    "their",
+    "about",
+  ]);
   const keywords = Object.entries(wordFreq)
     .filter(([word]) => !stopWords.has(word))
     .sort((a, b) => b[1] - a[1])
@@ -409,22 +446,23 @@ function generateBrandKitFallback(
     .map(([word]) => word);
 
   // Generate about blurb from meta description or first paragraph
-  const aboutBlurb = results[0]?.metaDescription?.slice(0, 160) || 
-    results[0]?.bodyText?.slice(0, 160) || 
-    'A professional brand committed to excellence.';
+  const aboutBlurb =
+    results[0]?.metaDescription?.slice(0, 160) ||
+    results[0]?.bodyText?.slice(0, 160) ||
+    "A professional brand committed to excellence.";
 
   return Promise.resolve({
     voice_summary: {
-      tone: ['professional', 'modern'],
-      style: 'conversational',
+      tone: ["professional", "modern"],
+      style: "conversational",
       avoid: [],
-      audience: 'general public',
-      personality: ['trustworthy', 'reliable']
+      audience: "general public",
+      personality: ["trustworthy", "reliable"],
     },
     keyword_themes: keywords,
     about_blurb: aboutBlurb,
     colors,
-    source_urls: [sourceUrl]
+    source_urls: [sourceUrl],
   });
 }
 
@@ -435,10 +473,10 @@ async function createEmbeddings(
   brandId: string,
   brandKit: BrandKitData,
   crawlResults: CrawlResult[],
-  supabase: any
+  supabase: any,
 ): Promise<void> {
   if (!OPENAI_API_KEY) {
-    console.warn('[Embeddings] OPENAI_API_KEY not set, skipping');
+    console.warn("[Embeddings] OPENAI_API_KEY not set, skipping");
     return;
   }
 
@@ -447,31 +485,34 @@ async function createEmbeddings(
   // Combine brand context for embedding
   const contextText = `
     ${brandKit.about_blurb}
-    Tone: ${brandKit.voice_summary.tone.join(', ')}
+    Tone: ${brandKit.voice_summary.tone.join(", ")}
     Style: ${brandKit.voice_summary.style}
     Audience: ${brandKit.voice_summary.audience}
-    Keywords: ${brandKit.keyword_themes.join(', ')}
-    ${crawlResults.slice(0, 3).map((r) => r.bodyText.slice(0, 500)).join('\n')}
+    Keywords: ${brandKit.keyword_themes.join(", ")}
+    ${crawlResults
+      .slice(0, 3)
+      .map((r) => r.bodyText.slice(0, 500))
+      .join("\n")}
   `.trim();
 
   try {
     const response = await openai.embeddings.create({
-      model: 'text-embedding-ada-002',
-      input: contextText
+      model: "text-embedding-ada-002",
+      input: contextText,
     });
 
     const embedding = response.data[0].embedding;
 
     // Store in Supabase with pgvector
-    await supabase.from('brand_embeddings').upsert({
+    await supabase.from("brand_embeddings").upsert({
       brand_id: brandId,
       embedding,
       content: contextText,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     });
 
     console.log(`[Embeddings] Created embedding for brand ${brandId}`);
   } catch (error) {
-    console.error('[Embeddings] Error creating embedding:', error);
+    console.error("[Embeddings] Error creating embedding:", error);
   }
 }

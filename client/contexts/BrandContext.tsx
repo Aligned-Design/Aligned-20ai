@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { supabase, Brand, BrandMember } from '@/lib/supabase';
-import { useAuth } from './AuthContext';
+import { createContext, useContext, useEffect, useState } from "react";
+import { supabase, Brand, BrandMember } from "@/lib/supabase";
+import { useAuth } from "./AuthContext";
 
 type BrandContextType = {
   brands: Brand[];
@@ -28,9 +28,9 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const { data: memberData } = await supabase
-        .from('brand_members')
-        .select('brand_id')
-        .eq('user_id', user.id);
+        .from("brand_members")
+        .select("brand_id")
+        .eq("user_id", user.id);
 
       if (!memberData || memberData.length === 0) {
         setBrands([]);
@@ -41,17 +41,17 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
 
       const brandIds = memberData.map((m) => m.brand_id);
       const { data: brandsData } = await supabase
-        .from('brands')
-        .select('*')
-        .in('id', brandIds)
-        .order('name');
+        .from("brands")
+        .select("*")
+        .in("id", brandIds)
+        .order("name");
 
       setBrands(brandsData || []);
       if (brandsData && brandsData.length > 0 && !currentBrand) {
         setCurrentBrand(brandsData[0]);
       }
     } catch (error) {
-      console.error('Error fetching brands:', error);
+      console.error("Error fetching brands:", error);
     } finally {
       setLoading(false);
     }
@@ -64,10 +64,13 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
   // Inject brand primary color into CSS variables for dynamic theming
   useEffect(() => {
     if (currentBrand?.primary_color) {
-      document.documentElement.style.setProperty('--brand-primary', currentBrand.primary_color);
+      document.documentElement.style.setProperty(
+        "--brand-primary",
+        currentBrand.primary_color,
+      );
     } else {
       // Reset to default primary color when no brand is selected
-      document.documentElement.style.setProperty('--brand-primary', '#8B5CF6');
+      document.documentElement.style.setProperty("--brand-primary", "#8B5CF6");
     }
   }, [currentBrand]);
 
@@ -89,7 +92,7 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
 export function useBrand() {
   const context = useContext(BrandContext);
   if (context === undefined) {
-    throw new Error('useBrand must be used within a BrandProvider');
+    throw new Error("useBrand must be used within a BrandProvider");
   }
   return context;
 }

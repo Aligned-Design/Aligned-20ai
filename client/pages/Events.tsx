@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
-import { useBrand } from '@/contexts/BrandContext';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { EmptyState } from '@/components/ui/empty-state';
-import { DashboardSkeleton } from '@/components/ui/skeletons';
-import { HelpTooltip } from '@/components/ui/help-tooltip';
+import { useState, useEffect } from "react";
+import { useBrand } from "@/contexts/BrandContext";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { EmptyState } from "@/components/ui/empty-state";
+import { DashboardSkeleton } from "@/components/ui/skeletons";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 import {
   CalendarPlus,
   MapPin,
@@ -15,22 +15,22 @@ import {
   Users,
   ExternalLink,
   Plus,
-} from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
 import {
   PlatformEvent,
   PLATFORM_CONFIGS,
   PlatformConnection,
   CreateEventFormData,
-} from '@/types/integrations';
+} from "@/types/integrations";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -38,9 +38,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Checkbox } from '@/components/ui/checkbox';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
 export default function Events() {
   const { currentBrand, loading: brandLoading } = useBrand();
@@ -62,18 +62,18 @@ export default function Events() {
 
     try {
       const { data, error } = await supabase
-        .from('platform_events')
-        .select('*')
-        .eq('brand_id', currentBrand.id)
-        .order('start_time', { ascending: true });
+        .from("platform_events")
+        .select("*")
+        .eq("brand_id", currentBrand.id)
+        .order("start_time", { ascending: true });
 
       if (error) throw error;
       setEvents(data || []);
     } catch (error: any) {
       toast({
-        title: 'Error loading events',
+        title: "Error loading events",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -85,16 +85,16 @@ export default function Events() {
 
     try {
       const { data, error } = await supabase
-        .from('platform_connections')
-        .select('*')
-        .eq('brand_id', currentBrand.id)
-        .eq('status', 'connected')
-        .in('provider', ['facebook', 'google_business']);
+        .from("platform_connections")
+        .select("*")
+        .eq("brand_id", currentBrand.id)
+        .eq("status", "connected")
+        .in("provider", ["facebook", "google_business"]);
 
       if (error) throw error;
       setConnections(data || []);
     } catch (error: any) {
-      console.error('Error loading connections:', error);
+      console.error("Error loading connections:", error);
     }
   };
 
@@ -115,9 +115,9 @@ export default function Events() {
   }
 
   const upcomingEvents = events.filter(
-    e => new Date(e.start_time) >= new Date() && e.status === 'published'
+    (e) => new Date(e.start_time) >= new Date() && e.status === "published",
   );
-  const draftEvents = events.filter(e => e.status === 'draft');
+  const draftEvents = events.filter((e) => e.status === "draft");
 
   return (
     <div className="p-10 space-y-10">
@@ -142,7 +142,8 @@ export default function Events() {
             <DialogHeader>
               <DialogTitle>Create New Event</DialogTitle>
               <DialogDescription>
-                Create an event and publish it to Facebook and Google Business Profile
+                Create an event and publish it to Facebook and Google Business
+                Profile
               </DialogDescription>
             </DialogHeader>
             <CreateEventForm
@@ -182,12 +183,18 @@ export default function Events() {
             <div className="text-center space-y-3">
               <CalendarPlus className="h-12 w-12 mx-auto text-muted-foreground" />
               <div>
-                <p className="font-medium mb-1">Connect Facebook or Google Business</p>
+                <p className="font-medium mb-1">
+                  Connect Facebook or Google Business
+                </p>
                 <p className="text-sm text-muted-foreground">
-                  To create events, connect at least one platform that supports events
+                  To create events, connect at least one platform that supports
+                  events
                 </p>
               </div>
-              <Button variant="outline" onClick={() => window.location.href = '/integrations'}>
+              <Button
+                variant="outline"
+                onClick={() => (window.location.href = "/integrations")}
+              >
                 Go to Integrations
               </Button>
             </div>
@@ -200,7 +207,7 @@ export default function Events() {
           <div className="space-y-3">
             <h2 className="text-xl font-semibold">Upcoming Events</h2>
             <div className="grid gap-4 md:grid-cols-2">
-              {upcomingEvents.map(event => (
+              {upcomingEvents.map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}
             </div>
@@ -211,7 +218,7 @@ export default function Events() {
           <div className="space-y-3">
             <h2 className="text-xl font-semibold">Drafts</h2>
             <div className="grid gap-4 md:grid-cols-2">
-              {draftEvents.map(event => (
+              {draftEvents.map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}
             </div>
@@ -226,7 +233,7 @@ export default function Events() {
             action={
               connections.length > 0
                 ? {
-                    label: 'Create Event',
+                    label: "Create Event",
                     onClick: () => setShowCreateDialog(true),
                   }
                 : undefined
@@ -242,25 +249,29 @@ function StatCard({
   title,
   value,
   icon,
-  variant = 'default',
+  variant = "default",
 }: {
   title: string;
   value: string;
   icon: React.ReactNode;
-  variant?: 'default' | 'success' | 'warning';
+  variant?: "default" | "success" | "warning";
 }) {
   const variantColors = {
-    default: 'text-muted-foreground',
-    success: 'text-mint',
-    warning: 'text-coral',
+    default: "text-muted-foreground",
+    success: "text-mint",
+    warning: "text-coral",
   };
 
   return (
     <Card>
       <CardContent className="pt-6">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-muted-foreground">{title}</span>
-          <div className={cn('transition-colors', variantColors[variant])}>{icon}</div>
+          <span className="text-sm font-medium text-muted-foreground">
+            {title}
+          </span>
+          <div className={cn("transition-colors", variantColors[variant])}>
+            {icon}
+          </div>
         </div>
         <div className="text-3xl font-semibold tracking-tight">{value}</div>
       </CardContent>
@@ -286,12 +297,16 @@ function EventCard({ event }: { event: PlatformEvent }) {
       <CardHeader>
         <div className="flex items-start justify-between gap-3">
           <CardTitle className="text-lg line-clamp-2">{event.title}</CardTitle>
-          <Badge variant={event.status === 'published' ? 'default' : 'secondary'}>
+          <Badge
+            variant={event.status === "published" ? "default" : "secondary"}
+          >
             {event.status}
           </Badge>
         </div>
         {event.description && (
-          <CardDescription className="line-clamp-2">{event.description}</CardDescription>
+          <CardDescription className="line-clamp-2">
+            {event.description}
+          </CardDescription>
         )}
       </CardHeader>
       <CardContent className="space-y-3">
@@ -300,8 +315,12 @@ function EventCard({ event }: { event: PlatformEvent }) {
           <div>
             <p className="font-medium">{startDate.toLocaleDateString()}</p>
             <p className="text-muted-foreground text-xs">
-              {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              {endDate && ` - ${endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+              {startDate.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+              {endDate &&
+                ` - ${endDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`}
             </p>
           </div>
         </div>
@@ -338,33 +357,38 @@ function EventCard({ event }: { event: PlatformEvent }) {
           <div className="flex items-center gap-2 text-sm">
             <Users className="h-4 w-4 text-muted-foreground" />
             <span className="text-muted-foreground">
-              {event.rsvp_count} {event.rsvp_count === 1 ? 'person' : 'people'} attending
+              {event.rsvp_count} {event.rsvp_count === 1 ? "person" : "people"}{" "}
+              attending
             </span>
           </div>
         )}
 
-        {event.published_urls && Object.keys(event.published_urls).length > 0 && (
-          <div className="pt-3 border-t border-border/50">
-            <p className="text-xs text-muted-foreground mb-2">Published on:</p>
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(event.published_urls).map(([platform, url]) => {
-                const platformConfig = PLATFORM_CONFIGS[platform as keyof typeof PLATFORM_CONFIGS];
-                return (
-                  <a
-                    key={platform}
-                    href={url as string}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-violet hover:underline"
-                  >
-                    {platformConfig?.icon} {platformConfig?.name}
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                );
-              })}
+        {event.published_urls &&
+          Object.keys(event.published_urls).length > 0 && (
+            <div className="pt-3 border-t border-border/50">
+              <p className="text-xs text-muted-foreground mb-2">
+                Published on:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(event.published_urls).map(([platform, url]) => {
+                  const platformConfig =
+                    PLATFORM_CONFIGS[platform as keyof typeof PLATFORM_CONFIGS];
+                  return (
+                    <a
+                      key={platform}
+                      href={url as string}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-violet hover:underline"
+                    >
+                      {platformConfig?.icon} {platformConfig?.name}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </CardContent>
     </Card>
   );
@@ -380,8 +404,8 @@ function CreateEventForm({
   const { currentBrand } = useBrand();
   const { toast } = useToast();
   const [formData, setFormData] = useState<CreateEventFormData>({
-    title: '',
-    description: '',
+    title: "",
+    description: "",
     start_time: new Date(),
     rsvp_enabled: false,
     platforms: [],
@@ -392,19 +416,20 @@ function CreateEventForm({
 
     if (!currentBrand?.id || formData.platforms.length === 0) {
       toast({
-        title: 'Validation Error',
-        description: 'Please fill all required fields and select at least one platform',
-        variant: 'destructive',
+        title: "Validation Error",
+        description:
+          "Please fill all required fields and select at least one platform",
+        variant: "destructive",
       });
       return;
     }
 
     try {
       const connectionIds = connections
-        .filter(c => formData.platforms.includes(c.provider))
-        .map(c => c.id);
+        .filter((c) => formData.platforms.includes(c.provider))
+        .map((c) => c.id);
 
-      const { error } = await supabase.from('platform_events').insert({
+      const { error } = await supabase.from("platform_events").insert({
         brand_id: currentBrand.id,
         connection_ids: connectionIds,
         title: formData.title,
@@ -416,21 +441,21 @@ function CreateEventForm({
         online_url: formData.online_url,
         cover_image_url: formData.cover_image_url,
         rsvp_enabled: formData.rsvp_enabled,
-        status: 'draft',
+        status: "draft",
       });
 
       if (error) throw error;
 
       toast({
-        title: 'Event Created',
-        description: 'Your event has been saved as a draft',
+        title: "Event Created",
+        description: "Your event has been saved as a draft",
       });
       onSuccess();
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -443,7 +468,7 @@ function CreateEventForm({
           id="title"
           placeholder="Annual Summer Festival"
           value={formData.title}
-          onChange={e => setFormData({ ...formData, title: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           required
         />
       </div>
@@ -455,7 +480,9 @@ function CreateEventForm({
           placeholder="Join us for an amazing celebration..."
           className="min-h-[100px]"
           value={formData.description}
-          onChange={e => setFormData({ ...formData, description: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, description: e.target.value })
+          }
         />
       </div>
 
@@ -466,7 +493,7 @@ function CreateEventForm({
             id="start"
             type="datetime-local"
             value={formData.start_time.toISOString().slice(0, 16)}
-            onChange={e =>
+            onChange={(e) =>
               setFormData({ ...formData, start_time: new Date(e.target.value) })
             }
             required
@@ -477,8 +504,8 @@ function CreateEventForm({
           <Input
             id="end"
             type="datetime-local"
-            value={formData.end_time?.toISOString().slice(0, 16) || ''}
-            onChange={e =>
+            value={formData.end_time?.toISOString().slice(0, 16) || ""}
+            onChange={(e) =>
               setFormData({ ...formData, end_time: new Date(e.target.value) })
             }
           />
@@ -491,7 +518,9 @@ function CreateEventForm({
           id="location-name"
           placeholder="City Park Amphitheater"
           value={formData.location_name}
-          onChange={e => setFormData({ ...formData, location_name: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, location_name: e.target.value })
+          }
         />
       </div>
 
@@ -501,7 +530,9 @@ function CreateEventForm({
           id="location-address"
           placeholder="123 Main St, City, State 12345"
           value={formData.location_address}
-          onChange={e => setFormData({ ...formData, location_address: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, location_address: e.target.value })
+          }
         />
       </div>
 
@@ -512,7 +543,9 @@ function CreateEventForm({
           type="url"
           placeholder="https://zoom.us/..."
           value={formData.online_url}
-          onChange={e => setFormData({ ...formData, online_url: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, online_url: e.target.value })
+          }
         />
       </div>
 
@@ -520,7 +553,7 @@ function CreateEventForm({
         <Checkbox
           id="rsvp"
           checked={formData.rsvp_enabled}
-          onCheckedChange={checked =>
+          onCheckedChange={(checked) =>
             setFormData({ ...formData, rsvp_enabled: checked as boolean })
           }
         />
@@ -531,7 +564,7 @@ function CreateEventForm({
 
       <div className="space-y-3">
         <Label>Select Platforms *</Label>
-        {connections.map(connection => {
+        {connections.map((connection) => {
           const platform = PLATFORM_CONFIGS[connection.provider];
           const isSelected = formData.platforms.includes(connection.provider);
 
@@ -539,12 +572,12 @@ function CreateEventForm({
             <div
               key={connection.id}
               className={cn(
-                'flex items-center gap-3 p-3 rounded-lg border border-border/50 cursor-pointer transition-all hover:bg-accent/5',
-                isSelected && 'bg-accent/10 border-violet'
+                "flex items-center gap-3 p-3 rounded-lg border border-border/50 cursor-pointer transition-all hover:bg-accent/5",
+                isSelected && "bg-accent/10 border-violet",
               )}
               onClick={() => {
                 const platforms = isSelected
-                  ? formData.platforms.filter(p => p !== connection.provider)
+                  ? formData.platforms.filter((p) => p !== connection.provider)
                   : [...formData.platforms, connection.provider];
                 setFormData({ ...formData, platforms });
               }}

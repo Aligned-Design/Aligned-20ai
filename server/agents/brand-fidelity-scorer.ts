@@ -1,9 +1,9 @@
 /**
  * Brand Fidelity Score (BFS) Calculator
- * 
+ *
  * Evaluates AI-generated content against brand guidelines
  * Minimum score: 0.80 required to move to review
- * 
+ *
  * Rubric (weighted):
  * - Tone alignment: 30%
  * - Terminology match: 20%
@@ -12,8 +12,8 @@
  * - Platform fit: 15%
  */
 
-import OpenAI from 'openai';
-import { BrandFidelityScore } from '../../client/types/agent-config';
+import OpenAI from "openai";
+import { BrandFidelityScore } from "../../client/types/agent-config";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -41,7 +41,7 @@ interface GeneratedContent {
 export async function calculateBFS(
   content: GeneratedContent,
   brandKit: BrandKit,
-  brandEmbedding?: number[]
+  brandEmbedding?: number[],
 ): Promise<BrandFidelityScore> {
   const scores = {
     tone_alignment: 0,
@@ -55,44 +55,50 @@ export async function calculateBFS(
   let regeneration_count = 0;
 
   // 1. Tone Alignment (30% weight)
-  scores.tone_alignment = await scoreToneAlignment(content, brandKit, brandEmbedding);
+  scores.tone_alignment = await scoreToneAlignment(
+    content,
+    brandKit,
+    brandEmbedding,
+  );
   if (scores.tone_alignment < 0.7) {
-    issues.push('Tone does not match brand personality');
+    issues.push("Tone does not match brand personality");
   }
 
   // 2. Terminology Match (20% weight)
   scores.terminology_match = scoreTerminologyMatch(content, brandKit);
   if (scores.terminology_match < 0.7) {
-    issues.push('Missing key brand terminology or phrases');
+    issues.push("Missing key brand terminology or phrases");
   }
 
   // 3. Compliance (20% weight)
   scores.compliance = scoreCompliance(content, brandKit);
   if (scores.compliance < 1.0) {
-    issues.push('Compliance issues detected (banned phrases or missing disclaimers)');
+    issues.push(
+      "Compliance issues detected (banned phrases or missing disclaimers)",
+    );
   }
 
   // 4. CTA Fit (15% weight)
   scores.cta_fit = scoreCTAFit(content, brandKit);
   if (scores.cta_fit < 0.7) {
-    issues.push('CTA does not align with brand voice or goals');
+    issues.push("CTA does not align with brand voice or goals");
   }
 
   // 5. Platform Fit (15% weight)
   scores.platform_fit = scorePlatformFit(content);
   if (scores.platform_fit < 0.8) {
-    issues.push('Content does not fit platform best practices');
+    issues.push("Content does not fit platform best practices");
   }
 
   // Calculate weighted overall score
   const overall =
-    scores.tone_alignment * 0.30 +
-    scores.terminology_match * 0.20 +
-    scores.compliance * 0.20 +
+    scores.tone_alignment * 0.3 +
+    scores.terminology_match * 0.2 +
+    scores.compliance * 0.2 +
     scores.cta_fit * 0.15 +
     scores.platform_fit * 0.15;
 
-  const passed = overall >= 0.80;
+  const passed = overall >= 0.8;
 
   return {
     overall,
@@ -114,15 +120,15 @@ export async function calculateBFS(
 async function scoreToneAlignment(
   content: GeneratedContent,
   brandKit: BrandKit,
-  brandEmbedding?: number[]
+  brandEmbedding?: number[],
 ): Promise<number> {
-  const combinedText = `${content.headline || ''} ${content.body} ${content.cta || ''}`;
+  const combinedText = `${content.headline || ""} ${content.body} ${content.cta || ""}`;
 
   // If we have brand embedding, use semantic similarity
   if (brandEmbedding && process.env.OPENAI_API_KEY) {
     try {
       const response = await openai.embeddings.create({
-        model: 'text-embedding-ada-002',
+        model: "text-embedding-ada-002",
         input: combinedText,
       });
 
@@ -132,20 +138,24 @@ async function scoreToneAlignment(
       // Map similarity (0-1) to score
       return similarity;
     } catch (error) {
-      console.error('Embedding similarity failed, falling back to keyword matching');
+      console.error(
+        "Embedding similarity failed, falling back to keyword matching",
+      );
     }
   }
 
   // Fallback: Keyword matching
   const toneKeywords = brandKit.tone_keywords || [];
   const personality = brandKit.brandPersonality || [];
-  const allKeywords = [...toneKeywords, ...personality].map((k) => k.toLowerCase());
+  const allKeywords = [...toneKeywords, ...personality].map((k) =>
+    k.toLowerCase(),
+  );
 
   if (allKeywords.length === 0) return 0.8; // No keywords defined, assume neutral
 
   const textLower = combinedText.toLowerCase();
   const matchCount = allKeywords.filter((keyword) =>
-    textLower.includes(keyword)
+    textLower.includes(keyword),
   ).length;
 
   const matchRate = matchCount / Math.max(allKeywords.length, 1);
@@ -160,16 +170,18 @@ async function scoreToneAlignment(
  */
 function scoreTerminologyMatch(
   content: GeneratedContent,
-  brandKit: BrandKit
+  brandKit: BrandKit,
 ): number {
-  const combinedText = `${content.headline || ''} ${content.body} ${content.cta || ''}`;
+  const combinedText = `${content.headline || ""} ${content.body} ${content.cta || ""}`;
   const textLower = combinedText.toLowerCase();
 
   let score = 0.5; // Base score
 
   // Check for common phrases
   if (brandKit.commonPhrases) {
-    const phrases = brandKit.commonPhrases.split(',').map((p) => p.trim().toLowerCase());
+    const phrases = brandKit.commonPhrases
+      .split(",")
+      .map((p) => p.trim().toLowerCase());
     const phrasesFound = phrases.filter((phrase) => textLower.includes(phrase));
     score += (phrasesFound.length / Math.max(phrases.length, 1)) * 0.3;
   }
@@ -177,23 +189,30 @@ function scoreTerminologyMatch(
   // Check writing style adherence
   if (brandKit.writingStyle) {
     const style = brandKit.writingStyle.toLowerCase();
-    
+
     // Conversational: short sentences, contractions, questions
-    if (style.includes('conversational')) {
-      const hasContractions = /\b(don't|can't|won't|it's|you're|we're)\b/.test(textLower);
-      const hasQuestions = combinedText.includes('?');
-      const avgSentenceLength = combinedText.split(/[.!?]/).reduce((sum, s) => sum + s.trim().split(' ').length, 0) / Math.max(combinedText.split(/[.!?]/).length, 1);
-      
+    if (style.includes("conversational")) {
+      const hasContractions = /\b(don't|can't|won't|it's|you're|we're)\b/.test(
+        textLower,
+      );
+      const hasQuestions = combinedText.includes("?");
+      const avgSentenceLength =
+        combinedText
+          .split(/[.!?]/)
+          .reduce((sum, s) => sum + s.trim().split(" ").length, 0) /
+        Math.max(combinedText.split(/[.!?]/).length, 1);
+
       if (hasContractions) score += 0.1;
       if (hasQuestions) score += 0.05;
       if (avgSentenceLength < 20) score += 0.05;
     }
 
     // Formal: no contractions, longer sentences, professional tone
-    if (style.includes('formal')) {
-      const hasNoContractions = !/\b(don't|can't|won't|it's|you're|we're)\b/.test(textLower);
+    if (style.includes("formal")) {
+      const hasNoContractions =
+        !/\b(don't|can't|won't|it's|you're|we're)\b/.test(textLower);
       const noProfanity = !/\b(damn|hell|crap)\b/.test(textLower);
-      
+
       if (hasNoContractions) score += 0.1;
       if (noProfanity) score += 0.1;
     }
@@ -208,9 +227,9 @@ function scoreTerminologyMatch(
  */
 function scoreCompliance(
   content: GeneratedContent,
-  brandKit: BrandKit
+  brandKit: BrandKit,
 ): number {
-  const combinedText = `${content.headline || ''} ${content.body} ${content.cta || ''}`;
+  const combinedText = `${content.headline || ""} ${content.body} ${content.cta || ""}`;
   const textLower = combinedText.toLowerCase();
 
   let violations = 0;
@@ -258,21 +277,36 @@ function scoreCompliance(
  * Score 4: CTA Fit (15%)
  * Evaluates call-to-action quality and alignment
  */
-function scoreCTAFit(
-  content: GeneratedContent,
-  brandKit: BrandKit
-): number {
-  const cta = content.cta || '';
-  
+function scoreCTAFit(content: GeneratedContent, brandKit: BrandKit): number {
+  const cta = content.cta || "";
+
   if (!cta || cta.trim().length === 0) return 0.3; // Missing CTA
 
   let score = 0.5; // Base score for having a CTA
 
   // Check CTA clarity (action verbs)
-  const actionVerbs = ['click', 'visit', 'learn', 'discover', 'explore', 'get', 'join', 'start', 'try', 'shop', 'book', 'download', 'subscribe', 'follow', 'share', 'comment', 'dm'];
+  const actionVerbs = [
+    "click",
+    "visit",
+    "learn",
+    "discover",
+    "explore",
+    "get",
+    "join",
+    "start",
+    "try",
+    "shop",
+    "book",
+    "download",
+    "subscribe",
+    "follow",
+    "share",
+    "comment",
+    "dm",
+  ];
   const ctaLower = cta.toLowerCase();
   const hasActionVerb = actionVerbs.some((verb) => ctaLower.includes(verb));
-  
+
   if (hasActionVerb) score += 0.3;
 
   // Check CTA brevity (under 10 words is ideal)
@@ -282,7 +316,9 @@ function scoreCTAFit(
   // Check tone alignment with brand
   const toneKeywords = brandKit.tone_keywords || [];
   if (toneKeywords.length > 0) {
-    const matchesFound = toneKeywords.filter((k) => ctaLower.includes(k.toLowerCase()));
+    const matchesFound = toneKeywords.filter((k) =>
+      ctaLower.includes(k.toLowerCase()),
+    );
     if (matchesFound.length > 0) score += 0.1;
   }
 
@@ -302,27 +338,27 @@ function scorePlatformFit(content: GeneratedContent): number {
 
   // Platform-specific scoring
   switch (platform) {
-    case 'instagram':
+    case "instagram":
       // Instagram: 125-150 chars ideal, 5-10 hashtags
       if (bodyLength >= 125 && bodyLength <= 2200) score += 0.2;
       if (hashtagCount >= 5 && hashtagCount <= 10) score += 0.2;
       if (content.headline && content.headline.length <= 60) score += 0.1;
       break;
 
-    case 'linkedin':
+    case "linkedin":
       // LinkedIn: 150-300 chars for engagement, minimal hashtags
       if (bodyLength >= 150 && bodyLength <= 3000) score += 0.2;
       if (hashtagCount <= 5) score += 0.2;
       if (!content.body.match(/[!]{2,}/)) score += 0.1; // No excessive punctuation
       break;
 
-    case 'facebook':
+    case "facebook":
       // Facebook: 80-120 chars ideal
       if (bodyLength >= 80 && bodyLength <= 300) score += 0.3;
       if (hashtagCount <= 3) score += 0.2;
       break;
 
-    case 'twitter':
+    case "twitter":
       // Twitter: Under 280 chars, minimal hashtags
       if (bodyLength <= 280) score += 0.3;
       if (hashtagCount <= 2) score += 0.2;
@@ -340,7 +376,7 @@ function scorePlatformFit(content: GeneratedContent): number {
  */
 function cosineSimilarity(vecA: number[], vecB: number[]): number {
   if (vecA.length !== vecB.length) {
-    throw new Error('Vectors must have same length');
+    throw new Error("Vectors must have same length");
   }
 
   let dotProduct = 0;
@@ -354,7 +390,7 @@ function cosineSimilarity(vecA: number[], vecB: number[]): number {
   }
 
   const denominator = Math.sqrt(normA) * Math.sqrt(normB);
-  
+
   if (denominator === 0) return 0;
 
   return dotProduct / denominator;

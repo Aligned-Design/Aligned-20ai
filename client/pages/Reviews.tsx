@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useBrand } from '@/contexts/BrandContext';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { EmptyState } from '@/components/ui/empty-state';
-import { DashboardSkeleton } from '@/components/ui/skeletons';
-import { HelpTooltip } from '@/components/ui/help-tooltip';
+import { useState, useEffect } from "react";
+import { useBrand } from "@/contexts/BrandContext";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { EmptyState } from "@/components/ui/empty-state";
+import { DashboardSkeleton } from "@/components/ui/skeletons";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 import {
   Star,
   MessageSquare,
@@ -14,26 +14,30 @@ import {
   Send,
   Sparkles,
   Filter,
-} from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
-import { PlatformReview, ReviewSentiment, PLATFORM_CONFIGS } from '@/types/integrations';
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
+import {
+  PlatformReview,
+  ReviewSentiment,
+  PLATFORM_CONFIGS,
+} from "@/types/integrations";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -41,16 +45,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 
 export default function Reviews() {
   const { currentBrand, loading: brandLoading } = useBrand();
   const { toast } = useToast();
   const [reviews, setReviews] = useState<PlatformReview[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [filterSentiment, setFilterSentiment] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('newest');
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterSentiment, setFilterSentiment] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("newest");
 
   useEffect(() => {
     if (currentBrand?.id) {
@@ -63,18 +67,18 @@ export default function Reviews() {
 
     try {
       const { data, error } = await supabase
-        .from('platform_reviews')
-        .select('*')
-        .eq('brand_id', currentBrand.id)
-        .order('review_date', { ascending: false });
+        .from("platform_reviews")
+        .select("*")
+        .eq("brand_id", currentBrand.id)
+        .order("review_date", { ascending: false });
 
       if (error) throw error;
       setReviews(data || []);
     } catch (error: any) {
       toast({
-        title: 'Error loading reviews',
+        title: "Error loading reviews",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -84,26 +88,26 @@ export default function Reviews() {
   const handleRespond = async (reviewId: string, responseText: string) => {
     try {
       const { error } = await supabase
-        .from('platform_reviews')
+        .from("platform_reviews")
         .update({
           response_text: responseText,
           responded_at: new Date().toISOString(),
-          status: 'answered',
+          status: "answered",
         })
-        .eq('id', reviewId);
+        .eq("id", reviewId);
 
       if (error) throw error;
 
       toast({
-        title: 'Response Sent',
-        description: 'Your response has been posted',
+        title: "Response Sent",
+        description: "Your response has been posted",
       });
       loadReviews();
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -124,21 +128,26 @@ export default function Reviews() {
     );
   }
 
-  const filteredReviews = reviews.filter(review => {
-    if (filterStatus !== 'all' && review.status !== filterStatus) return false;
-    if (filterSentiment !== 'all' && review.sentiment !== filterSentiment) return false;
+  const filteredReviews = reviews.filter((review) => {
+    if (filterStatus !== "all" && review.status !== filterStatus) return false;
+    if (filterSentiment !== "all" && review.sentiment !== filterSentiment)
+      return false;
     return true;
   });
 
   const sortedReviews = [...filteredReviews].sort((a, b) => {
     switch (sortBy) {
-      case 'newest':
-        return new Date(b.review_date).getTime() - new Date(a.review_date).getTime();
-      case 'oldest':
-        return new Date(a.review_date).getTime() - new Date(b.review_date).getTime();
-      case 'highest':
+      case "newest":
+        return (
+          new Date(b.review_date).getTime() - new Date(a.review_date).getTime()
+        );
+      case "oldest":
+        return (
+          new Date(a.review_date).getTime() - new Date(b.review_date).getTime()
+        );
+      case "highest":
         return b.rating - a.rating;
-      case 'lowest':
+      case "lowest":
         return a.rating - b.rating;
       default:
         return 0;
@@ -147,12 +156,15 @@ export default function Reviews() {
 
   const stats = {
     total: reviews.length,
-    unanswered: reviews.filter(r => r.status === 'unanswered').length,
-    average: reviews.length > 0
-      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
-      : '0.0',
-    positive: reviews.filter(r => r.sentiment === 'positive').length,
-    negative: reviews.filter(r => r.sentiment === 'negative').length,
+    unanswered: reviews.filter((r) => r.status === "unanswered").length,
+    average:
+      reviews.length > 0
+        ? (
+            reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+          ).toFixed(1)
+        : "0.0",
+    positive: reviews.filter((r) => r.sentiment === "positive").length,
+    negative: reviews.filter((r) => r.sentiment === "negative").length,
   };
 
   return (
@@ -239,7 +251,7 @@ export default function Reviews() {
             description="Reviews from your connected platforms will appear here"
           />
         ) : (
-          sortedReviews.map(review => (
+          sortedReviews.map((review) => (
             <ReviewCard
               key={review.id}
               review={review}
@@ -257,29 +269,35 @@ function StatCard({
   value,
   subtitle,
   icon,
-  variant = 'default',
+  variant = "default",
 }: {
   title: string;
   value: string;
   subtitle?: string;
   icon: React.ReactNode;
-  variant?: 'default' | 'success' | 'warning';
+  variant?: "default" | "success" | "warning";
 }) {
   const variantColors = {
-    default: 'text-muted-foreground',
-    success: 'text-mint',
-    warning: 'text-coral',
+    default: "text-muted-foreground",
+    success: "text-mint",
+    warning: "text-coral",
   };
 
   return (
     <Card>
       <CardContent className="pt-6">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-muted-foreground">{title}</span>
-          <div className={cn('transition-colors', variantColors[variant])}>{icon}</div>
+          <span className="text-sm font-medium text-muted-foreground">
+            {title}
+          </span>
+          <div className={cn("transition-colors", variantColors[variant])}>
+            {icon}
+          </div>
         </div>
         <div className="text-3xl font-semibold tracking-tight">{value}</div>
-        {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+        {subtitle && (
+          <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+        )}
       </CardContent>
     </Card>
   );
@@ -292,26 +310,26 @@ function ReviewCard({
   review: PlatformReview;
   onRespond: (text: string) => void;
 }) {
-  const [responseText, setResponseText] = useState('');
+  const [responseText, setResponseText] = useState("");
   const [showResponseDialog, setShowResponseDialog] = useState(false);
 
   const platform = PLATFORM_CONFIGS[review.provider];
   const sentimentColors: Record<ReviewSentiment, string> = {
-    positive: 'bg-mint/10 text-mint border-mint/20',
-    neutral: 'bg-azure/10 text-azure border-azure/20',
-    negative: 'bg-coral/10 text-coral border-coral/20',
+    positive: "bg-mint/10 text-mint border-mint/20",
+    neutral: "bg-azure/10 text-azure border-azure/20",
+    negative: "bg-coral/10 text-coral border-coral/20",
   };
 
   const handleSubmitResponse = () => {
     if (responseText.trim()) {
       onRespond(responseText);
-      setResponseText('');
+      setResponseText("");
       setShowResponseDialog(false);
     }
   };
 
   const handleGenerateAI = () => {
-    const aiResponse = `Thank you for your ${review.rating}-star review! We appreciate your feedback and are glad you had a ${review.rating >= 4 ? 'positive' : 'valuable'} experience with ${review.reviewer_name}.`;
+    const aiResponse = `Thank you for your ${review.rating}-star review! We appreciate your feedback and are glad you had a ${review.rating >= 4 ? "positive" : "valuable"} experience with ${review.reviewer_name}.`;
     setResponseText(aiResponse);
   };
 
@@ -322,7 +340,9 @@ function ReviewCard({
           <div className="flex items-start gap-3 flex-1">
             <Avatar>
               <AvatarImage src={review.reviewer_avatar_url} />
-              <AvatarFallback>{review.reviewer_name?.[0]?.toUpperCase()}</AvatarFallback>
+              <AvatarFallback>
+                {review.reviewer_name?.[0]?.toUpperCase()}
+              </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -332,7 +352,9 @@ function ReviewCard({
                   {platform?.name}
                 </Badge>
                 {review.sentiment && (
-                  <Badge className={cn('border', sentimentColors[review.sentiment])}>
+                  <Badge
+                    className={cn("border", sentimentColors[review.sentiment])}
+                  >
                     {review.sentiment}
                   </Badge>
                 )}
@@ -343,10 +365,10 @@ function ReviewCard({
                     <Star
                       key={i}
                       className={cn(
-                        'h-4 w-4',
+                        "h-4 w-4",
                         i < review.rating
-                          ? 'fill-coral text-coral'
-                          : 'text-muted-foreground/30'
+                          ? "fill-coral text-coral"
+                          : "text-muted-foreground/30",
                       )}
                     />
                   ))}
@@ -357,7 +379,9 @@ function ReviewCard({
               </div>
             </div>
           </div>
-          <Badge variant={review.status === 'unanswered' ? 'destructive' : 'default'}>
+          <Badge
+            variant={review.status === "unanswered" ? "destructive" : "default"}
+          >
             {review.status}
           </Badge>
         </div>
@@ -370,13 +394,17 @@ function ReviewCard({
             <div className="flex items-center gap-2">
               <Badge variant="secondary">Your Response</Badge>
               <span className="text-xs text-muted-foreground">
-                {review.responded_at && new Date(review.responded_at).toLocaleDateString()}
+                {review.responded_at &&
+                  new Date(review.responded_at).toLocaleDateString()}
               </span>
             </div>
             <p className="text-sm leading-relaxed">{review.response_text}</p>
           </div>
         ) : (
-          <Dialog open={showResponseDialog} onOpenChange={setShowResponseDialog}>
+          <Dialog
+            open={showResponseDialog}
+            onOpenChange={setShowResponseDialog}
+          >
             <DialogTrigger asChild>
               <Button variant="outline" className="w-full">
                 <MessageSquare className="h-4 w-4 mr-2" />
@@ -387,7 +415,8 @@ function ReviewCard({
               <DialogHeader>
                 <DialogTitle>Respond to {review.reviewer_name}</DialogTitle>
                 <DialogDescription>
-                  Write a thoughtful response to this {review.rating}-star review
+                  Write a thoughtful response to this {review.rating}-star
+                  review
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
@@ -399,7 +428,7 @@ function ReviewCard({
                     placeholder="Write your response..."
                     className="min-h-[150px]"
                     value={responseText}
-                    onChange={e => setResponseText(e.target.value)}
+                    onChange={(e) => setResponseText(e.target.value)}
                   />
                   <Button
                     variant="outline"

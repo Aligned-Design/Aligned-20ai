@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase } from "./supabase";
 
 export interface UploadedFile {
   name: string;
@@ -18,18 +18,18 @@ export interface UploadedFile {
 export async function uploadBrandFile(
   file: File,
   brandId: string,
-  category: string
+  category: string,
 ): Promise<UploadedFile> {
-  const fileExt = file.name.split('.').pop();
+  const fileExt = file.name.split(".").pop();
   const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
   const filePath = `${brandId}/${category}/${fileName}`;
 
   // Upload to Supabase Storage
   const { data, error } = await supabase.storage
-    .from('brand-assets')
+    .from("brand-assets")
     .upload(filePath, file, {
-      cacheControl: '3600',
-      upsert: false
+      cacheControl: "3600",
+      upsert: false,
     });
 
   if (error) {
@@ -37,16 +37,16 @@ export async function uploadBrandFile(
   }
 
   // Get public URL
-  const { data: { publicUrl } } = supabase.storage
-    .from('brand-assets')
-    .getPublicUrl(filePath);
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("brand-assets").getPublicUrl(filePath);
 
   return {
     name: file.name,
     url: publicUrl,
     path: filePath,
     type: file.type,
-    size: file.size
+    size: file.size,
   };
 }
 
@@ -57,10 +57,10 @@ export async function uploadBrandFiles(
   files: File[],
   brandId: string,
   category: string,
-  assetType: string
+  assetType: string,
 ): Promise<UploadedFile[]> {
   const uploadPromises = files.map((file) =>
-    uploadBrandFile(file, brandId, category)
+    uploadBrandFile(file, brandId, category),
   );
 
   const uploadedFiles = await Promise.all(uploadPromises);
@@ -73,15 +73,13 @@ export async function uploadBrandFiles(
     file_type: file.type,
     file_size_bytes: file.size,
     asset_type: assetType,
-    tags: [category]
+    tags: [category],
   }));
 
-  const { error } = await supabase
-    .from('brand_assets')
-    .insert(assetRecords);
+  const { error } = await supabase.from("brand_assets").insert(assetRecords);
 
   if (error) {
-    console.error('Error creating brand_assets records:', error);
+    console.error("Error creating brand_assets records:", error);
   }
 
   return uploadedFiles;
@@ -92,7 +90,7 @@ export async function uploadBrandFiles(
  */
 export async function deleteBrandFile(filePath: string): Promise<void> {
   const { error } = await supabase.storage
-    .from('brand-assets')
+    .from("brand-assets")
     .remove([filePath]);
 
   if (error) {

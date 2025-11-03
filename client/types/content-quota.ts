@@ -3,31 +3,31 @@
  * Phase 5 - Agent Orchestration & Scheduling
  */
 
-export type Platform = 
-  | 'instagram' 
-  | 'facebook' 
-  | 'linkedin' 
-  | 'twitter' 
-  | 'tiktok'
-  | 'youtube_shorts'
-  | 'blog'
-  | 'email'
-  | 'google_business';
+export type Platform =
+  | "instagram"
+  | "facebook"
+  | "linkedin"
+  | "twitter"
+  | "tiktok"
+  | "youtube_shorts"
+  | "blog"
+  | "email"
+  | "google_business";
 
-export type ContentType = 
-  | 'reel'
-  | 'carousel'
-  | 'image'
-  | 'story'
-  | 'post'
-  | 'article'
-  | 'video'
-  | 'email'
-  | 'blog';
+export type ContentType =
+  | "reel"
+  | "carousel"
+  | "image"
+  | "story"
+  | "post"
+  | "article"
+  | "video"
+  | "email"
+  | "blog";
 
-export type FunnelStage = 'top' | 'mid' | 'bottom';
+export type FunnelStage = "top" | "mid" | "bottom";
 
-export type PostingFrequency = 'light' | 'standard' | 'aggressive';
+export type PostingFrequency = "light" | "standard" | "aggressive";
 
 /**
  * Default posting quotas per platform
@@ -45,67 +45,67 @@ export interface PlatformQuota {
  */
 export const DEFAULT_PLATFORM_QUOTAS: PlatformQuota[] = [
   {
-    platform: 'instagram',
+    platform: "instagram",
     posts_per_week: { min: 3, max: 5 },
     posts_per_month: { min: 12, max: 20 },
-    content_types: ['reel', 'carousel', 'image', 'story'],
-    description: 'Mix of reels, carousels, images',
+    content_types: ["reel", "carousel", "image", "story"],
+    description: "Mix of reels, carousels, images",
   },
   {
-    platform: 'facebook',
+    platform: "facebook",
     posts_per_week: { min: 3, max: 5 },
     posts_per_month: { min: 12, max: 20 },
-    content_types: ['reel', 'carousel', 'image', 'post'],
-    description: 'Mix of reels, carousels, images',
+    content_types: ["reel", "carousel", "image", "post"],
+    description: "Mix of reels, carousels, images",
   },
   {
-    platform: 'linkedin',
+    platform: "linkedin",
     posts_per_week: { min: 2, max: 3 },
     posts_per_month: { min: 8, max: 12 },
-    content_types: ['post', 'article'],
-    description: 'Thought leadership + brand updates',
+    content_types: ["post", "article"],
+    description: "Thought leadership + brand updates",
   },
   {
-    platform: 'twitter',
+    platform: "twitter",
     posts_per_week: { min: 3, max: 5 },
     posts_per_month: { min: 12, max: 20 },
-    content_types: ['post'],
-    description: 'Snippets, quotes, blog promos',
+    content_types: ["post"],
+    description: "Snippets, quotes, blog promos",
   },
   {
-    platform: 'tiktok',
+    platform: "tiktok",
     posts_per_week: { min: 2, max: 2 },
     posts_per_month: { min: 8, max: 8 },
-    content_types: ['video'],
-    description: 'Short-form video',
+    content_types: ["video"],
+    description: "Short-form video",
   },
   {
-    platform: 'youtube_shorts',
+    platform: "youtube_shorts",
     posts_per_week: { min: 2, max: 2 },
     posts_per_month: { min: 8, max: 8 },
-    content_types: ['video'],
-    description: 'Short-form video',
+    content_types: ["video"],
+    description: "Short-form video",
   },
   {
-    platform: 'blog',
+    platform: "blog",
     posts_per_week: { min: 1, max: 1 },
     posts_per_month: { min: 4, max: 4 },
-    content_types: ['blog'],
-    description: 'SEO or educational posts',
+    content_types: ["blog"],
+    description: "SEO or educational posts",
   },
   {
-    platform: 'email',
+    platform: "email",
     posts_per_week: { min: 1, max: 1 },
     posts_per_month: { min: 4, max: 4 },
-    content_types: ['email'],
-    description: 'Nurture or announcement series',
+    content_types: ["email"],
+    description: "Nurture or announcement series",
   },
   {
-    platform: 'google_business',
+    platform: "google_business",
     posts_per_week: { min: 1, max: 1 },
     posts_per_month: { min: 4, max: 4 },
-    content_types: ['post'],
-    description: 'Service highlights or promos',
+    content_types: ["post"],
+    description: "Service highlights or promos",
   },
 ];
 
@@ -151,9 +151,17 @@ export interface MonthlyContentPlan {
  * Performance adjustment rules
  */
 export interface PerformanceAdjustment {
-  condition: 'engagement_up' | 'engagement_down' | 'growth_flat' | 'failed_posts';
+  condition:
+    | "engagement_up"
+    | "engagement_down"
+    | "growth_flat"
+    | "failed_posts";
   threshold: number; // e.g., 0.25 for 25%
-  action: 'increase_frequency' | 'decrease_frequency' | 'shift_mix' | 'audit_integrations';
+  action:
+    | "increase_frequency"
+    | "decrease_frequency"
+    | "shift_mix"
+    | "audit_integrations";
   adjustment_value?: number; // e.g., +1 or -1 posts/week
   details: string;
 }
@@ -163,30 +171,30 @@ export interface PerformanceAdjustment {
  */
 export const PERFORMANCE_ADJUSTMENT_RULES: PerformanceAdjustment[] = [
   {
-    condition: 'engagement_up',
+    condition: "engagement_up",
     threshold: 0.25,
-    action: 'increase_frequency',
+    action: "increase_frequency",
     adjustment_value: 1,
-    details: 'Add +1 post/week on top 2 performing channels',
+    details: "Add +1 post/week on top 2 performing channels",
   },
   {
-    condition: 'engagement_down',
-    threshold: 0.20,
-    action: 'decrease_frequency',
+    condition: "engagement_down",
+    threshold: 0.2,
+    action: "decrease_frequency",
     adjustment_value: -1,
-    details: 'Reduce output by 1 post/week; focus on quality',
+    details: "Reduce output by 1 post/week; focus on quality",
   },
   {
-    condition: 'growth_flat',
+    condition: "growth_flat",
     threshold: 2, // 2+ months
-    action: 'shift_mix',
-    details: 'Shift mix: 60% awareness → 40% conversion posts',
+    action: "shift_mix",
+    details: "Shift mix: 60% awareness → 40% conversion posts",
   },
   {
-    condition: 'failed_posts',
+    condition: "failed_posts",
     threshold: 2, // 2+ failures per month
-    action: 'audit_integrations',
-    details: 'Auto-audit integrations and flag for user review',
+    action: "audit_integrations",
+    details: "Auto-audit integrations and flag for user review",
   },
 ];
 
@@ -202,7 +210,7 @@ export interface BrandPostingConfig {
       [C in ContentType]?: number; // 0-1 percentage
     };
   };
-  approval_workflow: 'auto' | 'manual'; // Auto-approve or manual review
+  approval_workflow: "auto" | "manual"; // Auto-approve or manual review
   publish_schedule: {
     [P in Platform]?: Array<{
       day: string;
@@ -222,15 +230,15 @@ export const POSTING_FREQUENCY_PRESETS: Record<
 > = {
   light: {
     multiplier: 0.7,
-    description: '~15-25 posts/month (70% of standard)',
+    description: "~15-25 posts/month (70% of standard)",
   },
   standard: {
     multiplier: 1.0,
-    description: '~25-40 posts/month (baseline)',
+    description: "~25-40 posts/month (baseline)",
   },
   aggressive: {
     multiplier: 1.5,
-    description: '~40-60 posts/month (150% of standard)',
+    description: "~40-60 posts/month (150% of standard)",
   },
 };
 
@@ -248,7 +256,7 @@ export interface WeeklySummary {
   engagement_change_pct: number;
   top_performer_id?: string;
   suggested_actions: Array<{
-    action: 'generate_more' | 'regenerate_low' | 'rebalance_plan';
+    action: "generate_more" | "regenerate_low" | "rebalance_plan";
     label: string;
     count?: number;
   }>;
@@ -257,14 +265,14 @@ export interface WeeklySummary {
 /**
  * Content piece status
  */
-export type ContentStatus = 
-  | 'draft'
-  | 'pending_review'
-  | 'approved'
-  | 'rejected'
-  | 'scheduled'
-  | 'published'
-  | 'failed';
+export type ContentStatus =
+  | "draft"
+  | "pending_review"
+  | "approved"
+  | "rejected"
+  | "scheduled"
+  | "published"
+  | "failed";
 
 /**
  * Scheduled content piece
@@ -312,11 +320,11 @@ export interface SystemSuccessMetrics {
  * Target metrics
  */
 export const TARGET_SUCCESS_METRICS = {
-  auto_generation_rate: 0.90, // ≥ 90%
-  approval_without_edit_rate: 0.80, // ≥ 80%
+  auto_generation_rate: 0.9, // ≥ 90%
+  approval_without_edit_rate: 0.8, // ≥ 80%
   avg_bfs_score: 0.85, // ≥ 0.85
   on_time_publication_rate: 0.95, // ≥ 95%
-  mom_engagement_growth: 0.10, // +10%
+  mom_engagement_growth: 0.1, // +10%
 };
 
 /**
@@ -324,15 +332,16 @@ export const TARGET_SUCCESS_METRICS = {
  */
 export function calculateMonthlyQuota(
   frequency: PostingFrequency,
-  enabledPlatforms: Platform[]
+  enabledPlatforms: Platform[],
 ): number {
   const multiplier = POSTING_FREQUENCY_PRESETS[frequency].multiplier;
-  
+
   let total = 0;
   for (const platform of enabledPlatforms) {
     const quota = DEFAULT_PLATFORM_QUOTAS.find((q) => q.platform === platform);
     if (quota) {
-      const avgMonthly = (quota.posts_per_month.min + quota.posts_per_month.max) / 2;
+      const avgMonthly =
+        (quota.posts_per_month.min + quota.posts_per_month.max) / 2;
       total += avgMonthly * multiplier;
     }
   }
@@ -347,9 +356,9 @@ export function generateContentMix(
   platform: Platform,
   totalPosts: number,
   contentTypes: ContentType[],
-  weightings?: { [K in ContentType]?: number }
+  weightings?: { [K in ContentType]?: number },
 ): ContentMix {
-  const breakdown: ContentMix['breakdown'] = {};
+  const breakdown: ContentMix["breakdown"] = {};
 
   // Default weightings if not provided
   const weights = weightings || getDefaultWeightings(platform);
@@ -366,9 +375,9 @@ export function generateContentMix(
 
   // Default funnel distribution (can be customized by Advisor)
   const funnelDistribution = {
-    top: 0.50, // 50% awareness
-    mid: 0.30, // 30% education
-    bottom: 0.20, // 20% conversion
+    top: 0.5, // 50% awareness
+    mid: 0.3, // 30% education
+    bottom: 0.2, // 20% conversion
   };
 
   return {
@@ -382,11 +391,13 @@ export function generateContentMix(
 /**
  * Get default content type weightings per platform
  */
-function getDefaultWeightings(platform: Platform): { [K in ContentType]?: number } {
+function getDefaultWeightings(platform: Platform): {
+  [K in ContentType]?: number;
+} {
   const defaults: Record<Platform, { [K in ContentType]?: number }> = {
-    instagram: { reel: 0.50, carousel: 0.30, image: 0.20 },
-    facebook: { reel: 0.40, carousel: 0.30, image: 0.30 },
-    linkedin: { post: 0.70, article: 0.30 },
+    instagram: { reel: 0.5, carousel: 0.3, image: 0.2 },
+    facebook: { reel: 0.4, carousel: 0.3, image: 0.3 },
+    linkedin: { post: 0.7, article: 0.3 },
     twitter: { post: 1.0 },
     tiktok: { video: 1.0 },
     youtube_shorts: { video: 1.0 },

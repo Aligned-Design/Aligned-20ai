@@ -28,15 +28,15 @@ pnpm dev
 
 ## 📋 What You Got
 
-| Feature | Status | File |
-|---------|--------|------|
-| Website Crawler | ✅ | `server/workers/brand-crawler.ts` |
-| File Uploads | ✅ | `client/lib/fileUpload.ts` |
-| OpenAI Summaries | ✅ | `server/workers/brand-crawler.ts` |
-| Color Extraction | ✅ | `server/workers/brand-crawler.ts` |
-| Vector Embeddings | ✅ | `supabase/migrations/...sql` |
-| Edge Function | ✅ | `supabase/functions/process-brand-intake/` |
-| Import Button | ✅ | `client/pages/BrandIntake.tsx` |
+| Feature           | Status | File                                       |
+| ----------------- | ------ | ------------------------------------------ |
+| Website Crawler   | ✅     | `server/workers/brand-crawler.ts`          |
+| File Uploads      | ✅     | `client/lib/fileUpload.ts`                 |
+| OpenAI Summaries  | ✅     | `server/workers/brand-crawler.ts`          |
+| Color Extraction  | ✅     | `server/workers/brand-crawler.ts`          |
+| Vector Embeddings | ✅     | `supabase/migrations/...sql`               |
+| Edge Function     | ✅     | `supabase/functions/process-brand-intake/` |
+| Import Button     | ✅     | `client/pages/BrandIntake.tsx`             |
 
 ---
 
@@ -70,11 +70,11 @@ CRAWL_USER_AGENT=AlignedAIBot/1.0 (+contact: hello@aligned-by-design.com)
 
 ## 🚨 Common Issues
 
-| Error | Fix |
-|-------|-----|
-| "OPENAI_API_KEY not set" | Add to `.env.local` or Edge Function secrets |
-| "Failed to upload file" | Create `brand-assets` bucket + RLS policies |
-| "Edge Function not found" | Run `supabase functions deploy process-brand-intake` |
+| Error                      | Fix                                                   |
+| -------------------------- | ----------------------------------------------------- |
+| "OPENAI_API_KEY not set"   | Add to `.env.local` or Edge Function secrets          |
+| "Failed to upload file"    | Create `brand-assets` bucket + RLS policies           |
+| "Edge Function not found"  | Run `supabase functions deploy process-brand-intake`  |
 | "pgvector extension error" | Run `CREATE EXTENSION vector;` in Supabase SQL Editor |
 
 ---

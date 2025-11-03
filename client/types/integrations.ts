@@ -1,44 +1,48 @@
 export type PlatformProvider =
-  | 'instagram'
-  | 'facebook'
-  | 'linkedin'
-  | 'twitter'
-  | 'tiktok'
-  | 'google_business'
-  | 'pinterest'
-  | 'youtube'
-  | 'squarespace'
-  | 'mailchimp'
-  | 'wordpress'
-  | 'shopify'
-  | 'woocommerce'
-  | 'faire'
-  | 'rangeme';
+  | "instagram"
+  | "facebook"
+  | "linkedin"
+  | "twitter"
+  | "tiktok"
+  | "google_business"
+  | "pinterest"
+  | "youtube"
+  | "squarespace"
+  | "mailchimp"
+  | "wordpress"
+  | "shopify"
+  | "woocommerce"
+  | "faire"
+  | "rangeme";
 
-export type PlatformTier = 1 | 2 | 'coming_soon';
+export type PlatformTier = 1 | 2 | "coming_soon";
 
-export type ConnectionStatus = 'connected' | 'expired' | 'disconnected' | 'error';
+export type ConnectionStatus =
+  | "connected"
+  | "expired"
+  | "disconnected"
+  | "error";
 
-export type PostStatus = 'draft' | 'scheduled' | 'published' | 'failed';
+export type PostStatus = "draft" | "scheduled" | "published" | "failed";
 
-export type ReviewStatus = 'unanswered' | 'answered' | 'flagged';
+export type ReviewStatus = "unanswered" | "answered" | "flagged";
 
-export type ReviewSentiment = 'positive' | 'neutral' | 'negative';
+export type ReviewSentiment = "positive" | "neutral" | "negative";
 
-export type EventStatus = 'draft' | 'published' | 'cancelled';
+export type EventStatus = "draft" | "published" | "cancelled";
 
-export type ContentType = 
-  | 'post'
-  | 'story'
-  | 'reel'
-  | 'article'
-  | 'tweet'
-  | 'video'
-  | 'pin'
-  | 'blog'
-  | 'email'
-  | 'event'
-  | 'offer';
+export type ContentType =
+  | "post"
+  | "story"
+  | "reel"
+  | "article"
+  | "tweet"
+  | "video"
+  | "pin"
+  | "blog"
+  | "email"
+  | "event"
+  | "offer";
 
 export interface PlatformConnection {
   id: string;
@@ -138,7 +142,14 @@ export interface ReviewResponseTemplate {
 export interface PlatformConfig {
   provider: PlatformProvider;
   name: string;
-  category: 'social' | 'video' | 'professional' | 'ecommerce' | 'reviews' | 'email' | 'web_blog';
+  category:
+    | "social"
+    | "video"
+    | "professional"
+    | "ecommerce"
+    | "reviews"
+    | "email"
+    | "web_blog";
   tier: PlatformTier;
   icon: string;
   color: string;
@@ -154,26 +165,26 @@ export interface PlatformConfig {
 
 export const PLATFORM_CONFIGS: Record<PlatformProvider, PlatformConfig> = {
   instagram: {
-    provider: 'instagram',
-    name: 'Instagram',
-    category: 'social',
+    provider: "instagram",
+    name: "Instagram",
+    category: "social",
     tier: 1,
-    icon: '📷',
-    color: '#E4405F',
-    supportedContentTypes: ['post', 'story', 'reel'],
+    icon: "📷",
+    color: "#E4405F",
+    supportedContentTypes: ["post", "story", "reel"],
     requiresAuth: true,
     maxCaptionLength: 2200,
     maxHashtags: 30,
     supportsScheduling: true,
   },
   facebook: {
-    provider: 'facebook',
-    name: 'Facebook',
-    category: 'social',
+    provider: "facebook",
+    name: "Facebook",
+    category: "social",
     tier: 1,
-    icon: '👥',
-    color: '#1877F2',
-    supportedContentTypes: ['post', 'story', 'event'],
+    icon: "👥",
+    color: "#1877F2",
+    supportedContentTypes: ["post", "story", "event"],
     requiresAuth: true,
     maxCaptionLength: 63206,
     supportsScheduling: true,
@@ -181,51 +192,51 @@ export const PLATFORM_CONFIGS: Record<PlatformProvider, PlatformConfig> = {
     supportsEvents: true,
   },
   linkedin: {
-    provider: 'linkedin',
-    name: 'LinkedIn',
-    category: 'professional',
+    provider: "linkedin",
+    name: "LinkedIn",
+    category: "professional",
     tier: 1,
-    icon: '💼',
-    color: '#0A66C2',
-    supportedContentTypes: ['post', 'article'],
+    icon: "💼",
+    color: "#0A66C2",
+    supportedContentTypes: ["post", "article"],
     requiresAuth: true,
     maxCaptionLength: 3000,
     supportsScheduling: true,
   },
   twitter: {
-    provider: 'twitter',
-    name: 'X (Twitter)',
-    category: 'social',
+    provider: "twitter",
+    name: "X (Twitter)",
+    category: "social",
     tier: 1,
-    icon: '🐦',
-    color: '#000000',
-    supportedContentTypes: ['tweet'],
+    icon: "🐦",
+    color: "#000000",
+    supportedContentTypes: ["tweet"],
     requiresAuth: true,
     maxCaptionLength: 280,
     maxHashtags: 10,
     supportsScheduling: true,
   },
   tiktok: {
-    provider: 'tiktok',
-    name: 'TikTok',
-    category: 'video',
+    provider: "tiktok",
+    name: "TikTok",
+    category: "video",
     tier: 1,
-    icon: '🎵',
-    color: '#000000',
-    supportedContentTypes: ['video'],
+    icon: "🎵",
+    color: "#000000",
+    supportedContentTypes: ["video"],
     requiresAuth: true,
     maxCaptionLength: 2200,
     maxHashtags: 30,
     supportsScheduling: true,
   },
   google_business: {
-    provider: 'google_business',
-    name: 'Google Business Profile',
-    category: 'reviews',
+    provider: "google_business",
+    name: "Google Business Profile",
+    category: "reviews",
     tier: 1,
-    icon: '🔍',
-    color: '#4285F4',
-    supportedContentTypes: ['post', 'event', 'offer'],
+    icon: "🔍",
+    color: "#4285F4",
+    supportedContentTypes: ["post", "event", "offer"],
     requiresAuth: true,
     maxCaptionLength: 1500,
     supportsScheduling: true,
@@ -233,102 +244,102 @@ export const PLATFORM_CONFIGS: Record<PlatformProvider, PlatformConfig> = {
     supportsEvents: true,
   },
   pinterest: {
-    provider: 'pinterest',
-    name: 'Pinterest',
-    category: 'social',
+    provider: "pinterest",
+    name: "Pinterest",
+    category: "social",
     tier: 1,
-    icon: '📌',
-    color: '#E60023',
-    supportedContentTypes: ['pin'],
+    icon: "📌",
+    color: "#E60023",
+    supportedContentTypes: ["pin"],
     requiresAuth: true,
     maxCaptionLength: 500,
     supportsScheduling: true,
   },
   youtube: {
-    provider: 'youtube',
-    name: 'YouTube',
-    category: 'video',
+    provider: "youtube",
+    name: "YouTube",
+    category: "video",
     tier: 1,
-    icon: '▶️',
-    color: '#FF0000',
-    supportedContentTypes: ['video'],
+    icon: "▶️",
+    color: "#FF0000",
+    supportedContentTypes: ["video"],
     requiresAuth: true,
     maxCaptionLength: 5000,
     supportsScheduling: true,
   },
   squarespace: {
-    provider: 'squarespace',
-    name: 'Squarespace',
-    category: 'web_blog',
+    provider: "squarespace",
+    name: "Squarespace",
+    category: "web_blog",
     tier: 1,
-    icon: '⬛',
-    color: '#000000',
-    supportedContentTypes: ['blog', 'email'],
+    icon: "⬛",
+    color: "#000000",
+    supportedContentTypes: ["blog", "email"],
     requiresAuth: true,
     supportsScheduling: true,
   },
   mailchimp: {
-    provider: 'mailchimp',
-    name: 'Mailchimp',
-    category: 'email',
+    provider: "mailchimp",
+    name: "Mailchimp",
+    category: "email",
     tier: 1,
-    icon: '📧',
-    color: '#FFE01B',
-    supportedContentTypes: ['email'],
+    icon: "📧",
+    color: "#FFE01B",
+    supportedContentTypes: ["email"],
     requiresAuth: true,
     supportsScheduling: true,
   },
   wordpress: {
-    provider: 'wordpress',
-    name: 'WordPress',
-    category: 'web_blog',
+    provider: "wordpress",
+    name: "WordPress",
+    category: "web_blog",
     tier: 1,
-    icon: '📝',
-    color: '#21759B',
-    supportedContentTypes: ['blog'],
+    icon: "📝",
+    color: "#21759B",
+    supportedContentTypes: ["blog"],
     requiresAuth: true,
     supportsScheduling: true,
   },
   shopify: {
-    provider: 'shopify',
-    name: 'Shopify',
-    category: 'ecommerce',
+    provider: "shopify",
+    name: "Shopify",
+    category: "ecommerce",
     tier: 2,
-    icon: '🛍️',
-    color: '#96BF48',
-    supportedContentTypes: ['post'],
+    icon: "🛍️",
+    color: "#96BF48",
+    supportedContentTypes: ["post"],
     requiresAuth: true,
     supportsScheduling: false,
   },
   woocommerce: {
-    provider: 'woocommerce',
-    name: 'WooCommerce',
-    category: 'ecommerce',
+    provider: "woocommerce",
+    name: "WooCommerce",
+    category: "ecommerce",
     tier: 2,
-    icon: '🛒',
-    color: '#96588A',
-    supportedContentTypes: ['post'],
+    icon: "🛒",
+    color: "#96588A",
+    supportedContentTypes: ["post"],
     requiresAuth: true,
     supportsScheduling: false,
   },
   faire: {
-    provider: 'faire',
-    name: 'Faire',
-    category: 'ecommerce',
-    tier: 'coming_soon',
-    icon: '📦',
-    color: '#4A90E2',
+    provider: "faire",
+    name: "Faire",
+    category: "ecommerce",
+    tier: "coming_soon",
+    icon: "📦",
+    color: "#4A90E2",
     supportedContentTypes: [],
     requiresAuth: true,
     supportsScheduling: false,
   },
   rangeme: {
-    provider: 'rangeme',
-    name: 'RangeMe',
-    category: 'ecommerce',
-    tier: 'coming_soon',
-    icon: '🏪',
-    color: '#FF6B35',
+    provider: "rangeme",
+    name: "RangeMe",
+    category: "ecommerce",
+    tier: "coming_soon",
+    icon: "🏪",
+    color: "#FF6B35",
     supportedContentTypes: [],
     requiresAuth: true,
     supportsScheduling: false,

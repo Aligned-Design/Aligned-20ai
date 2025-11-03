@@ -10,6 +10,7 @@
 ### ✅ 1. Website Crawler (`server/workers/brand-crawler.ts`)
 
 **Features:**
+
 - ✅ Playwright-based headless browser
 - ✅ Respects `robots.txt`
 - ✅ Same-domain only, max 50 pages, depth ≤ 3
@@ -25,6 +26,7 @@
 ### ✅ 2. AI Integration (OpenAI)
 
 **Features:**
+
 - ✅ Voice summary generation (tone, style, personality)
 - ✅ Keyword theme extraction
 - ✅ About blurb generation (120-160 chars)
@@ -33,6 +35,7 @@
 - ✅ Logs warning when OPENAI_API_KEY missing
 
 **Models Used:**
+
 - `gpt-4-turbo-preview` (summaries)
 - `text-embedding-ada-002` (embeddings)
 
@@ -41,6 +44,7 @@
 ### ✅ 3. Color Extraction (`node-vibrant`)
 
 **Features:**
+
 - ✅ Screenshots homepage
 - ✅ Extracts primary/secondary/accent colors
 - ✅ Confidence scores
@@ -51,6 +55,7 @@
 ### ✅ 4. File Upload System (`client/lib/fileUpload.ts`)
 
 **Features:**
+
 - ✅ Upload to Supabase Storage `brand-assets` bucket
 - ✅ Organized by `brandId/category/filename`
 - ✅ Creates `brand_assets` records
@@ -59,6 +64,7 @@
 - ✅ Proper error handling
 
 **Supported File Types:**
+
 - Logos (images)
 - Brand imagery (images)
 - Text references (PDF, DOC, TXT)
@@ -72,17 +78,21 @@
 ### ✅ 5. Database (Supabase)
 
 **New Tables:**
+
 - `brand_embeddings` (pgvector enabled)
 
 **New Columns on `brands`:**
+
 - `voice_summary` (JSONB) ✅ Exists
 - `visual_summary` (JSONB) ✅ Exists
 - `brand_kit` (JSONB) ✅ Exists
 
 **Extensions:**
+
 - `vector` (pgvector) ✅ Migration created
 
 **RLS Policies:**
+
 - Brand isolation enforced
 - No cross-brand access
 - Service role can manage embeddings
@@ -92,6 +102,7 @@
 ### ✅ 6. Edge Function (`supabase/functions/process-brand-intake`)
 
 **Features:**
+
 - ✅ Triggers crawler on demand
 - ✅ Processes brand intake
 - ✅ Updates `brands` table with results
@@ -106,6 +117,7 @@
 ### ✅ 7. UI Updates (`client/pages/BrandIntake.tsx`)
 
 **New Features:**
+
 - ✅ "Import from Website" button (Section 1)
 - ✅ Progress indicator during import
 - ✅ File upload handling in submit
@@ -114,6 +126,7 @@
 - ✅ Friendly status messages
 
 **UX Flow:**
+
 1. User enters website URL
 2. Clicks "Import from Website"
 3. Sees progress: "Crawling website..." → "Processing complete!"
@@ -188,6 +201,7 @@ supabase db reset  # or apply migration manually
 ### 4. Create Storage Bucket
 
 In Supabase Dashboard → Storage:
+
 1. Create bucket: `brand-assets`
 2. Make it **public**
 3. Run: `supabase/storage/brand-assets-policies.sql`
@@ -264,14 +278,14 @@ pnpm dev
 
 Based on testing with real websites:
 
-| Metric | Value | Notes |
-|--------|-------|-------|
-| **Avg crawl time** | 30-60s | Depends on site size |
-| **Max pages crawled** | 50 | Configurable |
-| **Avg file upload** | 2-3s | Per 5 files |
-| **OpenAI summary** | 3-5s | API latency |
-| **Color extraction** | 2-3s | Screenshot + analysis |
-| **Total import time** | 40-70s | End-to-end |
+| Metric                | Value  | Notes                 |
+| --------------------- | ------ | --------------------- |
+| **Avg crawl time**    | 30-60s | Depends on site size  |
+| **Max pages crawled** | 50     | Configurable          |
+| **Avg file upload**   | 2-3s   | Per 5 files           |
+| **OpenAI summary**    | 3-5s   | API latency           |
+| **Color extraction**  | 2-3s   | Screenshot + analysis |
+| **Total import time** | 40-70s | End-to-end            |
 
 ---
 
@@ -301,17 +315,17 @@ SELECT * FROM brand_embeddings WHERE brand_id = 'brand-a-id';
 
 ## 📈 Phase 3 Final Score
 
-| Component | Status | Score |
-|-----------|--------|-------|
-| **20-Question Intake Form** | ✅ Complete (34 fields) | 100/100 |
-| **Autosave Functionality** | ✅ Complete (5s interval) | 100/100 |
-| **File Upload UI** | ✅ Complete | 100/100 |
-| **File Upload Backend** | ✅ **IMPLEMENTED** | **100/100** |
-| **Brand Kit JSON Storage** | ✅ Complete | 100/100 |
-| **Brand Snapshot Page** | ✅ Complete | 100/100 |
-| **Website Crawler** | ✅ **IMPLEMENTED** | **100/100** |
-| **AI Embeddings** | ✅ **IMPLEMENTED** | **100/100** |
-| **Voice/Visual Summaries** | ✅ **IMPLEMENTED** | **100/100** |
+| Component                   | Status                    | Score       |
+| --------------------------- | ------------------------- | ----------- |
+| **20-Question Intake Form** | ✅ Complete (34 fields)   | 100/100     |
+| **Autosave Functionality**  | ✅ Complete (5s interval) | 100/100     |
+| **File Upload UI**          | ✅ Complete               | 100/100     |
+| **File Upload Backend**     | ✅ **IMPLEMENTED**        | **100/100** |
+| **Brand Kit JSON Storage**  | ✅ Complete               | 100/100     |
+| **Brand Snapshot Page**     | ✅ Complete               | 100/100     |
+| **Website Crawler**         | ✅ **IMPLEMENTED**        | **100/100** |
+| **AI Embeddings**           | ✅ **IMPLEMENTED**        | **100/100** |
+| **Voice/Visual Summaries**  | ✅ **IMPLEMENTED**        | **100/100** |
 
 **Phase 3 Total**: **100/100** ✅
 
@@ -374,11 +388,13 @@ pnpm dev
 ### Option 2: Move to Phase 4
 
 Phase 3 is **production-ready**! You can:
+
 - ✅ Proceed to Phase 4 (AI Agents)
 - ✅ Test in parallel
 - ✅ Deploy to staging
 
 **Phase 4 Preview:**
+
 - Doc Agent (content generation)
 - Design Agent (visual creation)
 - Advisor Agent (analytics + recommendations)

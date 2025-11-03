@@ -14,9 +14,11 @@ I've created all the core components for the crawler guardrails system. Here's w
 ## 📦 Files Created
 
 ### 1. Type Definitions
+
 **File**: `client/types/brand-kit-field.ts` (143 lines)
 
 **Key Features**:
+
 - `TrackedField<T>` - Every field has `value`, `source`, `last_updated_at`
 - `FieldSource` - "user" | "crawler" | "import"
 - `CrawlerSuggestion` - Diff modal data structure
@@ -24,11 +26,12 @@ I've created all the core components for the crawler guardrails system. Here's w
 - Helper functions: `createTrackedField()`, `canCrawlerUpdate()`, `getSourceLabel()`
 
 **Usage**:
+
 ```typescript
-import { createTrackedField, canCrawlerUpdate } from '@/types/brand-kit-field';
+import { createTrackedField, canCrawlerUpdate } from "@/types/brand-kit-field";
 
 // Create tracked field
-const color = createTrackedField('#8B5CF6', 'crawler');
+const color = createTrackedField("#8B5CF6", "crawler");
 // { value: '#8B5CF6', source: 'crawler', last_updated_at: '2025-01-16T...' }
 
 // Check if crawler can update
@@ -40,9 +43,11 @@ if (canCrawlerUpdate(existingField)) {
 ---
 
 ### 2. Diff Modal Component
+
 **File**: `client/components/brand-intake/CrawlerDiffModal.tsx` (309 lines)
 
 **Key Features**:
+
 - Accept/Keep buttons per field
 - Grouped by category (Colors, Fonts, Tone, Keywords, About)
 - User-edited fields shown as "protected"
@@ -51,6 +56,7 @@ if (canCrawlerUpdate(existingField)) {
 - Shows confidence scores
 
 **Props**:
+
 ```typescript
 <CrawlerDiffModal
   open={showDiffModal}
@@ -63,6 +69,7 @@ if (canCrawlerUpdate(existingField)) {
 ---
 
 ### 3. API Routes
+
 **File**: `server/routes/crawler.ts` (429 lines)
 
 **Endpoints**:
@@ -75,7 +82,7 @@ Response: { job_id, status: 'pending' }
 
 // 2. Get crawl results
 GET /api/crawl/result/:jobId
-Response: { 
+Response: {
   job_id,
   status: 'completed',
   suggestions: [...],
@@ -99,6 +106,7 @@ Response: { success: true, field, value }
 ```
 
 **Enforcement Rules**:
+
 - ✅ Checks `field.source === 'user'` before overwriting
 - ✅ Rejects crawler updates if user has edited (unless `force_user_override: true`)
 - ✅ Records all changes to history table
@@ -107,15 +115,18 @@ Response: { success: true, field, value }
 ---
 
 ### 4. Database Migration
+
 **File**: `supabase/migrations/20250116_create_brand_kit_history.sql` (83 lines)
 
 **Creates**:
+
 - `brand_kit_history` table with RLS
 - Indexes for efficient queries
 - Auto-cleanup trigger (keeps last 10 per field)
 - `crawler_settings` column on `brands` table
 
 **Schema**:
+
 ```sql
 CREATE TABLE brand_kit_history (
   id UUID PRIMARY KEY,
@@ -150,9 +161,9 @@ supabase db push
 In `server/index.ts`, add:
 
 ```typescript
-import crawlerRoutes from './routes/crawler';
+import crawlerRoutes from "./routes/crawler";
 
-app.use('/api', crawlerRoutes);
+app.use("/api", crawlerRoutes);
 ```
 
 ### Step 3: Update BrandIntake.tsx
@@ -160,15 +171,17 @@ app.use('/api', crawlerRoutes);
 Add these imports:
 
 ```typescript
-import { CrawlerDiffModal } from '@/components/brand-intake/CrawlerDiffModal';
-import { CrawlerSuggestion, FieldChange } from '@/types/brand-kit-field';
+import { CrawlerDiffModal } from "@/components/brand-intake/CrawlerDiffModal";
+import { CrawlerSuggestion, FieldChange } from "@/types/brand-kit-field";
 ```
 
 Add state:
 
 ```typescript
 const [showDiffModal, setShowDiffModal] = useState(false);
-const [crawlerSuggestions, setCrawlerSuggestions] = useState<CrawlerSuggestion[]>([]);
+const [crawlerSuggestions, setCrawlerSuggestions] = useState<
+  CrawlerSuggestion[]
+>([]);
 ```
 
 Replace `handleImportFromWebsite` function with:
@@ -185,24 +198,24 @@ const handleImportFromWebsite = async () => {
   }
 
   setImporting(true);
-  setImportProgress('Starting website crawl...');
+  setImportProgress("Starting website crawl...");
 
   try {
     // Start crawl job
-    const startResponse = await fetch('/api/crawl/start', {
-      method: 'POST',
+    const startResponse = await fetch("/api/crawl/start", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'x-user-id': user?.id || '',
+        "Content-Type": "application/json",
+        "x-user-id": user?.id || "",
       },
       body: JSON.stringify({
         brand_id: brandId,
-        url: formData.websiteUrl
-      })
+        url: formData.websiteUrl,
+      }),
     });
 
     if (!startResponse.ok) {
-      throw new Error('Failed to start crawl');
+      throw new Error("Failed to start crawl");
     }
 
     const { job_id } = await startResponse.json();
@@ -210,19 +223,19 @@ const handleImportFromWebsite = async () => {
     // Poll for results
     let attempts = 0;
     const maxAttempts = 60;
-    
+
     while (attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const resultResponse = await fetch(`/api/crawl/result/${job_id}`);
       const result = await resultResponse.json();
 
-      if (result.status === 'completed') {
+      if (result.status === "completed") {
         setCrawlerSuggestions(result.suggestions || []);
         setShowDiffModal(true);
         break;
-      } else if (result.status === 'failed') {
-        throw new Error(result.error || 'Crawl failed');
+      } else if (result.status === "failed") {
+        throw new Error(result.error || "Crawl failed");
       }
 
       attempts++;
@@ -230,9 +243,8 @@ const handleImportFromWebsite = async () => {
     }
 
     if (attempts >= maxAttempts) {
-      throw new Error('Crawl timeout');
+      throw new Error("Crawl timeout");
     }
-
   } catch (error: any) {
     toast({
       title: "Import failed",
@@ -241,7 +253,7 @@ const handleImportFromWebsite = async () => {
     });
   } finally {
     setImporting(false);
-    setImportProgress('');
+    setImportProgress("");
   }
 };
 ```
@@ -251,32 +263,32 @@ Add apply handler:
 ```typescript
 const handleApplyCrawlerChanges = async (changes: FieldChange[]) => {
   try {
-    const response = await fetch('/api/brand-kit/apply', {
-      method: 'POST',
+    const response = await fetch("/api/brand-kit/apply", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'x-user-id': user?.id || '',
+        "Content-Type": "application/json",
+        "x-user-id": user?.id || "",
       },
       body: JSON.stringify({
         brand_id: brandId,
-        changes
-      })
+        changes,
+      }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to apply changes');
+      throw new Error("Failed to apply changes");
     }
 
     // Update form with accepted changes
     const updates: any = {};
     for (const change of changes) {
-      if (change.field === 'colors') {
+      if (change.field === "colors") {
         updates.primaryColor = change.value.primary;
         updates.secondaryColor = change.value.secondary;
         updates.accentColor = change.value.accent;
-      } else if (change.field === 'keywords') {
+      } else if (change.field === "keywords") {
         updates.toneKeywords = change.value;
-      } else if (change.field === 'about_blurb') {
+      } else if (change.field === "about_blurb") {
         updates.shortDescription = change.value;
       }
     }
@@ -317,18 +329,18 @@ Add modal to JSX (right after opening `<div className="container..."`):
 In each section component (e.g., `Section3VisualIdentity.tsx`), add source badges:
 
 ```tsx
-import { getSourceLabel } from '@/types/brand-kit-field';
+import { getSourceLabel } from "@/types/brand-kit-field";
 
 // In the color picker
 <Label>
   Primary Color
-  {brandKit?.colors?.source === 'crawler' && (
+  {brandKit?.colors?.source === "crawler" && (
     <Badge variant="outline" className="ml-2 text-xs">
       <Sparkles className="h-3 w-3 mr-1" />
       AI suggestion
     </Badge>
   )}
-</Label>
+</Label>;
 ```
 
 ### Add "Re-scan Website" Button
@@ -336,11 +348,7 @@ import { getSourceLabel } from '@/types/brand-kit-field';
 In Brand Guide editor:
 
 ```tsx
-<Button
-  variant="outline"
-  onClick={handleRescanWebsite}
-  disabled={rescanning}
->
+<Button variant="outline" onClick={handleRescanWebsite} disabled={rescanning}>
   <RotateCcw className="h-4 w-4 mr-2" />
   Re-scan Website
 </Button>
@@ -361,11 +369,16 @@ Create a popover showing change history per field:
     <div className="space-y-2">
       <h4 className="font-medium">Change History</h4>
       {history.map((entry) => (
-        <div key={entry.id} className="flex items-center justify-between text-sm">
+        <div
+          key={entry.id}
+          className="flex items-center justify-between text-sm"
+        >
           <div>
             <div>{formatDate(entry.created_at)}</div>
             <div className="text-muted-foreground">
-              {entry.changed_by === 'user' ? 'Manually edited' : 'AI suggestion'}
+              {entry.changed_by === "user"
+                ? "Manually edited"
+                : "AI suggestion"}
             </div>
           </div>
           <Button
@@ -387,6 +400,7 @@ Create a popover showing change history per field:
 ## 🔒 Data Model Structure
 
 ### Old Structure (Phase 3)
+
 ```json
 {
   "brandName": "Aligned AI",
@@ -396,6 +410,7 @@ Create a popover showing change history per field:
 ```
 
 ### New Structure (with source tracking)
+
 ```json
 {
   "brandName": {
@@ -431,34 +446,36 @@ Create a popover showing change history per field:
 ## ✅ Acceptance Criteria Check
 
 - [x] **User-edited color stays after re-crawl**  
-  ✅ Enforced in `/api/brand-kit/apply` - rejects if `source === 'user'`
+      ✅ Enforced in `/api/brand-kit/apply` - rejects if `source === 'user'`
 
 - [x] **Accept/Keep flow for each field**  
-  ✅ `CrawlerDiffModal` provides per-field buttons
+      ✅ `CrawlerDiffModal` provides per-field buttons
 
 - [x] **History shows before/after + timestamps**  
-  ✅ `brand_kit_history` table tracks all changes
+      ✅ `brand_kit_history` table tracks all changes
 
 - [x] **Revert restores both value and source**  
-  ✅ `/api/brand-kit/revert` endpoint
+      ✅ `/api/brand-kit/revert` endpoint
 
 - [x] **Re-scan suggests but doesn't change user fields**  
-  ✅ API checks `currentSource` before suggesting changes
+      ✅ API checks `currentSource` before suggesting changes
 
 - [x] **No silent overwrites**  
-  ✅ All changes require explicit user acceptance
+      ✅ All changes require explicit user acceptance
 
 ---
 
 ## 🧪 Testing Checklist
 
 ### Test 1: User Edit Protection
+
 1. Import website → Accept color suggestion
 2. Manually edit color (source becomes "user")
 3. Re-scan website
 4. **Expected**: Color not in suggestions list OR marked as "protected"
 
 ### Test 2: Diff Modal Workflow
+
 1. Enter website URL
 2. Click "Import from Website"
 3. Wait for diff modal
@@ -467,6 +484,7 @@ Create a popover showing change history per field:
 6. **Expected**: Only selected 3 fields update
 
 ### Test 3: History & Revert
+
 1. Import website, accept colors
 2. Manually edit colors
 3. View history
@@ -475,6 +493,7 @@ Create a popover showing change history per field:
 6. **Expected**: Color reverts to crawler value, source becomes "crawler"
 
 ### Test 4: Auto-Apply Toggle (optional)
+
 1. Enable `crawler_auto_apply: true` in settings
 2. Re-scan website
 3. **Expected**: Only non-user fields auto-update (no modal)
@@ -504,7 +523,7 @@ Existing `brand_kit` data (without source tracking) will work as-is. When user f
 function migrateBrandKit(oldKit: any) {
   const newKit: any = {};
   for (const [field, value] of Object.entries(oldKit)) {
-    newKit[field] = createTrackedField(value, 'user'); // Assume user-entered
+    newKit[field] = createTrackedField(value, "user"); // Assume user-entered
   }
   return newKit;
 }
@@ -521,15 +540,15 @@ function migrateBrandKit(oldKit: any) {
 
 ## 🔐 Safety Rules (Enforced in Code)
 
-| Rule | Enforcement | File |
-|------|-------------|------|
-| **Never overwrite user edits** | `source === 'user'` check | `server/routes/crawler.ts:221` |
-| **Respect robots.txt** | `robots.isAllowed()` | `server/workers/brand-crawler.ts:95` |
-| **Same-domain only** | `linkUrl.hostname === baseDomain` | `server/workers/brand-crawler.ts:132` |
-| **Max 50 pages** | `results.length < CRAWL_MAX_PAGES` | `server/workers/brand-crawler.ts:71` |
-| **1s crawl delay** | `setTimeout(1000)` | `server/workers/brand-crawler.ts:144` |
-| **Depth ≤ 3** | `depth > MAX_DEPTH` | `server/workers/brand-crawler.ts:81` |
-| **No contact info** | `allow_contact_info === false` | Not impl yet (future) |
+| Rule                           | Enforcement                        | File                                  |
+| ------------------------------ | ---------------------------------- | ------------------------------------- |
+| **Never overwrite user edits** | `source === 'user'` check          | `server/routes/crawler.ts:221`        |
+| **Respect robots.txt**         | `robots.isAllowed()`               | `server/workers/brand-crawler.ts:95`  |
+| **Same-domain only**           | `linkUrl.hostname === baseDomain`  | `server/workers/brand-crawler.ts:132` |
+| **Max 50 pages**               | `results.length < CRAWL_MAX_PAGES` | `server/workers/brand-crawler.ts:71`  |
+| **1s crawl delay**             | `setTimeout(1000)`                 | `server/workers/brand-crawler.ts:144` |
+| **Depth ≤ 3**                  | `depth > MAX_DEPTH`                | `server/workers/brand-crawler.ts:81`  |
+| **No contact info**            | `allow_contact_info === false`     | Not impl yet (future)                 |
 
 ---
 

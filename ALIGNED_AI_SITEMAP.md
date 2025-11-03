@@ -11,6 +11,7 @@ This document serves as the master map for Aligned AI, showing every page, secti
 **Accessible without login; marketing and onboarding pages**
 
 ### 1. Homepage (`/`)
+
 - **Purpose**: Product overview and conversion
 - **Sections**:
   - Hero with value proposition
@@ -23,6 +24,7 @@ This document serves as the master map for Aligned AI, showing every page, secti
 - **Component**: `client/pages/Index.tsx`
 
 ### 2. Features
+
 - **Purpose**: Deep dive into AI capabilities
 - **Sections**:
   - Doc Agent (Aligned Words) - Content generation
@@ -30,10 +32,11 @@ This document serves as the master map for Aligned AI, showing every page, secti
   - Advisor Agent (Aligned Insights) - Data-driven recommendations
   - Platform integrations showcase
   - Workflow automation examples
-- **Route**: `/features` *(to be implemented)*
+- **Route**: `/features` _(to be implemented)_
 - **Status**: 🔄 Planned
 
 ### 3. Integrations
+
 - **Purpose**: Showcase supported platforms
 - **Sections**:
   - Tier 1 Platforms (Meta, LinkedIn, TikTok, X, Google Business, Pinterest, YouTube, Squarespace, Mailchimp, WordPress)
@@ -41,26 +44,28 @@ This document serves as the master map for Aligned AI, showing every page, secti
   - Coming Soon (Faire, RangeMe)
   - Integration benefits
   - OAuth security details
-- **Route**: `/integrations-marketing` *(to be implemented)*
+- **Route**: `/integrations-marketing` _(to be implemented)_
 - **Status**: 🔄 Planned
 
 ### 4. Pricing / Plans
+
 - **Purpose**: Transparent pricing and plan comparison
 - **Plans**:
   - **Solo**: Individual creators ($49/mo)
   - **Agency**: Teams and agencies ($199/mo)
   - **Enterprise**: Custom solutions (Contact sales)
 - **Features Comparison Table**
-- **Route**: `/pricing` *(to be implemented)*
+- **Route**: `/pricing` _(to be implemented)_
 - **Status**: 🔄 Planned
 
 ### 5. About / Contact / Legal
+
 - **About Us**: Company mission and team
 - **Contact**: Support form and sales contact
 - **Terms of Service**: Legal agreement
 - **Privacy Policy**: Data handling and privacy
 - **Support**: Help center access
-- **Route**: `/about`, `/contact`, `/terms`, `/privacy` *(to be implemented)*
+- **Route**: `/about`, `/contact`, `/terms`, `/privacy` _(to be implemented)_
 - **Status**: 🔄 Planned
 
 ---
@@ -72,6 +77,7 @@ This document serves as the master map for Aligned AI, showing every page, secti
 **Component**: `client/components/layout/AppLayout.tsx`
 
 #### Sidebar Navigation
+
 ```
 ┌─ Aligned AI Logo
 ├─ Brand Switcher (dropdown)
@@ -90,13 +96,15 @@ This document serves as the master map for Aligned AI, showing every page, secti
 ```
 
 #### Top Bar
+
 - **Left**: Search (⌘K trigger)
 - **Center**: Current brand badge
-- **Right**: 
+- **Right**:
   - Notifications bell
   - Profile menu (Profile, Sign Out)
 
 #### Role-Based Visibility
+
 See Section C for detailed permissions matrix.
 
 ---
@@ -108,17 +116,21 @@ See Section C for detailed permissions matrix.
 **Access**: All authenticated users (role-aware views)
 
 #### Purpose
+
 At-a-glance performance, tasks, and AI agent insights for the current brand.
 
 #### Sections
 
 ##### Welcome + AI Summary
+
 - Personalized greeting
 - Weekly performance highlight ("Reach +14% this week")
 - Brand health score
 
 ##### Content Pipeline
+
 Status breakdown:
+
 - 📝 **Draft** - Content being created
 - 👀 **In Review** - Awaiting approval
 - ✅ **Approved** - Ready to schedule
@@ -126,33 +138,39 @@ Status breakdown:
 - 🚀 **Published** - Live on platforms
 
 ##### Calendar Snapshot
+
 - 7-day preview
 - Quick view of scheduled posts
 - Link to full calendar
 
 ##### Approvals Queue
+
 - Posts awaiting approval (for Approvers)
 - Quick approve/reject actions
 - Request edits option
 
 ##### Advisor Insights
+
 - Best posting times
 - Top-performing topics
 - Recommended formats
 - Trending hashtags
 
 ##### Connection Health & Token Status
+
 - Platform connection status
 - Token expiration warnings
 - Quick reconnect actions
 
 ##### Recent Activity
+
 - Last 10 actions across the brand
 - Agent-generated content
 - Manual uploads
 - Approvals/rejections
 
 ##### Quick Create
+
 - Fast access to create:
   - Social post
   - Blog article
@@ -161,13 +179,13 @@ Status breakdown:
 
 #### Role-Aware Views
 
-| Role | View Access |
-|------|-------------|
-| **Owner/Admin** | All brands + billing + team health + system metrics |
+| Role                 | View Access                                              |
+| -------------------- | -------------------------------------------------------- |
+| **Owner/Admin**      | All brands + billing + team health + system metrics      |
 | **Strategy Manager** | Analytics + Advisor insights + Approvals + Full pipeline |
-| **Brand Manager** | Pipeline + Quick Create + Assets + Calendar |
-| **Approver/Client** | Read-only + Approve/Request Edits on assigned content |
-| **Viewer** | Read-only summary, no actions |
+| **Brand Manager**    | Pipeline + Quick Create + Assets + Calendar              |
+| **Approver/Client**  | Read-only + Approve/Request Edits on assigned content    |
+| **Viewer**           | Read-only summary, no actions                            |
 
 ---
 
@@ -178,14 +196,17 @@ Status breakdown:
 **Access**: All roles (read/write varies)
 
 #### Purpose
+
 Visual scheduling interface for all content across platforms.
 
 #### View Modes
+
 - 📅 **Month View** - Overview of entire month
 - 📊 **Week View** - Detailed 7-day schedule
 - 📋 **List View** - Chronological list with filters
 
 #### Features
+
 - **Drag-and-drop** rescheduling (Brand Manager+)
 - **Multi-brand** view (Admin only)
 - **Platform filters** (Instagram, Facebook, LinkedIn, etc.)
@@ -199,6 +220,7 @@ Visual scheduling interface for all content across platforms.
   - Purple: Published
 
 #### Integrations
+
 - Syncs with `social_posts` table
 - Reflects `platform_events` for events
 - Updates real-time via Supabase subscriptions
@@ -212,11 +234,13 @@ Visual scheduling interface for all content across platforms.
 **Access**: Admin, Strategy Manager, Brand Manager
 
 #### Purpose
+
 Comprehensive brand onboarding and AI training data collection.
 
 #### Multi-Section Form (~20 questions)
 
 ##### Section 1: Brand Basics
+
 - Brand name
 - Website URL
 - Tagline
@@ -225,6 +249,7 @@ Comprehensive brand onboarding and AI training data collection.
 - Primary audience
 
 ##### Section 2: Voice & Messaging
+
 - Brand personality traits
 - Tone keywords
 - Writing style
@@ -233,6 +258,7 @@ Comprehensive brand onboarding and AI training data collection.
 - Common phrases
 
 ##### Section 3: Visual Identity
+
 - Primary color (hex picker)
 - Secondary color
 - Accent color
@@ -243,6 +269,7 @@ Comprehensive brand onboarding and AI training data collection.
 - Reference material links
 
 ##### Section 4: Content Preferences
+
 - Platforms used
 - Post frequency
 - Preferred content types
@@ -250,18 +277,21 @@ Comprehensive brand onboarding and AI training data collection.
 - Competitors / inspiration
 
 ##### Section 5: Operational & Compliance
+
 - Approval workflow
 - Required disclaimers
 - Content restrictions
 - Social handles
 
 ##### Section 6: AI Training Assets
+
 - Text reference files
 - Visual reference files
 - Previous content samples
 - AI-specific notes
 
 #### Website Crawler Feature
+
 - **Technology**: Playwright + OpenAI
 - **Process**:
   1. User provides URL
@@ -274,7 +304,9 @@ Comprehensive brand onboarding and AI training data collection.
 - **Component**: `server/workers/brand-crawler.ts`
 
 #### AI Snapshot Panel
+
 Real-time summary of:
+
 - Detected tone
 - Key keywords
 - Brand colors
@@ -282,6 +314,7 @@ Real-time summary of:
 - Content themes
 
 #### Review Diff Modal
+
 - Shows: Previous value | Crawler suggestion | Current value
 - User can: Accept All, Accept Individual, Reject All
 - Component: `client/components/brand-intake/CrawlerDiffModal.tsx`
@@ -295,9 +328,11 @@ Real-time summary of:
 **Access**: Admin, Strategy Manager, Brand Manager
 
 #### Purpose
+
 Centralized media management for all brand content.
 
 #### Features
+
 - **Upload**: Images, videos, PDFs, documents
 - **Organize**: Folders and tags
 - **Search**: Keyword and tag search
@@ -312,6 +347,7 @@ Centralized media management for all brand content.
   - Metadata extraction
 
 #### Storage
+
 - **Backend**: Supabase Storage
 - **Bucket**: `brand-assets`
 - **RLS**: Brand-specific isolation
@@ -326,9 +362,11 @@ Centralized media management for all brand content.
 **Access**: Admin, Strategy Manager, Brand Manager
 
 #### Purpose
+
 Unified composer for multi-platform content creation.
 
 #### Tier 1 API Support
+
 All content types supported:
 
 1. **Meta (Facebook + Instagram Business)**
@@ -371,6 +409,7 @@ All content types supported:
     - Blog auto-publish
 
 #### Shared Fields
+
 - **Title** (optional, for blogs/articles)
 - **Caption / Content** (with character counter)
 - **Media Upload** (images/videos)
@@ -380,7 +419,9 @@ All content types supported:
 - **Platform Selection** (multi-select checkboxes)
 
 #### AI Modes
+
 Accessible via toolbar:
+
 - 🤖 **Generate** - Create from scratch
 - ✍️ **Rewrite** - Improve existing text
 - 🌐 **Translate** - Multi-language support
@@ -388,6 +429,7 @@ Accessible via toolbar:
 - 🎨 **Generate Image** - AI image creation
 
 #### Brand Fidelity Score (BFS)
+
 - Real-time scoring (0.0 - 1.0)
 - Minimum: 0.80 to approve
 - Breakdown:
@@ -399,6 +441,7 @@ Accessible via toolbar:
 - Auto-regenerate if below threshold
 
 #### Approval Workflow Pane
+
 - **Status indicator**
 - **Approvers list**
 - **Comments thread**
@@ -406,6 +449,7 @@ Accessible via toolbar:
 - **Approve/Reject** actions
 
 #### Platform-Specific Validation
+
 - Character limits per platform
 - Hashtag limits
 - Media format requirements
@@ -416,17 +460,20 @@ Accessible via toolbar:
 
 ### 7. Posts / Pipeline
 
-**Route**: `/posts` *(to be implemented)*  
+**Route**: `/posts` _(to be implemented)_  
 **Status**: 🔄 Planned - Currently shown in Dashboard
 
 #### Purpose
+
 Manage all content across pipeline stages.
 
 #### View Modes
+
 - 📊 **Kanban Board** - By status columns
 - 📋 **Table View** - Sortable list
 
 #### Columns (Kanban)
+
 1. Draft
 2. In Review
 3. Approved
@@ -434,6 +481,7 @@ Manage all content across pipeline stages.
 5. Published
 
 #### Features
+
 - **Bulk Actions**:
   - Approve multiple
   - Schedule multiple
@@ -463,10 +511,13 @@ Manage all content across pipeline stages.
 **Access**: All roles (depth varies)
 
 #### Purpose
+
 Performance tracking and data-driven insights.
 
 #### Channel-Level Metrics
+
 Per platform dashboard showing:
+
 - **Reach** - Total impressions
 - **Engagement** - Likes, comments, shares
 - **CTR** - Click-through rate
@@ -474,12 +525,14 @@ Per platform dashboard showing:
 - **Top Posts** - Best performing content
 
 #### Trend Charts
+
 - Line charts for metrics over time
 - Comparison mode (multiple date ranges)
 - Platform comparison overlays
 - Export to PNG/PDF
 
 #### AI Insights (Advisor Agent)
+
 - **Best Times to Post** - By platform and day
 - **Top Topics** - Content themes that perform
 - **Format Recommendations** - Video vs. image vs. carousel
@@ -487,17 +540,20 @@ Per platform dashboard showing:
 - **Audience Insights** - Demographics and behavior
 
 #### Advisor Recommendations Panel
+
 - Actionable next steps
 - Content gap analysis
 - Competitor benchmarking
 - Suggested experiments
 
 #### Reports
+
 - **Download PDF** - Formatted analytics report
 - **Scheduled Reports** - Email delivery
 - **Custom Dashboards** - Save filter combinations
 
 #### Date Range Comparison
+
 - This week vs. last week
 - This month vs. last month
 - Custom date ranges
@@ -512,12 +568,15 @@ Per platform dashboard showing:
 **Access**: Admin only
 
 #### Purpose
+
 Manage all platform connections and OAuth flows.
 
 #### Platform Categories
 
 ##### Tier 1 (Fully Integrated)
+
 Connected to unified composer:
+
 - 📱 **Social Media**: Instagram, Facebook, LinkedIn, X (Twitter), TikTok, Pinterest
 - 🎥 **Video**: YouTube
 - 💼 **Professional**: Google Business Profile
@@ -525,17 +584,22 @@ Connected to unified composer:
 - 📝 **Blog/Web**: WordPress, Squarespace Blog
 
 ##### Tier 2 (E-Commerce)
+
 Partial integration:
+
 - 🛍️ **Shopify** - Product feed
 - 🛒 **WooCommerce** - Order sync
 
 ##### Coming Soon
+
 - 📦 **Faire** - Wholesale marketplace
 - 🏪 **RangeMe** - Retail distribution
 - 🌐 **Amazon Seller Central**
 
 #### Connection Tiles
+
 Each platform shows:
+
 - **Logo & Brand Color**
 - **Connection Status**:
   - 🟢 Connected
@@ -552,11 +616,13 @@ Each platform shows:
   - 🗑️ Disconnect
 
 #### Multi-Account Support
+
 - Connect multiple accounts per platform
 - Example: 3 Instagram accounts, 2 Facebook pages
 - Switch between accounts in composer
 
 #### OAuth Wizard
+
 - Click "+ Connect New Platform"
 - Select platform from grid
 - OAuth redirect flow
@@ -565,6 +631,7 @@ Each platform shows:
 - Auto-refresh token management
 
 #### Token Health Monitoring
+
 - Automatic expiration detection
 - Proactive reconnection prompts
 - Token refresh on API calls
@@ -579,11 +646,13 @@ Each platform shows:
 **Access**: Admin, Strategy Manager, Brand Manager, Approver (respond only)
 
 #### Purpose
+
 Centralized review management from Facebook and Google Business Profile.
 
 #### Features
 
 ##### Review Dashboard
+
 - **Total Reviews Count**
 - **Average Rating** (1-5 stars)
 - **Unanswered Count** (alerts)
@@ -593,6 +662,7 @@ Centralized review management from Facebook and Google Business Profile.
   - 😞 Negative (1-2 stars)
 
 ##### Filters & Sorting
+
 - **Filter by**:
   - Rating (1-5 stars)
   - Status (Unanswered, Answered, Flagged)
@@ -605,14 +675,16 @@ Centralized review management from Facebook and Google Business Profile.
   - Lowest rating
 
 ##### AI Sentiment Analysis
+
 - Automatic classification per review
 - Sentiment score (0-1)
 - Emotion detection
 - Urgency flagging
 
 ##### Response Management
+
 - **View Review**: Full review text + metadata
-- **AI-Suggested Reply**: 
+- **AI-Suggested Reply**:
   - Context-aware response
   - Brand tone matching
   - Customizable templates
@@ -621,6 +693,7 @@ Centralized review management from Facebook and Google Business Profile.
 - **Response Templates**: Save frequently used responses
 
 ##### Review Card Display
+
 - Reviewer name + avatar
 - Star rating (visual)
 - Review text
@@ -631,6 +704,7 @@ Centralized review management from Facebook and Google Business Profile.
 - Quick actions (Respond, Flag, Archive)
 
 ##### Export Report
+
 - PDF download
 - CSV export
 - Date range selection
@@ -645,11 +719,13 @@ Centralized review management from Facebook and Google Business Profile.
 **Access**: Admin, Strategy Manager, Brand Manager
 
 #### Purpose
+
 Create and manage events for Facebook and Google Business Profile.
 
 #### Event Creation Form
 
 ##### Basic Info
+
 - **Title** (required)
 - **Description** (rich text)
 - **Event Type** (dropdown):
@@ -661,12 +737,14 @@ Create and manage events for Facebook and Google Business Profile.
   - Other
 
 ##### Date & Time
+
 - **Start Date/Time** (required)
 - **End Date/Time** (optional)
 - **Timezone** (auto-detected)
 - **All-day event** (checkbox)
 
 ##### Location
+
 - **Physical Location**:
   - Venue name
   - Street address
@@ -677,26 +755,31 @@ Create and manage events for Facebook and Google Business Profile.
   - Platform name
 
 ##### Media
+
 - **Cover Image** (recommended 1920×1080)
 - **Additional Images** (gallery)
 
 ##### Settings
+
 - **RSVP Enabled** (checkbox)
 - **Max Attendees** (optional)
 - **Ticket URL** (if paid)
 - **Registration Required** (checkbox)
 
 ##### Platform Selection
+
 - Facebook Events
 - Google Business Events
 - Multi-select supported
 
 #### Events List View
+
 - **Upcoming Events**: Future-dated, published
 - **Draft Events**: Not yet published
 - **Past Events**: Historical with metrics
 
 #### Event Card Display
+
 - Cover image thumbnail
 - Event title
 - Date & time
@@ -707,11 +790,13 @@ Create and manage events for Facebook and Google Business Profile.
 - Actions (Edit, Duplicate, Cancel, Delete)
 
 #### Calendar Sync
+
 - Auto-add to Aligned AI calendar
 - Optional: Sync to website calendar (Squarespace/WordPress plugin)
 - iCal export for external calendars
 
 #### Metrics & Engagement
+
 - **RSVP Count**: Going / Interested
 - **Reach**: Event page views
 - **Engagement**: Comments, shares
@@ -721,17 +806,20 @@ Create and manage events for Facebook and Google Business Profile.
 
 ### 12. Emails & Campaigns
 
-**Route**: `/emails` *(to be implemented)*  
+**Route**: `/emails` _(to be implemented)_  
 **Status**: 🔄 Planned - Currently part of Create Post flow
 
 #### Purpose
+
 Dedicated email campaign creation and management.
 
 #### Supported Platforms
+
 - **Squarespace Email Campaigns**
 - **Mailchimp**
 
 #### Campaign Builder
+
 - **Template Library**:
   - Newsletter
   - Announcement
@@ -747,11 +835,13 @@ Dedicated email campaign creation and management.
 - **Preview**: Desktop + Mobile
 
 #### Email List Management
+
 - **Segments**: Filter subscribers
 - **Import/Export**: CSV support
 - **Sync**: Platform native lists
 
 #### Campaign Analytics
+
 - **Open Rate**: % who opened
 - **Click Rate**: % who clicked links
 - **Bounce Rate**: Failed deliveries
@@ -759,6 +849,7 @@ Dedicated email campaign creation and management.
 - **Heat Map**: Where users clicked
 
 #### A/B Testing
+
 - Subject line variants
 - Content variants
 - Send time optimization
@@ -768,16 +859,19 @@ Dedicated email campaign creation and management.
 ### 13. Settings
 
 **Route**: `/settings`  
-**Component**: `client/pages/Settings.tsx` *(to be implemented)*  
+**Component**: `client/pages/Settings.tsx` _(to be implemented)_  
 **Access**: Role-dependent (see tabs below)
 
 #### Purpose
+
 Centralized configuration for user, brand, and system settings.
 
 #### Tabs
 
 ##### Profile & Notifications
+
 **Access**: All users
+
 - Personal info (name, email)
 - Password change
 - Profile picture
@@ -790,7 +884,9 @@ Centralized configuration for user, brand, and system settings.
 - Time zone
 
 ##### Brand Settings
+
 **Access**: Admin, Brand Manager
+
 - **Posting Rules**:
   - Default post frequency
   - Preferred posting times
@@ -810,7 +906,9 @@ Centralized configuration for user, brand, and system settings.
   - Topic restrictions
 
 ##### Team & Roles
+
 **Access**: Admin only
+
 - **User List**: All team members
 - **Invite Users**: Email invitations
 - **Role Assignment**:
@@ -823,7 +921,9 @@ Centralized configuration for user, brand, and system settings.
 - **Deactivate Users**: Soft delete
 
 ##### Billing & Usage
+
 **Access**: Admin (Owner) only
+
 - **Current Plan**: Solo / Agency / Enterprise
 - **Usage Metrics**:
   - Posts published this month
@@ -836,7 +936,9 @@ Centralized configuration for user, brand, and system settings.
 - **Quota Alerts**: 80%, 90%, 100% thresholds
 
 ##### API Keys / Webhooks
+
 **Access**: Admin only
+
 - **API Keys**: Generate, revoke, rotate
 - **Webhooks**: Configure event callbacks
   - Post published
@@ -846,7 +948,9 @@ Centralized configuration for user, brand, and system settings.
 - **Developer Docs**: Link to API reference
 
 ##### Security / 2FA
+
 **Access**: All users (own account)
+
 - **Two-Factor Authentication**:
   - Enable/Disable
   - App-based (Authenticator)
@@ -856,7 +960,9 @@ Centralized configuration for user, brand, and system settings.
 - **Security Alerts**: Unusual activity
 
 ##### Data Exports
+
 **Access**: Admin only
+
 - **Export Brand Data**:
   - All posts (JSON/CSV)
   - All assets (ZIP)
@@ -869,13 +975,15 @@ Centralized configuration for user, brand, and system settings.
 
 ### 14. Admin / Owner Only
 
-**Route**: `/admin` *(to be implemented)*  
+**Route**: `/admin` _(to be implemented)_  
 **Access**: Admin role only
 
 #### Purpose
+
 System-wide management and monitoring across all brands.
 
 #### Tenant-Level Overview
+
 - **All Brands Summary**:
   - Total brands
   - Total users
@@ -885,6 +993,7 @@ System-wide management and monitoring across all brands.
   - API quota consumption
 
 #### User Management
+
 - **Full User List** (all brands)
 - **Invite Users**: System-wide invitations
 - **Role Management**: Assign/revoke roles
@@ -892,6 +1001,7 @@ System-wide management and monitoring across all brands.
 - **Audit Log**: User actions
 
 #### Billing Dashboard
+
 - **Plan Distribution**:
   - Solo plan count
   - Agency plan count
@@ -904,6 +1014,7 @@ System-wide management and monitoring across all brands.
 - **Overages**: Brands exceeding limits
 
 #### System Health
+
 - **Connection Uptime**:
   - % uptime per platform
   - Recent outages
@@ -922,6 +1033,7 @@ System-wide management and monitoring across all brands.
   - Advisor Agent: Insight accuracy
 
 #### Feature Flags
+
 - Enable/disable features globally
 - A/B testing configuration
 - Beta feature access
@@ -930,10 +1042,11 @@ System-wide management and monitoring across all brands.
 
 ### 15. Support / Docs / Changelog
 
-**Route**: `/support` *(to be implemented)*  
+**Route**: `/support` _(to be implemented)_  
 **Access**: All users
 
 #### In-App Help Center
+
 - **Search**: AI-assisted article search
 - **Categories**:
   - Getting Started
@@ -947,18 +1060,21 @@ System-wide management and monitoring across all brands.
 - **Live Chat**: Support widget
 
 #### Documentation
+
 - **User Guides**: Step-by-step instructions
 - **API Reference**: Developer docs
 - **Keyboard Shortcuts**: ⌘K reference
 - **Best Practices**: Content strategy tips
 
 #### Changelog / Release Notes
+
 - **What's New**: Feature announcements
 - **Version History**: Past releases
 - **Upcoming Features**: Roadmap preview
 - **Bug Fixes**: Known issues resolved
 
 #### Contact Support
+
 - **Ticket Submission**: Email-based support
 - **Live Chat**: Business hours
 - **Emergency Hotline**: Enterprise only
@@ -967,24 +1083,25 @@ System-wide management and monitoring across all brands.
 
 ## C. Role-Based Navigation Visibility
 
-| Menu Item | Admin | Strategy Mgr | Brand Mgr | Approver/Client | Viewer |
-|-----------|:-----:|:------------:|:---------:|:---------------:|:------:|
-| **Dashboard** | ✅ Full | ✅ Full | ✅ Full | ✅ Read | ✅ Read |
-| **Brands** | ✅ All brands | ✅ Assigned | ✅ Assigned | 🔒 Hidden | 🔒 Hidden |
-| **Create Post** | ✅ Full | ✅ Full | ✅ Full | 🔒 Hidden | 🔒 Hidden |
-| **Calendar** | ✅ Edit | ✅ Edit | ✅ Edit | ✅ Read | ✅ Read |
-| **Brand Kit** | ✅ Edit | ✅ Edit | ✅ Edit | 🔒 Hidden | 🔒 Hidden |
-| **Assets** | ✅ Manage | ✅ Manage | ✅ Manage | 🔒 Hidden | 🔒 Hidden |
-| **Posts/Pipeline** | ✅ Full | ✅ Full | ✅ Full | ✅ Approve only | ✅ Read |
-| **Analytics** | ✅ Full | ✅ Full | ✅ Full | ✅ Summary | ✅ Summary |
-| **Integrations** | ✅ Manage | 🔒 Read | 🔒 Hidden | 🔒 Hidden | 🔒 Hidden |
-| **Reviews** | ✅ Manage | ✅ Manage | ✅ Respond | ✅ Respond | ✅ Read |
-| **Events** | ✅ Manage | ✅ Manage | ✅ Manage | ✅ Read | 🔒 Hidden |
-| **Emails** | ✅ Manage | ✅ Manage | ✅ Manage | 🔒 Hidden | 🔒 Hidden |
-| **Settings** | ✅ All tabs | 🔒 Profile only | 🔒 Profile + Brand | 🔒 Profile only | 🔒 Profile only |
-| **Admin Tools** | ✅ Full | 🔒 Hidden | 🔒 Hidden | 🔒 Hidden | 🔒 Hidden |
+| Menu Item          |     Admin     |  Strategy Mgr   |     Brand Mgr      | Approver/Client |     Viewer      |
+| ------------------ | :-----------: | :-------------: | :----------------: | :-------------: | :-------------: |
+| **Dashboard**      |    ✅ Full    |     ✅ Full     |      ✅ Full       |     ✅ Read     |     ✅ Read     |
+| **Brands**         | ✅ All brands |   ✅ Assigned   |    ✅ Assigned     |    🔒 Hidden    |    🔒 Hidden    |
+| **Create Post**    |    ✅ Full    |     ✅ Full     |      ✅ Full       |    🔒 Hidden    |    🔒 Hidden    |
+| **Calendar**       |    ✅ Edit    |     ✅ Edit     |      ✅ Edit       |     ✅ Read     |     ✅ Read     |
+| **Brand Kit**      |    ✅ Edit    |     ✅ Edit     |      ✅ Edit       |    🔒 Hidden    |    🔒 Hidden    |
+| **Assets**         |   ✅ Manage   |    ✅ Manage    |     ✅ Manage      |    🔒 Hidden    |    🔒 Hidden    |
+| **Posts/Pipeline** |    ✅ Full    |     ✅ Full     |      ✅ Full       | ✅ Approve only |     ✅ Read     |
+| **Analytics**      |    ✅ Full    |     ✅ Full     |      ✅ Full       |   ✅ Summary    |   ✅ Summary    |
+| **Integrations**   |   ✅ Manage   |     🔒 Read     |     🔒 Hidden      |    🔒 Hidden    |    🔒 Hidden    |
+| **Reviews**        |   ✅ Manage   |    ✅ Manage    |     ✅ Respond     |   ✅ Respond    |     ✅ Read     |
+| **Events**         |   ✅ Manage   |    ✅ Manage    |     ✅ Manage      |     ✅ Read     |    🔒 Hidden    |
+| **Emails**         |   ✅ Manage   |    ✅ Manage    |     ✅ Manage      |    🔒 Hidden    |    🔒 Hidden    |
+| **Settings**       |  ✅ All tabs  | 🔒 Profile only | 🔒 Profile + Brand | 🔒 Profile only | 🔒 Profile only |
+| **Admin Tools**    |    ✅ Full    |    🔒 Hidden    |     🔒 Hidden      |    🔒 Hidden    |    🔒 Hidden    |
 
 ### Permission Legend
+
 - ✅ **Full Access** - Complete read/write permissions
 - ✅ **Edit** - Can modify content
 - ✅ **Manage** - Can create, edit, delete
@@ -1000,38 +1117,42 @@ System-wide management and monitoring across all brands.
 ## D. Data Flows Cross-Reference
 
 ### Content Creation Flow
+
 ```
 User → Brand Kit → AI Agents → Post Draft → Approval → Schedule → Publish → Analytics
 ```
 
-| Page | Primary Agents | Data Sources | Outputs | Notes |
-|------|---------------|--------------|---------|-------|
-| **Dashboard** | Advisor | `brands`, `social_posts`, `platform_reviews`, `analytics` | Summaries, next actions | Surfaces AI insights |
-| **Calendar** | Doc + Design | `social_posts`, `platform_events` | Scheduled content | Real-time sync |
-| **Brand Kit** | All 3 agents | User input, Website crawler | Brand embeddings, AI training data | Feeds all AI context |
-| **Create Post** | Doc + Design | Brand kit, previous posts | Post drafts with BFS | Multi-platform validation |
-| **Posts/Pipeline** | Doc + Design | `social_posts`, `generation_logs` | Content workflow | Approval state machine |
-| **Analytics** | Advisor | Platform APIs, `social_posts` | Insights, recommendations | ML-powered trends |
-| **Integrations** | None (OAuth) | `platform_connections` | Access tokens | Token refresh automation |
-| **Reviews** | Advisor (sentiment) | Facebook API, Google API | Review data, responses | AI sentiment analysis |
-| **Events** | Doc + Design | `platform_events` | Event posts | Calendar sync |
-| **Emails** | Doc + Design | Email platform APIs | Campaign data | Template-based |
+| Page               | Primary Agents      | Data Sources                                              | Outputs                            | Notes                     |
+| ------------------ | ------------------- | --------------------------------------------------------- | ---------------------------------- | ------------------------- |
+| **Dashboard**      | Advisor             | `brands`, `social_posts`, `platform_reviews`, `analytics` | Summaries, next actions            | Surfaces AI insights      |
+| **Calendar**       | Doc + Design        | `social_posts`, `platform_events`                         | Scheduled content                  | Real-time sync            |
+| **Brand Kit**      | All 3 agents        | User input, Website crawler                               | Brand embeddings, AI training data | Feeds all AI context      |
+| **Create Post**    | Doc + Design        | Brand kit, previous posts                                 | Post drafts with BFS               | Multi-platform validation |
+| **Posts/Pipeline** | Doc + Design        | `social_posts`, `generation_logs`                         | Content workflow                   | Approval state machine    |
+| **Analytics**      | Advisor             | Platform APIs, `social_posts`                             | Insights, recommendations          | ML-powered trends         |
+| **Integrations**   | None (OAuth)        | `platform_connections`                                    | Access tokens                      | Token refresh automation  |
+| **Reviews**        | Advisor (sentiment) | Facebook API, Google API                                  | Review data, responses             | AI sentiment analysis     |
+| **Events**         | Doc + Design        | `platform_events`                                         | Event posts                        | Calendar sync             |
+| **Emails**         | Doc + Design        | Email platform APIs                                       | Campaign data                      | Template-based            |
 
 ### AI Agent Responsibilities
 
 #### Doc Agent (Aligned Words)
+
 - **Consumes**: Brand kit, tone embeddings, previous content
 - **Produces**: Post captions, blog articles, email copy
 - **Quality Gate**: Brand Fidelity Score ≥ 0.80
 - **Used In**: Create Post, Emails, Events
 
 #### Design Agent (Aligned Creative)
+
 - **Consumes**: Brand colors, fonts, logo, imagery style
 - **Produces**: Social graphics, carousel images, video thumbnails
 - **Quality Gate**: Visual brand alignment check
 - **Used In**: Create Post, Events
 
 #### Advisor Agent (Aligned Insights)
+
 - **Consumes**: Analytics data, engagement metrics, platform trends
 - **Produces**: Posting recommendations, content ideas, optimal times
 - **Quality Gate**: Statistical significance thresholds
@@ -1039,17 +1160,17 @@ User → Brand Kit → AI Agents → Post Draft → Approval → Schedule → Pu
 
 ### Database Tables Reference
 
-| Table | Purpose | Related Pages |
-|-------|---------|---------------|
-| `brands` | Brand configurations | Brand Kit, Dashboard, All |
-| `brand_embeddings` | AI training vectors | All agent operations |
-| `brand_kit_history` | Change tracking | Brand Kit diff modal |
-| `social_posts` | Content items | Create Post, Calendar, Pipeline |
-| `platform_connections` | OAuth tokens | Integrations, Create Post |
-| `platform_reviews` | Review aggregation | Reviews |
-| `platform_events` | Event data | Events, Calendar |
-| `generation_logs` | AI agent audit trail | Admin, Analytics |
-| `content_review_queue` | Approval workflow | Pipeline, Dashboard |
+| Table                  | Purpose              | Related Pages                   |
+| ---------------------- | -------------------- | ------------------------------- |
+| `brands`               | Brand configurations | Brand Kit, Dashboard, All       |
+| `brand_embeddings`     | AI training vectors  | All agent operations            |
+| `brand_kit_history`    | Change tracking      | Brand Kit diff modal            |
+| `social_posts`         | Content items        | Create Post, Calendar, Pipeline |
+| `platform_connections` | OAuth tokens         | Integrations, Create Post       |
+| `platform_reviews`     | Review aggregation   | Reviews                         |
+| `platform_events`      | Event data           | Events, Calendar                |
+| `generation_logs`      | AI agent audit trail | Admin, Analytics                |
+| `content_review_queue` | Approval workflow    | Pipeline, Dashboard             |
 
 ---
 
@@ -1164,6 +1285,7 @@ auth.users
 ## F. Implementation Status
 
 ### ✅ Fully Implemented
+
 - [x] Homepage (public marketing)
 - [x] Authentication (Login/Signup)
 - [x] Dashboard (with role-aware views)
@@ -1181,11 +1303,13 @@ auth.users
 - [x] AI Agent Guardrails (BFS, linter)
 
 ### 🔄 Partially Implemented
+
 - [ ] Posts/Pipeline (shown in Dashboard, needs dedicated page)
 - [ ] Emails/Campaigns (in Create Post, needs dedicated module)
 - [ ] Settings (basic structure, needs all tabs)
 
 ### 📋 Planned
+
 - [ ] Features page (marketing)
 - [ ] Pricing page (marketing)
 - [ ] About/Contact/Legal pages
@@ -1201,6 +1325,7 @@ auth.users
 ### Site Map Build Verification
 
 #### ✅ Navigation
+
 - [ ] All pages exist in sidebar navigation
 - [ ] Routes are registered in `client/App.tsx`
 - [ ] Responsive navigation on mobile
@@ -1208,6 +1333,7 @@ auth.users
 - [ ] Search (⌘K) includes all pages
 
 #### ✅ Role-Based Visibility
+
 - [ ] Admin sees all menu items
 - [ ] Strategy Manager sees assigned items
 - [ ] Brand Manager sees create/edit items
@@ -1216,6 +1342,7 @@ auth.users
 - [ ] Hidden items don't appear in DOM
 
 #### ✅ Security (RLS)
+
 - [ ] All queries filter by `brand_id`
 - [ ] Users can't access other brands' data
 - [ ] Admin can access all brands
@@ -1223,6 +1350,7 @@ auth.users
 - [ ] No data leaks in API responses
 
 #### ✅ Integrations
+
 - [ ] Tier 1 APIs available in Create Post
 - [ ] Multi-account connect supported
 - [ ] OAuth flows complete successfully
@@ -1230,6 +1358,7 @@ auth.users
 - [ ] Connection health monitoring active
 
 #### ✅ Content Pipeline
+
 - [ ] Create → Review → Approve → Schedule → Publish
 - [ ] Status updates propagate correctly
 - [ ] Notifications sent to approvers
@@ -1237,6 +1366,7 @@ auth.users
 - [ ] Multi-platform publish works
 
 #### ✅ AI Agents
+
 - [ ] Doc Agent generates on-brand content
 - [ ] Design Agent creates visuals
 - [ ] Advisor Agent provides insights
@@ -1244,6 +1374,7 @@ auth.users
 - [ ] Content linter catches violations
 
 #### ✅ Reviews & Events
+
 - [ ] Facebook reviews sync correctly
 - [ ] Google Business reviews sync correctly
 - [ ] AI sentiment analysis accurate
@@ -1252,6 +1383,7 @@ auth.users
 - [ ] RSVP tracking functional
 
 #### ✅ Multi-Brand Support
+
 - [ ] Brand switcher works
 - [ ] Data isolated per brand
 - [ ] Admin view aggregates brands
@@ -1263,6 +1395,7 @@ auth.users
 ## H. Future Enhancements
 
 ### Phase 8: Advanced Features
+
 - **Content Templates Library**
 - **Bulk Upload & Schedule**
 - **A/B Testing Engine**
@@ -1271,6 +1404,7 @@ auth.users
 - **White-Label Options**
 
 ### Phase 9: E-Commerce Deep Integration
+
 - **Shopify Product Feed Sync**
 - **WooCommerce Order Automation**
 - **Dynamic Product Posts**
@@ -1278,6 +1412,7 @@ auth.users
 - **Sales Performance Tracking**
 
 ### Phase 10: Enterprise Features
+
 - **Multi-Tenant Architecture**
 - **Custom Branding**
 - **Advanced Permissions**
@@ -1449,41 +1584,41 @@ Aligned AI
 
 ### Main Navigation Table
 
-| Route | Page Name | Status | Access Roles | Primary Purpose |
-|-------|-----------|--------|--------------|----------------|
-| `/` | Homepage | ✅ Live | Public | Marketing conversion |
-| `/login` | Login | ✅ Live | Public | User authentication |
-| `/signup` | Signup | ✅ Live | Public | New user registration |
-| `/dashboard` | Dashboard | ✅ Live | All Auth | Performance overview |
-| `/brands` | Brands | ✅ Live | Admin, Mgr | Brand management |
-| `/brand-intake` | Brand Kit | ✅ Live | Admin, Mgr | Brand onboarding |
-| `/create-post` | Create Post | ✅ Live | Admin, Mgr | Multi-platform composer |
-| `/calendar` | Calendar | ✅ Live | All Auth | Content scheduling |
-| `/assets` | Assets | ✅ Live | Admin, Mgr | Media library |
-| `/analytics` | Analytics | ✅ Live | All Auth | Performance metrics |
-| `/integrations` | Integrations | ✅ Live | Admin | Platform connections |
-| `/reviews` | Reviews | ✅ Live | Admin, Mgr, Approver | Review management |
-| `/events` | Events | ✅ Live | Admin, Mgr | Event publishing |
-| `/emails` | Emails | 🔄 Planned | Admin, Mgr | Email campaigns |
-| `/settings` | Settings | 🔄 Partial | All Auth | Configuration |
-| `/admin` | Admin Tools | 📋 Planned | Admin Only | System management |
+| Route           | Page Name    | Status     | Access Roles         | Primary Purpose         |
+| --------------- | ------------ | ---------- | -------------------- | ----------------------- |
+| `/`             | Homepage     | ✅ Live    | Public               | Marketing conversion    |
+| `/login`        | Login        | ✅ Live    | Public               | User authentication     |
+| `/signup`       | Signup       | ✅ Live    | Public               | New user registration   |
+| `/dashboard`    | Dashboard    | ✅ Live    | All Auth             | Performance overview    |
+| `/brands`       | Brands       | ✅ Live    | Admin, Mgr           | Brand management        |
+| `/brand-intake` | Brand Kit    | ✅ Live    | Admin, Mgr           | Brand onboarding        |
+| `/create-post`  | Create Post  | ✅ Live    | Admin, Mgr           | Multi-platform composer |
+| `/calendar`     | Calendar     | ✅ Live    | All Auth             | Content scheduling      |
+| `/assets`       | Assets       | ✅ Live    | Admin, Mgr           | Media library           |
+| `/analytics`    | Analytics    | ✅ Live    | All Auth             | Performance metrics     |
+| `/integrations` | Integrations | ✅ Live    | Admin                | Platform connections    |
+| `/reviews`      | Reviews      | ✅ Live    | Admin, Mgr, Approver | Review management       |
+| `/events`       | Events       | ✅ Live    | Admin, Mgr           | Event publishing        |
+| `/emails`       | Emails       | 🔄 Planned | Admin, Mgr           | Email campaigns         |
+| `/settings`     | Settings     | 🔄 Partial | All Auth             | Configuration           |
+| `/admin`        | Admin Tools  | 📋 Planned | Admin Only           | System management       |
 
 ### Feature Implementation Status
 
-| Feature | Status | Component Path | Database Tables | Notes |
-|---------|--------|----------------|-----------------|-------|
-| Brand Kit Form | ✅ Complete | `client/pages/BrandIntake.tsx` | `brands`, `brand_embeddings` | 6 sections, crawler integration |
-| Website Crawler | ✅ Complete | `server/workers/brand-crawler.ts` | `brand_kit_history` | Playwright + OpenAI |
-| Multi-Platform Post | ✅ Complete | `client/pages/CreatePost.tsx` | `social_posts` | 15 platforms supported |
-| Platform Integrations | ✅ Complete | `client/pages/Integrations.tsx` | `platform_connections` | OAuth + token management |
-| Reviews Management | ✅ Complete | `client/pages/Reviews.tsx` | `platform_reviews` | AI sentiment analysis |
-| Events Management | ✅ Complete | `client/pages/Events.tsx` | `platform_events` | Facebook + Google Business |
-| AI Agent Guardrails | ✅ Complete | Multiple files | `generation_logs`, `agent_cache` | BFS scoring, linter |
-| Role-Based Access | ✅ Complete | RLS policies | All tables | 5 role types supported |
-| Calendar View | 🔄 Basic | `client/pages/Calendar.tsx` | `social_posts`, `platform_events` | Needs drag-drop enhancement |
-| Email Campaigns | 🔄 In Progress | Partial in CreatePost | `social_posts` | Needs dedicated module |
-| Settings Pages | 🔄 Partial | Needs implementation | Multiple | Profile + Brand done |
-| Admin Dashboard | 📋 Planned | Not started | All tables | Tenant-level overview |
+| Feature               | Status         | Component Path                    | Database Tables                   | Notes                           |
+| --------------------- | -------------- | --------------------------------- | --------------------------------- | ------------------------------- |
+| Brand Kit Form        | ✅ Complete    | `client/pages/BrandIntake.tsx`    | `brands`, `brand_embeddings`      | 6 sections, crawler integration |
+| Website Crawler       | ✅ Complete    | `server/workers/brand-crawler.ts` | `brand_kit_history`               | Playwright + OpenAI             |
+| Multi-Platform Post   | ✅ Complete    | `client/pages/CreatePost.tsx`     | `social_posts`                    | 15 platforms supported          |
+| Platform Integrations | ✅ Complete    | `client/pages/Integrations.tsx`   | `platform_connections`            | OAuth + token management        |
+| Reviews Management    | ✅ Complete    | `client/pages/Reviews.tsx`        | `platform_reviews`                | AI sentiment analysis           |
+| Events Management     | ✅ Complete    | `client/pages/Events.tsx`         | `platform_events`                 | Facebook + Google Business      |
+| AI Agent Guardrails   | ✅ Complete    | Multiple files                    | `generation_logs`, `agent_cache`  | BFS scoring, linter             |
+| Role-Based Access     | ✅ Complete    | RLS policies                      | All tables                        | 5 role types supported          |
+| Calendar View         | 🔄 Basic       | `client/pages/Calendar.tsx`       | `social_posts`, `platform_events` | Needs drag-drop enhancement     |
+| Email Campaigns       | 🔄 In Progress | Partial in CreatePost             | `social_posts`                    | Needs dedicated module          |
+| Settings Pages        | 🔄 Partial     | Needs implementation              | Multiple                          | Profile + Brand done            |
+| Admin Dashboard       | 📋 Planned     | Not started                       | All tables                        | Tenant-level overview           |
 
 ---
 

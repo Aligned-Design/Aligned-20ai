@@ -2,7 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Check, ChevronLeft, ChevronRight, Download, Loader2 } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Loader2,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -62,7 +68,7 @@ export default function BrandIntake() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [importing, setImporting] = useState(false);
-  const [importProgress, setImportProgress] = useState('');
+  const [importProgress, setImportProgress] = useState("");
 
   // Auto-save functionality
   const {
@@ -156,50 +162,55 @@ export default function BrandIntake() {
     }
 
     setImporting(true);
-    setImportProgress('Crawling website...');
+    setImportProgress("Crawling website...");
 
     try {
       // Call Edge Function to process brand intake
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
       const response = await fetch(
         `${supabase.supabaseUrl}/functions/v1/process-brand-intake`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session?.access_token}`
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
           },
           body: JSON.stringify({
             brandId,
-            websiteUrl: formData.websiteUrl
-          })
-        }
+            websiteUrl: formData.websiteUrl,
+          }),
+        },
       );
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to import from website');
+        throw new Error(error.error || "Failed to import from website");
       }
 
       const result = await response.json();
 
-      setImportProgress('Processing complete!');
+      setImportProgress("Processing complete!");
 
       // Update form data with imported values
       setFormData((prev) => ({
         ...prev,
         primaryColor: result.brandKit.colors?.primary || prev.primaryColor,
-        secondaryColor: result.brandKit.colors?.secondary || prev.secondaryColor,
+        secondaryColor:
+          result.brandKit.colors?.secondary || prev.secondaryColor,
         accentColor: result.brandKit.colors?.accent || prev.accentColor,
         toneKeywords: result.brandKit.voice_summary?.tone || prev.toneKeywords,
-        brandPersonality: result.brandKit.voice_summary?.personality || prev.brandPersonality,
+        brandPersonality:
+          result.brandKit.voice_summary?.personality || prev.brandPersonality,
         shortDescription: result.brandKit.about_blurb || prev.shortDescription,
       }));
 
       toast({
         title: "Import successful!",
-        description: "Website data has been imported. Review and adjust as needed.",
+        description:
+          "Website data has been imported. Review and adjust as needed.",
       });
     } catch (error: any) {
       toast({
@@ -209,7 +220,7 @@ export default function BrandIntake() {
       });
     } finally {
       setImporting(false);
-      setImportProgress('');
+      setImportProgress("");
     }
   };
 
@@ -223,31 +234,51 @@ export default function BrandIntake() {
 
       if (formData.logoFiles?.length) {
         uploadPromises.push(
-          uploadBrandFiles(formData.logoFiles, brandId, 'logos', 'logo')
+          uploadBrandFiles(formData.logoFiles, brandId, "logos", "logo"),
         );
       }
 
       if (formData.brandImageryFiles?.length) {
         uploadPromises.push(
-          uploadBrandFiles(formData.brandImageryFiles, brandId, 'imagery', 'imagery')
+          uploadBrandFiles(
+            formData.brandImageryFiles,
+            brandId,
+            "imagery",
+            "imagery",
+          ),
         );
       }
 
       if (formData.textReferenceFiles?.length) {
         uploadPromises.push(
-          uploadBrandFiles(formData.textReferenceFiles, brandId, 'references', 'text_reference')
+          uploadBrandFiles(
+            formData.textReferenceFiles,
+            brandId,
+            "references",
+            "text_reference",
+          ),
         );
       }
 
       if (formData.visualReferenceFiles?.length) {
         uploadPromises.push(
-          uploadBrandFiles(formData.visualReferenceFiles, brandId, 'references', 'visual_reference')
+          uploadBrandFiles(
+            formData.visualReferenceFiles,
+            brandId,
+            "references",
+            "visual_reference",
+          ),
         );
       }
 
       if (formData.previousContentFiles?.length) {
         uploadPromises.push(
-          uploadBrandFiles(formData.previousContentFiles, brandId, 'content', 'previous_content')
+          uploadBrandFiles(
+            formData.previousContentFiles,
+            brandId,
+            "content",
+            "previous_content",
+          ),
         );
       }
 
@@ -324,7 +355,8 @@ export default function BrandIntake() {
               <div>
                 <h3 className="font-semibold mb-1">Import from Website</h3>
                 <p className="text-sm text-muted-foreground">
-                  Automatically extract brand colors, voice, and keywords from your website.
+                  Automatically extract brand colors, voice, and keywords from
+                  your website.
                 </p>
               </div>
               <Button

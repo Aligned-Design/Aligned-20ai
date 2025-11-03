@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,13 +6,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Check, X, RotateCcw, Sparkles } from 'lucide-react';
-import { CrawlerSuggestion, FieldChange } from '@/types/brand-kit-field';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Check, X, RotateCcw, Sparkles } from "lucide-react";
+import { CrawlerSuggestion, FieldChange } from "@/types/brand-kit-field";
+import { cn } from "@/lib/utils";
 
 interface CrawlerDiffModalProps {
   open: boolean;
@@ -27,17 +27,22 @@ export function CrawlerDiffModal({
   suggestions,
   onApplyChanges,
 }: CrawlerDiffModalProps) {
-  const [selectedChanges, setSelectedChanges] = useState<Set<string>>(new Set());
-  const [activeTab, setActiveTab] = useState('all');
+  const [selectedChanges, setSelectedChanges] = useState<Set<string>>(
+    new Set(),
+  );
+  const [activeTab, setActiveTab] = useState("all");
 
   // Group suggestions by category
-  const groupedSuggestions = suggestions.reduce((acc, suggestion) => {
-    if (!acc[suggestion.category]) {
-      acc[suggestion.category] = [];
-    }
-    acc[suggestion.category].push(suggestion);
-    return acc;
-  }, {} as Record<string, CrawlerSuggestion[]>);
+  const groupedSuggestions = suggestions.reduce(
+    (acc, suggestion) => {
+      if (!acc[suggestion.category]) {
+        acc[suggestion.category] = [];
+      }
+      acc[suggestion.category].push(suggestion);
+      return acc;
+    },
+    {} as Record<string, CrawlerSuggestion[]>,
+  );
 
   const categories = Object.keys(groupedSuggestions);
 
@@ -55,16 +60,14 @@ export function CrawlerDiffModal({
 
   const selectAll = () => {
     const filteredSuggestions =
-      activeTab === 'all'
-        ? suggestions
-        : groupedSuggestions[activeTab] || [];
+      activeTab === "all" ? suggestions : groupedSuggestions[activeTab] || [];
 
     setSelectedChanges(
       new Set(
         filteredSuggestions
-          .filter((s) => s.currentSource !== 'user')
-          .map((s) => s.field)
-      )
+          .filter((s) => s.currentSource !== "user")
+          .map((s) => s.field),
+      ),
     );
   };
 
@@ -78,7 +81,7 @@ export function CrawlerDiffModal({
       .map((s) => ({
         field: s.field,
         value: s.suggestedValue,
-        source: 'crawler' as const,
+        source: "crawler" as const,
       }));
 
     onApplyChanges(changes);
@@ -87,17 +90,17 @@ export function CrawlerDiffModal({
 
   const renderSuggestionCard = (suggestion: CrawlerSuggestion) => {
     const isSelected = selectedChanges.has(suggestion.field);
-    const isUserEdited = suggestion.currentSource === 'user';
+    const isUserEdited = suggestion.currentSource === "user";
 
     return (
       <div
         key={suggestion.field}
         className={cn(
-          'rounded-xl border p-6 transition-all',
+          "rounded-xl border p-6 transition-all",
           isSelected && !isUserEdited
-            ? 'border-violet bg-violet/5'
-            : 'border-border/50 bg-card',
-          isUserEdited && 'opacity-60'
+            ? "border-violet bg-violet/5"
+            : "border-border/50 bg-card",
+          isUserEdited && "opacity-60",
         )}
       >
         <div className="flex items-start justify-between gap-4">
@@ -109,7 +112,7 @@ export function CrawlerDiffModal({
                   User-edited (protected)
                 </Badge>
               )}
-              {!isUserEdited && suggestion.currentSource === 'crawler' && (
+              {!isUserEdited && suggestion.currentSource === "crawler" && (
                 <Badge variant="outline" className="text-xs gap-1">
                   <Sparkles className="h-3 w-3" />
                   AI suggestion
@@ -119,7 +122,9 @@ export function CrawlerDiffModal({
 
             <div className="space-y-3 mt-4">
               <div className="flex items-start gap-3">
-                <div className="shrink-0 w-20 text-sm text-muted-foreground">Current:</div>
+                <div className="shrink-0 w-20 text-sm text-muted-foreground">
+                  Current:
+                </div>
                 <div className="flex-1">
                   {renderValue(suggestion.currentValue, suggestion.field)}
                 </div>
@@ -145,7 +150,7 @@ export function CrawlerDiffModal({
           <div className="flex gap-2">
             <Button
               size="sm"
-              variant={isSelected ? 'default' : 'outline'}
+              variant={isSelected ? "default" : "outline"}
               onClick={() => toggleSuggestion(suggestion.field)}
               disabled={isUserEdited}
               className="shrink-0"
@@ -156,7 +161,7 @@ export function CrawlerDiffModal({
                   Accept
                 </>
               ) : (
-                'Keep mine'
+                "Keep mine"
               )}
             </Button>
           </div>
@@ -166,11 +171,12 @@ export function CrawlerDiffModal({
   };
 
   const renderValue = (value: any, field: string) => {
-    if (!value) return <span className="text-muted-foreground italic">Not set</span>;
+    if (!value)
+      return <span className="text-muted-foreground italic">Not set</span>;
 
     // Colors
-    if (field.includes('color') || field === 'colors') {
-      if (typeof value === 'object' && !Array.isArray(value)) {
+    if (field.includes("color") || field === "colors") {
+      if (typeof value === "object" && !Array.isArray(value)) {
         return (
           <div className="flex gap-2">
             {Object.entries(value).map(([key, color]) => (
@@ -210,7 +216,7 @@ export function CrawlerDiffModal({
     }
 
     // Objects
-    if (typeof value === 'object') {
+    if (typeof value === "object") {
       return (
         <div className="space-y-1">
           {Object.entries(value).map(([key, val]) => (
@@ -227,13 +233,11 @@ export function CrawlerDiffModal({
   };
 
   const filteredSuggestions =
-    activeTab === 'all'
-      ? suggestions
-      : groupedSuggestions[activeTab] || [];
+    activeTab === "all" ? suggestions : groupedSuggestions[activeTab] || [];
 
   const selectedCount = selectedChanges.size;
   const userEditedCount = suggestions.filter(
-    (s) => s.currentSource === 'user'
+    (s) => s.currentSource === "user",
   ).length;
 
   return (
@@ -245,17 +249,19 @@ export function CrawlerDiffModal({
             Review Website Import
           </DialogTitle>
           <DialogDescription>
-            Select which AI-suggested changes to accept. User-edited fields are protected
-            and won't be overwritten.
+            Select which AI-suggested changes to accept. User-edited fields are
+            protected and won't be overwritten.
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 overflow-hidden flex flex-col">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="flex-1 overflow-hidden flex flex-col"
+        >
           <div className="flex items-center justify-between mb-4">
             <TabsList>
-              <TabsTrigger value="all">
-                All ({suggestions.length})
-              </TabsTrigger>
+              <TabsTrigger value="all">All ({suggestions.length})</TabsTrigger>
               {categories.map((category) => (
                 <TabsTrigger key={category} value={category}>
                   {category.charAt(0).toUpperCase() + category.slice(1)} (
@@ -298,7 +304,7 @@ export function CrawlerDiffModal({
             </Button>
             <Button onClick={handleApply} disabled={selectedCount === 0}>
               <Check className="h-4 w-4 mr-2" />
-              Apply {selectedCount} change{selectedCount !== 1 ? 's' : ''}
+              Apply {selectedCount} change{selectedCount !== 1 ? "s" : ""}
             </Button>
           </div>
         </DialogFooter>

@@ -3,11 +3,11 @@
  * Phase 5 - Guardrails & Quality Gates
  */
 
-export type SafetyMode = 'safe' | 'bold' | 'edgy_opt_in';
+export type SafetyMode = "safe" | "bold" | "edgy_opt_in";
 
-export type CompliancePack = 'finance' | 'real_estate' | 'wellness' | 'none';
+export type CompliancePack = "finance" | "real_estate" | "wellness" | "none";
 
-export type AgentType = 'doc' | 'design' | 'advisor';
+export type AgentType = "doc" | "design" | "advisor";
 
 /**
  * Brand Safety Configuration
@@ -67,7 +67,7 @@ export interface LinterResult {
 
 export interface PlatformViolation {
   platform: string;
-  issue: 'char_limit' | 'hashtag_limit' | 'aspect_ratio' | 'file_size';
+  issue: "char_limit" | "hashtag_limit" | "aspect_ratio" | "file_size";
   current: number;
   limit: number;
   suggestion: string;
@@ -107,10 +107,10 @@ export interface DocInput {
   topic: string;
   tone: string;
   platform: string;
-  format: 'reel' | 'carousel' | 'image' | 'story' | 'post';
+  format: "reel" | "carousel" | "image" | "story" | "post";
   max_length?: number;
   include_cta: boolean;
-  cta_type?: 'link' | 'comment' | 'dm' | 'bio';
+  cta_type?: "link" | "comment" | "dm" | "bio";
   advisor_context?: AdvisorOutput;
 }
 
@@ -218,60 +218,84 @@ export interface PromptTemplate {
  * Safety Mode Descriptions
  */
 export const SAFETY_MODE_DESCRIPTIONS: Record<SafetyMode, string> = {
-  safe: 'No profanity, no controversy, neutral/inclusive tone (default)',
-  bold: 'Persuasive, edgy metaphors allowed; still no profanity/hate',
-  edgy_opt_in: 'Explicit client opt-in only; stronger hooks; still blocks hate/violence/illegal',
+  safe: "No profanity, no controversy, neutral/inclusive tone (default)",
+  bold: "Persuasive, edgy metaphors allowed; still no profanity/hate",
+  edgy_opt_in:
+    "Explicit client opt-in only; stronger hooks; still blocks hate/violence/illegal",
 };
 
 /**
  * Compliance Pack Requirements
  */
-export const COMPLIANCE_PACKS: Record<CompliancePack, {
-  required_disclaimers: string[];
-  banned_claims: string[];
-  review_keywords: string[];
-}> = {
+export const COMPLIANCE_PACKS: Record<
+  CompliancePack,
+  {
+    required_disclaimers: string[];
+    banned_claims: string[];
+    review_keywords: string[];
+  }
+> = {
   finance: {
     required_disclaimers: [
-      'Investing involves risk. Past performance does not guarantee future results.',
-      'Not financial advice. Consult a licensed advisor.',
+      "Investing involves risk. Past performance does not guarantee future results.",
+      "Not financial advice. Consult a licensed advisor.",
     ],
     banned_claims: [
-      'guaranteed returns',
-      'risk-free',
-      'can\'t lose',
-      'sure thing',
-      '100% profit',
+      "guaranteed returns",
+      "risk-free",
+      "can't lose",
+      "sure thing",
+      "100% profit",
     ],
-    review_keywords: ['invest', 'return', 'profit', 'portfolio', 'stock', 'crypto'],
+    review_keywords: [
+      "invest",
+      "return",
+      "profit",
+      "portfolio",
+      "stock",
+      "crypto",
+    ],
   },
   real_estate: {
     required_disclaimers: [
-      'Actual results may vary. Not a guarantee of property value.',
-      'Consult a real estate professional for specific advice.',
+      "Actual results may vary. Not a guarantee of property value.",
+      "Consult a real estate professional for specific advice.",
     ],
     banned_claims: [
-      'guaranteed appreciation',
-      'can\'t lose value',
-      'always goes up',
-      'risk-free investment',
+      "guaranteed appreciation",
+      "can't lose value",
+      "always goes up",
+      "risk-free investment",
     ],
-    review_keywords: ['property', 'investment', 'appreciation', 'value', 'returns'],
+    review_keywords: [
+      "property",
+      "investment",
+      "appreciation",
+      "value",
+      "returns",
+    ],
   },
   wellness: {
     required_disclaimers: [
-      'These statements have not been evaluated by the FDA.',
-      'Not intended to diagnose, treat, cure, or prevent any disease.',
-      'Consult a healthcare professional before use.',
+      "These statements have not been evaluated by the FDA.",
+      "Not intended to diagnose, treat, cure, or prevent any disease.",
+      "Consult a healthcare professional before use.",
     ],
     banned_claims: [
-      'cure',
-      'treat disease',
-      'FDA approved',
-      'guaranteed results',
-      'miracle',
+      "cure",
+      "treat disease",
+      "FDA approved",
+      "guaranteed results",
+      "miracle",
     ],
-    review_keywords: ['health', 'cure', 'treat', 'disease', 'medical', 'therapy'],
+    review_keywords: [
+      "health",
+      "cure",
+      "treat",
+      "disease",
+      "medical",
+      "therapy",
+    ],
   },
   none: {
     required_disclaimers: [],
@@ -284,16 +308,16 @@ export const COMPLIANCE_PACKS: Record<CompliancePack, {
  * Default Brand Safety Config
  */
 export const DEFAULT_SAFETY_CONFIG: BrandSafetyConfig = {
-  safety_mode: 'safe',
+  safety_mode: "safe",
   banned_phrases: [],
   competitor_names: [],
   claims: [],
   required_disclaimers: [],
   required_hashtags: [],
   brand_links: [],
-  disallowed_topics: ['politics', 'religion', 'medical advice'],
+  disallowed_topics: ["politics", "religion", "medical advice"],
   allow_topics: [],
-  compliance_pack: 'none',
+  compliance_pack: "none",
 };
 
 /**
@@ -316,7 +340,7 @@ export const DEFAULT_GENERATION_PARAMS = {
  * BFS Thresholds
  */
 export const BFS_THRESHOLDS = {
-  minimum: 0.80,
+  minimum: 0.8,
   excellent: 0.95,
   max_regenerations: 2,
 };

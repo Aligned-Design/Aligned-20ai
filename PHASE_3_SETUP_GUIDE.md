@@ -14,6 +14,7 @@ pnpm exec playwright install chromium --with-deps
 ```
 
 **New packages added:**
+
 - `playwright` - Headless browser for website crawling
 - `openai` - AI summaries and embeddings
 - `node-vibrant` - Color extraction from images
@@ -88,10 +89,10 @@ ON storage.objects
 FOR INSERT
 TO authenticated
 WITH CHECK (
-  bucket_id = 'brand-assets' 
+  bucket_id = 'brand-assets'
   AND (storage.foldername(name))[1] IN (
-    SELECT brand_id::text 
-    FROM brand_members 
+    SELECT brand_id::text
+    FROM brand_members
     WHERE user_id = auth.uid()
   )
 );
@@ -111,8 +112,8 @@ TO authenticated
 USING (
   bucket_id = 'brand-assets'
   AND (storage.foldername(name))[1] IN (
-    SELECT brand_id::text 
-    FROM brand_members 
+    SELECT brand_id::text
+    FROM brand_members
     WHERE user_id = auth.uid()
   )
 );
@@ -175,6 +176,7 @@ You should see `process-brand-intake` in the list.
 5. Verify form fields populate with extracted data
 
 **Expected behavior:**
+
 - Primary/Secondary/Accent colors update
 - Tone keywords populate
 - Brand personality fills in
@@ -208,20 +210,21 @@ SELECT * FROM search_similar_brands(
 
 ### Crawler Rules (enforced in code)
 
-| Rule | Value | Configurable |
-|------|-------|--------------|
-| **Scope** | Same-domain only | ❌ |
-| **Max pages** | 50 | ✅ `CRAWL_MAX_PAGES` |
-| **Max depth** | 3 levels | ❌ |
-| **Crawl delay** | 1 second | ❌ |
-| **Timeout** | 30 seconds | ✅ `CRAWL_TIMEOUT_MS` |
-| **Respect robots.txt** | Yes | ❌ |
-| **Render JS** | Yes (Playwright) | ❌ |
-| **Extract PDFs** | No | ❌ |
+| Rule                   | Value            | Configurable          |
+| ---------------------- | ---------------- | --------------------- |
+| **Scope**              | Same-domain only | ❌                    |
+| **Max pages**          | 50               | ✅ `CRAWL_MAX_PAGES`  |
+| **Max depth**          | 3 levels         | ❌                    |
+| **Crawl delay**        | 1 second         | ❌                    |
+| **Timeout**            | 30 seconds       | ✅ `CRAWL_TIMEOUT_MS` |
+| **Respect robots.txt** | Yes              | ❌                    |
+| **Render JS**          | Yes (Playwright) | ❌                    |
+| **Extract PDFs**       | No               | ❌                    |
 
 ### What Gets Extracted
 
 From each page:
+
 - Title (`<title>`)
 - Meta description (`<meta name="description">`)
 - Headings (H1, H2, H3)
@@ -238,14 +241,15 @@ Pages are deduplicated by MD5 hash of body text. Identical content = 1 entry.
 
 ### OpenAI Models Used
 
-| Task | Model | Purpose |
-|------|-------|---------|
-| **Summaries** | `gpt-4-turbo-preview` | Extract tone, style, keywords |
-| **Embeddings** | `text-embedding-ada-002` | 1536-dim vectors |
+| Task           | Model                    | Purpose                       |
+| -------------- | ------------------------ | ----------------------------- |
+| **Summaries**  | `gpt-4-turbo-preview`    | Extract tone, style, keywords |
+| **Embeddings** | `text-embedding-ada-002` | 1536-dim vectors              |
 
 ### Fallback Behavior
 
 If `OPENAI_API_KEY` is not set:
+
 - ✅ Website crawling still works
 - ✅ Color extraction still works
 - ✅ Rule-based summaries (basic keyword extraction)
@@ -294,6 +298,7 @@ supabase secrets set OPENAI_API_KEY=sk-your-key
 ### Issue: "Failed to upload file"
 
 **Possible causes:**
+
 1. Storage bucket `brand-assets` doesn't exist → Create it
 2. RLS policies blocking upload → Check policies
 3. File too large → Check bucket size limits
@@ -301,6 +306,7 @@ supabase secrets set OPENAI_API_KEY=sk-your-key
 ### Issue: "Crawler timeout"
 
 **Solutions:**
+
 - Increase `CRAWL_TIMEOUT_MS` (default: 30000)
 - Check if website blocks bots
 - Verify website is accessible
@@ -325,14 +331,14 @@ supabase functions deploy process-brand-intake --no-verify-jwt
 
 ## 📊 Performance Expectations
 
-| Operation | Time | Notes |
-|-----------|------|-------|
-| **File upload (5 files)** | 2-5s | Depends on file size |
-| **Website crawl (10 pages)** | 10-20s | 1s delay per page |
-| **Website crawl (50 pages)** | 50-60s | Max pages limit |
-| **OpenAI summary** | 3-5s | API latency |
-| **Color extraction** | 2-3s | Screenshot + analysis |
-| **Embedding creation** | 1-2s | Per brand |
+| Operation                    | Time   | Notes                 |
+| ---------------------------- | ------ | --------------------- |
+| **File upload (5 files)**    | 2-5s   | Depends on file size  |
+| **Website crawl (10 pages)** | 10-20s | 1s delay per page     |
+| **Website crawl (50 pages)** | 50-60s | Max pages limit       |
+| **OpenAI summary**           | 3-5s   | API latency           |
+| **Color extraction**         | 2-3s   | Screenshot + analysis |
+| **Embedding creation**       | 1-2s   | Per brand             |
 
 **Total import time**: 30-90 seconds (depending on website size)
 
@@ -405,6 +411,7 @@ package.json                  # New dependencies added
 ## 🎉 You're Ready!
 
 **Next steps:**
+
 1. Add OpenAI API key
 2. Run migration
 3. Deploy Edge Function
@@ -412,6 +419,7 @@ package.json                  # New dependencies added
 5. Move to Phase 4 (AI Agent Integration)
 
 **Need help?** Check logs:
+
 - Edge Function: Supabase Dashboard → Edge Functions → Logs
 - Browser: Dev Tools → Console
 - Server: `pnpm dev` terminal output

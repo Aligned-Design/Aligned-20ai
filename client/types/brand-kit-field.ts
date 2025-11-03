@@ -1,11 +1,11 @@
 /**
  * Brand Kit Field Types with Source Tracking
- * 
+ *
  * Every field tracks its value, source, and update timestamp
  * Precedence: user > import > crawler
  */
 
-export type FieldSource = 'user' | 'crawler' | 'import';
+export type FieldSource = "user" | "crawler" | "import";
 
 export interface TrackedField<T = any> {
   value: T;
@@ -69,12 +69,12 @@ export interface CrawlerSuggestion {
   currentSource: FieldSource;
   suggestedValue: any;
   confidence: number;
-  category: 'colors' | 'fonts' | 'tone' | 'keywords' | 'about' | 'other';
+  category: "colors" | "fonts" | "tone" | "keywords" | "about" | "other";
 }
 
 export interface CrawlResult {
   job_id: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: "pending" | "processing" | "completed" | "failed";
   suggestions: CrawlerSuggestion[];
   palette: string[];
   keywords: string[];
@@ -97,7 +97,7 @@ export interface FieldHistoryEntry {
   new_value: any;
   old_source: FieldSource;
   new_source: FieldSource;
-  changed_by: 'user' | 'crawler' | 'system';
+  changed_by: "user" | "crawler" | "system";
   user_id?: string;
 }
 
@@ -112,7 +112,7 @@ export interface BrandKitHistory {
  */
 export function createTrackedField<T>(
   value: T,
-  source: FieldSource = 'user'
+  source: FieldSource = "user",
 ): TrackedField<T> {
   return {
     value,
@@ -124,9 +124,11 @@ export function createTrackedField<T>(
 /**
  * Helper to check if field can be updated by crawler
  */
-export function canCrawlerUpdate(field: TrackedField<any> | undefined): boolean {
+export function canCrawlerUpdate(
+  field: TrackedField<any> | undefined,
+): boolean {
   if (!field) return true; // No existing value, crawler can set it
-  return field.source !== 'user'; // Only update if not user-edited
+  return field.source !== "user"; // Only update if not user-edited
 }
 
 /**
@@ -134,9 +136,9 @@ export function canCrawlerUpdate(field: TrackedField<any> | undefined): boolean 
  */
 export function getSourceLabel(source: FieldSource): string {
   const labels: Record<FieldSource, string> = {
-    user: 'Manually entered',
-    crawler: 'AI suggestion',
-    import: 'Imported',
+    user: "Manually entered",
+    crawler: "AI suggestion",
+    import: "Imported",
   };
   return labels[source];
 }

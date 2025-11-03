@@ -1,6 +1,6 @@
 /**
  * Content Linter & Moderation Pipeline
- * 
+ *
  * Runs pre/post-generation checks:
  * - Profanity/toxicity detection
  * - Banned phrases/claims
@@ -8,7 +8,7 @@
  * - Platform limit violations
  * - PII detection
  * - Competitor mentions
- * 
+ *
  * Auto-fixes where possible, blocks if unsafe
  */
 
@@ -18,7 +18,7 @@ import {
   BrandSafetyConfig,
   PLATFORM_LIMITS,
   COMPLIANCE_PACKS,
-} from '../../client/types/agent-config';
+} from "../../client/types/agent-config";
 
 interface ContentToLint {
   body: string;
@@ -33,7 +33,7 @@ interface ContentToLint {
  */
 export async function lintContent(
   content: ContentToLint,
-  safetyConfig: BrandSafetyConfig
+  safetyConfig: BrandSafetyConfig,
 ): Promise<LinterResult> {
   const issues: string[] = [];
   const fixes: string[] = [];
@@ -73,7 +73,8 @@ export async function lintContent(
 
   // Determine if needs human review
   const needsHumanReview =
-    (missingDisclaimers.length > 0 && safetyConfig.compliance_pack !== 'none') ||
+    (missingDisclaimers.length > 0 &&
+      safetyConfig.compliance_pack !== "none") ||
     competitorMentions.length > 0 ||
     toxicityScore > 0.5;
 
@@ -100,16 +101,29 @@ export async function lintContent(
  * Check for profanity/explicit language
  */
 function checkProfanity(content: ContentToLint): boolean {
-  const combinedText = `${content.headline || ''} ${content.body} ${content.cta || ''}`.toLowerCase();
+  const combinedText =
+    `${content.headline || ""} ${content.body} ${content.cta || ""}`.toLowerCase();
 
   // Basic profanity list (expand as needed)
   const profanityList = [
-    'fuck', 'shit', 'damn', 'bitch', 'ass', 'bastard', 'crap', 'piss',
-    'cock', 'dick', 'pussy', 'cunt', 'whore', 'slut'
+    "fuck",
+    "shit",
+    "damn",
+    "bitch",
+    "ass",
+    "bastard",
+    "crap",
+    "piss",
+    "cock",
+    "dick",
+    "pussy",
+    "cunt",
+    "whore",
+    "slut",
   ];
 
   return profanityList.some((word) => {
-    const regex = new RegExp(`\\b${word}\\b`, 'i');
+    const regex = new RegExp(`\\b${word}\\b`, "i");
     return regex.test(combinedText);
   });
 }
@@ -119,16 +133,32 @@ function checkProfanity(content: ContentToLint): boolean {
  * (In production, use Perspective API or similar)
  */
 async function checkToxicity(content: ContentToLint): Promise<number> {
-  const combinedText = `${content.headline || ''} ${content.body} ${content.cta || ''}`.toLowerCase();
+  const combinedText =
+    `${content.headline || ""} ${content.body} ${content.cta || ""}`.toLowerCase();
 
   // Toxic keywords (simplified - use ML model in production)
   const toxicKeywords = [
-    'hate', 'kill', 'die', 'stupid', 'idiot', 'moron', 'loser', 'ugly',
-    'attack', 'destroy', 'terrible', 'awful', 'sucks', 'worst', 'pathetic'
+    "hate",
+    "kill",
+    "die",
+    "stupid",
+    "idiot",
+    "moron",
+    "loser",
+    "ugly",
+    "attack",
+    "destroy",
+    "terrible",
+    "awful",
+    "sucks",
+    "worst",
+    "pathetic",
   ];
 
-  const matches = toxicKeywords.filter((keyword) => combinedText.includes(keyword));
-  
+  const matches = toxicKeywords.filter((keyword) =>
+    combinedText.includes(keyword),
+  );
+
   // Simple scoring: count / total keywords
   const score = Math.min(matches.length / 10, 1.0);
 
@@ -140,9 +170,10 @@ async function checkToxicity(content: ContentToLint): Promise<number> {
  */
 function checkBannedPhrases(
   content: ContentToLint,
-  safetyConfig: BrandSafetyConfig
+  safetyConfig: BrandSafetyConfig,
 ): string[] {
-  const combinedText = `${content.headline || ''} ${content.body} ${content.cta || ''}`.toLowerCase();
+  const combinedText =
+    `${content.headline || ""} ${content.body} ${content.cta || ""}`.toLowerCase();
   const found: string[] = [];
 
   for (const phrase of safetyConfig.banned_phrases) {
@@ -159,9 +190,10 @@ function checkBannedPhrases(
  */
 function checkBannedClaims(
   content: ContentToLint,
-  safetyConfig: BrandSafetyConfig
+  safetyConfig: BrandSafetyConfig,
 ): string[] {
-  const combinedText = `${content.headline || ''} ${content.body} ${content.cta || ''}`.toLowerCase();
+  const combinedText =
+    `${content.headline || ""} ${content.body} ${content.cta || ""}`.toLowerCase();
   const found: string[] = [];
 
   // Get compliance pack rules
@@ -190,9 +222,9 @@ function checkBannedClaims(
  */
 function checkMissingDisclaimers(
   content: ContentToLint,
-  safetyConfig: BrandSafetyConfig
+  safetyConfig: BrandSafetyConfig,
 ): string[] {
-  const combinedText = `${content.headline || ''} ${content.body} ${content.cta || ''}`;
+  const combinedText = `${content.headline || ""} ${content.body} ${content.cta || ""}`;
   const missing: string[] = [];
 
   // Check brand-specific required disclaimers
@@ -206,8 +238,8 @@ function checkMissingDisclaimers(
   const compliancePack = COMPLIANCE_PACKS[safetyConfig.compliance_pack];
   if (compliancePack) {
     // Only require if content contains review keywords
-    const containsReviewKeyword = compliancePack.review_keywords.some((keyword) =>
-      combinedText.toLowerCase().includes(keyword.toLowerCase())
+    const containsReviewKeyword = compliancePack.review_keywords.some(
+      (keyword) => combinedText.toLowerCase().includes(keyword.toLowerCase()),
     );
 
     if (containsReviewKeyword) {
@@ -227,7 +259,7 @@ function checkMissingDisclaimers(
  */
 function checkMissingHashtags(
   content: ContentToLint,
-  safetyConfig: BrandSafetyConfig
+  safetyConfig: BrandSafetyConfig,
 ): string[] {
   const contentHashtags = content.hashtags || [];
   const missing: string[] = [];
@@ -255,20 +287,20 @@ function checkPlatformLimits(content: ContentToLint): PlatformViolation[] {
   const hashtagCount = content.hashtags?.length || 0;
 
   // Check character limits
-  if ('caption' in limits && bodyLength > limits.caption) {
+  if ("caption" in limits && bodyLength > limits.caption) {
     violations.push({
       platform,
-      issue: 'char_limit',
+      issue: "char_limit",
       current: bodyLength,
       limit: limits.caption,
       suggestion: `Shorten to ${limits.caption} characters`,
     });
   }
 
-  if ('post' in limits && bodyLength > limits.post) {
+  if ("post" in limits && bodyLength > limits.post) {
     violations.push({
       platform,
-      issue: 'char_limit',
+      issue: "char_limit",
       current: bodyLength,
       limit: limits.post,
       suggestion: `Shorten to ${limits.post} characters`,
@@ -276,10 +308,10 @@ function checkPlatformLimits(content: ContentToLint): PlatformViolation[] {
   }
 
   // Check hashtag limits
-  if ('hashtags' in limits && hashtagCount > limits.hashtags) {
+  if ("hashtags" in limits && hashtagCount > limits.hashtags) {
     violations.push({
       platform,
-      issue: 'hashtag_limit',
+      issue: "hashtag_limit",
       current: hashtagCount,
       limit: limits.hashtags,
       suggestion: `Remove ${hashtagCount - limits.hashtags} hashtags`,
@@ -293,7 +325,7 @@ function checkPlatformLimits(content: ContentToLint): PlatformViolation[] {
  * Detect PII (emails, phone numbers)
  */
 function detectPII(content: ContentToLint): string[] {
-  const combinedText = `${content.headline || ''} ${content.body} ${content.cta || ''}`;
+  const combinedText = `${content.headline || ""} ${content.body} ${content.cta || ""}`;
   const detected: string[] = [];
 
   // Email regex
@@ -318,9 +350,10 @@ function detectPII(content: ContentToLint): string[] {
  */
 function checkCompetitorMentions(
   content: ContentToLint,
-  safetyConfig: BrandSafetyConfig
+  safetyConfig: BrandSafetyConfig,
 ): string[] {
-  const combinedText = `${content.headline || ''} ${content.body} ${content.cta || ''}`.toLowerCase();
+  const combinedText =
+    `${content.headline || ""} ${content.body} ${content.cta || ""}`.toLowerCase();
   const found: string[] = [];
 
   for (const competitor of safetyConfig.competitor_names) {
@@ -338,16 +371,18 @@ function checkCompetitorMentions(
 export function autoFixContent(
   content: ContentToLint,
   linterResult: LinterResult,
-  safetyConfig: BrandSafetyConfig
+  safetyConfig: BrandSafetyConfig,
 ): { content: ContentToLint; fixes: string[] } {
   let fixedContent = { ...content };
   const fixes: string[] = [];
 
   // Auto-insert missing disclaimers
   if (linterResult.missing_disclaimers.length > 0) {
-    const disclaimers = linterResult.missing_disclaimers.join(' ');
+    const disclaimers = linterResult.missing_disclaimers.join(" ");
     fixedContent.body = `${fixedContent.body}\n\n${disclaimers}`;
-    fixes.push(`Auto-inserted ${linterResult.missing_disclaimers.length} disclaimer(s)`);
+    fixes.push(
+      `Auto-inserted ${linterResult.missing_disclaimers.length} disclaimer(s)`,
+    );
   }
 
   // Auto-insert missing hashtags
@@ -356,23 +391,28 @@ export function autoFixContent(
       ...(fixedContent.hashtags || []),
       ...linterResult.missing_hashtags,
     ];
-    fixes.push(`Auto-inserted ${linterResult.missing_hashtags.length} required hashtag(s)`);
+    fixes.push(
+      `Auto-inserted ${linterResult.missing_hashtags.length} required hashtag(s)`,
+    );
   }
 
   // Auto-shorten if over platform limits
   if (linterResult.platform_violations.length > 0) {
     for (const violation of linterResult.platform_violations) {
-      if (violation.issue === 'char_limit') {
+      if (violation.issue === "char_limit") {
         const maxLength = violation.limit - 50; // Leave room for disclaimers
         if (fixedContent.body.length > maxLength) {
-          fixedContent.body = fixedContent.body.substring(0, maxLength) + '...';
+          fixedContent.body = fixedContent.body.substring(0, maxLength) + "...";
           fixes.push(`Auto-shortened to ${maxLength} characters`);
         }
       }
 
-      if (violation.issue === 'hashtag_limit') {
+      if (violation.issue === "hashtag_limit") {
         const toRemove = violation.current - violation.limit;
-        fixedContent.hashtags = fixedContent.hashtags?.slice(0, violation.limit);
+        fixedContent.hashtags = fixedContent.hashtags?.slice(
+          0,
+          violation.limit,
+        );
         fixes.push(`Removed ${toRemove} excess hashtag(s)`);
       }
     }
@@ -381,12 +421,15 @@ export function autoFixContent(
   // Strip PII if detected
   if (linterResult.pii_detected.length > 0) {
     for (const pii of linterResult.pii_detected) {
-      fixedContent.body = fixedContent.body.replace(pii, '[REDACTED]');
+      fixedContent.body = fixedContent.body.replace(pii, "[REDACTED]");
       if (fixedContent.headline) {
-        fixedContent.headline = fixedContent.headline.replace(pii, '[REDACTED]');
+        fixedContent.headline = fixedContent.headline.replace(
+          pii,
+          "[REDACTED]",
+        );
       }
       if (fixedContent.cta) {
-        fixedContent.cta = fixedContent.cta.replace(pii, '[REDACTED]');
+        fixedContent.cta = fixedContent.cta.replace(pii, "[REDACTED]");
       }
     }
     fixes.push(`Removed ${linterResult.pii_detected.length} PII instance(s)`);

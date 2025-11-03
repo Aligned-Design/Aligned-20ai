@@ -153,7 +153,9 @@ function AppRoutes() {
             <ProtectedRoute>
               <AppLayout>
                 <Suspense
-                  fallback={<Loading fullScreen text="Loading integrations..." />}
+                  fallback={
+                    <Loading fullScreen text="Loading integrations..." />
+                  }
                 >
                   <Integrations />
                 </Suspense>
