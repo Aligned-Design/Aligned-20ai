@@ -12,14 +12,14 @@ import {
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   ChartConfig,
-} from '@/components/ui/chart';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/chart";
+import { cn } from "@/lib/utils";
 
 // Reach/Engagement Area Chart
 interface TrendData {
@@ -30,8 +30,8 @@ interface TrendData {
 
 export function TrendAreaChart({
   data,
-  dataKey = 'value',
-  color = '#8b5cf6',
+  dataKey = "value",
+  color = "#8b5cf6",
   className,
 }: {
   data: TrendData[];
@@ -41,13 +41,13 @@ export function TrendAreaChart({
 }) {
   const chartConfig: ChartConfig = {
     [dataKey]: {
-      label: 'Value',
+      label: "Value",
       color,
     },
   };
 
   return (
-    <ChartContainer config={chartConfig} className={cn('h-[200px]', className)}>
+    <ChartContainer config={chartConfig} className={cn("h-[200px]", className)}>
       <AreaChart data={data}>
         <defs>
           <linearGradient id={`fill${dataKey}`} x1="0" y1="0" x2="0" y2="1">
@@ -79,7 +79,7 @@ export function TrendAreaChart({
 // Mini Sparkline (small trend indicator)
 export function Sparkline({
   data,
-  color = '#8b5cf6',
+  color = "#8b5cf6",
   className,
 }: {
   data: number[];
@@ -90,13 +90,16 @@ export function Sparkline({
 
   const chartConfig: ChartConfig = {
     value: {
-      label: 'Value',
+      label: "Value",
       color,
     },
   };
 
   return (
-    <ChartContainer config={chartConfig} className={cn('h-[40px] w-full', className)}>
+    <ChartContainer
+      config={chartConfig}
+      className={cn("h-[40px] w-full", className)}
+    >
       <LineChart data={chartData}>
         <Line
           type="monotone"
@@ -133,10 +136,15 @@ export function PipelineBarChart({
   }, {} as ChartConfig);
 
   return (
-    <ChartContainer config={chartConfig} className={cn('h-[200px]', className)}>
+    <ChartContainer config={chartConfig} className={cn("h-[200px]", className)}>
       <BarChart data={data} layout="vertical">
         <XAxis type="number" tick={{ fontSize: 12 }} />
-        <YAxis dataKey="stage" type="category" width={100} tick={{ fontSize: 12 }} />
+        <YAxis
+          dataKey="stage"
+          type="category"
+          width={100}
+          tick={{ fontSize: 12 }}
+        />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Bar dataKey="count" radius={[0, 4, 4, 0]}>
           {data.map((entry, index) => (
@@ -171,7 +179,7 @@ export function ChannelDonutChart({
   }, {} as ChartConfig);
 
   return (
-    <ChartContainer config={chartConfig} className={cn('h-[250px]', className)}>
+    <ChartContainer config={chartConfig} className={cn("h-[250px]", className)}>
       <PieChart>
         <ChartTooltip content={<ChartTooltipContent />} />
         <Pie
@@ -211,17 +219,17 @@ export function GrowthLineChart({
 }) {
   const chartConfig: ChartConfig = {
     current: {
-      label: 'Current Period',
-      color: '#8b5cf6',
+      label: "Current Period",
+      color: "#8b5cf6",
     },
     previous: {
-      label: 'Previous Period',
-      color: '#d1d5db',
+      label: "Previous Period",
+      color: "#d1d5db",
     },
   };
 
   return (
-    <ChartContainer config={chartConfig} className={cn('h-[250px]', className)}>
+    <ChartContainer config={chartConfig} className={cn("h-[250px]", className)}>
       <LineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis dataKey="date" tick={{ fontSize: 12 }} />
@@ -262,32 +270,36 @@ export function MetricCard({
   title: string;
   value: string | number;
   change?: string;
-  trend?: 'up' | 'down' | 'neutral';
+  trend?: "up" | "down" | "neutral";
   icon?: React.ReactNode;
   sparklineData?: number[];
   className?: string;
 }) {
   const trendColors = {
-    up: 'text-mint',
-    down: 'text-coral',
-    neutral: 'text-muted-foreground',
+    up: "text-mint",
+    down: "text-coral",
+    neutral: "text-muted-foreground",
   };
 
-  const trendColor = trend ? trendColors[trend] : 'text-muted-foreground';
+  const trendColor = trend ? trendColors[trend] : "text-muted-foreground";
 
   return (
     <div
       className={cn(
-        'rounded-2xl border border-border/50 bg-card p-6 shadow-soft transition-all hover:shadow-md',
-        className
+        "rounded-2xl border border-border/50 bg-card p-6 shadow-soft transition-all hover:shadow-md",
+        className,
       )}
     >
       <div className="flex items-start justify-between mb-4">
         <div>
-          <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
+          <p className="text-sm font-medium text-muted-foreground mb-1">
+            {title}
+          </p>
           <p className="text-3xl font-semibold tracking-tight">{value}</p>
           {change && (
-            <p className={cn('text-sm font-medium mt-1', trendColor)}>{change}</p>
+            <p className={cn("text-sm font-medium mt-1", trendColor)}>
+              {change}
+            </p>
           )}
         </div>
         {icon && (

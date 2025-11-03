@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Sparkles,
   CheckCircle2,
@@ -12,10 +12,10 @@ import {
   Zap,
   ArrowRight,
   Plus,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { MetricCard } from './AnalyticsCharts';
-import { useNavigate } from 'react-router-dom';
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { MetricCard } from "./AnalyticsCharts";
+import { useNavigate } from "react-router-dom";
 
 // Welcome & AI Summary Widget
 export function WelcomeWidget({
@@ -32,7 +32,12 @@ export function WelcomeWidget({
   const navigate = useNavigate();
 
   return (
-    <Card className={cn('bg-gradient-to-br from-violet/5 via-azure/5 to-mint/5 border-border/50', className)}>
+    <Card
+      className={cn(
+        "bg-gradient-to-br from-violet/5 via-azure/5 to-mint/5 border-border/50",
+        className,
+      )}
+    >
       <CardContent className="pt-6">
         <div className="space-y-4">
           <div>
@@ -46,16 +51,28 @@ export function WelcomeWidget({
           </div>
           <div className="flex flex-wrap gap-3">
             {pendingApprovals > 0 && (
-              <Button variant="default" className="gap-2" onClick={() => navigate('/create-post')}>
+              <Button
+                variant="default"
+                className="gap-2"
+                onClick={() => navigate("/create-post")}
+              >
                 <CheckCircle2 className="h-4 w-4" />
                 Review ({pendingApprovals})
               </Button>
             )}
-            <Button variant="outline" className="gap-2" onClick={() => navigate('/create-post')}>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => navigate("/create-post")}
+            >
               <Zap className="h-4 w-4" />
               Generate next week
             </Button>
-            <Button variant="outline" className="gap-2" onClick={() => navigate('/create-post')}>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => navigate("/create-post")}
+            >
               <Plus className="h-4 w-4" />
               Create post
             </Button>
@@ -72,7 +89,7 @@ interface PipelineStage {
   count: number;
   change: number;
   color: string;
-  status: 'draft' | 'review' | 'approved' | 'scheduled' | 'published';
+  status: "draft" | "review" | "approved" | "scheduled" | "published";
 }
 
 export function ContentPipelineWidget({
@@ -85,11 +102,11 @@ export function ContentPipelineWidget({
   const navigate = useNavigate();
 
   const stageIcons = {
-    draft: '📝',
-    review: '👀',
-    approved: '✅',
-    scheduled: '⏰',
-    published: '🚀',
+    draft: "📝",
+    review: "👀",
+    approved: "✅",
+    scheduled: "⏰",
+    published: "🚀",
   };
 
   return (
@@ -102,24 +119,25 @@ export function ContentPipelineWidget({
           <div
             key={stage.stage}
             className="flex items-center justify-between p-3 rounded-lg hover:bg-accent/5 transition-colors cursor-pointer group"
-            onClick={() => navigate('/calendar')}
+            onClick={() => navigate("/calendar")}
           >
             <div className="flex items-center gap-3">
               <span className="text-2xl">{stageIcons[stage.status]}</span>
               <div>
                 <p className="font-medium">{stage.stage}</p>
                 <p className="text-sm text-muted-foreground">
-                  {stage.count} {stage.count === 1 ? 'item' : 'items'}
+                  {stage.count} {stage.count === 1 ? "item" : "items"}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               {stage.change !== 0 && (
                 <Badge
-                  variant={stage.change > 0 ? 'default' : 'secondary'}
+                  variant={stage.change > 0 ? "default" : "secondary"}
                   className="text-xs"
                 >
-                  {stage.change > 0 ? '+' : ''}{stage.change}
+                  {stage.change > 0 ? "+" : ""}
+                  {stage.change}
                 </Badge>
               )}
               <Button
@@ -163,7 +181,7 @@ export function CalendarSnapshotWidget({
           variant="ghost"
           size="sm"
           className="gap-2"
-          onClick={() => navigate('/calendar')}
+          onClick={() => navigate("/calendar")}
         >
           Open Calendar <ArrowRight className="h-4 w-4" />
         </Button>
@@ -192,10 +210,10 @@ export function CalendarSnapshotWidget({
                 <div className="flex items-center gap-2 mt-1">
                   <Clock className="h-3 w-3 text-muted-foreground" />
                   <p className="text-xs text-muted-foreground">
-                    {post.scheduledFor.toLocaleDateString()} at{' '}
+                    {post.scheduledFor.toLocaleDateString()} at{" "}
                     {post.scheduledFor.toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
+                      hour: "2-digit",
+                      minute: "2-digit",
                     })}
                   </p>
                 </div>
@@ -238,7 +256,9 @@ export function ApprovalsQueueWidget({
   onRequestEdits?: (id: string) => void;
   className?: string;
 }) {
-  const canApprove = ['admin', 'strategy_manager', 'approver'].includes(userRole);
+  const canApprove = ["admin", "strategy_manager", "approver"].includes(
+    userRole,
+  );
 
   if (items.length === 0) {
     return (
@@ -249,7 +269,9 @@ export function ApprovalsQueueWidget({
         <CardContent>
           <div className="text-center py-8">
             <CheckCircle2 className="h-12 w-12 mx-auto text-mint mb-3" />
-            <p className="text-sm text-muted-foreground">All caught up! No approvals pending.</p>
+            <p className="text-sm text-muted-foreground">
+              All caught up! No approvals pending.
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -281,7 +303,7 @@ export function ApprovalsQueueWidget({
               </div>
               {item.bfsScore && (
                 <Badge
-                  variant={item.bfsScore >= 0.8 ? 'default' : 'destructive'}
+                  variant={item.bfsScore >= 0.8 ? "default" : "destructive"}
                   className="text-xs"
                 >
                   BFS {(item.bfsScore * 100).toFixed(0)}%
@@ -375,7 +397,7 @@ export function AdvisorInsightsWidget({
 // Connection Health Widget
 interface ConnectionStatus {
   platform: string;
-  status: 'connected' | 'expiring' | 'expired' | 'disconnected';
+  status: "connected" | "expiring" | "expired" | "disconnected";
   expiresIn?: number;
   lastPublish?: Date;
   icon: string;
@@ -391,14 +413,14 @@ export function ConnectionHealthWidget({
   const navigate = useNavigate();
 
   const statusConfig = {
-    connected: { color: 'text-mint', badge: 'default' },
-    expiring: { color: 'text-coral', badge: 'destructive' },
-    expired: { color: 'text-destructive', badge: 'destructive' },
-    disconnected: { color: 'text-muted-foreground', badge: 'secondary' },
+    connected: { color: "text-mint", badge: "default" },
+    expiring: { color: "text-coral", badge: "destructive" },
+    expired: { color: "text-destructive", badge: "destructive" },
+    disconnected: { color: "text-muted-foreground", badge: "secondary" },
   };
 
   const needsAction = connections.filter((c) =>
-    ['expiring', 'expired', 'disconnected'].includes(c.status)
+    ["expiring", "expired", "disconnected"].includes(c.status),
   );
 
   return (
@@ -415,7 +437,7 @@ export function ConnectionHealthWidget({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate('/integrations')}
+          onClick={() => navigate("/integrations")}
         >
           Manage
         </Button>
@@ -432,21 +454,31 @@ export function ConnectionHealthWidget({
                 <span className="text-xl">{connection.icon}</span>
                 <div>
                   <p className="font-medium text-sm">{connection.platform}</p>
-                  {connection.status === 'expiring' && connection.expiresIn && (
-                    <p className="text-xs text-coral">Expires in {connection.expiresIn}d</p>
-                  )}
-                  {connection.lastPublish && connection.status === 'connected' && (
-                    <p className="text-xs text-muted-foreground">
-                      Last: {connection.lastPublish.toLocaleDateString()}
+                  {connection.status === "expiring" && connection.expiresIn && (
+                    <p className="text-xs text-coral">
+                      Expires in {connection.expiresIn}d
                     </p>
                   )}
+                  {connection.lastPublish &&
+                    connection.status === "connected" && (
+                      <p className="text-xs text-muted-foreground">
+                        Last: {connection.lastPublish.toLocaleDateString()}
+                      </p>
+                    )}
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <div className={cn('h-2 w-2 rounded-full', config.color.replace('text-', 'bg-'))} />
-                {connection.status !== 'connected' && (
+                <div
+                  className={cn(
+                    "h-2 w-2 rounded-full",
+                    config.color.replace("text-", "bg-"),
+                  )}
+                />
+                {connection.status !== "connected" && (
                   <Button size="sm" variant="outline" className="text-xs">
-                    {connection.status === 'disconnected' ? 'Connect' : 'Reconnect'}
+                    {connection.status === "disconnected"
+                      ? "Connect"
+                      : "Reconnect"}
                   </Button>
                 )}
               </div>
@@ -463,10 +495,10 @@ export function QuickCreateWidget({ className }: { className?: string }) {
   const navigate = useNavigate();
 
   const quickActions = [
-    { label: 'Social Post', icon: '📱', route: '/create-post' },
-    { label: 'Blog Article', icon: '📝', route: '/create-post' },
-    { label: 'Email Campaign', icon: '📧', route: '/emails' },
-    { label: 'Event', icon: '📆', route: '/events' },
+    { label: "Social Post", icon: "📱", route: "/create-post" },
+    { label: "Blog Article", icon: "📝", route: "/create-post" },
+    { label: "Email Campaign", icon: "📧", route: "/emails" },
+    { label: "Event", icon: "📆", route: "/events" },
   ];
 
   return (

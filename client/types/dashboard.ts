@@ -1,4 +1,9 @@
-export type UserRole = 'admin' | 'strategy_manager' | 'brand_manager' | 'approver' | 'viewer';
+export type UserRole =
+  | "admin"
+  | "strategy_manager"
+  | "brand_manager"
+  | "approver"
+  | "viewer";
 
 export interface DashboardMetrics {
   id: string;
@@ -35,7 +40,7 @@ export interface AdvisorInsight {
   impact: string;
   source_posts?: string[];
   icon?: string;
-  type: 'time' | 'topic' | 'format' | 'hashtag' | 'audience';
+  type: "time" | "topic" | "format" | "hashtag" | "audience";
 }
 
 export interface ClientPortalSettings {
@@ -93,7 +98,7 @@ export interface ClientUpload {
   tags?: string[];
   notes?: string;
   campaign?: string;
-  status: 'pending' | 'approved' | 'rejected' | 'in_use';
+  status: "pending" | "approved" | "rejected" | "in_use";
   assigned_to?: string;
   processed_at?: string;
   created_at: string;
@@ -115,7 +120,7 @@ export interface ContentVersion {
 export interface ClientMessage {
   id: string;
   brand_id: string;
-  message_type: 'update' | 'comment' | 'notification';
+  message_type: "update" | "comment" | "notification";
   title?: string;
   content: string;
   metadata: Record<string, any>;
@@ -131,7 +136,7 @@ export interface ApprovalComment {
   post_id: string;
   user_id: string;
   comment_text: string;
-  comment_type: 'feedback' | 'approval' | 'rejection' | 'mention';
+  comment_type: "feedback" | "approval" | "rejection" | "mention";
   mentions?: string[];
   created_at: string;
 }
@@ -157,7 +162,7 @@ export interface PipelineStats {
 
 export interface ConnectionHealth {
   platform: string;
-  status: 'connected' | 'expiring' | 'expired' | 'disconnected';
+  status: "connected" | "expiring" | "expired" | "disconnected";
   expiresIn?: number;
   lastPublish?: Date;
   icon: string;
