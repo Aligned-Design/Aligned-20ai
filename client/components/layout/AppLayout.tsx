@@ -22,15 +22,23 @@ import {
   ChevronDown,
   LogOut,
   User,
+  Plug,
+  PenSquare,
+  MessageSquare,
+  CalendarPlus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/brands', icon: Briefcase, label: 'Brands' },
+  { to: '/create-post', icon: PenSquare, label: 'Create Post' },
   { to: '/calendar', icon: CalendarDays, label: 'Calendar' },
   { to: '/assets', icon: FolderOpen, label: 'Assets' },
   { to: '/analytics', icon: BarChart3, label: 'Analytics' },
+  { to: '/integrations', icon: Plug, label: 'Integrations' },
+  { to: '/reviews', icon: MessageSquare, label: 'Reviews' },
+  { to: '/events', icon: CalendarPlus, label: 'Events' },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
