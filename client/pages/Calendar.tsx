@@ -1,0 +1,137 @@
+import { useEffect, useState } from 'react';
+import { useBrand } from '@/contexts/BrandContext';
+import { supabase, ContentItem } from '@/lib/supabase';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { CalendarDays, Plus, CheckCircle2, Clock, XCircle, Eye } from 'lucide-react';
+import { format } from 'date-fns';
+
+export default function Calendar() {
+  const { currentBrand } = useBrand();
+  const [contentItems, setContentItems] = useState<ContentItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (currentBrand) {
+      fetchContent();
+    }
+  }, [currentBrand]);
+
+  const fetchContent = async () => {
+    if (!currentBrand) return;
+    
+    try {
+      const { data } = await supabase
+        .from('content_items')
+        .select('*')
+        .eq('brand_id', currentBrand.id)
+        .order('scheduled_for', { ascending: true });
+
+      setContentItems(data || []);
+    } catch (error) {
+      console.error('Error fetching content:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!currentBrand) {
+    return (
+      <div className="flex h-full items-center justify-center p-8">
+        <div className="text-center max-w-md">
+          <CalendarDays className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+          <h2 className="text-xl font-semibold mb-2">No brand selected</h2>
+          <p className="text-muted-foreground">
+            Select a brand to view its content calendar.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-8 space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Content Calendar</h1>
+          <p className="text-muted-foreground mt-1">
+            Schedule and manage content for {currentBrand.name}
+          </p>
+        </div>
+        <Button className="gap-2">
+          <Plus className="h-4 w-4" /> Create Content
+        </Button>
+      </div>
+
+      <div className="grid gap-6">
+        {loading ? (
+          <div className="text-center py-12">Loading...</div>
+        ) : contentItems.length === 0 ? (
+          <div className="text-center py-12 border rounded-xl bg-card">
+            <CalendarDays className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No content scheduled</h3>
+            <p className="text-muted-foreground mb-4">
+              Create your first content item or let our AI agents generate content for you
+            </p>
+            <Button>Create Content</Button>
+          </div>
+        ) : (
+          contentItems.map((item) => (
+            <ContentCard key={item.id} item={item} />
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ContentCard({ item }: { item: ContentItem }) {
+  const statusConfig = {
+    draft: { icon: Clock, color: 'text-gray-500', bg: 'bg-gray-100', label: 'Draft' },
+    pending_review: { icon: Eye, color: 'text-yellow-600', bg: 'bg-yellow-100', label: 'Pending Review' },
+    approved: { icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-100', label: 'Approved' },
+    published: { icon: CheckCircle2, color: 'text-blue-600', bg: 'bg-blue-100', label: 'Published' },
+    rejected: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-100', label: 'Rejected' },
+  };
+
+  const config = statusConfig[item.status];
+  const Icon = config.icon;
+
+  return (
+    <div className="rounded-xl border bg-card p-6 hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="text-lg font-semibold">{item.title}</h3>
+            <Badge variant="outline" className="text-xs">
+              {item.content_type}
+            </Badge>
+            {item.platform && (
+              <Badge variant="secondary" className="text-xs">
+                {item.platform}
+              </Badge>
+            )}
+          </div>
+          {item.scheduled_for && (
+            <p className="text-sm text-muted-foreground">
+              Scheduled for {format(new Date(item.scheduled_for), 'PPp')}
+            </p>
+          )}
+        </div>
+        <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${config.bg}`}>
+          <Icon className={`h-4 w-4 ${config.color}`} />
+          <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
+        </div>
+      </div>
+      {item.body && (
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{item.body}</p>
+      )}
+      {item.generated_by_agent && (
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+          Generated by {item.generated_by_agent.replace('_', ' ')}
+        </div>
+      )}
+    </div>
+  );
+}
