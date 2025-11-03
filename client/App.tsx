@@ -32,6 +32,10 @@ const Assets = lazy(() => import("./pages/Assets"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const BrandIntake = lazy(() => import("./pages/BrandIntake"));
 const BrandSnapshot = lazy(() => import("./pages/BrandSnapshot"));
+const Integrations = lazy(() => import("./pages/Integrations"));
+const CreatePost = lazy(() => import("./pages/CreatePost"));
+const Reviews = lazy(() => import("./pages/Reviews"));
+const Events = lazy(() => import("./pages/Events"));
 
 const queryClient = new QueryClient();
 
@@ -140,6 +144,62 @@ function AppRoutes() {
               >
                 <BrandSnapshot />
               </Suspense>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/integrations"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Suspense
+                  fallback={<Loading fullScreen text="Loading integrations..." />}
+                >
+                  <Integrations />
+                </Suspense>
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create-post"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Suspense
+                  fallback={<Loading fullScreen text="Loading composer..." />}
+                >
+                  <CreatePost />
+                </Suspense>
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reviews"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Suspense
+                  fallback={<Loading fullScreen text="Loading reviews..." />}
+                >
+                  <Reviews />
+                </Suspense>
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/events"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Suspense
+                  fallback={<Loading fullScreen text="Loading events..." />}
+                >
+                  <Events />
+                </Suspense>
+              </AppLayout>
             </ProtectedRoute>
           }
         />
