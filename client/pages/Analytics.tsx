@@ -2,20 +2,24 @@ import { useBrand } from '@/contexts/BrandContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BarChart3, TrendingUp, TrendingDown, Eye, Heart, Share2, MessageCircle } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
+import { DashboardSkeleton } from '@/components/ui/skeletons';
 
 export default function Analytics() {
-  const { currentBrand } = useBrand();
+  const { currentBrand, loading } = useBrand();
+
+  if (loading) {
+    return <DashboardSkeleton />;
+  }
 
   if (!currentBrand) {
     return (
       <div className="flex h-full items-center justify-center p-8">
-        <div className="text-center max-w-md">
-          <BarChart3 className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <h2 className="text-xl font-semibold mb-2">No brand selected</h2>
-          <p className="text-muted-foreground">
-            Select a brand to view analytics and insights.
-          </p>
-        </div>
+        <EmptyState
+          icon={BarChart3}
+          title="No brand selected"
+          description="Select a brand from the sidebar to view analytics, performance metrics, and AI-powered insights."
+        />
       </div>
     );
   }
