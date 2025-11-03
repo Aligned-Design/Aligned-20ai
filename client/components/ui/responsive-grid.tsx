@@ -1,3 +1,4 @@
+import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface ResponsiveGridProps {
@@ -35,6 +36,10 @@ export function ResponsiveGrid({
 
   return (
     <div className={cn(gridClasses, className)}>
+      {children}
+    </div>
+  );
+}
       {children}
     </div>
   );

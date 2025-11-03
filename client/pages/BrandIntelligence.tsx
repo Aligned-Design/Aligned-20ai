@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { BrandIntelligenceSkeleton } from '@/components/ui/skeleton';
+import { ResponsiveGrid } from '@/components/ui/responsive-grid';
+import { useBrandIntelligence } from '@/hooks/useBrandIntelligence';
 import { 
   Brain, 
   Target, 
@@ -22,69 +26,15 @@ import { cn } from '@/lib/utils';
 import { BrandIntelligence, StrategicRecommendation, ContentSuggestion } from '@shared/brand-intelligence';
 
 export default function BrandIntelligencePage() {
-  const [intelligence, setIntelligence] = useState<BrandIntelligence | null>(null);
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  const [error, setError] = useState<string | null>(null);
+  const { intelligence, loading, error, refresh, submitFeedback } = useBrandIntelligence('brand_1');
 
-  useEffect(() => {
-    loadBrandIntelligence();
-  }, []);
-
-  const loadBrandIntelligence = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await fetch('/api/brand-intelligence/brand_1');
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      setIntelligence(data);
-    } catch (error) {
-      console.error('Failed to load brand intelligence:', error);
-      setError(error instanceof Error ? error.message : 'Failed to load data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRecommendationFeedback = async (recommendationId: string, action: 'accepted' | 'rejected') => {
-    try {
-      const response = await fetch('/api/brand-intelligence/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recommendationId, action })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to submit feedback');
-      }
-      
-      await loadBrandIntelligence();
-    } catch (error) {
-      console.error('Failed to submit feedback:', error);
-      setError('Failed to submit feedback. Please try again.');
-    }
-  };
-
-  // Loading state with skeleton
+  // Loading state with accessible skeleton
   if (loading) {
     return (
-      <div className="space-y-6 p-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <div className="h-8 w-64 bg-gray-200 rounded animate-pulse" />
-            <div className="h-4 w-96 bg-gray-200 rounded animate-pulse" />
-          </div>
-          <div className="h-10 w-32 bg-gray-200 rounded animate-pulse" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
-          ))}
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <BrandIntelligenceSkeleton />
         </div>
       </div>
     );
@@ -93,16 +43,17 @@ export default function BrandIntelligencePage() {
   // Error state
   if (error) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center space-y-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center space-y-4 max-w-md mx-auto p-6">
           <AlertTriangle className="h-12 w-12 text-red-500 mx-auto" />
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Something went wrong</h3>
-            <p className="text-gray-600 mt-1">{error}</p>
-            <Button onClick={loadBrandIntelligence} className="mt-4">
-              Try Again
-            </Button>
+            <h3 className="text-lg font-semibold text-gray-900">Unable to Load Brand Intelligence</h3>
+            <p className="text-gray-600 mt-2">{error}</p>
           </div>
+          <Button onClick={refresh} className="gap-2">
+            <RefreshCw className="h-4 w-4" />
+            Try Again
+          </Button>
         </div>
       </div>
     );
@@ -111,149 +62,174 @@ export default function BrandIntelligencePage() {
   // Empty state
   if (!intelligence) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center space-y-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center space-y-4 max-w-md mx-auto p-6">
           <Brain className="h-12 w-12 text-gray-400 mx-auto" />
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">No intelligence data available</h3>
-            <p className="text-gray-600 mt-1">We're analyzing your brand data. Please check back later.</p>
-            <Button onClick={loadBrandIntelligence} className="mt-4">
-              Refresh
-            </Button>
+            <h3 className="text-lg font-semibold text-gray-900">No Intelligence Data Available</h3>
+            <p className="text-gray-600 mt-2">We're analyzing your brand data. This may take a few minutes.</p>
           </div>
+          <Button onClick={refresh} className="gap-2">
+            <RefreshCw className="h-4 w-4" />
+            Check Again
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
-        {/* Header - Improved spacing and hierarchy */}
-        <header className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-                <Brain className="h-10 w-10 text-blue-600" />
-                Brand Intelligence
-              </h1>
-              <p className="text-lg text-gray-600">AI-powered insights to optimize your brand strategy</p>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
+          {/* Header with improved hierarchy and accessibility */}
+          <header className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="space-y-2">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 flex items-center gap-3">
+                  <Brain className="h-8 w-8 sm:h-10 sm:w-10 text-blue-600" aria-hidden="true" />
+                  Brand Intelligence
+                </h1>
+                <p className="text-base sm:text-lg text-gray-600">
+                  AI-powered insights to optimize your brand strategy
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Badge 
+                  variant="outline" 
+                  className={cn(
+                    "text-sm font-medium",
+                    intelligence.confidenceScore >= 0.8 ? "bg-green-50 text-green-700 border-green-200" :
+                    intelligence.confidenceScore >= 0.6 ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
+                    "bg-red-50 text-red-700 border-red-200"
+                  )}
+                  aria-label={`Confidence score: ${Math.round(intelligence.confidenceScore * 100)} percent`}
+                >
+                  Confidence: {Math.round(intelligence.confidenceScore * 100)}%
+                </Badge>
+                <Button 
+                  onClick={refresh} 
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-2"
+                  aria-label="Refresh brand intelligence data"
+                >
+                  <RefreshCw className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Refresh</span>
+                </Button>
+              </div>
             </div>
-            
-            <div className="flex items-center gap-3">
-              <Badge 
-                variant="outline" 
-                className={cn(
-                  "text-sm font-medium",
-                  intelligence.confidenceScore >= 0.8 ? "bg-green-50 text-green-700 border-green-200" :
-                  intelligence.confidenceScore >= 0.6 ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
-                  "bg-red-50 text-red-700 border-red-200"
-                )}
-              >
-                Confidence: {Math.round(intelligence.confidenceScore * 100)}%
-              </Badge>
-              <Button onClick={loadBrandIntelligence} variant="outline" size="sm" className="gap-2">
-                <RefreshCw className="h-4 w-4" />
-                Refresh
-              </Button>
-            </div>
-          </div>
 
-          {/* Key Insights Summary - Improved layout */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <InsightCard
-              title="Brand Differentiation"
-              value={`${intelligence.brandProfile.differentiators.length} key factors`}
-              icon={<Target className="h-5 w-5" />}
-              color="blue"
-            />
-            <InsightCard
-              title="Competitive Opportunities"
-              value={`${intelligence.competitorInsights.gapAnalysis.opportunityAreas.length} identified`}
-              icon={<TrendingUp className="h-5 w-5" />}
-              color="green"
-            />
-            <InsightCard
-              title="Content Insights"
-              value={`${intelligence.audienceInsights.contentPreferences.topPerformingTypes.length} top types`}
-              icon={<Users className="h-5 w-5" />}
-              color="purple"
-            />
-            <InsightCard
-              title="Active Recommendations"
-              value={`${intelligence.recommendations.strategic.length + intelligence.recommendations.tactical.length} total`}
-              icon={<Lightbulb className="h-5 w-5" />}
-              color="orange"
-            />
-          </div>
-        </header>
-
-        {/* Main Content Tabs - Improved accessibility */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 h-auto p-1 bg-gray-100">
-            <TabsTrigger 
-              value="overview" 
-              className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-3 text-sm font-medium"
+            {/* Key Insights Summary with responsive grid */}
+            <ResponsiveGrid 
+              cols={{ sm: 1, md: 2, lg: 4 }} 
+              gap="md"
+              className="mt-6"
             >
-              🎯 Overview
-            </TabsTrigger>
-            <TabsTrigger 
-              value="competitors" 
-              className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-3 text-sm font-medium"
-            >
-              📊 Competitors
-            </TabsTrigger>
-            <TabsTrigger 
-              value="audience" 
-              className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-3 text-sm font-medium"
-            >
-              👥 Audience
-            </TabsTrigger>
-            <TabsTrigger 
-              value="content" 
-              className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-3 text-sm font-medium"
-            >
-              📝 Content
-            </TabsTrigger>
-            <TabsTrigger 
-              value="recommendations" 
-              className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-3 text-sm font-medium"
-            >
-              💡 Recommendations
-            </TabsTrigger>
-          </TabsList>
-
-          <div className="bg-white rounded-lg shadow-sm border">
-            <TabsContent value="overview" className="m-0 p-6">
-              <BrandOverview intelligence={intelligence} />
-            </TabsContent>
-
-            <TabsContent value="competitors" className="m-0 p-6">
-              <MemoizedCompetitorAnalysis intelligence={intelligence} />
-            </TabsContent>
-
-            <TabsContent value="audience" className="m-0 p-6">
-              <MemoizedAudienceInsights intelligence={intelligence} />
-            </TabsContent>
-
-            <TabsContent value="content" className="m-0 p-6">
-              <MemoizedContentIntelligence intelligence={intelligence} />
-            </TabsContent>
-
-            <TabsContent value="recommendations" className="m-0 p-6">
-              <RecommendationsPanel 
-                intelligence={intelligence}
-                onFeedback={handleRecommendationFeedback}
+              <InsightCard
+                title="Brand Differentiation"
+                value={`${intelligence.brandProfile.differentiators.length} key factors`}
+                icon={<Target className="h-5 w-5" aria-hidden="true" />}
+                color="blue"
               />
-            </TabsContent>
-          </div>
-        </Tabs>
+              <InsightCard
+                title="Competitive Opportunities"
+                value={`${intelligence.competitorInsights.gapAnalysis.opportunityAreas.length} identified`}
+                icon={<TrendingUp className="h-5 w-5" aria-hidden="true" />}
+                color="green"
+              />
+              <InsightCard
+                title="Content Insights"
+                value={`${intelligence.audienceInsights.contentPreferences.topPerformingTypes.length} top types`}
+                icon={<Users className="h-5 w-5" aria-hidden="true" />}
+                color="purple"
+              />
+              <InsightCard
+                title="Active Recommendations"
+                value={`${intelligence.recommendations.strategic.length + intelligence.recommendations.tactical.length} total`}
+                icon={<Lightbulb className="h-5 w-5" aria-hidden="true" />}
+                color="orange"
+              />
+            </ResponsiveGrid>
+          </header>
+
+          {/* Main Content Tabs with improved accessibility */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList 
+              className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto p-1 bg-gray-100"
+              role="tablist"
+              aria-label="Brand intelligence sections"
+            >
+              <TabsTrigger 
+                value="overview" 
+                className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-2 sm:py-3 text-xs sm:text-sm font-medium"
+                role="tab"
+              >
+                <span className="hidden sm:inline">🎯 </span>Overview
+              </TabsTrigger>
+              <TabsTrigger 
+                value="competitors" 
+                className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-2 sm:py-3 text-xs sm:text-sm font-medium"
+                role="tab"
+              >
+                <span className="hidden sm:inline">📊 </span>Competitors
+              </TabsTrigger>
+              <TabsTrigger 
+                value="audience" 
+                className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-2 sm:py-3 text-xs sm:text-sm font-medium"
+                role="tab"
+              >
+                <span className="hidden sm:inline">👥 </span>Audience
+              </TabsTrigger>
+              <TabsTrigger 
+                value="content" 
+                className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-2 sm:py-3 text-xs sm:text-sm font-medium"
+                role="tab"
+              >
+                <span className="hidden sm:inline">📝 </span>Content
+              </TabsTrigger>
+              <TabsTrigger 
+                value="recommendations" 
+                className="data-[state=active]:bg-white data-[state=active]:text-gray-900 py-2 sm:py-3 text-xs sm:text-sm font-medium"
+                role="tab"
+              >
+                <span className="hidden sm:inline">💡 </span>Recommendations
+              </TabsTrigger>
+            </TabsList>
+
+            <div className="bg-white rounded-lg shadow-sm border">
+              <TabsContent value="overview" className="m-0 p-4 sm:p-6" role="tabpanel">
+                <BrandOverview intelligence={intelligence} />
+              </TabsContent>
+
+              <TabsContent value="competitors" className="m-0 p-4 sm:p-6" role="tabpanel">
+                <MemoizedCompetitorAnalysis intelligence={intelligence} />
+              </TabsContent>
+
+              <TabsContent value="audience" className="m-0 p-4 sm:p-6" role="tabpanel">
+                <MemoizedAudienceInsights intelligence={intelligence} />
+              </TabsContent>
+
+              <TabsContent value="content" className="m-0 p-4 sm:p-6" role="tabpanel">
+                <MemoizedContentIntelligence intelligence={intelligence} />
+              </TabsContent>
+
+              <TabsContent value="recommendations" className="m-0 p-4 sm:p-6" role="tabpanel">
+                <RecommendationsPanel 
+                  intelligence={intelligence}
+                  onFeedback={submitFeedback}
+                />
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 }
 
-// Improved InsightCard component
+// Enhanced InsightCard with improved accessibility
 function InsightCard({ title, value, icon, color }: {
   title: string;
   value: string;
@@ -268,15 +244,18 @@ function InsightCard({ title, value, icon, color }: {
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow border">
-      <CardContent className="p-6">
-        <div className="flex items-center gap-4 mb-3">
-          <div className={cn("p-2 rounded-lg border", colorClasses[color])}>
+    <Card className="hover:shadow-md transition-shadow border" role="article">
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex items-center gap-3 sm:gap-4 mb-3">
+          <div 
+            className={cn("p-2 rounded-lg border", colorClasses[color])}
+            aria-hidden="true"
+          >
             {icon}
           </div>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-            <p className="text-lg font-bold text-gray-900">{value}</p>
+            <p className="text-lg font-bold text-gray-900 truncate" title={value}>{value}</p>
           </div>
         </div>
       </CardContent>
@@ -691,6 +670,27 @@ function ContentSuggestionCard({ suggestion, onFeedback }: {
             size="sm"
             variant="outline"
             onClick={() => onFeedback(suggestion.id, 'rejected')}
+            className="gap-1"
+          >
+            <ThumbsDown className="h-3 w-3" />
+            Skip
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Memoized components for performance
+const MemoizedContentIntelligence = React.memo(ContentIntelligence);
+const MemoizedCompetitorAnalysis = React.memo(CompetitorAnalysis);
+const MemoizedAudienceInsights = React.memo(AudienceInsights);
+
+function formatNumber(num: number): string {
+  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+  return num.toString();
+}
             className="gap-1"
           >
             <ThumbsDown className="h-3 w-3" />

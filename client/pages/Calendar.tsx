@@ -1,165 +1,301 @@
-import { useEffect, useState } from 'react';
-import { useBrand } from '@/contexts/BrandContext';
-import { supabase, ContentItem } from '@/lib/supabase';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Plus, CheckCircle2, Clock, XCircle, Eye } from 'lucide-react';
-import { format } from 'date-fns';
-import { EmptyState } from '@/components/ui/empty-state';
-import { ErrorState } from '@/components/ui/error-state';
-import { CalendarSkeleton } from '@/components/ui/skeletons';
-import { useToast } from '@/hooks/use-toast';
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Plus,
+  Filter,
+  Calendar as CalendarIcon
+} from 'lucide-react';
+
+interface CalendarEvent {
+  id: string;
+  title: string;
+  brand: string;
+  platform: string;
+  type: 'scheduled' | 'draft' | 'published';
+  time: string;
+  date: string;
+}
 
 export default function Calendar() {
-  const { currentBrand, loading: brandLoading } = useBrand();
-  const [contentItems, setContentItems] = useState<ContentItem[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
-    if (currentBrand) {
-      fetchContent();
-    }
-  }, [currentBrand]);
+    loadCalendarEvents();
+  }, [currentDate]);
 
-  const fetchContent = async () => {
-    if (!currentBrand) return;
-
-    setLoading(true);
-    setError(null);
-
+  const loadCalendarEvents = async () => {
     try {
-      const { data, error: fetchError } = await supabase
-        .from('content_items')
-        .select('*')
-        .eq('brand_id', currentBrand.id)
-        .order('scheduled_for', { ascending: true });
-
-      if (fetchError) throw fetchError;
-      setContentItems(data || []);
-    } catch (err: any) {
-      console.error('Error fetching content:', err);
-      setError(err.message || 'Failed to load content calendar');
-      toast({
-        title: 'Error loading calendar',
-        description: 'We couldn\'t load your content. Please try again.',
-        variant: 'destructive',
-      });
+      // Mock data - replace with actual API call
+      const mockEvents: CalendarEvent[] = [
+        {
+          id: '1',
+          title: 'Summer Collection Launch',
+          brand: 'Nike',
+          platform: 'Instagram',
+          type: 'scheduled',
+          time: '09:00',
+          date: new Date().toISOString().split('T')[0]
+        },
+        {
+          id: '2',
+          title: 'Product Announcement',
+          brand: 'Apple',
+          platform: 'Twitter',
+          type: 'draft',
+          time: '14:00',
+          date: new Date(Date.now() + 86400000).toISOString().split('T')[0]
+        }
+      ];
+      setEvents(mockEvents);
+    } catch (error) {
+      console.error('Failed to load calendar events:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  if (brandLoading || (loading && contentItems.length === 0)) {
-    return <CalendarSkeleton />;
-  }
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
 
-  if (!currentBrand) {
+    const days = [];
+    
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+    
+    // Add days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day));
+    }
+    
+    return days;
+  };
+
+  const getEventsForDate = (date: Date | null) => {
+    if (!date) return [];
+    const dateString = date.toISOString().split('T')[0];
+    return events.filter(event => event.date === dateString);
+  };
+
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    setCurrentDate(prev => {
+      const newDate = new Date(prev);
+      if (direction === 'prev') {
+        newDate.setMonth(prev.getMonth() - 1);
+      } else {
+        newDate.setMonth(prev.getMonth() + 1);
+      }
+      return newDate;
+    });
+  };
+
+  if (loading) {
     return (
-      <div className="flex h-full items-center justify-center p-8">
-        <EmptyState
-          icon={CalendarDays}
-          title="No brand selected"
-          description="Select a brand from the sidebar to view and manage its content calendar."
-        />
+      <div className="p-6 space-y-6">
+        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
+        <div className="h-96 bg-gray-200 rounded-lg animate-pulse" />
       </div>
     );
   }
 
-  if (error) {
-    return (
-      <div className="p-8">
-        <ErrorState
-          message={error}
-          onRetry={fetchContent}
-        />
-      </div>
-    );
-  }
+  const days = getDaysInMonth(currentDate);
+  const monthYear = currentDate.toLocaleDateString('en-US', { 
+    month: 'long', 
+    year: 'numeric' 
+  });
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Content Calendar</h1>
-          <p className="text-muted-foreground mt-1">
-            Schedule and manage content for {currentBrand.name}
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900">Content Calendar</h1>
+          <p className="text-gray-600">Schedule and manage your content across all platforms</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" /> Create Content
-        </Button>
+        <div className="flex gap-3">
+          <Button variant="outline" className="gap-2">
+            <Filter className="h-4 w-4" />
+            Filter
+          </Button>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" />
+            Schedule Content
+          </Button>
+        </div>
       </div>
 
-      <div className="grid gap-6">
-        {contentItems.length === 0 ? (
-          <EmptyState
-            icon={CalendarDays}
-            title="No content scheduled"
-            description="Create your first content item or let our AI agents generate on-brand content for you. Get started in seconds."
-            action={{
-              label: "Create First Post",
-              onClick: () => toast({ title: 'Content creator coming soon!' }),
-            }}
-          />
-        ) : (
-          contentItems.map((item) => (
-            <ContentCard key={item.id} item={item} />
-          ))
-        )}
-      </div>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <CalendarIcon className="h-5 w-5" />
+              {monthYear}
+            </CardTitle>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigateMonth('prev')}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigateMonth('next')}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-7 gap-1 mb-4">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <div key={day} className="p-2 text-center text-sm font-medium text-gray-600">
+                {day}
+              </div>
+            ))}
+          </div>
+          
+          <div className="grid grid-cols-7 gap-1">
+            {days.map((day, index) => {
+              const dayEvents = getEventsForDate(day);
+              const isToday = day && day.toDateString() === new Date().toDateString();
+              
+              return (
+                <div 
+                  key={index} 
+                  className={`min-h-24 p-2 border rounded-lg ${
+                    day ? 'bg-white hover:bg-gray-50' : 'bg-gray-50'
+                  } ${isToday ? 'ring-2 ring-blue-500' : ''}`}
+                >
+                  {day && (
+                    <>
+                      <div className="text-sm font-medium mb-1">
+                        {day.getDate()}
+                      </div>
+                      <div className="space-y-1">
+                        {dayEvents.map(event => (
+                          <div 
+                            key={event.id}
+                            className="text-xs p-1 rounded bg-blue-100 text-blue-800 truncate"
+                          >
+                            {event.time} - {event.title}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Upcoming Events */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Upcoming Events</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {events.slice(0, 5).map(event => (
+              <div key={event.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                  <div>
+                    <p className="font-medium">{event.title}</p>
+                    <p className="text-sm text-gray-600">
+                      {event.brand} • {event.platform}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium">{event.time}</p>
+                  <Badge variant="outline" className="text-xs">
+                    {event.type}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
-
-function ContentCard({ item }: { item: ContentItem }) {
-  const statusConfig = {
-    draft: { icon: Clock, color: 'text-gray-500', bg: 'bg-gray-100', label: 'Draft' },
-    pending_review: { icon: Eye, color: 'text-yellow-600', bg: 'bg-yellow-100', label: 'Pending Review' },
-    approved: { icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-100', label: 'Approved' },
-    published: { icon: CheckCircle2, color: 'text-blue-600', bg: 'bg-blue-100', label: 'Published' },
-    rejected: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-100', label: 'Rejected' },
-  };
-
-  const config = statusConfig[item.status];
-  const Icon = config.icon;
-
-  return (
-    <div className="rounded-xl border bg-card p-6 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-lg font-semibold">{item.title}</h3>
-            <Badge variant="outline" className="text-xs">
-              {item.content_type}
-            </Badge>
-            {item.platform && (
-              <Badge variant="secondary" className="text-xs">
-                {item.platform}
-              </Badge>
-            )}
+                <div 
+                  key={index} 
+                  className={`min-h-24 p-2 border rounded-lg ${
+                    day ? 'bg-white hover:bg-gray-50' : 'bg-gray-50'
+                  } ${isToday ? 'ring-2 ring-blue-500' : ''}`}
+                >
+                  {day && (
+                    <>
+                      <div className="text-sm font-medium mb-1">
+                        {day.getDate()}
+                      </div>
+                      <div className="space-y-1">
+                        {dayEvents.map(event => (
+                          <div 
+                            key={event.id}
+                            className="text-xs p-1 rounded bg-blue-100 text-blue-800 truncate"
+                          >
+                            {event.time} - {event.title}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
           </div>
-          {item.scheduled_for && (
-            <p className="text-sm text-muted-foreground">
-              Scheduled for {format(new Date(item.scheduled_for), 'PPp')}
-            </p>
-          )}
-        </div>
-        <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${config.bg}`}>
-          <Icon className={`h-4 w-4 ${config.color}`} />
-          <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
-        </div>
-      </div>
-      {item.body && (
-        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{item.body}</p>
-      )}
-      {item.generated_by_agent && (
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-          Generated by {item.generated_by_agent.replace('_', ' ')}
-        </div>
-      )}
+        </CardContent>
+      </Card>
+
+      {/* Upcoming Events */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Upcoming Events</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {events.slice(0, 5).map(event => (
+              <div key={event.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                  <div>
+                    <p className="font-medium">{event.title}</p>
+                    <p className="text-sm text-gray-600">
+                      {event.brand} • {event.platform}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium">{event.time}</p>
+                  <Badge variant="outline" className="text-xs">
+                    {event.type}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

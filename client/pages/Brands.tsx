@@ -1,21 +1,32 @@
-import { useState } from "react";
-import { useBrand } from "@/contexts/BrandContext";
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Plus, ExternalLink, Palette } from "lucide-react";
+  Plus,
+  Search,
+  Settings,
+  BarChart3,
+  Calendar,
+  ExternalLink,
+} from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useBrand } from "@/contexts/BrandContext";
+
+interface Brand {
+  id: string;
+  name: string;
+  logo: string;
+  status: "active" | "paused" | "setup";
+  platforms: string[];
+  lastActivity: string;
+  contentCount: number;
+  engagement: number;
+}
 
 export default function Brands() {
   const { brands, refreshBrands, setCurrentBrand, loading } = useBrand();
@@ -31,6 +42,54 @@ export default function Brands() {
     description: "",
     primary_color: "#8B5CF6",
   });
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    loadBrands();
+  }, []);
+
+  const loadBrands = async () => {
+    try {
+      // Mock data - replace with actual API call
+      const mockBrands: Brand[] = [
+        {
+          id: "1",
+          name: "Nike",
+          logo: "👟",
+          status: "active",
+          platforms: ["Instagram", "Facebook", "Twitter"],
+          lastActivity: new Date().toISOString(),
+          contentCount: 24,
+          engagement: 4.2,
+        },
+        {
+          id: "2",
+          name: "Apple",
+          logo: "🍎",
+          status: "active",
+          platforms: ["Instagram", "LinkedIn"],
+          lastActivity: new Date(Date.now() - 86400000).toISOString(),
+          contentCount: 18,
+          engagement: 3.8,
+        },
+        {
+          id: "3",
+          name: "Tesla",
+          logo: "🚗",
+          status: "setup",
+          platforms: ["Twitter"],
+          lastActivity: new Date(Date.now() - 172800000).toISOString(),
+          contentCount: 5,
+          engagement: 0,
+        },
+      ];
+      setBrands(mockBrands);
+    } catch (error) {
+      console.error("Failed to load brands:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreate = async () => {
     if (!user) return;
@@ -82,15 +141,58 @@ export default function Brands() {
     }
   };
 
+  const filteredBrands = brands.filter((brand) =>
+    brand.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (loading) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Brand Management</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your brands and their settings
+          <h1 className="text-3xl font-bold text-gray-900">Brands</h1>
+          <p className="text-gray-600">
+            Manage your client brands and their social media presence
           </p>
         </div>
+        <Button className="gap-2" onClick={() => setOpen(true)}>
+          <Plus className="h-4 w-4" />
+          Add Brand
+        </Button>
+      </div>
+
+      {/* Search */}
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Input
+          placeholder="Search brands..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
+      {/* Brands Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredBrands.map((brand) => (
+          <BrandCard key={brand.id} brand={brand} />
+        ))}
+      </div>
+
+      {/* Create Brand Dialog */}
+      {open && (
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="gap-2">
@@ -193,90 +295,85 @@ export default function Brands() {
             </Button>
           </DialogContent>
         </Dialog>
-      </div>
+      )}
+    </div>
+  );
+}
 
-      {loading ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {[...Array(3)].map((_, i) => (
-            <CardSkeleton key={i} />
-          ))}
-        </div>
-      ) : brands.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {brands.map((brand) => (
-            <div
-              key={brand.id}
-              className="group rounded-xl border bg-card p-6 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div
-                  className="h-12 w-12 rounded-lg flex items-center justify-center"
-                  style={{ backgroundColor: brand.primary_color }}
-                >
-                  <Palette className="h-6 w-6 text-white" />
-                </div>
-                {brand.website_url && (
-                  <a
-                    href={brand.website_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-foreground"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                )}
-              </div>
-              <h3 className="text-lg font-semibold mb-1">{brand.name}</h3>
-              {brand.industry && (
-                <p className="text-sm text-muted-foreground mb-2">
-                  {brand.industry}
-                </p>
-              )}
-              {brand.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                  {brand.description}
-                </p>
-              )}
-              <div className="flex gap-2 mt-4">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setCurrentBrand(brand)}
-                  className="flex-1"
-                >
-                  Select Brand
-                </Button>
-                {!brand.intake_completed && (
-                  <Button
-                    size="sm"
-                    onClick={() =>
-                      navigate(`/brand-intake?brandId=${brand.id}`)
-                    }
-                    className="flex-1"
-                  >
-                    Complete Intake
-                  </Button>
-                )}
-                {brand.intake_completed && (
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() =>
-                      navigate(`/brand-snapshot?brandId=${brand.id}`)
-                    }
-                    className="flex-1"
-                  >
-                    View Profile
-                  </Button>
-                )}
-              </div>
+function BrandCard({ brand }: { brand: Brand }) {
+  const getStatusColor = (status: Brand["status"]) => {
+    switch (status) {
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "paused":
+        return "bg-yellow-100 text-yellow-800";
+      case "setup":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  return (
+    <Card className="hover:shadow-lg transition-shadow">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="text-2xl">{brand.logo}</div>
+            <div>
+              <CardTitle className="text-lg">{brand.name}</CardTitle>
+              <Badge className={getStatusColor(brand.status)}>
+                {brand.status}
+              </Badge>
             </div>
-          ))}
+          </div>
+          <Button variant="ghost" size="sm">
+            <Settings className="h-4 w-4" />
+          </Button>
         </div>
-      ) : (
-        <EmptyState
-          icon={Palette}
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <p className="text-sm text-gray-600 mb-2">Connected Platforms</p>
+          <div className="flex flex-wrap gap-1">
+            {brand.platforms.map((platform) => (
+              <Badge key={platform} variant="outline" className="text-xs">
+                {platform}
+              </Badge>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p className="text-gray-600">Content</p>
+            <p className="font-semibold">{brand.contentCount} posts</p>
+          </div>
+          <div>
+            <p className="text-gray-600">Engagement</p>
+            <p className="font-semibold">{brand.engagement}%</p>
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" className="flex-1 gap-1">
+            <BarChart3 className="h-3 w-3" />
+            Analytics
+          </Button>
+          <Button size="sm" variant="outline" className="flex-1 gap-1">
+            <Calendar className="h-3 w-3" />
+            Calendar
+          </Button>
+        </div>
+
+        <p className="text-xs text-gray-500">
+          Last activity:{" "}
+          {new Date(brand.lastActivity).toLocaleDateString()}
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
           title="No brands yet"
           description="Create your first brand to unlock AI-powered content generation, automated scheduling, and intelligent analytics."
           action={{
@@ -286,5 +383,80 @@ export default function Brands() {
         />
       )}
     </div>
+  );
+}
+
+function BrandCard({ brand }: { brand: Brand }) {
+  const getStatusColor = (status: Brand["status"]) => {
+    switch (status) {
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "paused":
+        return "bg-yellow-100 text-yellow-800";
+      case "setup":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  return (
+    <Card className="hover:shadow-lg transition-shadow">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="text-2xl">{brand.logo}</div>
+            <div>
+              <CardTitle className="text-lg">{brand.name}</CardTitle>
+              <Badge className={getStatusColor(brand.status)}>
+                {brand.status}
+              </Badge>
+            </div>
+          </div>
+          <Button variant="ghost" size="sm">
+            <Settings className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <p className="text-sm text-gray-600 mb-2">Connected Platforms</p>
+          <div className="flex flex-wrap gap-1">
+            {brand.platforms.map((platform) => (
+              <Badge key={platform} variant="outline" className="text-xs">
+                {platform}
+              </Badge>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p className="text-gray-600">Content</p>
+            <p className="font-semibold">{brand.contentCount} posts</p>
+          </div>
+          <div>
+            <p className="text-gray-600">Engagement</p>
+            <p className="font-semibold">{brand.engagement}%</p>
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" className="flex-1 gap-1">
+            <BarChart3 className="h-3 w-3" />
+            Analytics
+          </Button>
+          <Button size="sm" variant="outline" className="flex-1 gap-1">
+            <Calendar className="h-3 w-3" />
+            Calendar
+          </Button>
+        </div>
+
+        <p className="text-xs text-gray-500">
+          Last activity:{" "}
+          {new Date(brand.lastActivity).toLocaleDateString()}
+        </p>
+      </CardContent>
+    </Card>
   );
 }

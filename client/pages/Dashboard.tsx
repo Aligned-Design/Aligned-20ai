@@ -1,247 +1,247 @@
-import { useBrand } from "@/contexts/BrandContext";
-import { Button } from "@/components/ui/button";
-import {
-  FileText,
-  Image,
-  TrendingUp,
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { 
+  LayoutDashboard, 
+  TrendingUp, 
+  Users, 
   Calendar,
-  ArrowRight,
-  Sparkles,
   Plus,
-} from "lucide-react";
-import { EmptyState } from "@/components/ui/empty-state";
-import { DashboardSkeleton } from "@/components/ui/skeletons";
-import { useNavigate } from "react-router-dom";
-import { HelpTooltip } from "@/components/ui/help-tooltip";
+  BarChart3,
+  Clock,
+  CheckCircle,
+  AlertTriangle
+} from 'lucide-react';
+
+interface DashboardData {
+  metrics: {
+    totalBrands: number;
+    activeContent: number;
+    pendingApprovals: number;
+    scheduledPosts: number;
+  };
+  recentActivity: Array<{
+    id: string;
+    type: 'content_created' | 'content_approved' | 'content_published';
+    title: string;
+    brand: string;
+    timestamp: string;
+  }>;
+  upcomingTasks: Array<{
+    id: string;
+    title: string;
+    dueDate: string;
+    priority: 'high' | 'medium' | 'low';
+  }>;
+}
 
 export default function Dashboard() {
-  const { currentBrand, loading } = useBrand();
-  const navigate = useNavigate();
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      // Mock data - replace with actual API call
+      const mockData: DashboardData = {
+        metrics: {
+          totalBrands: 8,
+          activeContent: 24,
+          pendingApprovals: 5,
+          scheduledPosts: 12
+        },
+        recentActivity: [
+          {
+            id: '1',
+            type: 'content_created',
+            title: 'Summer Campaign Post',
+            brand: 'Nike',
+            timestamp: new Date().toISOString()
+          },
+          {
+            id: '2',
+            type: 'content_approved',
+            title: 'Product Launch Video',
+            brand: 'Apple',
+            timestamp: new Date(Date.now() - 3600000).toISOString()
+          }
+        ],
+        upcomingTasks: [
+          {
+            id: '1',
+            title: 'Review Q4 Campaign Strategy',
+            dueDate: new Date(Date.now() + 86400000).toISOString(),
+            priority: 'high'
+          }
+        ]
+      };
+      setData(mockData);
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
-    return <DashboardSkeleton />;
-  }
-
-  if (!currentBrand) {
     return (
-      <div className="flex h-full items-center justify-center p-8">
-        <EmptyState
-          icon={Sparkles}
-          title="No brand selected"
-          description="Create or select a brand to get started with Aligned AI and unlock intelligent content automation."
-          action={{
-            label: "Create Your First Brand",
-            onClick: () => navigate("/brands"),
-          }}
-        />
+      <div className="p-6 space-y-6">
+        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }
 
+  if (!data) return <div>Failed to load dashboard</div>;
+
   return (
-    <div className="p-10 space-y-10">
-      <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <h1 className="text-4xl font-semibold tracking-tight">Dashboard</h1>
-          <HelpTooltip content="Your dashboard shows a real-time overview of content performance, AI agent activity, and upcoming posts. All metrics update automatically." />
+    <div className="p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600">Welcome back! Here's what's happening with your campaigns.</p>
         </div>
-        <p className="text-muted-foreground text-lg">
-          Welcome back! Here's what's happening with {currentBrand.name}.
-        </p>
+        <Button className="gap-2">
+          <Plus className="h-4 w-4" />
+          Create Content
+        </Button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Content Items"
-          value="24"
-          subtitle="12 scheduled"
-          icon={<FileText className="h-5 w-5" />}
-          trend="+8%"
+      {/* Metrics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <MetricCard
+          title="Total Brands"
+          value={data.metrics.totalBrands}
+          icon={<LayoutDashboard className="h-6 w-6" />}
+          color="blue"
         />
-        <StatCard
-          title="Assets"
-          value="156"
-          subtitle="82 images, 74 docs"
-          icon={<Image className="h-5 w-5" />}
-          trend="+12"
+        <MetricCard
+          title="Active Content"
+          value={data.metrics.activeContent}
+          icon={<BarChart3 className="h-6 w-6" />}
+          color="green"
         />
-        <StatCard
-          title="Engagement"
-          value="3.2k"
-          subtitle="This month"
-          icon={<TrendingUp className="h-5 w-5" />}
-          trend="+24%"
+        <MetricCard
+          title="Pending Approvals"
+          value={data.metrics.pendingApprovals}
+          icon={<Clock className="h-6 w-6" />}
+          color="yellow"
         />
-        <StatCard
-          title="Next Publish"
-          value="Today"
-          subtitle="3 posts at 2:00 PM"
-          icon={<Calendar className="h-5 w-5" />}
+        <MetricCard
+          title="Scheduled Posts"
+          value={data.metrics.scheduledPosts}
+          icon={<Calendar className="h-6 w-6" />}
+          color="purple"
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-border/50 bg-card p-8 shadow-soft">
-          <h3 className="text-xl font-semibold mb-6">Recent Activity</h3>
-          <div className="space-y-5">
-            <ActivityItem
-              agent="Doc Agent"
-              action="Generated 3 blog post drafts"
-              time="2 hours ago"
-            />
-            <ActivityItem
-              agent="Design Agent"
-              action="Created Instagram carousel template"
-              time="5 hours ago"
-            />
-            <ActivityItem
-              agent="Advisor Agent"
-              action="Recommended new posting schedule"
-              time="1 day ago"
-            />
-            <ActivityItem
-              agent="Manual"
-              action="New asset uploaded: brand-logo-2024.png"
-              time="2 days ago"
-            />
-          </div>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Activity */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {data.recentActivity.map((activity) => (
+                <div key={activity.id} className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium">{activity.title}</p>
+                    <p className="text-sm text-gray-600">{activity.brand}</p>
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {new Date(activity.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="rounded-2xl border border-border/50 bg-card p-8 shadow-soft">
-          <div className="flex items-center gap-3 mb-6">
-            <h3 className="text-xl font-semibold">AI Agent Status</h3>
-            <HelpTooltip content="Three specialized AI agents work together: Doc Agent writes content, Design Agent creates visuals, and Advisor Agent provides data-driven recommendations." />
-          </div>
-          <div className="space-y-6">
-            <AgentStatus
-              name="Doc Agent"
-              subtitle="Aligned Words"
-              status="active"
-              description="Ready to generate content"
-            />
-            <AgentStatus
-              name="Design Agent"
-              subtitle="Aligned Creative"
-              status="active"
-              description="Templates synced"
-            />
-            <AgentStatus
-              name="Advisor Agent"
-              subtitle="Aligned Insights"
-              status="analyzing"
-              description="Analyzing last month's performance"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-violet/5 via-azure/5 to-mint/5 p-8 shadow-soft">
-        <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-violet/10 blur-3xl" />
-        <div className="relative flex items-start justify-between gap-6">
-          <div className="space-y-2">
-            <h3 className="text-xl font-semibold">Monthly Content Engine</h3>
-            <p className="text-sm leading-relaxed text-muted-foreground max-w-lg">
-              Next month's content will be automatically generated by the 10th.
-              Review and approve drafts in the Calendar.
-            </p>
-          </div>
-          <Button variant="outline" className="gap-2 shrink-0">
-            View Calendar <ArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
+        {/* Upcoming Tasks */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Upcoming Tasks</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {data.upcomingTasks.map((task) => (
+                <div key={task.id} className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                    <AlertTriangle className="h-4 w-4 text-orange-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium">{task.title}</p>
+                    <p className="text-sm text-gray-600">
+                      Due {new Date(task.dueDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <Badge variant={task.priority === 'high' ? 'destructive' : 'secondary'}>
+                    {task.priority}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 }
 
-function StatCard({
-  title,
-  value,
-  subtitle,
-  icon,
-  trend,
-}: {
+function MetricCard({ title, value, icon, color }: {
   title: string;
-  value: string;
-  subtitle: string;
+  value: number;
   icon: React.ReactNode;
-  trend?: string;
+  color: 'blue' | 'green' | 'yellow' | 'purple';
 }) {
-  return (
-    <div className="group rounded-2xl border border-border/50 bg-card p-7 shadow-soft transition-all hover:shadow-md hover:border-border">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-medium text-muted-foreground">
-          {title}
-        </span>
-        <div className="text-muted-foreground transition-colors group-hover:text-violet">
-          {icon}
-        </div>
-      </div>
-      <div className="text-3xl font-semibold tracking-tight">{value}</div>
-      <div className="flex items-center justify-between mt-2">
-        <p className="text-sm text-muted-foreground">{subtitle}</p>
-        {trend && (
-          <span className="text-sm text-mint font-medium">{trend}</span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function ActivityItem({
-  agent,
-  action,
-  time,
-}: {
-  agent: string;
-  action: string;
-  time: string;
-}) {
-  return (
-    <div className="flex items-start gap-4">
-      <div className="mt-1.5 h-2 w-2 rounded-full bg-violet shrink-0" />
-      <div className="flex-1 min-w-0">
-        <p className="font-medium text-sm">{agent}</p>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {action}
-        </p>
-      </div>
-      <span className="text-xs text-muted-foreground shrink-0">{time}</span>
-    </div>
-  );
-}
-
-function AgentStatus({
-  name,
-  subtitle,
-  status,
-  description,
-}: {
-  name: string;
-  subtitle: string;
-  status: "active" | "analyzing" | "idle";
-  description: string;
-}) {
-  const statusColors = {
-    active: "bg-mint",
-    analyzing: "bg-coral",
-    idle: "bg-muted-foreground",
+  const colorClasses = {
+    blue: 'text-blue-600 bg-blue-100',
+    green: 'text-green-600 bg-green-100',
+    yellow: 'text-yellow-600 bg-yellow-100',
+    purple: 'text-purple-600 bg-purple-100'
   };
 
   return (
-    <div className="flex items-start gap-4">
-      <div
-        className={`mt-1.5 h-2.5 w-2.5 rounded-full ${statusColors[status]} shrink-0`}
-      />
-      <div className="flex-1">
-        <div className="flex items-baseline gap-2">
-          <p className="font-medium">{name}</p>
-          <span className="text-xs text-muted-foreground">{subtitle}</span>
+    <Card>
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-600">{title}</p>
+            <p className="text-3xl font-bold text-gray-900">{value}</p>
+          </div>
+          <div className={`p-3 rounded-full ${colorClasses[color]}`}>
+            {icon}
+          </div>
         </div>
-        <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-          {description}
-        </p>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
+  );
+}
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-600">{title}</p>
+            <p className="text-3xl font-bold text-gray-900">{value}</p>
+          </div>
+          <div className={`p-3 rounded-full ${colorClasses[color]}`}>
+            {icon}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
   );
 }

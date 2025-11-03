@@ -1,14 +1,12 @@
 export interface BrandIntelligence {
   id: string;
   brandId: string;
-  
-  // Brand Positioning
   brandProfile: {
     usp: string[];
     differentiators: string[];
     coreValues: string[];
     targetAudience: {
-      demographics: Record<string, any>;
+      demographics: Record<string, string>;
       psychographics: string[];
       painPoints: string[];
       interests: string[];
@@ -26,8 +24,6 @@ export interface BrandIntelligence {
       logoGuidelines: string;
     };
   };
-  
-  // Competitor Intelligence
   competitorInsights: {
     primaryCompetitors: CompetitorProfile[];
     benchmarks: {
@@ -42,17 +38,13 @@ export interface BrandIntelligence {
       differentiationOpportunities: string[];
     };
   };
-  
-  // Audience Intelligence
   audienceInsights: {
-    activityPatterns: {
-      [platform: string]: {
-        peakHours: string[];
-        peakDays: string[];
-        timezone: string;
-        engagementHeatmap: Array<{ hour: number; day: number; score: number }>;
-      };
-    };
+    activityPatterns: Record<string, {
+      peakHours: string[];
+      peakDays: string[];
+      timezone: string;
+      engagementHeatmap: Array<{ hour: number; day: number; score: number }>;
+    }>;
     contentPreferences: {
       topPerformingTypes: string[];
       engagementTriggers: string[];
@@ -65,8 +57,6 @@ export interface BrandIntelligence {
       engagementBoosterTactics: string[];
     };
   };
-  
-  // Performance Intelligence
   contentIntelligence: {
     performanceCorrelations: {
       timeVsEngagement: Array<{ time: string; avgEngagement: number }>;
@@ -79,15 +69,12 @@ export interface BrandIntelligence {
       improvementOpportunities: string[];
     };
   };
-  
-  // AI Recommendations
   recommendations: {
     strategic: StrategicRecommendation[];
     tactical: TacticalRecommendation[];
     contentSuggestions: ContentSuggestion[];
     timingOptimization: TimingRecommendation[];
   };
-  
   lastAnalyzed: string;
   nextAnalysis: string;
   confidenceScore: number;
@@ -157,6 +144,19 @@ export interface TimingRecommendation {
   timezone: string;
   reasoning: string;
   expectedUplift: number;
+}
+
+export interface BrandIntelligenceUpdate {
+  brandId: string;
+  competitorData?: any[];
+  performanceData?: any[];
+  audienceData?: any[];
+  feedbackData?: {
+    recommendationId: string;
+    action: 'accepted' | 'rejected' | 'modified';
+    feedback?: string;
+  }[];
+}
 }
 
 export interface BrandIntelligenceUpdate {
