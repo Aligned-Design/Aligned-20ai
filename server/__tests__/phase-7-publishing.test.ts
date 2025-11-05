@@ -4,7 +4,7 @@
  * Total: 50+ tests
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'test';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import crypto from 'crypto';
 import { oauthStateCache } from '../lib/oauth-state-cache';
 
