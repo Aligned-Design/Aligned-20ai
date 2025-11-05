@@ -385,8 +385,9 @@ function MetricCard({ title, current, previous, change, icon, color, isPercentag
   color: string;
   isPercentage?: boolean;
 }) {
-  const isPositive = change > 0;
+  const isPositive = typeof change === 'number' && !Number.isNaN(change) ? change > 0 : false;
   const safeCurrent = typeof current === 'number' && !Number.isNaN(current) ? current : 0;
+  const safeChange = typeof change === 'number' && !Number.isNaN(change) ? change : 0;
   const displayValue = isPercentage ? `${safeCurrent}%` : formatNumber(safeCurrent);
 
   return (
@@ -406,7 +407,7 @@ function MetricCard({ title, current, previous, change, icon, color, isPercentag
               "text-sm font-medium",
               isPositive ? "text-green-600" : "text-red-600"
             )}>
-              {isPositive ? '+' : ''}{change.toFixed(1)}%
+              {isPositive ? '+' : ''}{safeChange.toFixed(1)}%
             </span>
           </div>
         </div>
