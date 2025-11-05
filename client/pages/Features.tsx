@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import Reveal from '@/components/Reveal';
+import FooterNew from '@/components/FooterNew';
 
 export default function Features() {
   return (
