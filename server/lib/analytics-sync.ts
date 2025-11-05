@@ -611,7 +611,7 @@ export class AnalyticsSync {
         `https://youtubeanalytics.googleapis.com/v2/reports?ids=channel=${config.accountId}&start-date=2024-01-01&end-date=2024-12-31&metrics=views,estimatedMinutesWatched,likes,comments,shares&access_token=${config.accessToken}`
       );
 
-      const analyticsData = analyticsResponse.ok ? await analyticsResponse.json() : { rows: [] };
+      const analyticsData: any = analyticsResponse.ok ? await analyticsResponse.json() : { rows: [] };
 
       return [...(videosData.items || []), ...(analyticsData.rows || [])];
     } catch (error) {
