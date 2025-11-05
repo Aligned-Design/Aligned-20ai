@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card as _Card, CardContent as _CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge as _Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { 
   Upload, 
   Search, 

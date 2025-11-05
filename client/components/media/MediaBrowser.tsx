@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge as _Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { Card as _Card } from '@/components/ui/card';
 import { Search, Grid, List} from 'lucide-react';
 import { cn } from '@/lib/utils';
