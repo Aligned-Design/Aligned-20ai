@@ -2,19 +2,25 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Sparkles, 
-  Users, 
-  Calendar, 
-  BarChart3, 
-  Shield, 
+import {
+  Sparkles,
+  Users,
+  Calendar,
+  BarChart3,
+  Shield,
   Lock,
   LinkIcon,
   ArrowRight,
   Brain,
   FileText,
-  Palette
+  Palette,
+  Linkedin,
+  Instagram,
+  Facebook
 } from 'lucide-react';
+
+import ReviewsCarousel from '@/components/reviews/ReviewsCarousel';
+import FooterNew from '@/components/FooterNew';
 
 export default function Index() {
   return (
@@ -261,6 +267,9 @@ export default function Index() {
         </div>
       </div>
 
+      {/* Reviews Section (new) */}
+      <ReviewsCarousel />
+
       {/* CTA Section */}
       <div className="py-20 relative z-10" style={{ background: 'linear-gradient(90deg,#14223a 0%, #3a1466 100%)' }}>
         <div className="max-w-7xl mx-auto px-6 text-center">
@@ -285,6 +294,10 @@ export default function Index() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <FooterNew />
+
     </div>
   );
 }
