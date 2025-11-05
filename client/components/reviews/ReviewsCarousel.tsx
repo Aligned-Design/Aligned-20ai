@@ -74,7 +74,7 @@ export default function ReviewsCarousel() {
   }, []);
 
   return (
-    <section aria-labelledby="reviews-heading" className="py-16 bg-gray-50">
+    <section aria-labelledby="reviews-heading" className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-8">
           <h3 id="reviews-heading" className="text-2xl md:text-3xl font-extrabold text-slate-900">
