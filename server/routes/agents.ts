@@ -30,10 +30,7 @@ import { generateWithAI, loadPromptTemplate} from "../workers/ai-generation";
 
 const router = Router();
 
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+// Use shared supabase client from server/lib/supabase.ts
 
 // Maximum regeneration attempts for BFS failures
 const MAX_REGENERATION_ATTEMPTS = 3;
