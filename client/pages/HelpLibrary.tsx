@@ -14,17 +14,7 @@ import {
   AlertCircle,
   Lightbulb,
 } from 'lucide-react';
-import {
-  HELP_CATEGORIES,
-  searchHelpArticles,
-  getCategoryById,
-  getArticleById,
-  HELP_CATEGORIES,
-  searchHelpArticles,
-  getCategoryById,
-  getArticleById,
-  HelpArticle
-} from '@shared/tooltip-library';
+import { HELP_CATEGORIES, searchHelpArticles, getCategoryById, getArticleById, HelpArticle } from '@shared/tooltip-library';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'getting-started': '🚀',
