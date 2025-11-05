@@ -276,12 +276,12 @@ function calculateCompliance(content: any, brandKit: any): number {
 /**
  * CTA fit scoring
  */
-function calculateCTAFit(content: unknown): number {
-  if (!content.cta || content.cta.length === 0) {
+function calculateCTAFit(content: any): number {
+  if (!content?.cta || content.cta.length === 0) {
     return 0.2; // Poor score if no CTA
   }
 
-  const cta = content.cta.toLowerCase();
+  const cta = (content.cta || '').toLowerCase();
   const ctaKeywords = [
     'learn',
     'discover',
