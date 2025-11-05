@@ -161,7 +161,7 @@ export class ConnectionsDBService {
       .eq('status', 'connected');
 
     if (error) throw new Error(`Failed to get connected platforms: ${error.message}`);
-    return data?.map((d: unknown) => d.platform) as Platform[];
+    return data?.map((d: any) => d.platform) as Platform[];
   }
 
   /**
