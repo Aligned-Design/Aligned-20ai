@@ -127,9 +127,10 @@ export function useBrandIntelligence(brandId: string): UseBrandIntelligenceRetur
       setLoading(true);
       setError(null);
 
-      // Make request with explicit JSON acceptance
+      // Make request with explicit JSON acceptance, using configured API base URL
+      const apiBase = (import.meta.env.VITE_API_BASE_URL ?? '/api').replace(/\/$/, '');
       const response = await fetch(
-        `/api/brand-intelligence/${brandId}`,
+        `${apiBase}/brand-intelligence/${encodeURIComponent(brandId)}`,
         {
           headers: {
             'Accept': 'application/json'
