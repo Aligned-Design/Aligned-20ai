@@ -16,6 +16,11 @@ import {
   CreditCard,
   LogOut,
   Search,
+  CalendarPlus,
+  Star,
+  CheckCircle2,
+  Plus,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -34,13 +39,25 @@ export function AppLayout({
   const currentPath = location.pathname;
 
   const agencyNavItems = [
+    // Dashboard & Brands
     { path: "/", label: "Overview", icon: LayoutDashboard },
     { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { path: "/brands", label: "Brands", icon: Building2 },
+
+    // Content Management
     { path: "/content", label: "Content", icon: FileText, badge: 3 },
+    { path: "/content/create", label: "Create Post", icon: Plus },
+    { path: "/content/generator", label: "AI Generator", icon: Sparkles },
     { path: "/calendar", label: "Calendar", icon: Calendar },
+    { path: "/events", label: "Events", icon: CalendarPlus },
+    { path: "/review-queue", label: "Review Queue", icon: CheckCircle2 },
+
+    // Analytics & Intelligence
     { path: "/analytics/brand_1", label: "Analytics", icon: BarChart3 },
     { path: "/brand-intelligence", label: "Intelligence", icon: Brain },
+    { path: "/reviews", label: "Reviews", icon: Star },
+
+    // Admin & Settings
     { path: "/integrations", label: "Integrations", icon: Zap },
     { path: "/media", label: "Media", icon: ImageIcon },
     { path: "/team", label: "Team", icon: Users },

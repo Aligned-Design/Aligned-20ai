@@ -37,10 +37,21 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Brands = lazy(() => import("./pages/Brands"));
 const Calendar = lazy(() => import("./pages/Calendar"));
 const Integrations = lazy(() => import("./pages/Integrations"));
-const MediaManager = lazy(() => import("./pages/MediaManager"));
+const MediaManager = lazy(() => import("./pages/MediaManagerV2")); // Using V2 for enhanced features
 const TeamManagement = lazy(() => import("./pages/TeamManagement"));
 const Billing = lazy(() => import("./pages/Billing"));
 const ClientSettings = lazy(() => import("./pages/ClientSettings"));
+
+// Authentication and missing pages
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
+const Events = lazy(() => import("./pages/Events"));
+const Reviews = lazy(() => import("./pages/Reviews"));
+const ReviewQueue = lazy(() => import("./pages/ReviewQueue"));
+const BrandIntake = lazy(() => import("./pages/BrandIntake"));
+const BrandSnapshot = lazy(() => import("./pages/BrandSnapshot"));
+const CreatePost = lazy(() => import("./pages/CreatePost"));
+const ContentGenerator = lazy(() => import("./pages/ContentGenerator"));
 
 // Register custom components with Builder.io
 Builder.registerComponent(BuilderPage, {
@@ -353,6 +364,94 @@ function AppContent() {
           <Suspense fallback={<PageLoader />}>
             <AnalyticsPortal brandId="shared" isSharedView />
           </Suspense>
+        }
+      />
+
+      {/* Authentication routes */}
+      <Route
+        path="/login"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <Login />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <Signup />
+          </Suspense>
+        }
+      />
+
+      {/* Additional Agency Feature Routes */}
+      <Route
+        path="/events"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <Events />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/reviews"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <Reviews />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/review-queue"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <ReviewQueue />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/brand-intake"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <BrandIntake />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/brand-snapshot"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <BrandSnapshot />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/content/create"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <CreatePost />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/content/generator"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <ContentGenerator />
+            </Suspense>
+          </AppLayout>
         }
       />
 
