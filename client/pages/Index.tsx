@@ -300,20 +300,20 @@ function WorkflowStep({
   description: string;
   color: 'blue' | 'purple' | 'green' | 'orange';
 }) {
-  const colorClasses = {
-    blue: 'bg-blue-100 text-blue-600',
-    purple: 'bg-purple-100 text-purple-600',
-    green: 'bg-green-100 text-green-600',
-    orange: 'bg-orange-100 text-orange-600',
+  const colorClasses: Record<string, string> = {
+    blue: 'bg-white/8 text-[#C9F06A]',
+    purple: 'bg-white/8 text-[#C49CFF]',
+    green: 'bg-white/8 text-[#9EFFB8]',
+    orange: 'bg-white/8 text-[#FFD58A]',
   };
 
   return (
     <div className="text-center">
-      <div className={`w-12 h-12 ${colorClasses[color]} rounded-full flex items-center justify-center mx-auto mb-4`}>
+      <div className={`w-12 h-12 ${colorClasses[color]} rounded-full flex items-center justify-center mx-auto mb-4 border border-white/8 shadow-sm`}>
         <span className="font-semibold">{number}</span>
       </div>
-      <h3 className="font-semibold mb-2">{title}</h3>
-      <p className="text-sm text-gray-600">{description}</p>
+      <h3 className="font-semibold text-white mb-2">{title}</h3>
+      <p className="text-sm text-slate-200">{description}</p>
     </div>
   );
 }
@@ -328,12 +328,12 @@ function Feature({
   desc: string;
 }) {
   return (
-    <div className="p-6 rounded-lg border bg-white hover:shadow-md transition-shadow">
-      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4 text-blue-600">
+    <div className="p-6 rounded-2xl bg-white/6 backdrop-blur-sm border border-white/8 hover:shadow-lg transition-transform hover:-translate-y-1">
+      <div className="w-10 h-10 bg-white/8 rounded-lg flex items-center justify-center mb-4 text-[#C9F06A]">
         {icon}
       </div>
-      <h3 className="font-semibold mb-2">{title}</h3>
-      <p className="text-gray-600 text-sm">{desc}</p>
+      <h3 className="font-semibold text-white mb-2">{title}</h3>
+      <p className="text-slate-200 text-sm">{desc}</p>
     </div>
   );
 }
