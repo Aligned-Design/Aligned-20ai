@@ -396,10 +396,11 @@ export default function BrandIntake() {
       });
 
       navigate(`/brand-snapshot?brandId=${brandId}`);
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error saving brand intake",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
