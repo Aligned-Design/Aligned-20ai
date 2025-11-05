@@ -128,7 +128,10 @@ export function useBrandIntelligence(brandId: string): UseBrandIntelligenceRetur
       setError(null);
 
       // Make request with explicit JSON acceptance, using configured API base URL
-      const apiBase = (import.meta.env.VITE_API_BASE_URL ?? '/api').replace(/\/$/, '');
+      const envBase = (import.meta.env.VITE_API_BASE_URL ?? '/api');
+      // When running in remote preview, a client-side env pointing to localhost isn't reachable from the browser.
+      // Prefer a relative `/api` path when the configured base targets localhost (dev machine).
+      const apiBase = (envBase.startsWith('http') && (envBase.includes('localhost') || envBase.includes('127.0.0.1'))) ? '/api' : envBase.replace(/\/$/, '');
       const response = await fetch(
         `${apiBase}/brand-intelligence/${encodeURIComponent(brandId)}`,
         {
