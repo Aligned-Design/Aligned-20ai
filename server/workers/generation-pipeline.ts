@@ -8,6 +8,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabase";
 import { 
   AdvisorOutput, 
   DocInput, 
@@ -20,10 +21,7 @@ import { generateWithAI, loadPromptTemplate } from "./ai-generation";
 import { calculateBFS } from "../agents/brand-fidelity-scorer";
 import { lintContent, autoFixContent } from "../agents/content-linter";
 
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+// Use shared supabase client from server/lib/supabase.ts
 
 export interface PipelineRequest {
   brand_id: string;
