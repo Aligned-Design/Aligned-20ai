@@ -133,10 +133,11 @@ export default function CreatePost() {
         title: "Draft Saved",
         description: "Your post has been saved as a draft",
       });
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     }
