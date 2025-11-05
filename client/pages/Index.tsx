@@ -198,6 +198,60 @@ export default function Index() {
         </div>
       </div>
 
+      {/* Agency Positioning Section */}
+      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 py-16 border-t border-b border-blue-100">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 rounded-full bg-indigo-100 px-4 py-2 text-sm font-medium text-indigo-700 mb-6">
+                <span>🎯</span>
+                Built by an Agency for Agencies
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                We Get Your Workflow
+              </h2>
+              <p className="text-lg text-gray-600">
+                Aligned AI was built by agency professionals who understand the real challenges:
+                managing multiple client brands, keeping approvals streamlined, and proving ROI to stakeholders.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <div className="text-2xl mb-3">🔀</div>
+                <h3 className="font-semibold text-gray-900 mb-2">Multi-Client at Scale</h3>
+                <p className="text-sm text-gray-600">
+                  Manage unlimited brands with separate workflows, permissions, and white-label dashboards—all from one agency account.
+                </p>
+              </div>
+
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <div className="text-2xl mb-3">✅</div>
+                <h3 className="font-semibold text-gray-900 mb-2">Client-Ready Approvals</h3>
+                <p className="text-sm text-gray-600">
+                  Let clients approve content without seeing your full platform. Branded portals, clear feedback, zero confusion.
+                </p>
+              </div>
+
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <div className="text-2xl mb-3">📊</div>
+                <h3 className="font-semibold text-gray-900 mb-2">Built-In ROI Proof</h3>
+                <p className="text-sm text-gray-600">
+                  Dashboard metrics, performance reports, and growth insights you can show clients to justify retainers.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 p-6 bg-white rounded-lg border border-indigo-200">
+              <p className="text-gray-700 text-center">
+                <span className="font-semibold">"You're in control."</span> Aligned AI was built to enhance your team's expertise,
+                not replace it. You stay in the driver's seat while AI handles the repetitive work.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* CTA Section */}
       <div className="bg-blue-600 py-16">
         <div className="container mx-auto px-4 text-center">

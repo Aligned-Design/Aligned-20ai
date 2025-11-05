@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 // Lazy load pages for performance
 const Demo = lazy(() => import("./pages/Demo"));
 const Pricing = lazy(() => import("./pages/Pricing"));
+const HelpLibrary = lazy(() => import("./pages/HelpLibrary"));
 const ContentDashboard = lazy(() => import("./pages/ContentDashboard"));
 const BrandIntelligence = lazy(() => import("./pages/BrandIntelligence"));
 const AnalyticsPortal = lazy(() => import("./pages/AnalyticsPortal"));
@@ -108,6 +109,11 @@ function AppContent() {
       <Route path="/demo" element={
         <Suspense fallback={<PageLoader />}>
           <Demo />
+        </Suspense>
+      } />
+      <Route path="/help" element={
+        <Suspense fallback={<PageLoader />}>
+          <HelpLibrary />
         </Suspense>
       } />
 
