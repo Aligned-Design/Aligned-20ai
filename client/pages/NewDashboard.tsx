@@ -141,10 +141,11 @@ export default function NewDashboard() {
         description: "The post has been approved successfully",
       });
       loadDashboardData();
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     }
