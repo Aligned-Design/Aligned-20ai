@@ -667,10 +667,11 @@ export class AnalyticsSync {
     }
   }
 
-  private extractMetadata(platform: Platform, item: unknown): AnalyticsMetric['metadata'] {
+  private extractMetadata(platform: Platform, item: any): AnalyticsMetric['metadata'] {
+    const it = item || {};
     return {
-      postType: this.mapPostType(platform, item.media_type || item.type),
-      hashtags: this.extractHashtags(item.caption || item.text || ''),
+      postType: this.mapPostType(platform, it.media_type || it.type),
+      hashtags: this.extractHashtags(it.caption || it.text || ''),
       contentCategory: 'general'
     };
   }
