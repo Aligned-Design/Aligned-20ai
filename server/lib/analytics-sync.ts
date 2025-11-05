@@ -654,7 +654,7 @@ export class AnalyticsSync {
         return {
           ...base,
           reach: item.insights?.data?.find((i: any) => i.name === 'reach')?.values?.[0]?.value || 0,
-          impressions: item.insights?.data?.find((i: unknown) => i.name === 'impressions')?.values?.[0]?.value || 0,
+          impressions: item.insights?.data?.find((i: any) => i.name === 'impressions')?.values?.[0]?.value || 0,
           engagement: item.insights?.data?.find((i: unknown) => i.name === 'engagement')?.values?.[0]?.value || 0,
           likes: item.like_count || 0,
           comments: item.comments_count || 0,
