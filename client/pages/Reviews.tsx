@@ -74,10 +74,11 @@ export default function Reviews() {
 
       if (error) throw error;
       setReviews(data || []);
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error loading reviews",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -103,10 +104,11 @@ export default function Reviews() {
         description: "Your response has been posted",
       });
       loadReviews();
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     }
