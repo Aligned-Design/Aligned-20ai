@@ -14,7 +14,6 @@ import {
   Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AnalyticsCharts as _AnalyticsCharts } from "./AnalyticsCharts";
 import { useNavigate } from "react-router-dom";
 
 // Welcome & AI Summary Widget
