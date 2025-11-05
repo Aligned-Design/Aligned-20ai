@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import type { AssetUploadResponse } from '@shared/api';
 
@@ -10,7 +11,7 @@ interface AssetUploaderProps {
   multiple?: boolean;
 }
 
-export function AssetUploader({ _brandId, category, onUpload, accept, multiple = false }: AssetUploaderProps) {
+export function AssetUploader({ brandId, category, onUpload, accept, multiple = false }: AssetUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<AssetUploadResponse[]>([]);
