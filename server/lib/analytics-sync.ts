@@ -334,7 +334,7 @@ export class AnalyticsSync {
 
       const pinsData: any = await pinsResponse.json();
       // Filter by date range
-      return (pinsData.data || []).filter((pin: unknown) => {
+      return (pinsData.data || []).filter((pin: any) => {
         const pinTime = new Date(pin.created_at).getTime();
         return pinTime >= startDate.getTime() && pinTime <= endDate.getTime();
       });
