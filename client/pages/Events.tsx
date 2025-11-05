@@ -94,8 +94,8 @@ export default function Events() {
 
       if (error) throw error;
       setConnections(data || []);
-    } catch (error: unknown) {
-      console.error("Error loading connections:", error);
+    } catch (err: unknown) {
+      console.error("Error loading connections:", err);
     }
   };
 
