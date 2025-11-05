@@ -1,10 +1,32 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const rawSupabaseUrl = (import.meta.env.VITE_SUPABASE_URL ?? '').toString();
+const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY ?? '').toString();
+
+// Normalize common accidental typos (e.g. leading extra 'h' -> 'hhttps://') and trim whitespace
+function normalizeUrl(url: string): string {
+  const trimmed = url.trim();
+  // Fix accidental duplicate leading character like 'hhttps://'
+  return trimmed.replace(/^hhttps:\/\//i, 'https://').replace(/^hhttp:\/\//i, 'http://');
+}
+
+function isValidHttpUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch (err) {
+    return false;
+  }
+}
+
+const supabaseUrl = normalizeUrl(rawSupabaseUrl);
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  throw new Error('Missing Supabase environment variables: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY. Please check your .env and runtime environment.');
+}
+
+if (!isValidHttpUrl(supabaseUrl)) {
+  throw new Error(`Invalid VITE_SUPABASE_URL: "${supabaseUrl}". Must be a valid HTTP or HTTPS URL.`);
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
