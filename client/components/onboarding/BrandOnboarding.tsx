@@ -97,9 +97,10 @@ export default function BrandOnboarding({ open, onComplete }: BrandOnboardingPro
 
       onComplete();
     } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       toast({
         title: 'Error creating brand',
-        description: error.message || 'Please try again.',
+        description: message || 'Please try again.',
         variant: 'destructive',
       });
     } finally {
