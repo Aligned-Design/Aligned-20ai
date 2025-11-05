@@ -21,7 +21,10 @@ import {
 import { cn } from '@/lib/utils';
 
 // Sample data for Nike brand
-const DEMO_DATA = {
+interface DemoPost { id: string; platform: string; content: string; status: string; publishedAt?: string; scheduledFor?: string; metrics?: { reach?: number; engagement?: number; likes?: number; comments?: number; shares?: number }; image?: string }
+interface DemoInsight { id: string; type: string; title: string; description: string; impact: string; suggestions: string[] }
+interface DemoData { brand: { name: string; logo: string; tagline: string; colors: { primary: string; accent: string } }; metrics: { totalReach: number; totalEngagement: number; followers: number; avgEngagementRate: number; monthlyGrowth: number }; posts: DemoPost[]; insights: DemoInsight[]; calendar: { date: string; posts: number; status: string }[] }
+const DEMO_DATA: DemoData = {
   brand: {
     name: 'Nike',
     logo: '👟',
