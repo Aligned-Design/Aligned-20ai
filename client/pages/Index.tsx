@@ -89,7 +89,7 @@ export default function Index() {
               <CardTitle className="text-slate-900">Aligned Words</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-200">
+              <p className="text-slate-600">
                 Writes captions, blogs, emails, and CTA variations in your exact brand voice.
               </p>
             </CardContent>
