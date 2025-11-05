@@ -96,7 +96,10 @@ class OAuthStateCache {
       return false;
     }
 
-    return Date.now() <= stateData.expiresAt;
+    // Allow small grace window to account for timing resolution
+    const now = Date.now();
+    const GRACE_MS = 50;
+    return now <= stateData.expiresAt + GRACE_MS;
   }
 
   /**
