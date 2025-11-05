@@ -314,7 +314,7 @@ export class AnalyticsSync {
         throw new Error(`Google Business API error: ${insightsResponse.statusText}`);
       }
 
-      const insightsData = await insightsResponse.json();
+      const insightsData: any = await insightsResponse.json();
       return insightsData.locationInsights || [];
     } catch (error) {
       console.error('Google Business date-range fetch error:', error);
@@ -566,7 +566,7 @@ export class AnalyticsSync {
         throw new Error(`Google Business API error: ${insightsResponse.statusText}`);
       }
 
-      const insightsData = await insightsResponse.json();
+      const insightsData: any = await insightsResponse.json();
       return insightsData.locationInsights || [];
     } catch (error) {
       console.error('Google Business fetch error:', error);
