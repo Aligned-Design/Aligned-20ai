@@ -186,20 +186,20 @@ export default function Demo() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Demo Header */}
-      <div className="bg-gradient-to-r from-gray-900 to-gray-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="text-center">
             <div className="flex items-center justify-center mb-6">
               <span className="text-6xl mr-4">{DEMO_DATA.brand.logo}</span>
               <div>
-                <h1 className="text-4xl font-bold">{DEMO_DATA.brand.name}</h1>
-                <p className="text-xl text-gray-300">{DEMO_DATA.brand.tagline}</p>
+                <h1 className="text-4xl font-bold text-slate-900">{DEMO_DATA.brand.name}</h1>
+                <p className="text-xl text-slate-600">{DEMO_DATA.brand.tagline}</p>
               </div>
             </div>
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl font-semibold mb-4">A Peek Inside the Dashboard</h2>
-              <p className="text-lg text-gray-300">
-                Experience how Nike's social media strategy comes to life with Aligned AI. 
+              <h2 className="text-2xl font-semibold mb-4 text-slate-900">A Peek Inside the Dashboard</h2>
+              <p className="text-lg text-slate-600">
+                Experience how Nike's social media strategy comes to life with Aligned AI.
                 Explore real-time analytics, content planning, and AI-powered insights.
               </p>
             </div>
