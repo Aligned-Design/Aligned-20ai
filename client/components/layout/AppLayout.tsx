@@ -61,14 +61,14 @@ export function AppLayout({
       {/* Sidebar */}
       <div className="w-64 bg-[#0B0C10] text-slate-200 border-r border-gray-800 flex flex-col">
         {/* Logo */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-[#071025] rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">AI</span>
             </div>
             <div>
-              <h2 className="font-semibold text-gray-900">Aligned AI</h2>
-              <p className="text-xs text-gray-500 capitalize">
+              <h2 className="font-semibold text-white">Aligned AI</h2>
+              <p className="text-xs text-slate-400 capitalize">
                 {userRole} Portal
               </p>
             </div>
