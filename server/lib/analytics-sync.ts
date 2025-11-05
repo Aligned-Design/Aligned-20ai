@@ -653,13 +653,13 @@ export class AnalyticsSync {
       case 'instagram':
         return {
           ...base,
-          reach: item.insights?.data?.find((i: unknown) => i.name === 'reach')?.values?.[0]?.value || 0,
+          reach: item.insights?.data?.find((i: any) => i.name === 'reach')?.values?.[0]?.value || 0,
           impressions: item.insights?.data?.find((i: unknown) => i.name === 'impressions')?.values?.[0]?.value || 0,
           engagement: item.insights?.data?.find((i: unknown) => i.name === 'engagement')?.values?.[0]?.value || 0,
           likes: item.like_count || 0,
           comments: item.comments_count || 0,
           engagementRate: item.like_count && item.insights ? 
-            ((item.like_count + item.comments_count) / (item.insights.data.find((i: unknown) => i.name === 'reach')?.values?.[0]?.value || 1)) * 100 : 0
+            ((item.like_count + item.comments_count) / (item.insights.data.find((i: any) => i.name === 'reach')?.values?.[0]?.value || 1)) * 100 : 0
         };
       // Add other platforms...
       default:
