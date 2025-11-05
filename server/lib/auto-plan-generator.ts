@@ -59,7 +59,7 @@ export class AutoPlanGenerator {
       metadata: m.metadata,
       createdAt: m.created_at,
       updatedAt: m.updated_at
-    }));
+    })) as any[];
 
     // Generate forecast for the month
     const forecast = await advisorEngine.generateForecast(brandId, formattedMetrics, 'next_month');
