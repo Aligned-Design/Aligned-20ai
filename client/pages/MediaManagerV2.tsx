@@ -107,8 +107,9 @@ export default function MediaManagerV2() {
     }
   };
 
-  const handleUploadComplete = (uploadedAssets: MediaAsset[]) => {
-    setAssets(prev => [...uploadedAssets, ...prev]);
+  const handleUploadComplete = (uploadedAssets: unknown[]) => {
+    const typed = (uploadedAssets as MediaAsset[]);
+    setAssets(prev => [...typed, ...prev]);
     loadStorageInfo();
     setActiveTab('library');
   };
