@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Badge as _Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { supabase, Brand } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { Loading } from "@/components/ui/loading";
