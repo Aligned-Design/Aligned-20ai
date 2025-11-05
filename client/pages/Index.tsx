@@ -104,7 +104,7 @@ export default function Index() {
               <CardTitle className="text-slate-900">Aligned Creative</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-200">
+              <p className="text-slate-600">
                 Creates templates, graphics, and visual content that matches your brand guidelines.
               </p>
             </CardContent>
