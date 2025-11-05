@@ -533,7 +533,8 @@ export default function BrandIntake() {
             <Button
               onClick={handleSubmit}
               disabled={submitting}
-              className="min-h-[44px] bg-gradient-to-r from-primary to-fuchsia-500"
+              className="min-h-[44px]"
+              variant="default"
             >
               {submitting ? "Processing..." : "Complete Brand Intake"}
             </Button>
