@@ -218,47 +218,47 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/6 px-4 py-2 text-sm font-medium text-[#E6F7D0] mb-6 border border-white/8">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-700 mb-6 border border-gray-100">
                 <span>🎯</span>
                 Built by an Agency for Agencies
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
                 We Get Your Workflow
               </h2>
-              <p className="text-lg text-slate-200">
+              <p className="text-lg text-slate-600">
                 Aligned AI was built by agency professionals who understand the real challenges:
                 managing multiple client brands, keeping approvals streamlined, and proving ROI to stakeholders.
               </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-6 items-stretch">
-              <div className="bg-white/6 rounded-2xl p-6 shadow-md border border-white/6">
+              <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
                 <div className="text-2xl mb-3">🔀</div>
-                <h3 className="font-semibold text-white mb-2">Multi-Client at Scale</h3>
-                <p className="text-sm text-slate-200">
+                <h3 className="font-semibold text-slate-900 mb-2">Multi-Client at Scale</h3>
+                <p className="text-sm text-slate-600">
                   Manage unlimited brands with separate workflows, permissions, and white-label dashboards—all from one agency account.
                 </p>
               </div>
 
-              <div className="bg-white/6 rounded-2xl p-6 shadow-md border border-white/6">
+              <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
                 <div className="text-2xl mb-3">✅</div>
-                <h3 className="font-semibold text-white mb-2">Client-Ready Approvals</h3>
-                <p className="text-sm text-slate-200">
+                <h3 className="font-semibold text-slate-900 mb-2">Client-Ready Approvals</h3>
+                <p className="text-sm text-slate-600">
                   Let clients approve content without seeing your full platform. Branded portals, clear feedback, zero confusion.
                 </p>
               </div>
 
-              <div className="bg-white/6 rounded-2xl p-6 shadow-md border border-white/6">
+              <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
                 <div className="text-2xl mb-3">📊</div>
-                <h3 className="font-semibold text-white mb-2">Built-In ROI Proof</h3>
-                <p className="text-sm text-slate-200">
+                <h3 className="font-semibold text-slate-900 mb-2">Built-In ROI Proof</h3>
+                <p className="text-sm text-slate-600">
                   Dashboard metrics, performance reports, and growth insights you can show clients to justify retainers.
                 </p>
               </div>
             </div>
 
-            <div className="mt-8 p-6 bg-white/6 rounded-2xl border border-white/8">
-              <p className="text-slate-200 text-center">
+            <div className="mt-8 p-6 bg-white rounded-2xl border border-gray-100">
+              <p className="text-slate-700 text-center">
                 <span className="font-semibold">"You're in control."</span> Aligned AI was built to enhance your team's expertise,
                 not replace it. You stay in the driver's seat while AI handles the repetitive work.
               </p>
