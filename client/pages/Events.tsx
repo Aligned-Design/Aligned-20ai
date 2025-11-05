@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useBrand } from "@/contexts/BrandContext";
 import { Button } from "@/components/ui/button";
-import { Badge as _Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
