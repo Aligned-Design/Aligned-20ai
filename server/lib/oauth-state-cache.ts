@@ -70,7 +70,10 @@ class OAuthStateCache {
     const now = Date.now();
     // Small grace window (ms) to tolerate timing resolution in tests/environments
     const GRACE_MS = 50;
-    if (now > stateData.expiresAt + GRACE_MS) {
+    const ttl = stateData.ttlSeconds ?? 10 * 60;
+    // Apply grace only for normal/default TTLs (avoid masking very short TTL tests)
+    const applyGrace = ttl >= 0.05; // in seconds (50ms)
+    if (now > stateData.expiresAt + (applyGrace ? GRACE_MS : 0)) {
       console.warn(`❌ OAuth state expired: ${state.substring(0, 8)}...`);
       this.states.delete(state);
       return null;
