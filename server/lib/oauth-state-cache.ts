@@ -116,7 +116,9 @@ class OAuthStateCache {
     const stateData = this.states.get(state);
     const now = Date.now();
     const GRACE_MS = 50;
-    if (!stateData || now > stateData.expiresAt + GRACE_MS) {
+    const ttl = stateData?.ttlSeconds ?? 10 * 60;
+    const applyGrace = ttl >= 0.05;
+    if (!stateData || now > stateData.expiresAt + (applyGrace ? GRACE_MS : 0)) {
       return null;
     }
     return stateData.codeVerifier;
