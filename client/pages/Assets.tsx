@@ -1,20 +1,28 @@
-import { useEffect, useState } from 'react';
-import { useBrand } from '@/contexts/BrandContext';
-import { supabase, Asset } from '@/lib/supabase';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { FolderOpen, Plus, Search, Image, FileText, Video, File } from 'lucide-react';
-import { EmptyState } from '@/components/ui/empty-state';
-import { ErrorState } from '@/components/ui/error-state';
-import { AssetGridSkeleton } from '@/components/ui/skeletons';
-import { useToast } from '@/hooks/use-toast';
+import { useEffect, useState } from "react";
+import { useBrand } from "@/contexts/BrandContext";
+import { supabase, Asset } from "@/lib/supabase";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  FolderOpen,
+  Plus,
+  Search,
+  Image,
+  FileText,
+  Video,
+  File,
+} from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ErrorState } from "@/components/ui/error-state";
+import { AssetGridSkeleton } from "@/components/ui/skeletons";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Assets() {
   const { currentBrand, loading: brandLoading } = useBrand();
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -31,21 +39,21 @@ export default function Assets() {
 
     try {
       const { data, error: fetchError } = await supabase
-        .from('assets')
-        .select('*')
-        .eq('brand_id', currentBrand.id)
-        .order('created_at', { ascending: false });
+        .from("assets")
+        .select("*")
+        .eq("brand_id", currentBrand.id)
+        .order("created_at", { ascending: false });
 
       if (fetchError) throw fetchError;
       setAssets(data || []);
     } catch (err: unknown) {
-      console.error('Error fetching assets:', err);
+      console.error("Error fetching assets:", err);
       const message = err instanceof Error ? err.message : String(err);
-      setError(message || 'Failed to load asset library');
+      setError(message || "Failed to load asset library");
       toast({
-        title: 'Error loading assets',
-        description: 'We couldn\'t load your assets. Please try again.',
-        variant: 'destructive',
+        title: "Error loading assets",
+        description: "We couldn't load your assets. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -53,7 +61,7 @@ export default function Assets() {
   };
 
   const filteredAssets = assets.filter((asset) =>
-    asset.file_name.toLowerCase().includes(searchQuery.toLowerCase())
+    asset.file_name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   if (brandLoading || (loading && assets.length === 0)) {
@@ -85,10 +93,7 @@ export default function Assets() {
   if (error) {
     return (
       <div className="p-8">
-        <ErrorState
-          message={error}
-          onRetry={fetchAssets}
-        />
+        <ErrorState message={error} onRetry={fetchAssets} />
       </div>
     );
   }
@@ -133,7 +138,7 @@ export default function Assets() {
             description="Upload your first asset to organize brand files, images, and templates in one place."
             action={{
               label: "Upload First Asset",
-              onClick: () => toast({ title: 'Asset upload coming soon!' }),
+              onClick: () => toast({ title: "Asset upload coming soon!" }),
             }}
           />
         )
@@ -151,11 +156,11 @@ export default function Assets() {
 function AssetCard({ asset }: { asset: Asset }) {
   const getIcon = () => {
     switch (asset.file_type) {
-      case 'image':
+      case "image":
         return <Image className="h-8 w-8" />;
-      case 'video':
+      case "video":
         return <Video className="h-8 w-8" />;
-      case 'document':
+      case "document":
         return <FileText className="h-8 w-8" />;
       default:
         return <File className="h-8 w-8" />;
@@ -163,9 +168,9 @@ function AssetCard({ asset }: { asset: Asset }) {
   };
 
   const formatSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
   return (
@@ -175,12 +180,17 @@ function AssetCard({ asset }: { asset: Asset }) {
       </div>
       <p className="text-sm font-medium truncate mb-1">{asset.file_name}</p>
       {asset.file_size_bytes && (
-        <p className="text-xs text-muted-foreground">{formatSize(asset.file_size_bytes)}</p>
+        <p className="text-xs text-muted-foreground">
+          {formatSize(asset.file_size_bytes)}
+        </p>
       )}
       {asset.tags && asset.tags.length > 0 && (
         <div className="flex gap-1 mt-2 flex-wrap">
           {asset.tags.slice(0, 2).map((tag) => (
-            <span key={tag} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+            <span
+              key={tag}
+              className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded"
+            >
               {tag}
             </span>
           ))}

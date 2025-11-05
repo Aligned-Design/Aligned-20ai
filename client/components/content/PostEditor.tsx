@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import type { PostModel, PostUpdateRequest } from '@shared/api';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import type { PostModel, PostUpdateRequest } from "@shared/api";
 
 interface PostEditorProps {
   post: PostModel;
@@ -13,9 +13,17 @@ interface PostEditorProps {
   readonly?: boolean;
 }
 
-export function PostEditor({ post, onSave, onUndo, onRedo, canUndo, canRedo, readonly = false }: PostEditorProps) {
+export function PostEditor({
+  post,
+  onSave,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
+  readonly = false,
+}: PostEditorProps) {
   const [caption, setCaption] = useState(post.caption);
-  const [hashtags, setHashtags] = useState(post.hashtags.join(' '));
+  const [hashtags, setHashtags] = useState(post.hashtags.join(" "));
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [characterCount, setCharacterCount] = useState(0);
@@ -27,26 +35,26 @@ export function PostEditor({ post, onSave, onUndo, onRedo, canUndo, canRedo, rea
     instagram: 2200,
     facebook: 63206,
     linkedin: 3000,
-    tiktok: 150
+    tiktok: 150,
   };
 
   const maxCharacters = platformLimits[post.platform];
 
   useEffect(() => {
-    const fullText = caption + ' ' + hashtags;
+    const fullText = caption + " " + hashtags;
     setCharacterCount(fullText.length);
   }, [caption, hashtags]);
 
   // Auto-save every 5 seconds
   useEffect(() => {
     if (readonly) return;
-    
+
     const timer = setTimeout(async () => {
       const updates: PostUpdateRequest = {
         caption,
-        hashtags: hashtags.split(' ').filter(tag => tag.trim())
+        hashtags: hashtags.split(" ").filter((tag) => tag.trim()),
       };
-      
+
       setIsSaving(true);
       try {
         await onSave(updates);
@@ -61,36 +69,36 @@ export function PostEditor({ post, onSave, onUndo, onRedo, canUndo, canRedo, rea
 
   const handleAIRewrite = async () => {
     try {
-      const response = await fetch('/api/ai-rewrite', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/ai-rewrite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content: caption,
           platform: post.platform,
-          brandId: post.brandId
-        })
+          brandId: post.brandId,
+        }),
       });
-      
+
       const result = await response.json();
       if (result.success) {
         setCaption(result.rewrittenContent);
       }
     } catch (error) {
-      console.error('AI rewrite failed:', error);
+      console.error("AI rewrite failed:", error);
     }
   };
 
   const getCharacterCountColor = () => {
     const percentage = characterCount / maxCharacters;
-    if (percentage > 0.9) return 'text-red-600';
-    if (percentage > 0.8) return 'text-yellow-600';
-    return 'text-gray-600';
+    if (percentage > 0.9) return "text-red-600";
+    if (percentage > 0.8) return "text-yellow-600";
+    return "text-gray-600";
   };
 
   const getComplianceColor = () => {
-    if (complianceScore >= 0.8) return 'text-green-600';
-    if (complianceScore >= 0.6) return 'text-yellow-600';
-    return 'text-red-600';
+    if (complianceScore >= 0.8) return "text-green-600";
+    if (complianceScore >= 0.6) return "text-yellow-600";
+    return "text-red-600";
   };
 
   return (
@@ -115,16 +123,14 @@ export function PostEditor({ post, onSave, onUndo, onRedo, canUndo, canRedo, rea
           >
             ↷ Redo
           </Button>
-          
+
           {lastSaved && (
             <span className="text-xs text-gray-500">
               Saved {lastSaved.toLocaleTimeString()}
             </span>
           )}
-          
-          {isSaving && (
-            <span className="text-xs text-blue-600">Saving...</span>
-          )}
+
+          {isSaving && <span className="text-xs text-blue-600">Saving...</span>}
         </div>
       </div>
 
@@ -150,7 +156,7 @@ export function PostEditor({ post, onSave, onUndo, onRedo, canUndo, canRedo, rea
             ✨ AI Rewrite
           </Button>
         </div>
-        
+
         <textarea
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
@@ -178,7 +184,7 @@ export function PostEditor({ post, onSave, onUndo, onRedo, canUndo, canRedo, rea
         <span className={getCharacterCountColor()}>
           {characterCount} / {maxCharacters} characters
         </span>
-        
+
         {characterCount > maxCharacters && (
           <span className="text-red-600 font-medium">
             Exceeds limit by {characterCount - maxCharacters}

@@ -3,7 +3,7 @@
  * Handles all database operations for analytics metrics and insights
  */
 
-import { supabase } from './supabase';
+import { supabase } from "./supabase";
 
 export interface AnalyticsMetrics {
   reach?: number;
@@ -53,25 +53,25 @@ export class AnalyticsDBService {
     platform?: string,
     startDate?: string,
     endDate?: string,
-    limit: number = 1000
+    limit: number = 1000,
   ): Promise<AnalyticsMetricRecord[]> {
     let query = supabase
-      .from('analytics_metrics')
-      .select('*')
-      .eq('brand_id', brandId)
-      .order('date', { ascending: false })
+      .from("analytics_metrics")
+      .select("*")
+      .eq("brand_id", brandId)
+      .order("date", { ascending: false })
       .limit(limit);
 
     if (platform) {
-      query = query.eq('platform', platform);
+      query = query.eq("platform", platform);
     }
 
     if (startDate) {
-      query = query.gte('date', startDate);
+      query = query.gte("date", startDate);
     }
 
     if (endDate) {
-      query = query.lte('date', endDate);
+      query = query.lte("date", endDate);
     }
 
     const { data, error } = await query;
@@ -83,18 +83,21 @@ export class AnalyticsDBService {
   /**
    * Get latest metrics for each platform
    */
-  async getLatestMetrics(brandId: string): Promise<Record<string, AnalyticsMetricRecord>> {
+  async getLatestMetrics(
+    brandId: string,
+  ): Promise<Record<string, AnalyticsMetricRecord>> {
     const { data, error } = await supabase
-      .from('analytics_metrics')
-      .select('*')
-      .eq('brand_id', brandId)
-      .order('date', { ascending: false });
+      .from("analytics_metrics")
+      .select("*")
+      .eq("brand_id", brandId)
+      .order("date", { ascending: false });
 
-    if (error) throw new Error(`Failed to fetch latest metrics: ${error.message}`);
+    if (error)
+      throw new Error(`Failed to fetch latest metrics: ${error.message}`);
 
     // Get latest for each platform
     const latest: Record<string, AnalyticsMetricRecord> = {};
-    (data as AnalyticsMetricRecord[]).forEach(metric => {
+    (data as AnalyticsMetricRecord[]).forEach((metric) => {
       if (!latest[metric.platform]) {
         latest[metric.platform] = metric;
       }
@@ -108,7 +111,7 @@ export class AnalyticsDBService {
    */
   async getMetricsSummary(
     brandId: string,
-    days: number = 30
+    days: number = 30,
   ): Promise<{
     totalReach: number;
     totalEngagement: number;
@@ -119,17 +122,24 @@ export class AnalyticsDBService {
   }> {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
-    const startDateStr = startDate.toISOString().split('T')[0];
+    const startDateStr = startDate.toISOString().split("T")[0];
 
-    const metrics = await this.getMetricsByDateRange(brandId, undefined, startDateStr);
+    const metrics = await this.getMetricsByDateRange(
+      brandId,
+      undefined,
+      startDateStr,
+    );
 
     const summary = {
       totalReach: 0,
       totalEngagement: 0,
       totalFollowers: 0,
       averageEngagementRate: 0,
-      topPlatform: '',
-      platformBreakdown: {} as Record<string, { reach: number; engagement: number; posts: number }>
+      topPlatform: "",
+      platformBreakdown: {} as Record<
+        string,
+        { reach: number; engagement: number; posts: number }
+      >,
     };
 
     let engagementRateSum = 0;
@@ -137,10 +147,11 @@ export class AnalyticsDBService {
 
     metrics.forEach((metric) => {
       const m = metric.metrics || {};
-      const reach = typeof m.reach === 'number' ? m.reach : 0;
-      const engagement = typeof m.engagement === 'number' ? m.engagement : 0;
-      const followers = typeof m.followers === 'number' ? m.followers : 0;
-      const engagementRate = typeof m.engagementRate === 'number' ? m.engagementRate : undefined;
+      const reach = typeof m.reach === "number" ? m.reach : 0;
+      const engagement = typeof m.engagement === "number" ? m.engagement : 0;
+      const followers = typeof m.followers === "number" ? m.followers : 0;
+      const engagementRate =
+        typeof m.engagementRate === "number" ? m.engagementRate : undefined;
 
       summary.totalReach += reach;
       summary.totalEngagement += engagement;
@@ -156,7 +167,7 @@ export class AnalyticsDBService {
         summary.platformBreakdown[metric.platform] = {
           reach: 0,
           engagement: 0,
-          posts: 0
+          posts: 0,
         };
       }
 
@@ -171,12 +182,14 @@ export class AnalyticsDBService {
 
     // Find top platform by engagement
     let maxEngagement = 0;
-    Object.entries(summary.platformBreakdown).forEach(([platform, data]: [string, any]) => {
-      if (data.engagement > maxEngagement) {
-        maxEngagement = data.engagement;
-        summary.topPlatform = platform;
-      }
-    });
+    Object.entries(summary.platformBreakdown).forEach(
+      ([platform, data]: [string, any]) => {
+        if (data.engagement > maxEngagement) {
+          maxEngagement = data.engagement;
+          summary.topPlatform = platform;
+        }
+      },
+    );
 
     return summary;
   }
@@ -187,7 +200,7 @@ export class AnalyticsDBService {
   async getPlatformStats(
     brandId: string,
     platform: string,
-    days: number = 30
+    days: number = 30,
   ): Promise<{
     totalReach: number;
     totalEngagement: number;
@@ -197,9 +210,13 @@ export class AnalyticsDBService {
   }> {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
-    const startDateStr = startDate.toISOString().split('T')[0];
+    const startDateStr = startDate.toISOString().split("T")[0];
 
-    const metrics = await this.getMetricsByDateRange(brandId, platform, startDateStr);
+    const metrics = await this.getMetricsByDateRange(
+      brandId,
+      platform,
+      startDateStr,
+    );
 
     let topPost: AnalyticsMetricRecord | undefined;
     let maxEngagement = 0;
@@ -209,16 +226,17 @@ export class AnalyticsDBService {
       totalEngagement: 0,
       averageEngagementRate: 0,
       posts: metrics.length,
-      topPost
+      topPost,
     };
 
     let engagementRateSum = 0;
 
     metrics.forEach((metric) => {
       const m = metric.metrics || {};
-      const reach = typeof m.reach === 'number' ? m.reach : 0;
-      const engagement = typeof m.engagement === 'number' ? m.engagement : 0;
-      const engagementRate = typeof m.engagementRate === 'number' ? m.engagementRate : undefined;
+      const reach = typeof m.reach === "number" ? m.reach : 0;
+      const engagement = typeof m.engagement === "number" ? m.engagement : 0;
+      const engagementRate =
+        typeof m.engagementRate === "number" ? m.engagementRate : undefined;
 
       stats.totalReach += reach;
       stats.totalEngagement += engagement;
@@ -255,10 +273,10 @@ export class AnalyticsDBService {
     itemsFailed: number,
     startTime: Date,
     endTime?: Date,
-    error?: { message: string; details: any }
+    error?: { message: string; details: any },
   ): Promise<SyncLogRecord> {
     const { data, error: dbError } = await supabase
-      .from('analytics_sync_logs')
+      .from("analytics_sync_logs")
       .insert({
         brand_id: brandId,
         tenant_id: tenantId,
@@ -269,9 +287,11 @@ export class AnalyticsDBService {
         items_failed: itemsFailed,
         started_at: startTime.toISOString(),
         completed_at: endTime?.toISOString(),
-        duration_ms: endTime ? endTime.getTime() - startTime.getTime() : undefined,
+        duration_ms: endTime
+          ? endTime.getTime() - startTime.getTime()
+          : undefined,
         error_message: error?.message,
-        error_details: error?.details
+        error_details: error?.details,
       })
       .select()
       .single();
@@ -285,13 +305,13 @@ export class AnalyticsDBService {
    */
   async getSyncLogs(
     brandId: string,
-    limit: number = 50
+    limit: number = 50,
   ): Promise<SyncLogRecord[]> {
     const { data, error } = await supabase
-      .from('analytics_sync_logs')
-      .select('*')
-      .eq('brand_id', brandId)
-      .order('created_at', { ascending: false })
+      .from("analytics_sync_logs")
+      .select("*")
+      .eq("brand_id", brandId)
+      .order("created_at", { ascending: false })
       .limit(limit);
 
     if (error) throw new Error(`Failed to fetch sync logs: ${error.message}`);
@@ -307,19 +327,22 @@ export class AnalyticsDBService {
     metric: string,
     target: number,
     deadline: Date,
-    notes?: string
+    notes?: string,
   ): Promise<any> {
     const { data, error } = await supabase
-      .from('analytics_goals')
-      .upsert({
-        brand_id: brandId,
-        tenant_id: tenantId,
-        metric,
-        target,
-        deadline: deadline.toISOString(),
-        notes,
-        status: 'active'
-      }, { onConflict: 'brand_id,metric' })
+      .from("analytics_goals")
+      .upsert(
+        {
+          brand_id: brandId,
+          tenant_id: tenantId,
+          metric,
+          target,
+          deadline: deadline.toISOString(),
+          notes,
+          status: "active",
+        },
+        { onConflict: "brand_id,metric" },
+      )
       .select()
       .single();
 
@@ -332,10 +355,10 @@ export class AnalyticsDBService {
    */
   async getGoals(brandId: string): Promise<any[]> {
     const { data, error } = await supabase
-      .from('analytics_goals')
-      .select('*')
-      .eq('brand_id', brandId)
-      .eq('status', 'active');
+      .from("analytics_goals")
+      .select("*")
+      .eq("brand_id", brandId)
+      .eq("status", "active");
 
     if (error) throw new Error(`Failed to fetch goals: ${error.message}`);
     return data || [];
@@ -344,14 +367,18 @@ export class AnalyticsDBService {
   /**
    * Update goal progress
    */
-  async updateGoalProgress(goalId: string, current: number, status?: string): Promise<any> {
+  async updateGoalProgress(
+    goalId: string,
+    current: number,
+    status?: string,
+  ): Promise<any> {
     const { data, error } = await supabase
-      .from('analytics_goals')
+      .from("analytics_goals")
       .update({
         current,
-        status: status || 'in_progress'
+        status: status || "in_progress",
       })
-      .eq('id', goalId)
+      .eq("id", goalId)
       .select()
       .single();
 
@@ -368,12 +395,12 @@ export class AnalyticsDBService {
     insightId: string,
     category: string,
     type: string,
-    feedback: 'accepted' | 'rejected' | 'implemented',
+    feedback: "accepted" | "rejected" | "implemented",
     previousWeight: number,
-    newWeight: number
+    newWeight: number,
   ): Promise<any> {
     const { data, error } = await supabase
-      .from('advisor_feedback')
+      .from("advisor_feedback")
       .insert({
         brand_id: brandId,
         tenant_id: tenantId,
@@ -382,7 +409,7 @@ export class AnalyticsDBService {
         type,
         feedback,
         previous_weight: previousWeight,
-        new_weight: newWeight
+        new_weight: newWeight,
       })
       .select()
       .single();
@@ -396,9 +423,9 @@ export class AnalyticsDBService {
    */
   async getAverageWeights(brandId: string): Promise<Record<string, number>> {
     const { data, error } = await supabase
-      .from('advisor_feedback')
-      .select('category, type, new_weight')
-      .eq('brand_id', brandId);
+      .from("advisor_feedback")
+      .select("category, type, new_weight")
+      .eq("brand_id", brandId);
 
     if (error) throw new Error(`Failed to fetch weights: ${error.message}`);
 

@@ -5,9 +5,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy, useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
-import '@/lib/builder';
-import { BuilderPage } from '@/components/BuilderPage';
-import { Builder } from '@builder.io/react';
+import "@/lib/builder";
+import { BuilderPage } from "@/components/BuilderPage";
+import { Builder } from "@builder.io/react";
 
 // Import existing components
 import Index from "./pages/Index";
@@ -19,7 +19,9 @@ const HelpLibrary = lazy(() => import("./pages/HelpLibrary"));
 const Features = lazy(() => import("./pages/Features"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Legal = lazy(() => import("./pages/Legal"));
-const IntegrationsMarketing = lazy(() => import("./pages/IntegrationsMarketing"));
+const IntegrationsMarketing = lazy(
+  () => import("./pages/IntegrationsMarketing"),
+);
 const About = lazy(() => import("./pages/About"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
@@ -42,10 +44,8 @@ const ClientSettings = lazy(() => import("./pages/ClientSettings"));
 
 // Register custom components with Builder.io
 Builder.registerComponent(BuilderPage, {
-  name: 'Custom Page',
-  inputs: [
-    { name: 'model', type: 'string', defaultValue: 'page' }
-  ]
+  name: "Custom Page",
+  inputs: [{ name: "model", type: "string", defaultValue: "page" }],
 });
 
 function App() {
@@ -64,19 +64,19 @@ function AppContent() {
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
-    const hasCompletedOnboarding = localStorage.getItem('onboarding-completed');
+    const hasCompletedOnboarding = localStorage.getItem("onboarding-completed");
     if (!hasCompletedOnboarding) {
       setShowOnboarding(true);
     }
   }, []);
 
   const handleOnboardingComplete = () => {
-    localStorage.setItem('onboarding-completed', 'true');
+    localStorage.setItem("onboarding-completed", "true");
     setShowOnboarding(false);
   };
 
   const handleOnboardingSkip = () => {
-    localStorage.setItem('onboarding-skipped', 'true');
+    localStorage.setItem("onboarding-skipped", "true");
     setShowOnboarding(false);
   };
 
@@ -85,7 +85,9 @@ function AppContent() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="max-w-md w-full p-6 bg-white rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold mb-4">Welcome to Aligned AI</h2>
-          <p className="text-gray-600 mb-6">Get started with your AI-powered marketing platform</p>
+          <p className="text-gray-600 mb-6">
+            Get started with your AI-powered marketing platform
+          </p>
           <div className="flex gap-3">
             <button
               onClick={handleOnboardingComplete}
@@ -109,188 +111,270 @@ function AppContent() {
     <Routes>
       {/* Public routes without layout */}
       <Route path="/" element={<Index />} />
-      <Route path="/pricing" element={
-        <Suspense fallback={<PageLoader />}>
-          <Pricing />
-        </Suspense>
-      } />
-      <Route path="/features" element={
-        <Suspense fallback={<PageLoader />}>
-          <Features />
-        </Suspense>
-      } />
-      <Route path="/contact" element={
-        <Suspense fallback={<PageLoader />}>
-          <Contact />
-        </Suspense>
-      } />
-      <Route path="/legal" element={
-        <Suspense fallback={<PageLoader />}>
-          <Legal />
-        </Suspense>
-      } />
-      <Route path="/demo" element={
-        <Suspense fallback={<PageLoader />}>
-          <Demo />
-        </Suspense>
-      } />
-      <Route path="/help" element={
-        <Suspense fallback={<PageLoader />}>
-          <HelpLibrary />
-        </Suspense>
-      } />
-
-      {/* Newly added marketing pages */}
-      <Route path="/integrations-marketing" element={
-        <Suspense fallback={<PageLoader />}>
-          <IntegrationsMarketing />
-        </Suspense>
-      } />
-      <Route path="/about" element={
-        <Suspense fallback={<PageLoader />}>
-          <About />
-        </Suspense>
-      } />
-      <Route path="/terms" element={
-        <Suspense fallback={<PageLoader />}>
-          <Terms />
-        </Suspense>
-      } />
-      <Route path="/privacy" element={
-        <Suspense fallback={<PageLoader />}>
-          <Privacy />
-        </Suspense>
-      } />
-      <Route path="/support" element={
-        <Suspense fallback={<PageLoader />}>
-          <Support />
-        </Suspense>
-      } />
-
-      {/* Agency routes with layout */}
-      <Route path="/dashboard" element={
-        <AppLayout userRole="agency">
+      <Route
+        path="/pricing"
+        element={
           <Suspense fallback={<PageLoader />}>
-            <Dashboard />
+            <Pricing />
           </Suspense>
-        </AppLayout>
-      } />
-      <Route path="/brands" element={
-        <AppLayout userRole="agency">
+        }
+      />
+      <Route
+        path="/features"
+        element={
           <Suspense fallback={<PageLoader />}>
-            <Brands />
+            <Features />
           </Suspense>
-        </AppLayout>
-      } />
-      <Route path="/content" element={
-        <AppLayout userRole="agency">
+        }
+      />
+      <Route
+        path="/contact"
+        element={
           <Suspense fallback={<PageLoader />}>
-            <ContentDashboard />
+            <Contact />
           </Suspense>
-        </AppLayout>
-      } />
-      <Route path="/calendar" element={
-        <AppLayout userRole="agency">
+        }
+      />
+      <Route
+        path="/legal"
+        element={
           <Suspense fallback={<PageLoader />}>
-            <Calendar />
+            <Legal />
           </Suspense>
-        </AppLayout>
-      } />
-      <Route path="/brand-intelligence" element={
-        <AppLayout userRole="agency">
+        }
+      />
+      <Route
+        path="/demo"
+        element={
           <Suspense fallback={<PageLoader />}>
-            <BrandIntelligence />
+            <Demo />
           </Suspense>
-        </AppLayout>
-      } />
-      <Route path="/analytics/:brandId" element={
-        <AppLayout userRole="agency">
+        }
+      />
+      <Route
+        path="/help"
+        element={
           <Suspense fallback={<PageLoader />}>
-            <AnalyticsPortal brandId="brand_1" />
+            <HelpLibrary />
           </Suspense>
-        </AppLayout>
-      } />
-      <Route path="/integrations" element={
-        <AppLayout userRole="agency">
-          <Suspense fallback={<PageLoader />}>
-            <Integrations />
-          </Suspense>
-        </AppLayout>
-      } />
-      <Route path="/media" element={
-        <AppLayout userRole="agency">
-          <Suspense fallback={<PageLoader />}>
-            <MediaManager />
-          </Suspense>
-        </AppLayout>
-      } />
-      <Route path="/team" element={
-        <AppLayout userRole="agency">
-          <Suspense fallback={<PageLoader />}>
-            <TeamManagement />
-          </Suspense>
-        </AppLayout>
-      } />
-      <Route path="/billing" element={
-        <AppLayout userRole="agency">
-          <Suspense fallback={<PageLoader />}>
-            <Billing />
-          </Suspense>
-        </AppLayout>
-      } />
-      <Route path="/settings" element={
-        <AppLayout userRole="agency">
-          <Suspense fallback={<PageLoader />}>
-            <Settings />
-          </Suspense>
-        </AppLayout>
-      } />
-
-      {/* Client routes with layout */}
-      <Route path="/client" element={
-        <AppLayout userRole="client">
-          <Suspense fallback={<PageLoader />}>
-            <ClientPortal />
-          </Suspense>
-        </AppLayout>
-      } />
-      <Route path="/client/settings" element={
-        <AppLayout userRole="client">
-          <Suspense fallback={<PageLoader />}>
-            <ClientSettings />
-          </Suspense>
-        </AppLayout>
-      } />
-      <Route path="/client/*" element={
-        <AppLayout userRole="client">
-          <Suspense fallback={<PageLoader />}>
-            <ClientPortal />
-          </Suspense>
-        </AppLayout>
-      } />
-
-      {/* Shared routes */}
-      <Route path="/analytics/shared/:token" element={
-        <Suspense fallback={<PageLoader />}>
-          <AnalyticsPortal brandId="shared" isSharedView />
-        </Suspense>
-      } />
-
-      {/* Builder.io dynamic routes */}
-      <Route 
-        path="/builder/*" 
-        element={<BuilderPage model="page" />} 
+        }
       />
 
+      {/* Newly added marketing pages */}
+      <Route
+        path="/integrations-marketing"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <IntegrationsMarketing />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/about"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <About />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/terms"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <Terms />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/privacy"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <Privacy />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/support"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <Support />
+          </Suspense>
+        }
+      />
+
+      {/* Agency routes with layout */}
+      <Route
+        path="/dashboard"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <Dashboard />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/brands"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <Brands />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/content"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <ContentDashboard />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/calendar"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <Calendar />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/brand-intelligence"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <BrandIntelligence />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/analytics/:brandId"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <AnalyticsPortal brandId="brand_1" />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/integrations"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <Integrations />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/media"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <MediaManager />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/team"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <TeamManagement />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/billing"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <Billing />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <AppLayout userRole="agency">
+            <Suspense fallback={<PageLoader />}>
+              <Settings />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+
+      {/* Client routes with layout */}
+      <Route
+        path="/client"
+        element={
+          <AppLayout userRole="client">
+            <Suspense fallback={<PageLoader />}>
+              <ClientPortal />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/client/settings"
+        element={
+          <AppLayout userRole="client">
+            <Suspense fallback={<PageLoader />}>
+              <ClientSettings />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/client/*"
+        element={
+          <AppLayout userRole="client">
+            <Suspense fallback={<PageLoader />}>
+              <ClientPortal />
+            </Suspense>
+          </AppLayout>
+        }
+      />
+
+      {/* Shared routes */}
+      <Route
+        path="/analytics/shared/:token"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <AnalyticsPortal brandId="shared" isSharedView />
+          </Suspense>
+        }
+      />
+
+      {/* Builder.io dynamic routes */}
+      <Route path="/builder/*" element={<BuilderPage model="page" />} />
+
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-      <Route path="*" element={
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900">Page Not Found</h1>
-            <p className="text-gray-600 mt-2">The page you're looking for doesn't exist.</p>
+      <Route
+        path="*"
+        element={
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-gray-900">
+                Page Not Found
+              </h1>
+              <p className="text-gray-600 mt-2">
+                The page you're looking for doesn't exist.
+              </p>
+            </div>
           </div>
-        </div>
-      } />
+        }
+      />
     </Routes>
   );
 }

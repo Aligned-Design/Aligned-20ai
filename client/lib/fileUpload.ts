@@ -29,7 +29,7 @@ export async function uploadBrandFile(
   // Simulate progress for better UX (actual Supabase SDK doesn't expose granular progress)
   const progressInterval = setInterval(() => {
     if (onProgress) {
-      onProgress(Math.min(80, (Math.random() * 100) * 0.3)); // Simulate up to 80%
+      onProgress(Math.min(80, Math.random() * 100 * 0.3)); // Simulate up to 80%
     }
   }, 200);
 
@@ -78,7 +78,11 @@ export async function uploadBrandFiles(
   brandId: string,
   category: string,
   assetType: string,
-  onProgress?: (progress: { currentFile: number; totalFiles: number; progress: number }) => void,
+  onProgress?: (progress: {
+    currentFile: number;
+    totalFiles: number;
+    progress: number;
+  }) => void,
 ): Promise<UploadedFile[]> {
   const uploadedFiles: UploadedFile[] = [];
 

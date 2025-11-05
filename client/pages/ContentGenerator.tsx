@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Wand2,
   Loader2,
   AlertCircle,
   CheckCircle,
-  Sparkles
-} from 'lucide-react';
-import { GenerationResult } from '@/components/generation/GenerationResult';
-import type { BrandFidelityScore, LinterResult } from '@/types/agent-config';
+  Sparkles,
+} from "lucide-react";
+import { GenerationResult } from "@/components/generation/GenerationResult";
+import type { BrandFidelityScore, LinterResult } from "@/types/agent-config";
 
 interface GenerationState {
   topic: string;
@@ -38,13 +38,13 @@ interface ResultState {
 }
 
 const DEFAULT_STATE: GenerationState = {
-  topic: '',
-  tone: 'professional',
-  platform: 'instagram',
-  format: 'post',
+  topic: "",
+  tone: "professional",
+  platform: "instagram",
+  format: "post",
   maxLength: 280,
   includeCTA: true,
-  ctaType: 'comment'
+  ctaType: "comment",
 };
 
 export default function ContentGenerator() {
@@ -56,7 +56,7 @@ export default function ContentGenerator() {
 
   const handleGenerate = async () => {
     if (!formState.topic.trim()) {
-      setError('Please enter a topic');
+      setError("Please enter a topic");
       return;
     }
 
@@ -64,9 +64,9 @@ export default function ContentGenerator() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/agents/generate/doc', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/agents/generate/doc", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           topic: formState.topic,
           tone: formState.tone,
@@ -74,12 +74,12 @@ export default function ContentGenerator() {
           format: formState.format,
           max_length: formState.maxLength,
           include_cta: formState.includeCTA,
-          cta_type: formState.ctaType
-        })
+          cta_type: formState.ctaType,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate content');
+        throw new Error("Failed to generate content");
       }
 
       const data = await response.json();
@@ -87,18 +87,18 @@ export default function ContentGenerator() {
         content: data.content,
         bfsScore: data.bfs_score,
         linterResult: data.linter_result,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       setRegenerationCount(0);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Generation failed');
+      setError(err instanceof Error ? err.message : "Generation failed");
     } finally {
       setLoading(false);
     }
   };
 
   const handleRegenerate = async () => {
-    setRegenerationCount(prev => prev + 1);
+    setRegenerationCount((prev) => prev + 1);
     await handleGenerate();
   };
 
@@ -107,14 +107,14 @@ export default function ContentGenerator() {
 
     try {
       setLoading(true);
-      const response = await fetch('/api/agents/approve', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/agents/approve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content: result.content,
           platform: formState.platform,
-          bfs_score: result.bfsScore?.overall
-        })
+          bfs_score: result.bfsScore?.overall,
+        }),
       });
 
       if (response.ok) {
@@ -125,10 +125,10 @@ export default function ContentGenerator() {
           setFormState(DEFAULT_STATE);
         }, 1500);
       } else {
-        setError('Failed to approve content');
+        setError("Failed to approve content");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Approval failed');
+      setError(err instanceof Error ? err.message : "Approval failed");
     } finally {
       setLoading(false);
     }
@@ -174,9 +174,12 @@ export default function ContentGenerator() {
                 <label className="block text-sm font-medium mb-1">
                   Platform
                 </label>
-                <Select value={formState.platform} onValueChange={(value) =>
-                  setFormState({ ...formState, platform: value })
-                }>
+                <Select
+                  value={formState.platform}
+                  onValueChange={(value) =>
+                    setFormState({ ...formState, platform: value })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -192,12 +195,13 @@ export default function ContentGenerator() {
 
               {/* Format */}
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Format
-                </label>
-                <Select value={formState.format} onValueChange={(value) =>
-                  setFormState({ ...formState, format: value })
-                }>
+                <label className="block text-sm font-medium mb-1">Format</label>
+                <Select
+                  value={formState.format}
+                  onValueChange={(value) =>
+                    setFormState({ ...formState, format: value })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -213,12 +217,13 @@ export default function ContentGenerator() {
 
               {/* Tone */}
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Tone
-                </label>
-                <Select value={formState.tone} onValueChange={(value) =>
-                  setFormState({ ...formState, tone: value })
-                }>
+                <label className="block text-sm font-medium mb-1">Tone</label>
+                <Select
+                  value={formState.tone}
+                  onValueChange={(value) =>
+                    setFormState({ ...formState, tone: value })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -243,7 +248,7 @@ export default function ContentGenerator() {
                   onChange={(e) =>
                     setFormState({
                       ...formState,
-                      maxLength: parseInt(e.target.value)
+                      maxLength: parseInt(e.target.value),
                     })
                   }
                   min={50}
@@ -261,7 +266,7 @@ export default function ContentGenerator() {
                     onChange={(e) =>
                       setFormState({
                         ...formState,
-                        includeCTA: e.target.checked
+                        includeCTA: e.target.checked,
                       })
                     }
                     className="rounded"
@@ -272,9 +277,12 @@ export default function ContentGenerator() {
                 </div>
 
                 {formState.includeCTA && (
-                  <Select value={formState.ctaType} onValueChange={(value) =>
-                    setFormState({ ...formState, ctaType: value })
-                  }>
+                  <Select
+                    value={formState.ctaType}
+                    onValueChange={(value) =>
+                      setFormState({ ...formState, ctaType: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -327,7 +335,8 @@ export default function ContentGenerator() {
                 <div className="text-center">
                   <Sparkles className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                   <p className="text-gray-500">
-                    Generate content to see results with BFS scoring and compliance checks
+                    Generate content to see results with BFS scoring and
+                    compliance checks
                   </p>
                 </div>
               </CardContent>
@@ -342,7 +351,7 @@ export default function ContentGenerator() {
               onRegenerate={handleRegenerate}
               onEdit={() => {
                 // In a full implementation, this would open an editor modal
-                console.log('Edit draft:', result.content);
+                console.log("Edit draft:", result.content);
               }}
               isLoading={loading}
             />

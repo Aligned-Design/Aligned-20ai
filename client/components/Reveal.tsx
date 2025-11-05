@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 
 export default function Reveal({
   children,
-  className = '',
+  className = "",
 }: {
   children: React.ReactNode;
   className?: string;
@@ -24,7 +24,7 @@ export default function Reveal({
           }
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.15 },
     );
 
     obs.observe(el);
@@ -35,10 +35,11 @@ export default function Reveal({
   return (
     <div
       ref={ref}
-      className={`${className} transition-all duration-180 ease-in-out`}>
+      className={`${className} transition-all duration-180 ease-in-out`}
+    >
       <div
-        className={`transform ${visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-3 scale-98'}`}
-        style={{ willChange: 'transform, opacity' }}
+        className={`transform ${visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-3 scale-98"}`}
+        style={{ willChange: "transform, opacity" }}
       >
         {children}
       </div>

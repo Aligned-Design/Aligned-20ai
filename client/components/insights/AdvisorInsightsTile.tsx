@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   TrendingUp,
   TrendingDown,
@@ -14,10 +14,10 @@ import {
   ThumbsDown,
   Play,
   Loader2,
-  RefreshCw
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { AdvisorInsight } from '@shared/analytics';
+  RefreshCw,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { AdvisorInsight } from "@shared/analytics";
 
 interface AdvisorInsightTileProps {
   brandId?: string;
@@ -28,12 +28,14 @@ interface AdvisorInsightTileProps {
 export function AdvisorInsightsTile({
   brandId,
   className,
-  maxInsights = 6
+  maxInsights = 6,
 }: AdvisorInsightTileProps) {
   const [insights, setInsights] = useState<AdvisorInsight[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [feedbackStates, setFeedbackStates] = useState<Record<string, AdvisorInsight['feedback']>>({});
+  const [feedbackStates, setFeedbackStates] = useState<
+    Record<string, AdvisorInsight["feedback"]>
+  >({});
 
   useEffect(() => {
     loadInsights();
@@ -45,36 +47,39 @@ export function AdvisorInsightsTile({
       setError(null);
       const url = brandId
         ? `/api/agents/advisor?brandId=${brandId}`
-        : '/api/agents/advisor';
+        : "/api/agents/advisor";
 
       const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch insights');
+      if (!response.ok) throw new Error("Failed to fetch insights");
 
       const data = await response.json();
       setInsights(Array.isArray(data) ? data : data.insights || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load insights');
-      console.error('Error loading insights:', err);
+      setError(err instanceof Error ? err.message : "Failed to load insights");
+      console.error("Error loading insights:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFeedback = async (insightId: string, feedback: AdvisorInsight['feedback']) => {
+  const handleFeedback = async (
+    insightId: string,
+    feedback: AdvisorInsight["feedback"],
+  ) => {
     try {
       // Optimistic update
-      setFeedbackStates(prev => ({ ...prev, [insightId]: feedback }));
+      setFeedbackStates((prev) => ({ ...prev, [insightId]: feedback }));
 
       // Send feedback to server
       await fetch(`/api/agents/advisor/${insightId}/feedback`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ feedback })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ feedback }),
       });
     } catch (err) {
-      console.error('Error sending feedback:', err);
+      console.error("Error sending feedback:", err);
       // Revert on error
-      setFeedbackStates(prev => {
+      setFeedbackStates((prev) => {
         const newState = { ...prev };
         delete newState[insightId];
         return newState;
@@ -84,45 +89,60 @@ export function AdvisorInsightsTile({
 
   const getInsightIcon = (insight: AdvisorInsight) => {
     switch (insight.type) {
-      case 'alert':
+      case "alert":
         return <AlertCircle className="h-5 w-5 text-red-500" />;
-      case 'recommendation':
+      case "recommendation":
         return <Zap className="h-5 w-5 text-blue-500" />;
-      case 'forecast':
-        return insight.evidence.change > 0
-          ? <TrendingUp className="h-5 w-5 text-green-500" />
-          : <TrendingDown className="h-5 w-5 text-orange-500" />;
-      case 'observation':
+      case "forecast":
+        return insight.evidence.change > 0 ? (
+          <TrendingUp className="h-5 w-5 text-green-500" />
+        ) : (
+          <TrendingDown className="h-5 w-5 text-orange-500" />
+        );
+      case "observation":
       default:
         return <Target className="h-5 w-5 text-purple-500" />;
     }
   };
 
-  const getTypeColor = (type: AdvisorInsight['type']) => {
+  const getTypeColor = (type: AdvisorInsight["type"]) => {
     switch (type) {
-      case 'alert': return 'bg-red-50 border-red-200';
-      case 'recommendation': return 'bg-blue-50 border-blue-200';
-      case 'forecast': return 'bg-green-50 border-green-200';
-      case 'observation': return 'bg-purple-50 border-purple-200';
+      case "alert":
+        return "bg-red-50 border-red-200";
+      case "recommendation":
+        return "bg-blue-50 border-blue-200";
+      case "forecast":
+        return "bg-green-50 border-green-200";
+      case "observation":
+        return "bg-purple-50 border-purple-200";
     }
   };
 
-  const getCategoryBadgeVariant = (category: AdvisorInsight['category']) => {
+  const getCategoryBadgeVariant = (category: AdvisorInsight["category"]) => {
     switch (category) {
-      case 'content': return 'default';
-      case 'timing': return 'secondary';
-      case 'platform': return 'outline';
-      case 'audience': return 'default';
-      case 'campaign': return 'secondary';
-      default: return 'outline';
+      case "content":
+        return "default";
+      case "timing":
+        return "secondary";
+      case "platform":
+        return "outline";
+      case "audience":
+        return "default";
+      case "campaign":
+        return "secondary";
+      default:
+        return "outline";
     }
   };
 
-  const getConfidenceColor = (confidence: AdvisorInsight['confidence']) => {
+  const getConfidenceColor = (confidence: AdvisorInsight["confidence"]) => {
     switch (confidence) {
-      case 'high': return 'text-green-600';
-      case 'medium': return 'text-yellow-600';
-      case 'low': return 'text-gray-600';
+      case "high":
+        return "text-green-600";
+      case "medium":
+        return "text-yellow-600";
+      case "low":
+        return "text-gray-600";
     }
   };
 
@@ -177,11 +197,7 @@ export function AdvisorInsightsTile({
             AI Insights & Recommendations
           </CardTitle>
           {insights.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={loadInsights}
-            >
+            <Button variant="ghost" size="sm" onClick={loadInsights}>
               <RefreshCw className="h-4 w-4" />
             </Button>
           )}
@@ -191,23 +207,25 @@ export function AdvisorInsightsTile({
         {displayInsights.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <p>No insights available yet.</p>
-            <p className="text-sm">Check back soon as we analyze your content performance.</p>
+            <p className="text-sm">
+              Check back soon as we analyze your content performance.
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
             {displayInsights.map((insight) => {
               const feedback = feedbackStates[insight.id] || insight.feedback;
-              const isImplemented = feedback === 'implemented';
-              const isAccepted = feedback === 'accepted';
-              const isRejected = feedback === 'rejected';
+              const isImplemented = feedback === "implemented";
+              const isAccepted = feedback === "accepted";
+              const isRejected = feedback === "rejected";
 
               return (
                 <div
                   key={insight.id}
                   className={cn(
-                    'border-l-4 p-4 rounded-lg transition-all',
+                    "border-l-4 p-4 rounded-lg transition-all",
                     getTypeColor(insight.type),
-                    isImplemented && 'opacity-60 bg-gray-50'
+                    isImplemented && "opacity-60 bg-gray-50",
                   )}
                 >
                   <div className="flex items-start gap-3">
@@ -234,13 +252,22 @@ export function AdvisorInsightsTile({
 
                       {/* Metadata badges */}
                       <div className="flex flex-wrap gap-2 mb-3">
-                        <Badge variant={getCategoryBadgeVariant(insight.category)} className="text-xs">
+                        <Badge
+                          variant={getCategoryBadgeVariant(insight.category)}
+                          className="text-xs"
+                        >
                           {insight.category}
                         </Badge>
-                        <Badge variant="outline" className={cn('text-xs', getConfidenceColor(insight.confidence))}>
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-xs",
+                            getConfidenceColor(insight.confidence),
+                          )}
+                        >
                           {insight.confidence} confidence
                         </Badge>
-                        {insight.impact === 'high' && (
+                        {insight.impact === "high" && (
                           <Badge variant="destructive" className="text-xs">
                             High Impact
                           </Badge>
@@ -249,24 +276,35 @@ export function AdvisorInsightsTile({
 
                       {/* Evidence section */}
                       <div className="bg-white bg-opacity-50 rounded p-2 mb-3 text-xs text-gray-600">
-                        <p><strong>Evidence:</strong> {insight.evidence.comparison}</p>
-                        <p className="text-gray-500">{insight.evidence.timeframe}</p>
+                        <p>
+                          <strong>Evidence:</strong>{" "}
+                          {insight.evidence.comparison}
+                        </p>
+                        <p className="text-gray-500">
+                          {insight.evidence.timeframe}
+                        </p>
                       </div>
 
                       {/* Suggestions */}
                       {insight.suggestions.length > 0 && (
                         <div className="mb-3">
-                          <p className="text-xs font-medium text-gray-700 mb-1">Suggestions:</p>
+                          <p className="text-xs font-medium text-gray-700 mb-1">
+                            Suggestions:
+                          </p>
                           <ul className="text-xs text-gray-600 space-y-1">
-                            {insight.suggestions.slice(0, 2).map((suggestion, idx) => (
-                              <li key={idx} className="flex gap-2">
-                                <span className="text-gray-400">•</span>
-                                <span>{suggestion}</span>
-                              </li>
-                            ))}
+                            {insight.suggestions
+                              .slice(0, 2)
+                              .map((suggestion, idx) => (
+                                <li key={idx} className="flex gap-2">
+                                  <span className="text-gray-400">•</span>
+                                  <span>{suggestion}</span>
+                                </li>
+                              ))}
                             {insight.suggestions.length > 2 && (
                               <li className="text-gray-500 italic">
-                                +{insight.suggestions.length - 2} more suggestion{insight.suggestions.length - 2 > 1 ? 's' : ''}
+                                +{insight.suggestions.length - 2} more
+                                suggestion
+                                {insight.suggestions.length - 2 > 1 ? "s" : ""}
                               </li>
                             )}
                           </ul>
@@ -279,7 +317,9 @@ export function AdvisorInsightsTile({
                           <Button
                             size="sm"
                             variant={isAccepted ? "default" : "outline"}
-                            onClick={() => handleFeedback(insight.id, 'accepted')}
+                            onClick={() =>
+                              handleFeedback(insight.id, "accepted")
+                            }
                             disabled={isRejected}
                             className="text-xs"
                           >
@@ -289,7 +329,9 @@ export function AdvisorInsightsTile({
                           <Button
                             size="sm"
                             variant={isRejected ? "destructive" : "outline"}
-                            onClick={() => handleFeedback(insight.id, 'rejected')}
+                            onClick={() =>
+                              handleFeedback(insight.id, "rejected")
+                            }
                             disabled={isAccepted}
                             className="text-xs"
                           >
@@ -299,7 +341,9 @@ export function AdvisorInsightsTile({
                           <Button
                             size="sm"
                             variant="default"
-                            onClick={() => handleFeedback(insight.id, 'implemented')}
+                            onClick={() =>
+                              handleFeedback(insight.id, "implemented")
+                            }
                             className="text-xs"
                           >
                             <Play className="h-3 w-3 mr-1" />

@@ -5,8 +5,8 @@
  * Now uses Supabase database for persistence
  */
 
-import { AuditLog, AuditAction, AuditLogQuery } from '@shared/approvals';
-import { auditLogs as dbAuditLogs} from './dbClient';
+import { AuditLog, AuditAction, AuditLogQuery } from "@shared/approvals";
+import { auditLogs as dbAuditLogs } from "./dbClient";
 
 /**
  * Helper to convert database record to AuditLog format
@@ -38,7 +38,7 @@ export async function logAuditAction(
   action: AuditAction,
   metadata: Record<string, unknown> = {},
   ipAddress?: string,
-  userAgent?: string
+  userAgent?: string,
 ): Promise<AuditLog> {
   try {
     const auditLog = await dbAuditLogs.create({
@@ -64,7 +64,7 @@ export async function logAuditAction(
 
     return dbRecordToAuditLog(auditLog);
   } catch (error) {
-    console.error('[Audit] Failed to log action:', error);
+    console.error("[Audit] Failed to log action:", error);
     throw error;
   }
 }
@@ -78,7 +78,7 @@ export async function queryAuditLogs(query: AuditLogQuery): Promise<{
   hasMore: boolean;
 }> {
   if (!query.brandId) {
-    throw new Error('brandId is required for audit queries');
+    throw new Error("brandId is required for audit queries");
   }
 
   const { logs: dbLogs, total } = await dbAuditLogs.query(query.brandId, {
@@ -105,7 +105,10 @@ export async function queryAuditLogs(query: AuditLogQuery): Promise<{
 /**
  * Get audit logs for a specific post
  */
-export async function getPostAuditTrail(brandId: string, postId: string): Promise<AuditLog[]> {
+export async function getPostAuditTrail(
+  brandId: string,
+  postId: string,
+): Promise<AuditLog[]> {
   const logs = await dbAuditLogs.getByPostId(brandId, postId);
   return logs.map(dbRecordToAuditLog);
 }
@@ -116,7 +119,7 @@ export async function getPostAuditTrail(brandId: string, postId: string): Promis
 export async function getAuditStatistics(
   brandId: string,
   startDate?: string,
-  endDate?: string
+  endDate?: string,
 ): Promise<{
   totalActions: number;
   byAction: Record<AuditAction, number>;
@@ -145,13 +148,14 @@ export async function getAuditStatistics(
   const requestedMap = new Map<string, AuditLog>();
 
   apiLogs.forEach((log) => {
-    if (log.action === 'APPROVAL_REQUESTED') {
+    if (log.action === "APPROVAL_REQUESTED") {
       requestedMap.set(log.postId, log);
-    } else if (log.action === 'APPROVED') {
+    } else if (log.action === "APPROVED") {
       const requested = requestedMap.get(log.postId);
       if (requested) {
         const time =
-          new Date(log.createdAt).getTime() - new Date(requested.createdAt).getTime();
+          new Date(log.createdAt).getTime() -
+          new Date(requested.createdAt).getTime();
         approvalTimes.push(time);
       }
     }
@@ -163,15 +167,16 @@ export async function getAuditStatistics(
       : 0;
 
   // Calculate rejection rate
-  const approved = byAction['APPROVED'] || 0;
-  const rejected = byAction['REJECTED'] || 0;
-  const rejectionRate = approved + rejected > 0 ? rejected / (approved + rejected) : 0;
+  const approved = byAction["APPROVED"] || 0;
+  const rejected = byAction["REJECTED"] || 0;
+  const rejectionRate =
+    approved + rejected > 0 ? rejected / (approved + rejected) : 0;
 
   // Count bulk approvals
-  const bulkApprovals = byAction['BULK_APPROVED'] || 0;
+  const bulkApprovals = byAction["BULK_APPROVED"] || 0;
 
   // Count emails
-  const emailsSent = byAction['EMAIL_SENT'] || 0;
+  const emailsSent = byAction["EMAIL_SENT"] || 0;
 
   // Top actors
   const actorCounts: Record<string, number> = {};
@@ -213,7 +218,7 @@ export async function verifyAuditLogIntegrity(_logId: string): Promise<{
 
   return {
     valid: true,
-    message: 'Audit log verified',
+    message: "Audit log verified",
   };
 }
 
@@ -223,7 +228,7 @@ export async function verifyAuditLogIntegrity(_logId: string): Promise<{
 export async function exportAuditLogs(
   brandId: string,
   startDate: string,
-  endDate: string
+  endDate: string,
 ): Promise<string> {
   const { logs } = await queryAuditLogs({
     brandId,
@@ -234,14 +239,14 @@ export async function exportAuditLogs(
 
   // CSV header
   const headers = [
-    'ID',
-    'Timestamp',
-    'Action',
-    'Actor Email',
-    'Post ID',
-    'Note',
-    'Bulk Count',
-    'Error',
+    "ID",
+    "Timestamp",
+    "Action",
+    "Actor Email",
+    "Post ID",
+    "Note",
+    "Bulk Count",
+    "Error",
   ];
 
   const rows = logs.map((log) => [
@@ -249,13 +254,15 @@ export async function exportAuditLogs(
     log.createdAt,
     log.action,
     log.actorEmail,
-    log.postId || '',
-    log.metadata.note || '',
-    log.metadata.bulkCount || '',
-    log.metadata.errorMessage || '',
+    log.postId || "",
+    log.metadata.note || "",
+    log.metadata.bulkCount || "",
+    log.metadata.errorMessage || "",
   ]);
 
-  const csv = [headers, ...rows].map((row) => row.map((cell) => `"${cell}"`).join(',')).join('\n');
+  const csv = [headers, ...rows]
+    .map((row) => row.map((cell) => `"${cell}"`).join(","))
+    .join("\n");
 
   return csv;
 }
@@ -263,8 +270,12 @@ export async function exportAuditLogs(
 /**
  * Delete audit logs older than specified days (for GDPR)
  */
-export async function deleteOldAuditLogs(olderThanDays: number): Promise<number> {
+export async function deleteOldAuditLogs(
+  olderThanDays: number,
+): Promise<number> {
   const deletedCount = await dbAuditLogs.deleteOlderThan(olderThanDays);
-  console.log(`[Audit] Deleted ${deletedCount} logs older than ${olderThanDays} days`);
+  console.log(
+    `[Audit] Deleted ${deletedCount} logs older than ${olderThanDays} days`,
+  );
   return deletedCount;
 }

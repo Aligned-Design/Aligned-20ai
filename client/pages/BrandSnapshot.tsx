@@ -280,7 +280,9 @@ export default function BrandSnapshot() {
 
         <div className="mt-8 rounded-xl border bg-white p-8 text-center">
           <Sparkles className="mx-auto h-12 w-12 text-[#C9F06A] mb-4" />
-          <h3 className="text-2xl font-bold mb-2 text-slate-900">Your AI Agents Are Ready!</h3>
+          <h3 className="text-2xl font-bold mb-2 text-slate-900">
+            Your AI Agents Are Ready!
+          </h3>
           <p className="text-muted-foreground mb-6 max-w-2xl mx-auto text-slate-600">
             Doc Agent, Design Agent, and Advisor Agent have been trained on your
             brand profile. They're ready to generate on-brand content, create

@@ -37,7 +37,7 @@ class OAuthStateCache {
     brandId: string,
     platform: string,
     codeVerifier: string,
-    ttlSeconds: number = 10 * 60
+    ttlSeconds: number = 10 * 60,
   ): void {
     const now = Date.now();
 
@@ -48,10 +48,12 @@ class OAuthStateCache {
       codeVerifier,
       createdAt: now,
       expiresAt: now + ttlSeconds * 1000,
-      ttlSeconds
+      ttlSeconds,
     });
 
-    console.log(`✅ OAuth state stored: ${state.substring(0, 8)}... for platform ${platform}`);
+    console.log(
+      `✅ OAuth state stored: ${state.substring(0, 8)}... for platform ${platform}`,
+    );
   }
 
   /**
@@ -81,7 +83,9 @@ class OAuthStateCache {
 
     // Delete state to prevent replay attacks
     this.states.delete(state);
-    console.log(`✅ OAuth state validated and consumed: ${state.substring(0, 8)}...`);
+    console.log(
+      `✅ OAuth state validated and consumed: ${state.substring(0, 8)}...`,
+    );
 
     return stateData;
   }
@@ -92,7 +96,7 @@ class OAuthStateCache {
    * @returns true if valid and not expired
    */
   validate(state: string): boolean {
-    if (!state || typeof state !== 'string' || state.length < 32) {
+    if (!state || typeof state !== "string" || state.length < 32) {
       return false;
     }
 
@@ -150,9 +154,12 @@ class OAuthStateCache {
    */
   private startCleanupJob(): void {
     // Clean up every 5 minutes
-    this.cleanupInterval = setInterval(() => {
-      this.cleanup();
-    }, 5 * 60 * 1000);
+    this.cleanupInterval = setInterval(
+      () => {
+        this.cleanup();
+      },
+      5 * 60 * 1000,
+    );
 
     // Allow process to exit even if interval is running
     if (this.cleanupInterval.unref) {
@@ -188,7 +195,7 @@ class OAuthStateCache {
 
     return {
       totalStates: this.states.size,
-      expiredCount
+      expiredCount,
     };
   }
 
@@ -197,7 +204,7 @@ class OAuthStateCache {
    */
   clear(): void {
     this.states.clear();
-    console.log('🧹 OAuth state cache cleared');
+    console.log("🧹 OAuth state cache cleared");
   }
 }
 

@@ -20,21 +20,43 @@ export default function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm md:flex">
-          <Link to="/features" className="text-muted-foreground hover:text-foreground transition-colors font-medium">Features</Link>
-          <Link to="/integrations" className="text-muted-foreground hover:text-foreground transition-colors font-medium">Integrations</Link>
-          <Link to="/pricing" className="text-muted-foreground hover:text-foreground transition-colors font-medium">Pricing</Link>
-          <Link to="/help" className="text-muted-foreground hover:text-foreground transition-colors font-medium">Help</Link>
-          <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors font-medium">Contact</Link>
+          <Link
+            to="/features"
+            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+          >
+            Features
+          </Link>
+          <Link
+            to="/integrations"
+            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+          >
+            Integrations
+          </Link>
+          <Link
+            to="/pricing"
+            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+          >
+            Pricing
+          </Link>
+          <Link
+            to="/help"
+            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+          >
+            Help
+          </Link>
+          <Link
+            to="/contact"
+            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+          >
+            Contact
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">
           <Button asChild variant="ghost" className="hidden md:inline-flex">
             <Link to="/login">Sign in</Link>
           </Button>
-          <Button
-            asChild
-            variant="default"
-          >
+          <Button asChild variant="default">
             <Link to="/signup">Get started</Link>
           </Button>
         </div>

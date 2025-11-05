@@ -2,7 +2,7 @@
  * AI Agent API Routes
  *
  * POST /api/agents/generate/doc - Generate content with Doc Agent
- * POST /api/agents/generate/design - Generate visuals with Design Agent  
+ * POST /api/agents/generate/design - Generate visuals with Design Agent
  * POST /api/agents/generate/advisor - Generate insights with Advisor Agent
  * GET /api/agents/bfs/calculate - Calculate Brand Fidelity Score
  * GET /api/agents/templates/:agent/:version - Get prompt template
@@ -14,19 +14,19 @@
 import { Router } from "express";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
-import { 
-  GenerationRequest, 
-  GenerationResponse, 
-  DocInput, 
+import {
+  GenerationRequest,
+  GenerationResponse,
+  DocInput,
   DocOutput,
   DesignInput,
   DesignOutput,
   AdvisorOutput,
-  BrandSafetyConfig 
+  BrandSafetyConfig,
 } from "../../client/types/agent-config";
 import { calculateBFS } from "../agents/brand-fidelity-scorer";
 import { lintContent, autoFixContent } from "../agents/content-linter";
-import { generateWithAI, loadPromptTemplate} from "../workers/ai-generation";
+import { generateWithAI, loadPromptTemplate } from "../workers/ai-generation";
 
 const router = Router();
 
@@ -41,13 +41,18 @@ const MAX_REGENERATION_ATTEMPTS = 3;
  */
 router.post("/generate/doc", async (req, res) => {
   try {
-    const { brand_id, input, safety_mode = "safe", __idempotency_key } = req.body as GenerationRequest;
+    const {
+      brand_id,
+      input,
+      safety_mode = "safe",
+      __idempotency_key,
+    } = req.body as GenerationRequest;
     const docInput = input as DocInput;
-    
+
     if (!brand_id || !input) {
-      return res.status(400).json({ 
-        success: false, 
-        error: "Missing required fields: brand_id, input" 
+      return res.status(400).json({
+        success: false,
+        error: "Missing required fields: brand_id, input",
       });
     }
 
@@ -59,7 +64,9 @@ router.post("/generate/doc", async (req, res) => {
       .single();
 
     if (brandError && brandError.code !== "PGRST116") {
-      throw new Error(`Failed to load brand safety config: ${brandError.message}`);
+      throw new Error(
+        `Failed to load brand safety config: ${brandError.message}`,
+      );
     }
 
     const safetyConfig: BrandSafetyConfig = brandData || {
@@ -72,7 +79,7 @@ router.post("/generate/doc", async (req, res) => {
       brand_links: [],
       disallowed_topics: [],
       allow_topics: [],
-      compliance_pack: "none"
+      compliance_pack: "none",
     };
 
     // Load brand kit for context injection
@@ -93,11 +100,15 @@ router.post("/generate/doc", async (req, res) => {
 
     while (attempts < MAX_REGENERATION_ATTEMPTS && !output) {
       attempts++;
-      
+
       try {
         // Generate content with AI
-        const aiOutput = await generateDocContent(docInput, brandKit, safetyConfig);
-        
+        const aiOutput = await generateDocContent(
+          docInput,
+          brandKit,
+          safetyConfig,
+        );
+
         // Calculate Brand Fidelity Score
         const bfs = await calculateBFS(
           {
@@ -105,7 +116,7 @@ router.post("/generate/doc", async (req, res) => {
             headline: aiOutput.headline,
             cta: aiOutput.cta,
             hashtags: aiOutput.hashtags,
-            platform: docInput.platform
+            platform: docInput.platform,
           },
           {
             tone_keywords: brandKit.toneKeywords || [],
@@ -114,8 +125,8 @@ router.post("/generate/doc", async (req, res) => {
             commonPhrases: brandKit.commonPhrases,
             required_disclaimers: safetyConfig.required_disclaimers,
             required_hashtags: safetyConfig.required_hashtags,
-            banned_phrases: safetyConfig.banned_phrases
-          }
+            banned_phrases: safetyConfig.banned_phrases,
+          },
         );
 
         // Run content linter
@@ -125,9 +136,9 @@ router.post("/generate/doc", async (req, res) => {
             headline: aiOutput.headline,
             cta: aiOutput.cta,
             hashtags: aiOutput.hashtags,
-            platform: docInput.platform
+            platform: docInput.platform,
           },
-          safetyConfig
+          safetyConfig,
         );
 
         // Auto-fix if possible
@@ -136,22 +147,27 @@ router.post("/generate/doc", async (req, res) => {
           headline: aiOutput.headline || "",
           cta: aiOutput.cta,
           hashtags: aiOutput.hashtags,
-          platform: docInput.platform
+          platform: docInput.platform,
         };
 
         if (!linterResult.passed && !linterResult.blocked) {
-          const { content: fixedContent, fixes } = autoFixContent({
-            body: finalContent.body,
-            headline: finalContent.headline,
-            cta: finalContent.cta,
-            hashtags: finalContent.hashtags,
-            platform: finalContent.platform
-          }, linterResult, safetyConfig);
-          
+          const { content: fixedContent, fixes } = autoFixContent(
+            {
+              body: finalContent.body,
+              headline: finalContent.headline,
+              cta: finalContent.cta,
+              hashtags: finalContent.hashtags,
+              platform: finalContent.platform,
+            },
+            linterResult,
+            safetyConfig,
+          );
+
           finalContent.body = fixedContent.body;
           finalContent.headline = fixedContent.headline || "";
           finalContent.cta = fixedContent.cta || finalContent.cta;
-          finalContent.hashtags = fixedContent.hashtags || finalContent.hashtags;
+          finalContent.hashtags =
+            fixedContent.hashtags || finalContent.hashtags;
           linterResult.fixes_applied = fixes;
         }
 
@@ -161,7 +177,10 @@ router.post("/generate/doc", async (req, res) => {
           break;
         }
 
-        if (bfs.passed && (linterResult.passed || linterResult.fixes_applied.length > 0)) {
+        if (
+          bfs.passed &&
+          (linterResult.passed || linterResult.fixes_applied.length > 0)
+        ) {
           output = {
             ...aiOutput,
             body: finalContent.body,
@@ -169,7 +188,7 @@ router.post("/generate/doc", async (req, res) => {
             cta: finalContent.cta,
             hashtags: finalContent.hashtags,
             bfs,
-            linter: linterResult
+            linter: linterResult,
           };
         } else if (linterResult.needs_human_review) {
           needsReview = true;
@@ -180,13 +199,15 @@ router.post("/generate/doc", async (req, res) => {
             cta: finalContent.cta,
             hashtags: finalContent.hashtags,
             bfs,
-            linter: linterResult
+            linter: linterResult,
           };
         }
         // If BFS failed or linter failed without fixes, continue loop for retry
-        
       } catch (generationError) {
-        console.error(`Generation attempt ${attempts} failed:`, generationError);
+        console.error(
+          `Generation attempt ${attempts} failed:`,
+          generationError,
+        );
         if (attempts >= MAX_REGENERATION_ATTEMPTS) {
           throw generationError;
         }
@@ -207,7 +228,11 @@ router.post("/generate/doc", async (req, res) => {
       revision: 0,
       timestamp: new Date().toISOString(),
       duration_ms: 0, // TODO: Track actual duration
-      error: blocked ? "Content blocked by safety filters" : (!output ? "Failed to generate acceptable content" : undefined)
+      error: blocked
+        ? "Content blocked by safety filters"
+        : !output
+          ? "Failed to generate acceptable content"
+          : undefined,
     };
 
     const { data: logData, error: logError } = await supabase
@@ -227,12 +252,15 @@ router.post("/generate/doc", async (req, res) => {
       linter: output?.linter,
       needs_review: needsReview,
       blocked,
-      error: blocked ? "Content blocked by safety filters" : (!output ? "Failed to generate acceptable content after multiple attempts" : undefined),
-      log_id: logData?.id || ""
+      error: blocked
+        ? "Content blocked by safety filters"
+        : !output
+          ? "Failed to generate acceptable content after multiple attempts"
+          : undefined,
+      log_id: logData?.id || "",
     };
 
     res.json(response);
-
   } catch (error) {
     console.error("Doc generation error:", error);
     res.status(500).json({
@@ -240,7 +268,7 @@ router.post("/generate/doc", async (req, res) => {
       error: error instanceof Error ? error.message : "Internal server error",
       needs_review: false,
       blocked: false,
-      log_id: ""
+      log_id: "",
     });
   }
 });
@@ -252,11 +280,11 @@ router.post("/generate/doc", async (req, res) => {
 router.post("/generate/design", async (req, res) => {
   try {
     const { brand_id, input } = req.body as GenerationRequest;
-    
+
     if (!brand_id || !input) {
-      return res.status(400).json({ 
-        success: false, 
-        error: "Missing required fields: brand_id, input" 
+      return res.status(400).json({
+        success: false,
+        error: "Missing required fields: brand_id, input",
       });
     }
 
@@ -285,7 +313,7 @@ router.post("/generate/design", async (req, res) => {
       approved: true, // Design output doesn't require BFS/linter checks
       revision: 0,
       timestamp: new Date().toISOString(),
-      duration_ms: 0
+      duration_ms: 0,
     };
 
     const { data: logData, error: logError } = await supabase
@@ -303,11 +331,10 @@ router.post("/generate/design", async (req, res) => {
       output,
       needs_review: false,
       blocked: false,
-      log_id: logData?.id || ""
+      log_id: logData?.id || "",
     };
 
     res.json(response);
-
   } catch (error) {
     console.error("Design generation error:", error);
     res.status(500).json({
@@ -315,7 +342,7 @@ router.post("/generate/design", async (req, res) => {
       error: error instanceof Error ? error.message : "Internal server error",
       needs_review: false,
       blocked: false,
-      log_id: ""
+      log_id: "",
     });
   }
 });
@@ -327,11 +354,11 @@ router.post("/generate/design", async (req, res) => {
 router.post("/generate/advisor", async (req, res) => {
   try {
     const { brand_id } = req.body as GenerationRequest;
-    
+
     if (!brand_id) {
-      return res.status(400).json({ 
-        success: false, 
-        error: "Missing required field: brand_id" 
+      return res.status(400).json({
+        success: false,
+        error: "Missing required field: brand_id",
       });
     }
 
@@ -349,7 +376,7 @@ router.post("/generate/advisor", async (req, res) => {
         output: cachedOutput.output,
         needs_review: false,
         blocked: false,
-        log_id: cachedOutput.id
+        log_id: cachedOutput.id,
       });
     }
 
@@ -366,7 +393,7 @@ router.post("/generate/advisor", async (req, res) => {
         brand_id,
         output,
         cached_at: new Date().toISOString(),
-        valid_until: validUntil.toISOString()
+        valid_until: validUntil.toISOString(),
       })
       .select()
       .single();
@@ -386,7 +413,7 @@ router.post("/generate/advisor", async (req, res) => {
       approved: true,
       revision: 0,
       timestamp: new Date().toISOString(),
-      duration_ms: 0
+      duration_ms: 0,
     };
 
     const { data: logData, error: __logError } = await supabase
@@ -400,11 +427,10 @@ router.post("/generate/advisor", async (req, res) => {
       output,
       needs_review: false,
       blocked: false,
-      log_id: logData?.id || cacheData?.id || ""
+      log_id: logData?.id || cacheData?.id || "",
     };
 
     res.json(response);
-
   } catch (error) {
     console.error("Advisor generation error:", error);
     res.status(500).json({
@@ -412,7 +438,7 @@ router.post("/generate/advisor", async (req, res) => {
       error: error instanceof Error ? error.message : "Internal server error",
       needs_review: false,
       blocked: false,
-      log_id: ""
+      log_id: "",
     });
   }
 });
@@ -440,11 +466,10 @@ router.post("/bfs/calculate", async (req, res) => {
       tone_keywords: brandKit?.toneKeywords || [],
       brandPersonality: brandKit?.brandPersonality || [],
       writingStyle: brandKit?.writingStyle,
-      commonPhrases: brandKit?.commonPhrases
+      commonPhrases: brandKit?.commonPhrases,
     });
 
     res.json(bfs);
-
   } catch (error) {
     console.error("BFS calculation error:", error);
     res.status(500).json({ error: "Failed to calculate BFS" });
@@ -473,7 +498,6 @@ router.get("/review/queue/:brandId", async (req, res) => {
     }
 
     res.json({ queue: reviewQueue || [] });
-
   } catch (error) {
     console.error("Review queue error:", error);
     res.status(500).json({ error: "Failed to load review queue" });
@@ -491,10 +515,10 @@ router.post("/review/approve/:logId", async (req, res) => {
 
     const { error } = await supabase
       .from("generation_logs")
-      .update({ 
+      .update({
         approved: true,
         reviewer_notes,
-        reviewed_at: new Date().toISOString()
+        reviewed_at: new Date().toISOString(),
       })
       .eq("id", logId);
 
@@ -503,7 +527,6 @@ router.post("/review/approve/:logId", async (req, res) => {
     }
 
     res.json({ success: true });
-
   } catch (error) {
     console.error("Approval error:", error);
     res.status(500).json({ error: "Failed to approve content" });
@@ -521,10 +544,10 @@ router.post("/review/reject/:logId", async (req, res) => {
 
     const { error } = await supabase
       .from("generation_logs")
-      .update({ 
+      .update({
         approved: false,
         reviewer_notes,
-        reviewed_at: new Date().toISOString()
+        reviewed_at: new Date().toISOString(),
       })
       .eq("id", logId);
 
@@ -533,7 +556,6 @@ router.post("/review/reject/:logId", async (req, res) => {
     }
 
     res.json({ success: true });
-
   } catch (error) {
     console.error("Rejection error:", error);
     res.status(500).json({ error: "Failed to reject content" });
@@ -549,9 +571,13 @@ router.get("/", (req, res) => {
 });
 
 // Helper functions for content generation
-async function generateDocContent(input: DocInput, brandKit: unknown, _safetyConfig: BrandSafetyConfig): Promise<DocOutput> {
+async function generateDocContent(
+  input: DocInput,
+  brandKit: unknown,
+  _safetyConfig: BrandSafetyConfig,
+): Promise<DocOutput> {
   const template = await loadPromptTemplate("doc", "v1.0", "en");
-  
+
   const prompt = template
     .replace(/\{\{brand_name\}\}/g, brandKit.brandName || "Your Brand")
     .replace(/\{\{tone_keywords\}\}/g, (brandKit.toneKeywords || []).join(", "))
@@ -562,7 +588,7 @@ async function generateDocContent(input: DocInput, brandKit: unknown, _safetyCon
     .replace(/\{\{max_length\}\}/g, input.max_length?.toString() || "2200");
 
   const aiResponse = await generateWithAI(prompt, "doc");
-  
+
   // Parse AI response (assuming JSON format)
   let parsedOutput;
   try {
@@ -570,14 +596,14 @@ async function generateDocContent(input: DocInput, brandKit: unknown, _safetyCon
   } catch {
     // Fallback parsing if not JSON
     parsedOutput = {
-      headline: aiResponse.split('\n')[0] || "",
+      headline: aiResponse.split("\n")[0] || "",
       body: aiResponse,
       cta: "Learn more",
       hashtags: ["#YourBrand"],
       post_theme: input.format,
       tone_used: "professional",
       aspect_ratio: input.platform === "instagram" ? "1080x1350" : "1200x630",
-      char_count: aiResponse.length
+      char_count: aiResponse.length,
     };
   }
 
@@ -590,22 +616,56 @@ async function generateDocContent(input: DocInput, brandKit: unknown, _safetyCon
     tone_used: parsedOutput.tone_used || "professional",
     aspect_ratio: parsedOutput.aspect_ratio,
     char_count: (parsedOutput.body || aiResponse).length,
-    bfs: { overall: 0, tone_alignment: 0, terminology_match: 0, compliance: 0, cta_fit: 0, platform_fit: 0, passed: false, issues: [], regeneration_count: 0 },
-    linter: { passed: false, profanity_detected: false, toxicity_score: 0, banned_phrases_found: [], banned_claims_found: [], missing_disclaimers: [], missing_hashtags: [], platform_violations: [], pii_detected: [], competitor_mentions: [], fixes_applied: [], blocked: false, needs_human_review: false }
+    bfs: {
+      overall: 0,
+      tone_alignment: 0,
+      terminology_match: 0,
+      compliance: 0,
+      cta_fit: 0,
+      platform_fit: 0,
+      passed: false,
+      issues: [],
+      regeneration_count: 0,
+    },
+    linter: {
+      passed: false,
+      profanity_detected: false,
+      toxicity_score: 0,
+      banned_phrases_found: [],
+      banned_claims_found: [],
+      missing_disclaimers: [],
+      missing_hashtags: [],
+      platform_violations: [],
+      pii_detected: [],
+      competitor_mentions: [],
+      fixes_applied: [],
+      blocked: false,
+      needs_human_review: false,
+    },
   };
 }
 
-async function generateDesignContent(input: DesignInput, brandKit: unknown): Promise<DesignOutput> {
+async function generateDesignContent(
+  input: DesignInput,
+  brandKit: unknown,
+): Promise<DesignOutput> {
   const template = await loadPromptTemplate("design", "v1.0", "en");
-  
+
   const prompt = template
-    .replace(/\{\{brand_colors\}\}/g, (brandKit.primaryColor ? [brandKit.primaryColor, brandKit.secondaryColor, brandKit.accentColor].filter(Boolean).join(", ") : "#8B5CF6"))
+    .replace(
+      /\{\{brand_colors\}\}/g,
+      brandKit.primaryColor
+        ? [brandKit.primaryColor, brandKit.secondaryColor, brandKit.accentColor]
+            .filter(Boolean)
+            .join(", ")
+        : "#8B5CF6",
+    )
     .replace(/\{\{theme\}\}/g, input.theme)
     .replace(/\{\{aspect_ratio\}\}/g, input.aspect_ratio)
     .replace(/\{\{headline\}\}/g, input.headline || "");
 
   const aiResponse = await generateWithAI(prompt, "design");
-  
+
   let parsedOutput;
   try {
     parsedOutput = JSON.parse(aiResponse);
@@ -616,7 +676,7 @@ async function generateDesignContent(input: DesignInput, brandKit: unknown): Pro
       alt_text: `${input.theme} content template`,
       visual_elements: ["Text overlay", "Brand colors", "Logo placement"],
       color_palette_used: [brandKit.primaryColor || "#8B5CF6"],
-      font_suggestions: [brandKit.fontFamily || "Inter"]
+      font_suggestions: [brandKit.fontFamily || "Inter"],
     };
   }
 
@@ -627,27 +687,35 @@ async function generateDesignContent(input: DesignInput, brandKit: unknown): Pro
     thumbnail_ref: parsedOutput.thumbnail_ref,
     visual_elements: parsedOutput.visual_elements || [],
     color_palette_used: parsedOutput.color_palette_used || [],
-    font_suggestions: parsedOutput.font_suggestions || []
+    font_suggestions: parsedOutput.font_suggestions || [],
   };
 }
 
-async function generateAdvisorInsights(brand_id: string): Promise<AdvisorOutput> {
+async function generateAdvisorInsights(
+  brand_id: string,
+): Promise<AdvisorOutput> {
   // Load recent post performance data
   const { data: posts } = await supabase
     .from("scheduled_content")
     .select("*")
     .eq("brand_id", brand_id)
-    .gte("scheduled_for", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()) // Last 30 days
+    .gte(
+      "scheduled_for",
+      new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    ) // Last 30 days
     .order("scheduled_for", { ascending: false });
 
   const template = await loadPromptTemplate("advisor", "v1.0", "en");
-  
+
   const prompt = template
     .replace(/\{\{brand_id\}\}/g, brand_id)
-    .replace(/\{\{recent_posts\}\}/g, JSON.stringify(posts?.slice(0, 20) || []));
+    .replace(
+      /\{\{recent_posts\}\}/g,
+      JSON.stringify(posts?.slice(0, 20) || []),
+    );
 
   const aiResponse = await generateWithAI(prompt, "advisor");
-  
+
   let parsedOutput;
   try {
     parsedOutput = JSON.parse(aiResponse);
@@ -658,15 +726,13 @@ async function generateAdvisorInsights(brand_id: string): Promise<AdvisorOutput>
         {
           title: "Continue Current Strategy",
           rationale: "Maintain consistent posting schedule and content themes.",
-          confidence: 0.7
-        }
+          confidence: 0.7,
+        },
       ],
-      best_times: [
-        { day: "Thursday", slot: "18:00", confidence: 0.8 }
-      ],
+      best_times: [{ day: "Thursday", slot: "18:00", confidence: 0.8 }],
       format_mix: { reel: 0.4, carousel: 0.4, image: 0.2 },
       hashtags: ["#YourBrand", "#ContentMarketing"],
-      keywords: ["growth", "engagement", "community"]
+      keywords: ["growth", "engagement", "community"],
     };
   }
 
@@ -677,7 +743,7 @@ async function generateAdvisorInsights(brand_id: string): Promise<AdvisorOutput>
     hashtags: parsedOutput.hashtags || [],
     keywords: parsedOutput.keywords || [],
     cached_at: new Date().toISOString(),
-    valid_until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    valid_until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
   };
 }
 

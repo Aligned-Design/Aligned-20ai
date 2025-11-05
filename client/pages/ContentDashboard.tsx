@@ -1,32 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { 
-  RefreshCw, 
-  Play, 
-  Eye, 
-  AlertTriangle, 
-  Clock, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import {
+  RefreshCw,
+  Play,
+  Eye,
+  AlertTriangle,
+  Clock,
   CheckCircle,
   Plus,
   Filter,
   Search,
   MoreHorizontal,
-  Zap
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { ContentItem, ProductionDashboardData, BatchOperation } from '@shared/content-production';
+  Zap,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  ContentItem,
+  ProductionDashboardData,
+  BatchOperation,
+} from "@shared/content-production";
 
 export default function ContentDashboard() {
-  const [dashboardData, setDashboardData] = useState<ProductionDashboardData | null>(null);
+  const [dashboardData, setDashboardData] =
+    useState<ProductionDashboardData | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     loadDashboardData();
@@ -37,13 +42,13 @@ export default function ContentDashboard() {
 
   const loadDashboardData = async () => {
     try {
-      const response = await fetch('/api/content/dashboard');
+      const response = await fetch("/api/content/dashboard");
       if (response.ok) {
         const data = await response.json();
         setDashboardData(data);
       }
     } catch (error) {
-      console.error('Failed to load dashboard:', error);
+      console.error("Failed to load dashboard:", error);
     } finally {
       setLoading(false);
     }
@@ -51,24 +56,24 @@ export default function ContentDashboard() {
 
   const handleBatchOperation = async (operation: BatchOperation) => {
     try {
-      await fetch('/api/content/batch', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(operation)
+      await fetch("/api/content/batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(operation),
       });
       await loadDashboardData();
       setSelectedItems([]);
     } catch (error) {
-      console.error('Batch operation failed:', error);
+      console.error("Batch operation failed:", error);
     }
   };
 
   const handleRetry = async (contentId: string) => {
     try {
-      await fetch(`/api/content/${contentId}/retry`, { method: 'POST' });
+      await fetch(`/api/content/${contentId}/retry`, { method: "POST" });
       await loadDashboardData();
     } catch (error) {
-      console.error('Retry failed:', error);
+      console.error("Retry failed:", error);
     }
   };
 
@@ -90,7 +95,9 @@ export default function ContentDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Content Production</h1>
-          <p className="text-gray-600">Manage and monitor your content generation pipeline</p>
+          <p className="text-gray-600">
+            Manage and monitor your content generation pipeline
+          </p>
         </div>
         <div className="flex gap-3">
           <Button onClick={loadDashboardData} variant="outline" size="sm">
@@ -160,19 +167,30 @@ export default function ContentDashboard() {
         <Card className="border-blue-200 bg-blue-50">
           <CardContent className="flex items-center justify-between p-4">
             <span className="text-blue-800 font-medium">
-              {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
+              {selectedItems.length} item{selectedItems.length > 1 ? "s" : ""}{" "}
+              selected
             </span>
             <div className="flex gap-2">
               <Button
                 size="sm"
-                onClick={() => handleBatchOperation({ action: 'retry', contentIds: selectedItems })}
+                onClick={() =>
+                  handleBatchOperation({
+                    action: "retry",
+                    contentIds: selectedItems,
+                  })
+                }
               >
                 Retry Selected
               </Button>
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => handleBatchOperation({ action: 'approve', contentIds: selectedItems })}
+                onClick={() =>
+                  handleBatchOperation({
+                    action: "approve",
+                    contentIds: selectedItems,
+                  })
+                }
               >
                 Approve Selected
               </Button>
@@ -233,18 +251,18 @@ interface StatusCardProps {
   title: string;
   count: number;
   total: number;
-  color: 'green' | 'yellow' | 'blue' | 'red';
+  color: "green" | "yellow" | "blue" | "red";
   icon: React.ReactNode;
 }
 
 function StatusCard({ title, count, total, color, icon }: StatusCardProps) {
   const percentage = total > 0 ? (count / total) * 100 : 0;
-  
+
   const colorClasses = {
-    green: 'text-green-600 bg-green-100 border-green-200',
-    yellow: 'text-yellow-600 bg-yellow-100 border-yellow-200',
-    blue: 'text-blue-600 bg-blue-100 border-blue-200',
-    red: 'text-red-600 bg-red-100 border-red-200'
+    green: "text-green-600 bg-green-100 border-green-200",
+    yellow: "text-yellow-600 bg-yellow-100 border-yellow-200",
+    blue: "text-blue-600 bg-blue-100 border-blue-200",
+    red: "text-red-600 bg-red-100 border-red-200",
   };
 
   return (
@@ -260,7 +278,9 @@ function StatusCard({ title, count, total, color, icon }: StatusCardProps) {
           <p className="font-medium">{title}</p>
           <div className="flex items-center gap-2 mt-2">
             <Progress value={percentage} className="flex-1 h-2" />
-            <span className="text-xs text-gray-600">{percentage.toFixed(0)}%</span>
+            <span className="text-xs text-gray-600">
+              {percentage.toFixed(0)}%
+            </span>
           </div>
         </div>
       </CardContent>
@@ -277,19 +297,19 @@ interface ContentGridProps {
   showQueuePosition?: boolean;
 }
 
-function ContentGrid({ 
-  items, 
-  selectedItems, 
-  onSelectionChange, 
+function ContentGrid({
+  items,
+  selectedItems,
+  onSelectionChange,
   onRetry,
   showErrorDetails,
-  showQueuePosition 
+  showQueuePosition,
 }: ContentGridProps) {
   const handleSelectItem = (id: string, selected: boolean) => {
     if (selected) {
       onSelectionChange([...selectedItems, id]);
     } else {
-      onSelectionChange(selectedItems.filter(item => item !== id));
+      onSelectionChange(selectedItems.filter((item) => item !== id));
     }
   };
 
@@ -319,39 +339,51 @@ interface ContentCardProps {
   showQueuePosition?: boolean;
 }
 
-function ContentCard({ 
-  item, 
-  isSelected, 
-  onSelect, 
+function ContentCard({
+  item,
+  isSelected,
+  onSelect,
   onRetry,
   showErrorDetails,
-  showQueuePosition 
+  showQueuePosition,
 }: ContentCardProps) {
-  const getStatusColor = (status: ContentItem['status']) => {
+  const getStatusColor = (status: ContentItem["status"]) => {
     switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'generating': return 'bg-blue-100 text-blue-800';
-      case 'queued': return 'bg-yellow-100 text-yellow-800';
-      case 'error': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "generating":
+        return "bg-blue-100 text-blue-800";
+      case "queued":
+        return "bg-yellow-100 text-yellow-800";
+      case "error":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
-  const getStatusIcon = (status: ContentItem['status']) => {
+  const getStatusIcon = (status: ContentItem["status"]) => {
     switch (status) {
-      case 'completed': return <CheckCircle className="h-4 w-4" />;
-      case 'generating': return <Zap className="h-4 w-4" />;
-      case 'queued': return <Clock className="h-4 w-4" />;
-      case 'error': return <AlertTriangle className="h-4 w-4" />;
-      default: return <Clock className="h-4 w-4" />;
+      case "completed":
+        return <CheckCircle className="h-4 w-4" />;
+      case "generating":
+        return <Zap className="h-4 w-4" />;
+      case "queued":
+        return <Clock className="h-4 w-4" />;
+      case "error":
+        return <AlertTriangle className="h-4 w-4" />;
+      default:
+        return <Clock className="h-4 w-4" />;
     }
   };
 
   return (
-    <Card className={cn(
-      "transition-all hover:shadow-md cursor-pointer",
-      isSelected && "ring-2 ring-primary"
-    )}>
+    <Card
+      className={cn(
+        "transition-all hover:shadow-md cursor-pointer",
+        isSelected && "ring-2 ring-primary",
+      )}
+    >
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           <input
@@ -360,7 +392,7 @@ function ContentCard({
             onChange={(e) => onSelect(e.target.checked)}
             className="mt-1"
           />
-          
+
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <Badge className={getStatusColor(item.status)}>
@@ -371,12 +403,16 @@ function ContentCard({
                 {item.platform}
               </Badge>
             </div>
-            
-            <h4 className="font-medium text-sm mb-1 line-clamp-1">{item.title}</h4>
-            <p className="text-xs text-gray-600 line-clamp-2 mb-3">{item.content}</p>
-            
+
+            <h4 className="font-medium text-sm mb-1 line-clamp-1">
+              {item.title}
+            </h4>
+            <p className="text-xs text-gray-600 line-clamp-2 mb-3">
+              {item.content}
+            </p>
+
             {/* Generation Progress */}
-            {item.generationJob && item.status === 'generating' && (
+            {item.generationJob && item.status === "generating" && (
               <div className="mb-3">
                 <div className="flex justify-between text-xs text-gray-600 mb-1">
                   <span>Generating...</span>
@@ -385,35 +421,35 @@ function ContentCard({
                 <Progress value={item.generationJob.progress} className="h-1" />
               </div>
             )}
-            
+
             {/* Error Details */}
             {showErrorDetails && item.generationJob?.error && (
               <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-800">
                 {item.generationJob.error}
               </div>
             )}
-            
+
             <div className="flex items-center justify-between">
               <span className="text-xs text-gray-500">
                 {new Date(item.updatedAt).toLocaleDateString()}
               </span>
-              
+
               <div className="flex gap-1">
                 <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
                   <Eye className="h-3 w-3" />
                 </Button>
-                
-                {item.status === 'error' && (
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
+
+                {item.status === "error" && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
                     className="h-6 w-6 p-0"
                     onClick={onRetry}
                   >
                     <RefreshCw className="h-3 w-3" />
                   </Button>
                 )}
-                
+
                 <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
                   <MoreHorizontal className="h-3 w-3" />
                 </Button>

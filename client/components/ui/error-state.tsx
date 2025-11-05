@@ -1,4 +1,4 @@
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -9,11 +9,11 @@ interface ErrorStateProps {
   variant?: "default" | "destructive";
 }
 
-export function ErrorState({ 
-  title = "Something went wrong", 
-  message, 
+export function ErrorState({
+  title = "Something went wrong",
+  message,
   onRetry,
-  variant = "destructive" 
+  variant = "destructive",
 }: ErrorStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4">
@@ -39,8 +39,14 @@ export function ErrorState({
 
 export function InlineError({ message }: { message: string }) {
   return (
-    <div className="flex items-start gap-2 text-sm text-destructive" role="alert">
-      <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
+    <div
+      className="flex items-start gap-2 text-sm text-destructive"
+      role="alert"
+    >
+      <AlertCircle
+        className="h-4 w-4 mt-0.5 flex-shrink-0"
+        aria-hidden="true"
+      />
       <p>{message}</p>
     </div>
   );

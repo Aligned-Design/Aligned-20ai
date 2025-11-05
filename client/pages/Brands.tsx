@@ -107,7 +107,7 @@ export default function Brands() {
   };
 
   const filteredBrands = brands.filter((brand) =>
-    brand.name.toLowerCase().includes(searchQuery.toLowerCase())
+    brand.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   if (loading) {
@@ -116,7 +116,10 @@ export default function Brands() {
         <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse" />
+            <div
+              key={i}
+              className="h-64 bg-gray-200 rounded-lg animate-pulse"
+            />
           ))}
         </div>
       </div>
@@ -279,21 +282,24 @@ function BrandCard({ brand }: { brand: Brand }) {
       return "📷";
     }
     const industries: Record<string, string> = {
-      "technology": "💻",
-      "healthcare": "⚕️",
-      "finance": "💰",
-      "retail": "🛍️",
-      "food": "🍔",
-      "education": "🎓",
-      "entertainment": "🎭",
-      "sports": "⚽",
-      "travel": "✈️",
+      technology: "💻",
+      healthcare: "⚕️",
+      finance: "💰",
+      retail: "🛍️",
+      food: "🍔",
+      education: "🎓",
+      entertainment: "🎭",
+      sports: "⚽",
+      travel: "✈️",
     };
     return industries[brand.industry?.toLowerCase() || ""] || "🏢";
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={handleClick}>
+    <Card
+      className="hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={handleClick}
+    >
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

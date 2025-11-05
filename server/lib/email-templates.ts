@@ -8,7 +8,7 @@ import {
   ReminderEmailData,
   PublishFailureEmailData,
   WeeklyDigestEmailData,
-} from '@shared/approvals';
+} from "@shared/approvals";
 
 /**
  * Generate approval request email
@@ -18,7 +18,7 @@ export function generateApprovalEmail(data: ApprovalEmailData): {
   htmlBody: string;
   textBody: string;
 } {
-  const brandColor = data.brandColor || '#8B5CF6';
+  const brandColor = data.brandColor || "#8B5CF6";
   const subject = `${data.brandName}: Approval needed — "${data.postTitle}"`;
 
   const htmlBody = `
@@ -49,7 +49,7 @@ export function generateApprovalEmail(data: ApprovalEmailData): {
 <body>
   <div class="container">
     <div class="header">
-      ${data.agencyLogo ? `<img src="${data.agencyLogo}" alt="${data.agencyName}" class="logo">` : ''}
+      ${data.agencyLogo ? `<img src="${data.agencyLogo}" alt="${data.agencyName}" class="logo">` : ""}
       <h1 style="font-size: 24px; margin-bottom: 5px;">${data.brandName}</h1>
       <p style="font-size: 14px; opacity: 0.9;">Content Review Needed</p>
     </div>
@@ -62,21 +62,23 @@ export function generateApprovalEmail(data: ApprovalEmailData): {
       <div class="post-preview">
         <div class="post-title">${data.postTitle}</div>
         <div class="post-content">${escapeHtml(data.postContent).substring(0, 150)}...</div>
-        <div class="platforms">📱 ${data.postPlatforms.join(', ')}</div>
+        <div class="platforms">📱 ${data.postPlatforms.join(", ")}</div>
       </div>
 
       ${
         data.deadline
           ? `<div class="deadline">
-          ⏰ <strong>Please review by:</strong> ${new Date(data.deadline).toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
+          ⏰ <strong>Please review by:</strong> ${new Date(
+            data.deadline,
+          ).toLocaleDateString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
           })}
         </div>`
-          : ''
+          : ""
       }
 
       <p style="margin: 20px 0; text-align: center;">
@@ -85,7 +87,7 @@ export function generateApprovalEmail(data: ApprovalEmailData): {
 
       <p style="margin: 20px 0; color: #666;">
         You can approve, request changes, or leave feedback directly in your approval portal.
-        If you have questions, please reach out to <strong>${data.requestedBy || 'the team'}</strong>.
+        If you have questions, please reach out to <strong>${data.requestedBy || "the team"}</strong>.
       </p>
 
       <div class="footer">
@@ -106,9 +108,9 @@ The ${data.agencyName} team has prepared content for your review and approval.
 
 POST: ${data.postTitle}
 "${data.postContent.substring(0, 150)}..."
-PLATFORMS: ${data.postPlatforms.join(', ')}
+PLATFORMS: ${data.postPlatforms.join(", ")}
 
-${data.deadline ? `DEADLINE: ${new Date(data.deadline).toLocaleDateString()}` : ''}
+${data.deadline ? `DEADLINE: ${new Date(data.deadline).toLocaleDateString()}` : ""}
 
 Review & Approve: ${data.approvalUrl}
 
@@ -129,7 +131,7 @@ export function generateReminderEmail(data: ReminderEmailData): {
   htmlBody: string;
   textBody: string;
 } {
-  const brandColor = data.brandColor || '#8B5CF6';
+  const brandColor = data.brandColor || "#8B5CF6";
   const subject = `Reminder: ${data.pendingCount} post(s) awaiting approval for ${data.brandName}`;
 
   const htmlBody = `
@@ -155,7 +157,7 @@ export function generateReminderEmail(data: ReminderEmailData): {
 <body>
   <div class="container">
     <div class="header">
-      ${data.agencyLogo ? `<img src="${data.agencyLogo}" alt="${data.agencyName}" style="height: 40px; margin-bottom: 15px;">` : ''}
+      ${data.agencyLogo ? `<img src="${data.agencyLogo}" alt="${data.agencyName}" style="height: 40px; margin-bottom: 15px;">` : ""}
       <h1 style="font-size: 24px;">${data.brandName}</h1>
       <p style="font-size: 14px; opacity: 0.9;">Approval Reminder</p>
     </div>
@@ -214,7 +216,7 @@ export function generatePublishFailureEmail(data: PublishFailureEmailData): {
   htmlBody: string;
   textBody: string;
 } {
-  const __brandColor = data.brandColor || '#DC2626';
+  const __brandColor = data.brandColor || "#DC2626";
   const subject = `⚠️ Publishing failed for "${data.postTitle}"`;
 
   const htmlBody = `
@@ -266,7 +268,7 @@ export function generatePublishFailureEmail(data: PublishFailureEmailData): {
           ? `<p style="text-align: center;">
         <a href="${data.supportUrl}" class="support-link">View More Details</a>
       </p>`
-          : ''
+          : ""
       }
 
       <div class="footer">
@@ -293,7 +295,7 @@ WHAT HAPPENS NEXT:
 - Your post remains safely stored and scheduled for retry
 - We'll notify you once the issue is resolved
 
-${data.supportUrl ? `More details: ${data.supportUrl}` : ''}
+${data.supportUrl ? `More details: ${data.supportUrl}` : ""}
 
 ---
 ${data.agencyName}
@@ -310,7 +312,7 @@ export function generateWeeklyDigestEmail(data: WeeklyDigestEmailData): {
   htmlBody: string;
   textBody: string;
 } {
-  const brandColor = data.brandColor || '#8B5CF6';
+  const brandColor = data.brandColor || "#8B5CF6";
   const subject = `${data.brandName} Weekly Report - ${data.weekStart} to ${data.weekEnd}`;
 
   const htmlBody = `
@@ -337,7 +339,7 @@ export function generateWeeklyDigestEmail(data: WeeklyDigestEmailData): {
 <body>
   <div class="container">
     <div class="header">
-      ${data.agencyLogo ? `<img src="${data.agencyLogo}" alt="${data.agencyName}" style="height: 40px; margin-bottom: 15px;">` : ''}
+      ${data.agencyLogo ? `<img src="${data.agencyLogo}" alt="${data.agencyName}" style="height: 40px; margin-bottom: 15px;">` : ""}
       <h1 style="font-size: 24px; margin-bottom: 5px;">${data.brandName}</h1>
       <p style="font-size: 14px; opacity: 0.9;">Weekly Performance Report</p>
       <p style="font-size: 12px; opacity: 0.8; margin-top: 10px;">${data.weekStart} to ${data.weekEnd}</p>
@@ -373,7 +375,7 @@ export function generateWeeklyDigestEmail(data: WeeklyDigestEmailData): {
           <span style="color: ${brandColor}; font-weight: bold;">${data.topPost.engagement.toLocaleString()} engagements</span>
         </div>
       </div>`
-          : ''
+          : ""
       }
 
       ${
@@ -381,7 +383,7 @@ export function generateWeeklyDigestEmail(data: WeeklyDigestEmailData): {
           ? `<div style="background: #FEF3C7; border-left: 4px solid #FCD34D; padding: 15px; margin: 20px 0; border-radius: 4px;">
         <strong>⏳ Action needed:</strong> You have ${data.pendingApprovals} post(s) waiting for approval.
       </div>`
-          : ''
+          : ""
       }
 
       <p style="text-align: center;">
@@ -417,10 +419,10 @@ ${
     ? `TOP POST: ${data.topPost.title}
 Platform: ${data.topPost.platform}
 Engagement: ${data.topPost.engagement.toLocaleString()}`
-    : ''
+    : ""
 }
 
-${data.pendingApprovals > 0 ? `ACTION NEEDED: ${data.pendingApprovals} post(s) awaiting approval` : ''}
+${data.pendingApprovals > 0 ? `ACTION NEEDED: ${data.pendingApprovals} post(s) awaiting approval` : ""}
 
 View Full Dashboard: ${data.dashboardUrl}
 
@@ -436,11 +438,11 @@ ${data.agencyName}
  */
 function escapeHtml(text: string): string {
   const map: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
   };
   return text.replace(/[&<>"']/g, (m) => map[m]);
 }

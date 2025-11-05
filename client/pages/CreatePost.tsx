@@ -51,12 +51,12 @@ export default function CreatePost() {
     hashtags: string[];
     cta_text?: string;
   }) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       title: content.title || prev.title,
       caption: content.caption,
       hashtags: content.hashtags,
-      cta_text: content.cta_text || prev.cta_text
+      cta_text: content.cta_text || prev.cta_text,
     }));
   };
 

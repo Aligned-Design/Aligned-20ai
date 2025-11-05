@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   LayoutDashboard,
   TrendingUp,
@@ -11,9 +11,9 @@ import {
   BarChart3,
   Clock,
   CheckCircle,
-  AlertTriangle
-} from 'lucide-react';
-import { AdvisorInsightsTile } from '@/components/insights/AdvisorInsightsTile';
+  AlertTriangle,
+} from "lucide-react";
+import { AdvisorInsightsTile } from "@/components/insights/AdvisorInsightsTile";
 
 interface DashboardData {
   metrics: {
@@ -24,7 +24,7 @@ interface DashboardData {
   };
   recentActivity: Array<{
     id: string;
-    type: 'content_created' | 'content_approved' | 'content_published';
+    type: "content_created" | "content_approved" | "content_published";
     title: string;
     brand: string;
     timestamp: string;
@@ -33,7 +33,7 @@ interface DashboardData {
     id: string;
     title: string;
     dueDate: string;
-    priority: 'high' | 'medium' | 'low';
+    priority: "high" | "medium" | "low";
   }>;
 }
 
@@ -53,36 +53,36 @@ export default function Dashboard() {
           totalBrands: 8,
           activeContent: 24,
           pendingApprovals: 5,
-          scheduledPosts: 12
+          scheduledPosts: 12,
         },
         recentActivity: [
           {
-            id: '1',
-            type: 'content_created',
-            title: 'Summer Campaign Post',
-            brand: 'Nike',
-            timestamp: new Date().toISOString()
+            id: "1",
+            type: "content_created",
+            title: "Summer Campaign Post",
+            brand: "Nike",
+            timestamp: new Date().toISOString(),
           },
           {
-            id: '2',
-            type: 'content_approved',
-            title: 'Product Launch Video',
-            brand: 'Apple',
-            timestamp: new Date(Date.now() - 3600000).toISOString()
-          }
+            id: "2",
+            type: "content_approved",
+            title: "Product Launch Video",
+            brand: "Apple",
+            timestamp: new Date(Date.now() - 3600000).toISOString(),
+          },
         ],
         upcomingTasks: [
           {
-            id: '1',
-            title: 'Review Q4 Campaign Strategy',
+            id: "1",
+            title: "Review Q4 Campaign Strategy",
             dueDate: new Date(Date.now() + 86400000).toISOString(),
-            priority: 'high'
-          }
-        ]
+            priority: "high",
+          },
+        ],
       };
       setData(mockData);
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
+      console.error("Failed to load dashboard data:", error);
     } finally {
       setLoading(false);
     }
@@ -94,7 +94,10 @@ export default function Dashboard() {
         <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
+            <div
+              key={i}
+              className="h-32 bg-gray-200 rounded-lg animate-pulse"
+            />
           ))}
         </div>
       </div>
@@ -190,7 +193,11 @@ export default function Dashboard() {
                       Due {new Date(task.dueDate).toLocaleDateString()}
                     </p>
                   </div>
-                  <Badge variant={task.priority === 'high' ? 'destructive' : 'secondary'}>
+                  <Badge
+                    variant={
+                      task.priority === "high" ? "destructive" : "secondary"
+                    }
+                  >
                     {task.priority}
                   </Badge>
                 </div>
@@ -203,17 +210,22 @@ export default function Dashboard() {
   );
 }
 
-function MetricCard({ title, value, icon, color }: {
+function MetricCard({
+  title,
+  value,
+  icon,
+  color,
+}: {
   title: string;
   value: number;
   icon: React.ReactNode;
-  color: 'blue' | 'green' | 'yellow' | 'purple';
+  color: "blue" | "green" | "yellow" | "purple";
 }) {
   const colorClasses = {
-    blue: 'text-blue-600 bg-blue-100',
-    green: 'text-green-600 bg-green-100',
-    yellow: 'text-yellow-600 bg-yellow-100',
-    purple: 'text-purple-600 bg-purple-100'
+    blue: "text-blue-600 bg-blue-100",
+    green: "text-green-600 bg-green-100",
+    yellow: "text-yellow-600 bg-yellow-100",
+    purple: "text-purple-600 bg-purple-100",
   };
 
   return (

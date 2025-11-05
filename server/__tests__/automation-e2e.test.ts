@@ -3,7 +3,7 @@
  * Tests the full flow: AI Generation → Brand Application → BFS Scoring → Scheduling
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   mockAIGeneratedContent,
   mockBrandGuide,
@@ -19,7 +19,7 @@ import {
   verifyBFSScore,
   verifyBFSBreakdown,
   calculateScheduleTime,
-} from './fixtures/automation-fixtures';
+} from "./fixtures/automation-fixtures";
 
 // ==================== MOCK SERVICES ====================
 
@@ -31,7 +31,13 @@ class MockAIService {
     return mockAIGeneratedContent.happy_path;
   }
 
-  async generateContentWithVariant(variant: 'happy_path' | 'brand_mismatch' | 'missing_cta' | 'compliance_violation') {
+  async generateContentWithVariant(
+    variant:
+      | "happy_path"
+      | "brand_mismatch"
+      | "missing_cta"
+      | "compliance_violation",
+  ) {
     return mockAIGeneratedContent[variant];
   }
 }
@@ -48,13 +54,19 @@ class MockBFSScorer {
 
   async scoreContent(content: unknown, brandGuide: unknown) {
     // Simulate scoring logic
-    const toneScore = content.tone === 'professional' ? 95 : 30;
-    const terminologyScore = content.body.includes('Solution') ? 90 : 40;
-    const complianceScore = !content.body.includes('guarantee') ? 95 : 20;
+    const toneScore = content.tone === "professional" ? 95 : 30;
+    const terminologyScore = content.body.includes("Solution") ? 90 : 40;
+    const complianceScore = !content.body.includes("guarantee") ? 95 : 20;
     const ctaScore = content.cta ? 90 : 10;
     const platformScore = 85;
 
-    const overallScore = (toneScore + terminologyScore + complianceScore + ctaScore + platformScore) / 5;
+    const overallScore =
+      (toneScore +
+        terminologyScore +
+        complianceScore +
+        ctaScore +
+        platformScore) /
+      5;
 
     return {
       overallScore: Math.round(overallScore),
@@ -69,19 +81,22 @@ class MockBFSScorer {
     };
   }
 
-  private generateRecommendations(content: unknown, _brandGuide: unknown): string[] {
+  private generateRecommendations(
+    content: unknown,
+    _brandGuide: unknown,
+  ): string[] {
     const recommendations: string[] = [];
 
-    if (content.tone !== 'professional') {
-      recommendations.push('Adjust tone to be more professional');
+    if (content.tone !== "professional") {
+      recommendations.push("Adjust tone to be more professional");
     }
 
     if (!content.cta) {
-      recommendations.push('Add a clear call-to-action');
+      recommendations.push("Add a clear call-to-action");
     }
 
-    if (content.body.includes('guarantee')) {
-      recommendations.push('Remove guarantee claims');
+    if (content.body.includes("guarantee")) {
+      recommendations.push("Remove guarantee claims");
     }
 
     return recommendations;
@@ -97,23 +112,25 @@ class MockSchedulingService {
   async schedulePost(postId: string, content: unknown, scheduleTime: Date) {
     // Check for conflicts
     for (const [, scheduled] of this.scheduledPosts) {
-      const timeDiff = Math.abs(scheduled.scheduleTime.getTime() - scheduleTime.getTime());
+      const timeDiff = Math.abs(
+        scheduled.scheduleTime.getTime() - scheduleTime.getTime(),
+      );
       if (timeDiff < 3600000) {
         // Less than 1 hour apart
-        throw new Error('Schedule conflict detected');
+        throw new Error("Schedule conflict detected");
       }
     }
 
     this.scheduledPosts.set(postId, {
       content,
       scheduleTime,
-      status: 'scheduled',
+      status: "scheduled",
     });
 
     return {
       postId,
       scheduleTime,
-      status: 'scheduled',
+      status: "scheduled",
     };
   }
 
@@ -146,7 +163,9 @@ class MockAuditLogger {
   }
 
   getLogs(action?: string) {
-    return action ? this.logs.filter((log) => log.action === action) : this.logs;
+    return action
+      ? this.logs.filter((log) => log.action === action)
+      : this.logs;
   }
 
   clear() {
@@ -178,14 +197,18 @@ class AutomationPipeline {
     platform: string;
     scheduleHours: number;
     timezone: string;
-    contentVariant?: 'happy_path' | 'brand_mismatch' | 'missing_cta' | 'compliance_violation';
+    contentVariant?:
+      | "happy_path"
+      | "brand_mismatch"
+      | "missing_cta"
+      | "compliance_violation";
     brandGuide?: unknown;
   }) {
     const startTime = Date.now();
 
     try {
       // Step 1: Log automation started
-      await this.auditLogger.logAction('AUTOMATION_STARTED', {
+      await this.auditLogger.logAction("AUTOMATION_STARTED", {
         postId: request.postId,
         brandId: request.brandId,
         platform: request.platform,
@@ -194,10 +217,12 @@ class AutomationPipeline {
 
       // Step 2: Generate AI content
       const content = request.contentVariant
-        ? await this.aiService.generateContentWithVariant(request.contentVariant)
-        : await this.aiService.generateContent('');
+        ? await this.aiService.generateContentWithVariant(
+            request.contentVariant,
+          )
+        : await this.aiService.generateContent("");
 
-      await this.auditLogger.logAction('AI_GENERATION_COMPLETE', {
+      await this.auditLogger.logAction("AI_GENERATION_COMPLETE", {
         postId: request.postId,
         contentPreview: `${content.title} - ${content.body.substring(0, 50)}...`,
         generationTime: Date.now() - startTime,
@@ -207,7 +232,7 @@ class AutomationPipeline {
       const brandGuide = request.brandGuide || mockBrandGuide;
       const bfsResult = await this.bfsScorer.scoreContent(content, brandGuide);
 
-      await this.auditLogger.logAction('BRAND_APPLICATION_COMPLETE', {
+      await this.auditLogger.logAction("BRAND_APPLICATION_COMPLETE", {
         postId: request.postId,
         bfsScore: bfsResult.overallScore,
         breakdown: bfsResult.breakdown,
@@ -216,25 +241,30 @@ class AutomationPipeline {
 
       // Step 4: Check if score meets threshold
       if (bfsResult.overallScore < 70) {
-        await this.auditLogger.logAction('AUTOMATION_FAILED', {
+        await this.auditLogger.logAction("AUTOMATION_FAILED", {
           postId: request.postId,
-          failureReason: 'BFS score below threshold',
+          failureReason: "BFS score below threshold",
           bfsScore: bfsResult.overallScore,
           recommendations: bfsResult.recommendations,
         });
 
-        throw new Error(`BFS score ${bfsResult.overallScore} below minimum threshold of 70`);
+        throw new Error(
+          `BFS score ${bfsResult.overallScore} below minimum threshold of 70`,
+        );
       }
 
       // Step 5: Schedule the post
-      const scheduleTime = calculateScheduleTime(request.timezone, request.scheduleHours);
+      const scheduleTime = calculateScheduleTime(
+        request.timezone,
+        request.scheduleHours,
+      );
       const __schedulingResult = await this.schedulingService.schedulePost(
         request.postId,
         content,
-        scheduleTime
+        scheduleTime,
       );
 
-      await this.auditLogger.logAction('SCHEDULING_COMPLETE', {
+      await this.auditLogger.logAction("SCHEDULING_COMPLETE", {
         postId: request.postId,
         platform: request.platform,
         scheduledTime: scheduleTime.toISOString(),
@@ -256,7 +286,7 @@ class AutomationPipeline {
     } catch (error) {
       const duration = Date.now() - startTime;
 
-      await this.auditLogger.logAction('AUTOMATION_FAILED', {
+      await this.auditLogger.logAction("AUTOMATION_FAILED", {
         postId: request.postId,
         error: error instanceof Error ? error.message : String(error),
         duration,
@@ -278,7 +308,7 @@ class AutomationPipeline {
 
 // ==================== TEST SUITE ====================
 
-describe('Automation Pipeline E2E Tests', () => {
+describe("Automation Pipeline E2E Tests", () => {
   let pipeline: AutomationPipeline;
 
   beforeEach(() => {
@@ -289,10 +319,10 @@ describe('Automation Pipeline E2E Tests', () => {
     pipeline.clearMocks();
   });
 
-  describe('Happy Path - Complete Automation Flow', () => {
-    it('should execute full automation pipeline successfully', async () => {
+  describe("Happy Path - Complete Automation Flow", () => {
+    it("should execute full automation pipeline successfully", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'happy_path',
+        contentVariant: "happy_path",
       });
 
       const result = await pipeline.executeAutomation(request);
@@ -304,9 +334,9 @@ describe('Automation Pipeline E2E Tests', () => {
       expect(result.scheduledTime).toBeDefined();
     });
 
-    it('should generate AI content successfully', async () => {
+    it("should generate AI content successfully", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'happy_path',
+        contentVariant: "happy_path",
       });
 
       const result = await pipeline.executeAutomation(request);
@@ -317,20 +347,23 @@ describe('Automation Pipeline E2E Tests', () => {
       expect(result.content.hashtags).toBeInstanceOf(Array);
     });
 
-    it('should score content against brand guide', async () => {
+    it("should score content against brand guide", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'happy_path',
+        contentVariant: "happy_path",
       });
 
       const result = await pipeline.executeAutomation(request);
 
-      const scoreValidation = verifyBFSScore(result.bfsScore, bfsScoreExpectations.perfect_brand_alignment);
+      const scoreValidation = verifyBFSScore(
+        result.bfsScore,
+        bfsScoreExpectations.perfect_brand_alignment,
+      );
       expect(scoreValidation.valid).toBe(true);
     });
 
-    it('should schedule post with correct timezone', async () => {
+    it("should schedule post with correct timezone", async () => {
       const request = createMockAutomationRequest({
-        timezone: 'US/Pacific',
+        timezone: "US/Pacific",
         scheduleHours: 24,
       });
 
@@ -341,9 +374,9 @@ describe('Automation Pipeline E2E Tests', () => {
       expect(scheduledDate.getTime()).toBeGreaterThan(Date.now());
     });
 
-    it('should create comprehensive audit trail', async () => {
+    it("should create comprehensive audit trail", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'happy_path',
+        contentVariant: "happy_path",
       });
 
       await pipeline.executeAutomation(request);
@@ -351,43 +384,51 @@ describe('Automation Pipeline E2E Tests', () => {
       const allLogs = pipeline.getAuditLogs();
       expect(allLogs.length).toBeGreaterThanOrEqual(4); // At minimum: started, generation, application, scheduling
 
-      expect(allLogs.some((log) => log.action === 'AUTOMATION_STARTED')).toBe(true);
-      expect(allLogs.some((log) => log.action === 'AI_GENERATION_COMPLETE')).toBe(true);
-      expect(allLogs.some((log) => log.action === 'BRAND_APPLICATION_COMPLETE')).toBe(true);
-      expect(allLogs.some((log) => log.action === 'SCHEDULING_COMPLETE')).toBe(true);
+      expect(allLogs.some((log) => log.action === "AUTOMATION_STARTED")).toBe(
+        true,
+      );
+      expect(
+        allLogs.some((log) => log.action === "AI_GENERATION_COMPLETE"),
+      ).toBe(true);
+      expect(
+        allLogs.some((log) => log.action === "BRAND_APPLICATION_COMPLETE"),
+      ).toBe(true);
+      expect(allLogs.some((log) => log.action === "SCHEDULING_COMPLETE")).toBe(
+        true,
+      );
     });
   });
 
-  describe('BFS Failure Scenarios', () => {
-    it('should fail when BFS score is below threshold', async () => {
+  describe("BFS Failure Scenarios", () => {
+    it("should fail when BFS score is below threshold", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'brand_mismatch',
+        contentVariant: "brand_mismatch",
       });
 
       await expect(pipeline.executeAutomation(request)).rejects.toThrow(
-        /BFS score.*below minimum threshold/
+        /BFS score.*below minimum threshold/,
       );
     });
 
-    it('should fail when CTA is missing', async () => {
+    it("should fail when CTA is missing", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'missing_cta',
+        contentVariant: "missing_cta",
       });
 
       await expect(pipeline.executeAutomation(request)).rejects.toThrow();
     });
 
-    it('should fail on compliance violations', async () => {
+    it("should fail on compliance violations", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'compliance_violation',
+        contentVariant: "compliance_violation",
       });
 
       await expect(pipeline.executeAutomation(request)).rejects.toThrow();
     });
 
-    it('should log BFS failure to audit trail', async () => {
+    it("should log BFS failure to audit trail", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'brand_mismatch',
+        contentVariant: "brand_mismatch",
       });
 
       try {
@@ -396,25 +437,25 @@ describe('Automation Pipeline E2E Tests', () => {
         // Expected failure
       }
 
-      const failureLogs = pipeline.getAuditLogs('AUTOMATION_FAILED');
+      const failureLogs = pipeline.getAuditLogs("AUTOMATION_FAILED");
       expect(failureLogs.length).toBeGreaterThan(0);
-      expect(failureLogs[0].metadata).toHaveProperty('failureReason');
+      expect(failureLogs[0].metadata).toHaveProperty("failureReason");
     });
   });
 
-  describe('Brand Mismatch Detection', () => {
-    it('should detect tone mismatch with strict brand guide', async () => {
+  describe("Brand Mismatch Detection", () => {
+    it("should detect tone mismatch with strict brand guide", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'brand_mismatch',
+        contentVariant: "brand_mismatch",
         brandGuide: strictBrandGuide,
       });
 
       await expect(pipeline.executeAutomation(request)).rejects.toThrow();
     });
 
-    it('should detect terminology mismatches', async () => {
+    it("should detect terminology mismatches", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'brand_mismatch',
+        contentVariant: "brand_mismatch",
       });
 
       try {
@@ -423,19 +464,19 @@ describe('Automation Pipeline E2E Tests', () => {
         expect(error).toBeDefined();
       }
 
-      const logs = pipeline.getAuditLogs('BRAND_APPLICATION_COMPLETE');
+      const logs = pipeline.getAuditLogs("BRAND_APPLICATION_COMPLETE");
       expect(logs.length).toBeGreaterThan(0);
     });
   });
 
-  describe('Scheduling & Conflict Detection', () => {
-    it('should handle multiple timezones correctly', async () => {
+  describe("Scheduling & Conflict Detection", () => {
+    it("should handle multiple timezones correctly", async () => {
       const timezoneTest = timezones.slice(0, 3);
 
       for (const tz of timezoneTest) {
         const request = createMockAutomationRequest({
           timezone: tz.name,
-          contentVariant: 'happy_path',
+          contentVariant: "happy_path",
         });
 
         const result = await pipeline.executeAutomation(request);
@@ -443,17 +484,17 @@ describe('Automation Pipeline E2E Tests', () => {
       }
     });
 
-    it('should detect scheduling conflicts', async () => {
+    it("should detect scheduling conflicts", async () => {
       const request1 = createMockAutomationRequest({
-        postId: 'post-1',
+        postId: "post-1",
         scheduleHours: 24,
-        contentVariant: 'happy_path',
+        contentVariant: "happy_path",
       });
 
       const request2 = createMockAutomationRequest({
-        postId: 'post-2',
+        postId: "post-2",
         scheduleHours: 24.3, // Within 1 hour of first post
-        contentVariant: 'happy_path',
+        contentVariant: "happy_path",
       });
 
       // First automation should succeed
@@ -461,20 +502,22 @@ describe('Automation Pipeline E2E Tests', () => {
       expect(result1.success).toBe(true);
 
       // Second automation should fail due to conflict
-      await expect(pipeline.executeAutomation(request2)).rejects.toThrow(/Schedule conflict/);
+      await expect(pipeline.executeAutomation(request2)).rejects.toThrow(
+        /Schedule conflict/,
+      );
     });
 
-    it('should allow non-conflicting schedules', async () => {
+    it("should allow non-conflicting schedules", async () => {
       const request1 = createMockAutomationRequest({
-        postId: 'post-1',
+        postId: "post-1",
         scheduleHours: 24,
-        contentVariant: 'happy_path',
+        contentVariant: "happy_path",
       });
 
       const request2 = createMockAutomationRequest({
-        postId: 'post-2',
+        postId: "post-2",
         scheduleHours: 48, // More than 1 hour later
-        contentVariant: 'happy_path',
+        contentVariant: "happy_path",
       });
 
       const result1 = await pipeline.executeAutomation(request1);
@@ -485,10 +528,10 @@ describe('Automation Pipeline E2E Tests', () => {
     });
   });
 
-  describe('Audit Trail Validation', () => {
-    it('should log all steps with correct metadata', async () => {
+  describe("Audit Trail Validation", () => {
+    it("should log all steps with correct metadata", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'happy_path',
+        contentVariant: "happy_path",
       });
 
       await pipeline.executeAutomation(request);
@@ -497,35 +540,51 @@ describe('Automation Pipeline E2E Tests', () => {
 
       // Verify each log type has required fields
       logs.forEach((log) => {
-        expect(log).toHaveProperty('action');
-        expect(log).toHaveProperty('metadata');
-        expect(log).toHaveProperty('timestamp');
+        expect(log).toHaveProperty("action");
+        expect(log).toHaveProperty("metadata");
+        expect(log).toHaveProperty("timestamp");
       });
     });
 
-    it('should maintain chronological order in audit logs', async () => {
+    it("should maintain chronological order in audit logs", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'happy_path',
+        contentVariant: "happy_path",
       });
 
       await pipeline.executeAutomation(request);
 
       const logs = pipeline.getAuditLogs();
       for (let i = 1; i < logs.length; i++) {
-        expect(logs[i].timestamp.getTime()).toBeGreaterThanOrEqual(logs[i - 1].timestamp.getTime());
+        expect(logs[i].timestamp.getTime()).toBeGreaterThanOrEqual(
+          logs[i - 1].timestamp.getTime(),
+        );
       }
     });
   });
 
-  describe('Concurrency & Cancellation', () => {
-    it('should handle concurrent automations for different posts', async () => {
+  describe("Concurrency & Cancellation", () => {
+    it("should handle concurrent automations for different posts", async () => {
       const requests = [
-        createMockAutomationRequest({ postId: 'post-1', scheduleHours: 24, contentVariant: 'happy_path' }),
-        createMockAutomationRequest({ postId: 'post-2', scheduleHours: 48, contentVariant: 'happy_path' }),
-        createMockAutomationRequest({ postId: 'post-3', scheduleHours: 72, contentVariant: 'happy_path' }),
+        createMockAutomationRequest({
+          postId: "post-1",
+          scheduleHours: 24,
+          contentVariant: "happy_path",
+        }),
+        createMockAutomationRequest({
+          postId: "post-2",
+          scheduleHours: 48,
+          contentVariant: "happy_path",
+        }),
+        createMockAutomationRequest({
+          postId: "post-3",
+          scheduleHours: 72,
+          contentVariant: "happy_path",
+        }),
       ];
 
-      const results = await Promise.all(requests.map((req) => pipeline.executeAutomation(req)));
+      const results = await Promise.all(
+        requests.map((req) => pipeline.executeAutomation(req)),
+      );
 
       expect(results).toHaveLength(3);
       results.forEach((result) => {
@@ -533,9 +592,9 @@ describe('Automation Pipeline E2E Tests', () => {
       });
     });
 
-    it('should handle automation cancellation before scheduling', async () => {
+    it("should handle automation cancellation before scheduling", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'happy_path',
+        contentVariant: "happy_path",
       });
 
       const result = await pipeline.executeAutomation(request);
@@ -546,10 +605,10 @@ describe('Automation Pipeline E2E Tests', () => {
     });
   });
 
-  describe('Performance & Timing', () => {
-    it('should complete automation within reasonable time', async () => {
+  describe("Performance & Timing", () => {
+    it("should complete automation within reasonable time", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'happy_path',
+        contentVariant: "happy_path",
       });
 
       const result = await pipeline.executeAutomation(request);
@@ -558,14 +617,14 @@ describe('Automation Pipeline E2E Tests', () => {
       expect(result.duration).toBeLessThan(5000);
     });
 
-    it('should have consistent execution times', async () => {
+    it("should have consistent execution times", async () => {
       const durations: number[] = [];
 
       for (let i = 0; i < 5; i++) {
         const request = createMockAutomationRequest({
           postId: `post-${i}`,
           scheduleHours: 24 + i,
-          contentVariant: 'happy_path',
+          contentVariant: "happy_path",
         });
 
         const result = await pipeline.executeAutomation(request);
@@ -580,10 +639,10 @@ describe('Automation Pipeline E2E Tests', () => {
     });
   });
 
-  describe('Error Recovery', () => {
-    it('should gracefully handle and log unexpected errors', async () => {
+  describe("Error Recovery", () => {
+    it("should gracefully handle and log unexpected errors", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: 'happy_path' as any, // Valid variant
+        contentVariant: "happy_path" as any, // Valid variant
       });
 
       // Modify request to trigger error
@@ -595,7 +654,7 @@ describe('Automation Pipeline E2E Tests', () => {
         // Expected
       }
 
-      const failureLogs = pipeline.getAuditLogs('AUTOMATION_FAILED');
+      const failureLogs = pipeline.getAuditLogs("AUTOMATION_FAILED");
       expect(failureLogs.length).toBeGreaterThan(0);
     });
   });

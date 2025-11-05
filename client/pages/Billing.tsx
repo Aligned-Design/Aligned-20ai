@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { 
-  CreditCard, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  CreditCard,
   Download,
   Calendar,
   CheckCircle,
   AlertTriangle,
-  ArrowUpRight
-} from 'lucide-react';
+  ArrowUpRight,
+} from "lucide-react";
 
 interface BillingData {
   subscription: {
     plan: string;
-    status: 'active' | 'past_due' | 'canceled';
+    status: "active" | "past_due" | "canceled";
     currentPeriodEnd: string;
     price: number;
     brands: number;
@@ -34,7 +34,7 @@ interface BillingData {
     id: string;
     date: string;
     amount: number;
-    status: 'paid' | 'pending' | 'failed';
+    status: "paid" | "pending" | "failed";
     downloadUrl?: string;
   }>;
 }
@@ -52,11 +52,13 @@ export default function Billing() {
       // Mock data - replace with actual API call
       const mockData: BillingData = {
         subscription: {
-          plan: 'Growth Plan',
-          status: 'active',
-          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          plan: "Growth Plan",
+          status: "active",
+          currentPeriodEnd: new Date(
+            Date.now() + 30 * 24 * 60 * 60 * 1000,
+          ).toISOString(),
           price: 149,
-          brands: 10
+          brands: 10,
         },
         usage: {
           contentGenerated: 245,
@@ -65,60 +67,70 @@ export default function Billing() {
           limits: {
             contentGenerated: 1000,
             postsScheduled: 500,
-            analyticsViews: 5000
-          }
+            analyticsViews: 5000,
+          },
         },
         invoices: [
           {
-            id: 'inv_001',
+            id: "inv_001",
             date: new Date().toISOString(),
             amount: 149,
-            status: 'paid'
+            status: "paid",
           },
           {
-            id: 'inv_002',
+            id: "inv_002",
             date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
             amount: 149,
-            status: 'paid'
+            status: "paid",
           },
           {
-            id: 'inv_003',
+            id: "inv_003",
             date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
             amount: 149,
-            status: 'paid'
-          }
-        ]
+            status: "paid",
+          },
+        ],
       };
       setData(mockData);
     } catch (error) {
-      console.error('Failed to load billing data:', error);
+      console.error("Failed to load billing data:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusColor = (status: BillingData['subscription']['status']) => {
+  const getStatusColor = (status: BillingData["subscription"]["status"]) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'past_due': return 'bg-red-100 text-red-800';
-      case 'canceled': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "past_due":
+        return "bg-red-100 text-red-800";
+      case "canceled":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
-  const getInvoiceStatusColor = (status: BillingData['invoices'][0]['status']) => {
+  const getInvoiceStatusColor = (
+    status: BillingData["invoices"][0]["status"],
+  ) => {
     switch (status) {
-      case 'paid': return 'bg-green-100 text-green-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'failed': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "paid":
+        return "bg-green-100 text-green-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "failed":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
@@ -144,8 +156,12 @@ export default function Billing() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Billing & Subscription</h1>
-          <p className="text-gray-600">Manage your subscription and billing information</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Billing & Subscription
+          </h1>
+          <p className="text-gray-600">
+            Manage your subscription and billing information
+          </p>
         </div>
         <Button className="gap-2">
           <ArrowUpRight className="h-4 w-4" />
@@ -166,13 +182,15 @@ export default function Billing() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-bold">{data.subscription.plan}</h3>
-                <p className="text-gray-600">{formatCurrency(data.subscription.price)}/month</p>
+                <p className="text-gray-600">
+                  {formatCurrency(data.subscription.price)}/month
+                </p>
               </div>
               <Badge className={getStatusColor(data.subscription.status)}>
                 {data.subscription.status}
               </Badge>
             </div>
-            
+
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Brands included</span>
@@ -181,7 +199,9 @@ export default function Billing() {
               <div className="flex justify-between text-sm">
                 <span>Next billing date</span>
                 <span className="font-medium">
-                  {new Date(data.subscription.currentPeriodEnd).toLocaleDateString()}
+                  {new Date(
+                    data.subscription.currentPeriodEnd,
+                  ).toLocaleDateString()}
                 </span>
               </div>
             </div>
@@ -208,10 +228,16 @@ export default function Billing() {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Content Generated</span>
-                <span>{data.usage.contentGenerated} / {data.usage.limits.contentGenerated}</span>
+                <span>
+                  {data.usage.contentGenerated} /{" "}
+                  {data.usage.limits.contentGenerated}
+                </span>
               </div>
-              <Progress 
-                value={calculateUsagePercentage(data.usage.contentGenerated, data.usage.limits.contentGenerated)} 
+              <Progress
+                value={calculateUsagePercentage(
+                  data.usage.contentGenerated,
+                  data.usage.limits.contentGenerated,
+                )}
                 className="h-2"
               />
             </div>
@@ -219,10 +245,16 @@ export default function Billing() {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Posts Scheduled</span>
-                <span>{data.usage.postsScheduled} / {data.usage.limits.postsScheduled}</span>
+                <span>
+                  {data.usage.postsScheduled} /{" "}
+                  {data.usage.limits.postsScheduled}
+                </span>
               </div>
-              <Progress 
-                value={calculateUsagePercentage(data.usage.postsScheduled, data.usage.limits.postsScheduled)} 
+              <Progress
+                value={calculateUsagePercentage(
+                  data.usage.postsScheduled,
+                  data.usage.limits.postsScheduled,
+                )}
                 className="h-2"
               />
             </div>
@@ -230,17 +262,26 @@ export default function Billing() {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Analytics Views</span>
-                <span>{data.usage.analyticsViews} / {data.usage.limits.analyticsViews}</span>
+                <span>
+                  {data.usage.analyticsViews} /{" "}
+                  {data.usage.limits.analyticsViews}
+                </span>
               </div>
-              <Progress 
-                value={calculateUsagePercentage(data.usage.analyticsViews, data.usage.limits.analyticsViews)} 
+              <Progress
+                value={calculateUsagePercentage(
+                  data.usage.analyticsViews,
+                  data.usage.limits.analyticsViews,
+                )}
                 className="h-2"
               />
             </div>
 
             <div className="pt-4 border-t">
               <p className="text-sm text-gray-600">
-                Usage resets on {new Date(data.subscription.currentPeriodEnd).toLocaleDateString()}
+                Usage resets on{" "}
+                {new Date(
+                  data.subscription.currentPeriodEnd,
+                ).toLocaleDateString()}
               </p>
             </div>
           </CardContent>
@@ -298,13 +339,13 @@ export default function Billing() {
   );
 }
 
-function InvoiceRow({ 
-  invoice, 
-  getStatusColor, 
-  formatCurrency 
+function InvoiceRow({
+  invoice,
+  getStatusColor,
+  formatCurrency,
 }: {
-  invoice: BillingData['invoices'][0];
-  getStatusColor: (status: BillingData['invoices'][0]['status']) => string;
+  invoice: BillingData["invoices"][0];
+  getStatusColor: (status: BillingData["invoices"][0]["status"]) => string;
   formatCurrency: (amount: number) => string;
 }) {
   return (
@@ -320,7 +361,7 @@ function InvoiceRow({
           </p>
         </div>
       </div>
-      
+
       <div className="flex items-center gap-4">
         <div className="text-right">
           <p className="font-medium">{formatCurrency(invoice.amount)}</p>
@@ -328,8 +369,8 @@ function InvoiceRow({
             {invoice.status}
           </Badge>
         </div>
-        
-        {invoice.status === 'paid' && (
+
+        {invoice.status === "paid" && (
           <Button variant="ghost" size="sm" className="gap-1">
             <Download className="h-3 w-3" />
             Download

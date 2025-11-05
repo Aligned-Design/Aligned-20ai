@@ -1,34 +1,34 @@
-import React, { useEffect, useRef } from 'react';
-import { Star } from 'lucide-react';
+import React, { useEffect, useRef } from "react";
+import { Star } from "lucide-react";
 
 const reviews = [
   {
     quote:
-      'Aligned AI turned our monthly content chaos into a predictable machine. The quality is consistently on-brand and the time savings are unreal.',
-    name: 'Avery Reed',
-    title: 'Agency Owner',
-    initials: 'AR',
+      "Aligned AI turned our monthly content chaos into a predictable machine. The quality is consistently on-brand and the time savings are unreal.",
+    name: "Avery Reed",
+    title: "Agency Owner",
+    initials: "AR",
   },
   {
     quote:
-      'Our team finally trusts an AI assistant. Drafts arrive ready to edit, not rewrite — and clients love the branded previews.',
-    name: 'Jordan Kim',
-    title: 'Marketing Director',
-    initials: 'JK',
+      "Our team finally trusts an AI assistant. Drafts arrive ready to edit, not rewrite — and clients love the branded previews.",
+    name: "Jordan Kim",
+    title: "Marketing Director",
+    initials: "JK",
   },
   {
     quote:
-      'The Advisor recommendations helped us prioritize content that actually moves metrics. Reporting now feels effortless.',
-    name: 'Priya Patel',
-    title: 'Growth Lead',
-    initials: 'PP',
+      "The Advisor recommendations helped us prioritize content that actually moves metrics. Reporting now feels effortless.",
+    name: "Priya Patel",
+    title: "Growth Lead",
+    initials: "PP",
   },
   {
     quote:
-      'We shaved hours off every campaign cycle. The approval flows are clean and clients approve faster than ever.',
-    name: 'Marcus Lee',
-    title: 'Creative Director',
-    initials: 'ML',
+      "We shaved hours off every campaign cycle. The approval flows are clean and clients approve faster than ever.",
+    name: "Marcus Lee",
+    title: "Creative Director",
+    initials: "ML",
   },
 ];
 
@@ -45,11 +45,14 @@ export default function ReviewsCarousel() {
       scrollInterval.current = window.setInterval(() => {
         if (!el) return;
         const scrollAmount = el.clientWidth * 0.9; // scroll almost a full view
-        if (el.scrollLeft + scrollAmount >= el.scrollWidth - el.clientWidth / 2) {
+        if (
+          el.scrollLeft + scrollAmount >=
+          el.scrollWidth - el.clientWidth / 2
+        ) {
           // wrap to start
-          el.scrollTo({ left: 0, behavior: 'smooth' });
+          el.scrollTo({ left: 0, behavior: "smooth" });
         } else {
-          el.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+          el.scrollBy({ left: scrollAmount, behavior: "smooth" });
         }
       }, 4500);
     };
@@ -62,13 +65,13 @@ export default function ReviewsCarousel() {
     };
 
     startAutoScroll();
-    el.addEventListener('mouseover', stopAutoScroll);
-    el.addEventListener('mouseout', startAutoScroll);
+    el.addEventListener("mouseover", stopAutoScroll);
+    el.addEventListener("mouseout", startAutoScroll);
 
     return () => {
       stopAutoScroll();
-      el.removeEventListener('mouseover', stopAutoScroll);
-      el.removeEventListener('mouseout', startAutoScroll);
+      el.removeEventListener("mouseover", stopAutoScroll);
+      el.removeEventListener("mouseout", startAutoScroll);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -77,16 +80,21 @@ export default function ReviewsCarousel() {
     <section aria-labelledby="reviews-heading" className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-8">
-          <h3 id="reviews-heading" className="text-2xl md:text-3xl font-extrabold text-slate-900">
+          <h3
+            id="reviews-heading"
+            className="text-2xl md:text-3xl font-extrabold text-slate-900"
+          >
             What agencies are saying
           </h3>
-          <p className="text-slate-600 mt-2">Real teams. Real results. Honest reviews.</p>
+          <p className="text-slate-600 mt-2">
+            Real teams. Real results. Honest reviews.
+          </p>
         </div>
 
         <div
           ref={containerRef}
           className="flex flex-col md:flex-row gap-6 overflow-x-auto md:overflow-x-visible no-scrollbar py-4 px-1 md:snap-x snap-mandatory scroll-smooth"
-          style={{ WebkitOverflowScrolling: 'touch' }}
+          style={{ WebkitOverflowScrolling: "touch" }}
         >
           {reviews.map((r, idx) => (
             <article
@@ -108,7 +116,9 @@ export default function ReviewsCarousel() {
                     <Star className="w-4 h-4" />
                     <Star className="w-4 h-4" />
                   </div>
-                  <p className="mt-3 text-slate-700 leading-relaxed">{r.quote}</p>
+                  <p className="mt-3 text-slate-700 leading-relaxed">
+                    {r.quote}
+                  </p>
 
                   <div className="mt-4">
                     <div className="text-slate-900 font-semibold">{r.name}</div>

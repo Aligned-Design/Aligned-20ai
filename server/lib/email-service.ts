@@ -3,17 +3,18 @@
  * Supports feature flagging for testing and development
  */
 
-import sgMail from '@sendgrid/mail';
-import nodemailer from 'nodemailer';
-import { SendEmailOptions, EmailSendResult } from '@shared/approvals';
+import sgMail from "@sendgrid/mail";
+import nodemailer from "nodemailer";
+import { SendEmailOptions, EmailSendResult } from "@shared/approvals";
 
 // Configuration
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@aligned-ai.com';
-const EMAIL_REPLY_TO = process.env.EMAIL_REPLY_TO || 'support@aligned-ai.com';
-const ENABLE_EMAILS = process.env.EMAIL_SERVICE_ENABLED === 'true';
-const USE_SENDGRID = process.env.EMAIL_PROVIDER === 'sendgrid' && SENDGRID_API_KEY;
-const NODE_ENV = process.env.NODE_ENV || 'development';
+const EMAIL_FROM = process.env.EMAIL_FROM || "noreply@aligned-ai.com";
+const EMAIL_REPLY_TO = process.env.EMAIL_REPLY_TO || "support@aligned-ai.com";
+const ENABLE_EMAILS = process.env.EMAIL_SERVICE_ENABLED === "true";
+const USE_SENDGRID =
+  process.env.EMAIL_PROVIDER === "sendgrid" && SENDGRID_API_KEY;
+const NODE_ENV = process.env.NODE_ENV || "development";
 
 // Nodemailer test account (for development)
 let testAccount: any = null;
@@ -24,25 +25,25 @@ let transporter: any = null;
  */
 export async function initializeEmailService(): Promise<void> {
   if (!ENABLE_EMAILS) {
-    console.log('[Email Service] Email notifications disabled');
+    console.log("[Email Service] Email notifications disabled");
     return;
   }
 
   if (USE_SENDGRID) {
     try {
       sgMail.setApiKey(SENDGRID_API_KEY!);
-      console.log('[Email Service] SendGrid initialized');
+      console.log("[Email Service] SendGrid initialized");
     } catch (error) {
-      console.error('[Email Service] Failed to initialize SendGrid:', error);
+      console.error("[Email Service] Failed to initialize SendGrid:", error);
       throw error;
     }
   } else {
     // Use Nodemailer for development/testing
     try {
-      if (NODE_ENV === 'development' || NODE_ENV === 'test') {
+      if (NODE_ENV === "development" || NODE_ENV === "test") {
         testAccount = await nodemailer.createTestAccount();
         transporter = nodemailer.createTransport({
-          host: 'smtp.ethereal.email',
+          host: "smtp.ethereal.email",
           port: 587,
           secure: false,
           auth: {
@@ -50,22 +51,22 @@ export async function initializeEmailService(): Promise<void> {
             pass: testAccount.pass,
           },
         });
-        console.log('[Email Service] Nodemailer (test) initialized');
+        console.log("[Email Service] Nodemailer (test) initialized");
       } else {
         // Production SMTP fallback
         transporter = nodemailer.createTransport({
           host: process.env.SMTP_HOST,
-          port: parseInt(process.env.SMTP_PORT || '587'),
-          secure: process.env.SMTP_SECURE === 'true',
+          port: parseInt(process.env.SMTP_PORT || "587"),
+          secure: process.env.SMTP_SECURE === "true",
           auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASSWORD,
           },
         });
-        console.log('[Email Service] Nodemailer (SMTP) initialized');
+        console.log("[Email Service] Nodemailer (SMTP) initialized");
       }
     } catch (error) {
-      console.error('[Email Service] Failed to initialize Nodemailer:', error);
+      console.error("[Email Service] Failed to initialize Nodemailer:", error);
       throw error;
     }
   }
@@ -74,9 +75,15 @@ export async function initializeEmailService(): Promise<void> {
 /**
  * Send an email notification
  */
-export async function sendEmail(options: SendEmailOptions, retryCount = 0): Promise<EmailSendResult> {
+export async function sendEmail(
+  options: SendEmailOptions,
+  retryCount = 0,
+): Promise<EmailSendResult> {
   if (!ENABLE_EMAILS) {
-    console.log('[Email Service] Email sending disabled, skipping:', options.to);
+    console.log(
+      "[Email Service] Email sending disabled, skipping:",
+      options.to,
+    );
     return { success: true, retries: 0 };
   }
 
@@ -105,12 +112,17 @@ export async function sendEmail(options: SendEmailOptions, retryCount = 0): Prom
       retries: retryCount,
     };
   } catch (error) {
-    console.error(`[Email Service] Failed to send email to ${options.to}:`, error);
+    console.error(
+      `[Email Service] Failed to send email to ${options.to}:`,
+      error,
+    );
 
     // Retry logic
     if (retryCount < MAX_RETRIES) {
       const delay = RETRY_DELAY_MS * Math.pow(2, retryCount); // Exponential backoff
-      console.log(`[Email Service] Retrying in ${delay}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`);
+      console.log(
+        `[Email Service] Retrying in ${delay}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`,
+      );
 
       await new Promise((resolve) => setTimeout(resolve, delay));
       return sendEmail(options, retryCount + 1);
@@ -118,7 +130,7 @@ export async function sendEmail(options: SendEmailOptions, retryCount = 0): Prom
 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
       retries: retryCount,
     };
   }
@@ -137,14 +149,14 @@ async function sendViaSegndGrid(options: SendEmailOptions): Promise<unknown> {
     text: options.textBody,
     // Custom args for tracking
     customArgs: {
-      brandId: options.brandId || 'unknown',
-      userId: options.userId || 'unknown',
-      type: options.notificationType || 'general',
+      brandId: options.brandId || "unknown",
+      userId: options.userId || "unknown",
+      type: options.notificationType || "general",
     },
   };
 
   const response = await sgMail.send(msg);
-  return { messageId: response[0].headers['x-message-id'] };
+  return { messageId: response[0].headers["x-message-id"] };
 }
 
 /**
@@ -152,7 +164,7 @@ async function sendViaSegndGrid(options: SendEmailOptions): Promise<unknown> {
  */
 async function sendViaNodemailer(options: SendEmailOptions): Promise<unknown> {
   if (!transporter) {
-    throw new Error('Nodemailer transporter not initialized');
+    throw new Error("Nodemailer transporter not initialized");
   }
 
   const info = await transporter.sendMail({
@@ -163,16 +175,16 @@ async function sendViaNodemailer(options: SendEmailOptions): Promise<unknown> {
     html: options.htmlBody,
     text: options.textBody,
     headers: {
-      'X-Brand-ID': options.brandId || 'unknown',
-      'X-User-ID': options.userId || 'unknown',
-      'X-Notification-Type': options.notificationType || 'general',
+      "X-Brand-ID": options.brandId || "unknown",
+      "X-User-ID": options.userId || "unknown",
+      "X-Notification-Type": options.notificationType || "general",
     },
   });
 
   // Log preview URL for test emails
-  if (NODE_ENV === 'development' && testAccount) {
+  if (NODE_ENV === "development" && testAccount) {
     const previewUrl = nodemailer.getTestMessageUrl(info);
-    console.log('[Email Service] Test email preview:', previewUrl);
+    console.log("[Email Service] Test email preview:", previewUrl);
   }
 
   return info;
@@ -183,7 +195,7 @@ async function sendViaNodemailer(options: SendEmailOptions): Promise<unknown> {
  */
 export async function sendEmailBatch(
   emails: SendEmailOptions[],
-  concurrency = 5
+  concurrency = 5,
 ): Promise<EmailSendResult[]> {
   const results: EmailSendResult[] = [];
   const pending = [...emails];
@@ -219,8 +231,8 @@ export async function checkEmailServiceHealth(): Promise<{
   if (!ENABLE_EMAILS) {
     return {
       healthy: true,
-      provider: 'disabled',
-      message: 'Email service is disabled',
+      provider: "disabled",
+      message: "Email service is disabled",
     };
   }
 
@@ -230,8 +242,8 @@ export async function checkEmailServiceHealth(): Promise<{
       // In practice, this would be a real health check endpoint
       return {
         healthy: true,
-        provider: 'sendgrid',
-        message: 'SendGrid is configured and ready',
+        provider: "sendgrid",
+        message: "SendGrid is configured and ready",
       };
     } else {
       // Verify Nodemailer connection
@@ -239,21 +251,21 @@ export async function checkEmailServiceHealth(): Promise<{
         await (transporter as any).verify();
         return {
           healthy: true,
-          provider: 'nodemailer',
-          message: 'Nodemailer SMTP connection verified',
+          provider: "nodemailer",
+          message: "Nodemailer SMTP connection verified",
         };
       }
       return {
         healthy: false,
-        provider: 'nodemailer',
-        message: 'Nodemailer transporter not initialized',
+        provider: "nodemailer",
+        message: "Nodemailer transporter not initialized",
       };
     }
   } catch (error) {
     return {
       healthy: false,
-      provider: USE_SENDGRID ? 'sendgrid' : 'nodemailer',
-      message: error instanceof Error ? error.message : 'Unknown error',
+      provider: USE_SENDGRID ? "sendgrid" : "nodemailer",
+      message: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }

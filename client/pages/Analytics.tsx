@@ -1,10 +1,18 @@
-import { useBrand } from '@/contexts/BrandContext';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { HelpTooltip } from '@/components/ui/help-tooltip';
-import { BarChart3, TrendingUp, TrendingDown, Eye, Heart, Share2, MessageCircle } from 'lucide-react';
-import { EmptyState } from '@/components/ui/empty-state';
-import { DashboardSkeleton } from '@/components/ui/skeletons';
+import { useBrand } from "@/contexts/BrandContext";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
+import {
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  Eye,
+  Heart,
+  Share2,
+  MessageCircle,
+} from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
+import { DashboardSkeleton } from "@/components/ui/skeletons";
 
 export default function Analytics() {
   const { currentBrand, loading } = useBrand();
@@ -31,7 +39,10 @@ export default function Analytics() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-bold">Analytics & Insights</h1>
-            <HelpTooltip content="Track your content performance across all platforms. See reach, engagement, and AI-powered recommendations to improve your strategy." side="bottom" />
+            <HelpTooltip
+              content="Track your content performance across all platforms. See reach, engagement, and AI-powered recommendations to improve your strategy."
+              side="bottom"
+            />
           </div>
           <p className="text-muted-foreground mt-1">
             Performance metrics for {currentBrand.name}
@@ -79,7 +90,10 @@ export default function Analytics() {
         <div className="rounded-xl border bg-card p-6">
           <div className="flex items-center gap-2 mb-4">
             <h3 className="text-lg font-semibold">Top Performing Content</h3>
-            <HelpTooltip content="Your best-performing posts this month. Use these as a template for future content to replicate success." side="right" />
+            <HelpTooltip
+              content="Your best-performing posts this month. Use these as a template for future content to replicate success."
+              side="right"
+            />
           </div>
           <div className="space-y-3">
             <PerformanceItem
@@ -105,8 +119,13 @@ export default function Analytics() {
 
         <div className="rounded-xl border bg-card p-6">
           <div className="flex items-center gap-2 mb-4">
-            <h3 className="text-lg font-semibold">Advisor Agent Recommendations</h3>
-            <HelpTooltip content="AI-powered suggestions to improve your content strategy. Recommendations are based on your performance data." side="left" />
+            <h3 className="text-lg font-semibold">
+              Advisor Agent Recommendations
+            </h3>
+            <HelpTooltip
+              content="AI-powered suggestions to improve your content strategy. Recommendations are based on your performance data."
+              side="left"
+            />
           </div>
           <div className="space-y-4">
             <RecommendationItem
@@ -132,14 +151,32 @@ export default function Analytics() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-semibold">Platform Performance</h3>
-            <HelpTooltip content="How your content is performing on each platform. Focus efforts on platforms with highest engagement growth." side="right" />
+            <HelpTooltip
+              content="How your content is performing on each platform. Focus efforts on platforms with highest engagement growth."
+              side="right"
+            />
           </div>
           <Badge variant="outline">Last 30 days</Badge>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
-          <PlatformCard platform="Instagram" posts={12} engagement={2847} growth="+18%" />
-          <PlatformCard platform="LinkedIn" posts={8} engagement={1923} growth="+24%" />
-          <PlatformCard platform="Facebook" posts={10} engagement={1456} growth="+12%" />
+          <PlatformCard
+            platform="Instagram"
+            posts={12}
+            engagement={2847}
+            growth="+18%"
+          />
+          <PlatformCard
+            platform="LinkedIn"
+            posts={8}
+            engagement={1923}
+            growth="+24%"
+          />
+          <PlatformCard
+            platform="Facebook"
+            posts={10}
+            engagement={1456}
+            growth="+12%"
+          />
         </div>
       </div>
     </div>
@@ -157,12 +194,12 @@ function MetricCard({
   title: string;
   value: string;
   change: string;
-  trend: 'up' | 'down';
+  trend: "up" | "down";
   icon: React.ReactNode;
   tooltip?: string;
 }) {
-  const TrendIcon = trend === 'up' ? TrendingUp : TrendingDown;
-  const trendColor = trend === 'up' ? 'text-green-600' : 'text-red-600';
+  const TrendIcon = trend === "up" ? TrendingUp : TrendingDown;
+  const trendColor = trend === "up" ? "text-green-600" : "text-red-600";
 
   return (
     <div className="rounded-xl border bg-card p-6">
@@ -177,7 +214,9 @@ function MetricCard({
       <div className="flex items-center gap-1 mt-1">
         <TrendIcon className={`h-4 w-4 ${trendColor}`} />
         <span className={`text-sm font-medium ${trendColor}`}>{change}</span>
-        <span className="text-xs text-muted-foreground ml-1">vs last month</span>
+        <span className="text-xs text-muted-foreground ml-1">
+          vs last month
+        </span>
       </div>
     </div>
   );
@@ -215,14 +254,14 @@ function RecommendationItem({
   title,
   description,
 }: {
-  priority: 'high' | 'medium' | 'low';
+  priority: "high" | "medium" | "low";
   title: string;
   description: string;
 }) {
   const priorityConfig = {
-    high: { color: 'bg-red-500', label: 'High' },
-    medium: { color: 'bg-yellow-500', label: 'Medium' },
-    low: { color: 'bg-blue-500', label: 'Low' },
+    high: { color: "bg-red-500", label: "High" },
+    medium: { color: "bg-yellow-500", label: "Medium" },
+    low: { color: "bg-blue-500", label: "Low" },
   };
 
   const config = priorityConfig[priority];

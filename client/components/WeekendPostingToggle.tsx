@@ -8,7 +8,13 @@
 import React, { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { AlertCircle, Calendar } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -23,7 +29,7 @@ export const WeekendPostingToggle: React.FC<WeekendPostingToggleProps> = ({
   enabled,
   onToggle,
   isLoading = false,
-  error
+  error,
 }) => {
   const [showDetails, setShowDetails] = useState(false);
 
@@ -50,10 +56,7 @@ export const WeekendPostingToggle: React.FC<WeekendPostingToggleProps> = ({
               disabled={isLoading}
               aria-label="Enable weekend posting"
             />
-            <Label
-              htmlFor="weekend-posting"
-              className="flex-1 cursor-pointer"
-            >
+            <Label htmlFor="weekend-posting" className="flex-1 cursor-pointer">
               <div className="font-semibold">Allow Weekend Posts</div>
               <div className="text-sm text-muted-foreground">
                 {enabled
@@ -104,8 +107,9 @@ export const WeekendPostingToggle: React.FC<WeekendPostingToggleProps> = ({
               <div>
                 <strong>Timezone Consideration:</strong>
                 <p className="text-muted-foreground mt-1">
-                  Weekend boundaries are determined by your brand timezone setting.
-                  Adjusting your timezone will update when weekends are considered.
+                  Weekend boundaries are determined by your brand timezone
+                  setting. Adjusting your timezone will update when weekends are
+                  considered.
                 </p>
               </div>
             </div>

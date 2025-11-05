@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Clock,
   ChevronRight,
@@ -12,9 +12,9 @@ import {
   RotateCcw,
   Copy,
   Eye,
-  Trash2
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  Trash2,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ContentVersion {
   id: string;
@@ -24,13 +24,17 @@ interface ContentVersion {
   platform: string;
   createdBy?: string;
   createdAt: string;
-  status: 'draft' | 'approved' | 'published' | 'archived';
+  status: "draft" | "approved" | "published" | "archived";
   bfsScore?: number;
   linterPassed: boolean;
   complianceIssuesCount: number;
-  changeType: 'created' | 'regenerated' | 'edited' | 'approved' | 'published';
+  changeType: "created" | "regenerated" | "edited" | "approved" | "published";
   changeReason?: string;
-  metadata?: { agentType?: string; regenerationCount?: number; tags?: string[] };
+  metadata?: {
+    agentType?: string;
+    regenerationCount?: number;
+    tags?: string[];
+  };
 }
 
 interface VersionDiff {
@@ -51,7 +55,7 @@ interface VersionHistoryViewerProps {
 
 export function VersionHistoryViewer({
   contentId,
-  className
+  className,
 }: VersionHistoryViewerProps) {
   const [versions, setVersions] = useState<ContentVersion[]>([]);
   const [selectedVersionA, setSelectedVersionA] = useState<number | null>(null);
@@ -75,7 +79,7 @@ export function VersionHistoryViewer({
     try {
       setLoading(true);
       const response = await fetch(`/api/content/${contentId}/versions`);
-      if (!response.ok) throw new Error('Failed to load versions');
+      if (!response.ok) throw new Error("Failed to load versions");
 
       const data = await response.json();
       setVersions(data.versions || []);
@@ -86,7 +90,7 @@ export function VersionHistoryViewer({
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load versions');
+      setError(err instanceof Error ? err.message : "Failed to load versions");
     } finally {
       setLoading(false);
     }
@@ -95,32 +99,35 @@ export function VersionHistoryViewer({
   const loadDiff = async () => {
     try {
       const response = await fetch(
-        `/api/content/${contentId}/versions/diff?a=${selectedVersionA}&b=${selectedVersionB}`
+        `/api/content/${contentId}/versions/diff?a=${selectedVersionA}&b=${selectedVersionB}`,
       );
-      if (!response.ok) throw new Error('Failed to load diff');
+      if (!response.ok) throw new Error("Failed to load diff");
 
       const data = await response.json();
       setDiff(data.diff);
     } catch (err) {
-      console.error('Error loading diff:', err);
+      console.error("Error loading diff:", err);
     }
   };
 
   const handleRollback = async (versionNumber: number) => {
     try {
-      const response = await fetch(`/api/content/${contentId}/versions/${versionNumber}/rollback`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: 'User initiated rollback' })
-      });
+      const response = await fetch(
+        `/api/content/${contentId}/versions/${versionNumber}/rollback`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reason: "User initiated rollback" }),
+        },
+      );
 
       if (response.ok) {
         await loadVersions();
       } else {
-        setError('Failed to rollback version');
+        setError("Failed to rollback version");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Rollback failed');
+      setError(err instanceof Error ? err.message : "Rollback failed");
     }
   };
 
@@ -141,7 +148,12 @@ export function VersionHistoryViewer({
           <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
           <div>
             <p className="font-medium text-red-900">{error}</p>
-            <Button onClick={loadVersions} variant="outline" size="sm" className="mt-2">
+            <Button
+              onClick={loadVersions}
+              variant="outline"
+              size="sm"
+              className="mt-2"
+            >
               Retry
             </Button>
           </div>
@@ -166,7 +178,7 @@ export function VersionHistoryViewer({
   }
 
   return (
-    <Tabs defaultValue="timeline" className={cn('space-y-4', className)}>
+    <Tabs defaultValue="timeline" className={cn("space-y-4", className)}>
       <TabsList>
         <TabsTrigger value="timeline">Timeline</TabsTrigger>
         <TabsTrigger value="compare">Compare</TabsTrigger>
@@ -179,12 +191,14 @@ export function VersionHistoryViewer({
             <Card
               key={version.id}
               className={cn(
-                'cursor-pointer transition-all',
-                expandedVersion === version.version ? 'ring-2 ring-blue-500' : ''
+                "cursor-pointer transition-all",
+                expandedVersion === version.version
+                  ? "ring-2 ring-blue-500"
+                  : "",
               )}
               onClick={() =>
                 setExpandedVersion(
-                  expandedVersion === version.version ? null : version.version
+                  expandedVersion === version.version ? null : version.version,
                 )
               }
             >
@@ -192,13 +206,18 @@ export function VersionHistoryViewer({
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-start gap-3 flex-1">
                     <div className="flex flex-col items-center gap-1">
-                      <div className={cn(
-                        'w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold',
-                        version.status === 'published' ? 'bg-green-600' :
-                        version.status === 'approved' ? 'bg-blue-600' :
-                        version.status === 'archived' ? 'bg-gray-400' :
-                        'bg-yellow-600'
-                      )}>
+                      <div
+                        className={cn(
+                          "w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold",
+                          version.status === "published"
+                            ? "bg-green-600"
+                            : version.status === "approved"
+                              ? "bg-blue-600"
+                              : version.status === "archived"
+                                ? "bg-gray-400"
+                                : "bg-yellow-600",
+                        )}
+                      >
                         {version.version}
                       </div>
                       {idx < versions.length - 1 && (
@@ -215,7 +234,11 @@ export function VersionHistoryViewer({
                           {version.changeType}
                         </Badge>
                         <Badge
-                          variant={version.status === 'published' ? 'default' : 'secondary'}
+                          variant={
+                            version.status === "published"
+                              ? "default"
+                              : "secondary"
+                          }
                           className="text-xs"
                         >
                           {version.status}
@@ -238,10 +261,14 @@ export function VersionHistoryViewer({
                         {version.bfsScore !== undefined && (
                           <div className="flex items-center gap-1">
                             <span className="text-gray-600">BFS:</span>
-                            <span className={cn(
-                              'font-semibold',
-                              version.bfsScore >= 0.8 ? 'text-green-600' : 'text-orange-600'
-                            )}>
+                            <span
+                              className={cn(
+                                "font-semibold",
+                                version.bfsScore >= 0.8
+                                  ? "text-green-600"
+                                  : "text-orange-600",
+                              )}
+                            >
                               {(version.bfsScore * 100).toFixed(0)}%
                             </span>
                           </div>
@@ -256,17 +283,20 @@ export function VersionHistoryViewer({
                         </div>
                         {version.complianceIssuesCount > 0 && (
                           <div className="text-red-600">
-                            {version.complianceIssuesCount} issue{version.complianceIssuesCount > 1 ? 's' : ''}
+                            {version.complianceIssuesCount} issue
+                            {version.complianceIssuesCount > 1 ? "s" : ""}
                           </div>
                         )}
                       </div>
                     </div>
                   </div>
 
-                  <ChevronRight className={cn(
-                    'h-5 w-5 text-gray-400 transition-transform',
-                    expandedVersion === version.version ? 'rotate-90' : ''
-                  )} />
+                  <ChevronRight
+                    className={cn(
+                      "h-5 w-5 text-gray-400 transition-transform",
+                      expandedVersion === version.version ? "rotate-90" : "",
+                    )}
+                  />
                 </div>
 
                 {/* Expanded Content */}
@@ -274,7 +304,9 @@ export function VersionHistoryViewer({
                   <div className="mt-4 pt-4 border-t space-y-3">
                     {/* Content Preview */}
                     <div>
-                      <p className="text-xs font-medium text-gray-600 mb-2">Content:</p>
+                      <p className="text-xs font-medium text-gray-600 mb-2">
+                        Content:
+                      </p>
                       <div className="bg-gray-50 rounded p-3 text-sm max-h-40 overflow-auto">
                         {version.content}
                       </div>
@@ -300,12 +332,12 @@ export function VersionHistoryViewer({
                           e.stopPropagation();
                           handleRollback(version.version);
                         }}
-                        disabled={version.status === 'published'}
+                        disabled={version.status === "published"}
                       >
                         <RotateCcw className="h-3 w-3 mr-1" />
                         Rollback
                       </Button>
-                      {version.status !== 'archived' && (
+                      {version.status !== "archived" && (
                         <Button
                           size="sm"
                           variant="outline"
@@ -332,36 +364,48 @@ export function VersionHistoryViewer({
         {/* Version Selection */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Select Versions to Compare</CardTitle>
+            <CardTitle className="text-base">
+              Select Versions to Compare
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Version A</label>
+                <label className="block text-sm font-medium mb-2">
+                  Version A
+                </label>
                 <select
-                  value={selectedVersionA || ''}
-                  onChange={(e) => setSelectedVersionA(parseInt(e.target.value))}
+                  value={selectedVersionA || ""}
+                  onChange={(e) =>
+                    setSelectedVersionA(parseInt(e.target.value))
+                  }
                   className="w-full rounded border border-gray-300 p-2 text-sm"
                 >
                   <option value="">Select version</option>
                   {versions.map((v) => (
                     <option key={v.id} value={v.version}>
-                      v{v.version} - {new Date(v.createdAt).toLocaleDateString()}
+                      v{v.version} -{" "}
+                      {new Date(v.createdAt).toLocaleDateString()}
                     </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Version B</label>
+                <label className="block text-sm font-medium mb-2">
+                  Version B
+                </label>
                 <select
-                  value={selectedVersionB || ''}
-                  onChange={(e) => setSelectedVersionB(parseInt(e.target.value))}
+                  value={selectedVersionB || ""}
+                  onChange={(e) =>
+                    setSelectedVersionB(parseInt(e.target.value))
+                  }
                   className="w-full rounded border border-gray-300 p-2 text-sm"
                 >
                   <option value="">Select version</option>
                   {versions.map((v) => (
                     <option key={v.id} value={v.version}>
-                      v{v.version} - {new Date(v.createdAt).toLocaleDateString()}
+                      v{v.version} -{" "}
+                      {new Date(v.createdAt).toLocaleDateString()}
                     </option>
                   ))}
                 </select>
@@ -395,24 +439,38 @@ export function VersionHistoryViewer({
                   {/* Quality Changes */}
                   {diff.bfsScoreChange !== undefined && (
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">BFS Score Change</span>
-                      <span className={cn(
-                        'font-semibold',
-                        diff.bfsScoreChange > 0 ? 'text-green-600' : 'text-red-600'
-                      )}>
-                        {diff.bfsScoreChange > 0 ? '+' : ''}{(diff.bfsScoreChange * 100).toFixed(1)}%
+                      <span className="text-sm text-gray-600">
+                        BFS Score Change
+                      </span>
+                      <span
+                        className={cn(
+                          "font-semibold",
+                          diff.bfsScoreChange > 0
+                            ? "text-green-600"
+                            : "text-red-600",
+                        )}
+                      >
+                        {diff.bfsScoreChange > 0 ? "+" : ""}
+                        {(diff.bfsScoreChange * 100).toFixed(1)}%
                       </span>
                     </div>
                   )}
 
                   {diff.complianceIssuesChange !== undefined && (
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Compliance Issues Change</span>
-                      <span className={cn(
-                        'font-semibold',
-                        diff.complianceIssuesChange < 0 ? 'text-green-600' : 'text-red-600'
-                      )}>
-                        {diff.complianceIssuesChange > 0 ? '+' : ''}{diff.complianceIssuesChange}
+                      <span className="text-sm text-gray-600">
+                        Compliance Issues Change
+                      </span>
+                      <span
+                        className={cn(
+                          "font-semibold",
+                          diff.complianceIssuesChange < 0
+                            ? "text-green-600"
+                            : "text-red-600",
+                        )}
+                      >
+                        {diff.complianceIssuesChange > 0 ? "+" : ""}
+                        {diff.complianceIssuesChange}
                       </span>
                     </div>
                   )}

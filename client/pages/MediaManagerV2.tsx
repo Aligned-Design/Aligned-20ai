@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Download,
   Trash2,
@@ -23,10 +23,10 @@ import {
   HardDrive,
   Grid,
   List,
-  Zap
-} from 'lucide-react';
-import { MediaUploadWithProgress } from '@/components/media/MediaUploadWithProgress';
-import { cn } from '@/lib/utils';
+  Zap,
+} from "lucide-react";
+import { MediaUploadWithProgress } from "@/components/media/MediaUploadWithProgress";
+import { cn } from "@/lib/utils";
 
 interface MediaAsset {
   id: string;
@@ -57,14 +57,16 @@ export default function MediaManagerV2() {
   const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | 'all'>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | "all">(
+    "all",
+  );
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedAssets, setSelectedAssets] = useState<Set<string>>(new Set());
-  const [activeTab, setActiveTab] = useState('library');
+  const [activeTab, setActiveTab] = useState("library");
 
-  const brandId = 'demo-brand'; // In real app, get from context
-  const tenantId = 'demo-tenant'; // In real app, get from context
+  const brandId = "demo-brand"; // In real app, get from context
+  const tenantId = "demo-tenant"; // In real app, get from context
 
   useEffect(() => {
     loadAssets();
@@ -78,18 +80,18 @@ export default function MediaManagerV2() {
 
       const params = new URLSearchParams({
         brandId,
-        ...(selectedCategory !== 'all' && { category: selectedCategory }),
+        ...(selectedCategory !== "all" && { category: selectedCategory }),
         ...(searchQuery && { search: searchQuery }),
-        limit: '100'
+        limit: "100",
       });
 
       const response = await fetch(`/api/media/list?${params}`);
-      if (!response.ok) throw new Error('Failed to load assets');
+      if (!response.ok) throw new Error("Failed to load assets");
 
       const data = await response.json();
       setAssets(data.assets || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load assets');
+      setError(err instanceof Error ? err.message : "Failed to load assets");
     } finally {
       setLoading(false);
     }
@@ -103,33 +105,33 @@ export default function MediaManagerV2() {
         setStorageInfo(data);
       }
     } catch (err) {
-      console.error('Failed to load storage info:', err);
+      console.error("Failed to load storage info:", err);
     }
   };
 
   const handleUploadComplete = (uploadedAssets: unknown[]) => {
-    const typed = (uploadedAssets as MediaAsset[]);
-    setAssets(prev => [...typed, ...prev]);
+    const typed = uploadedAssets as MediaAsset[];
+    setAssets((prev) => [...typed, ...prev]);
     loadStorageInfo();
-    setActiveTab('library');
+    setActiveTab("library");
   };
 
   const handleDelete = async (assetId: string) => {
-    if (!confirm('Delete this asset?')) return;
+    if (!confirm("Delete this asset?")) return;
 
     try {
       const response = await fetch(`/api/media/${assetId}/delete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ brandId })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brandId }),
       });
 
       if (response.ok) {
-        setAssets(prev => prev.filter(a => a.id !== assetId));
+        setAssets((prev) => prev.filter((a) => a.id !== assetId));
         loadStorageInfo();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Delete failed');
+      setError(err instanceof Error ? err.message : "Delete failed");
     }
   };
 
@@ -138,48 +140,50 @@ export default function MediaManagerV2() {
     if (!confirm(`Delete ${selectedAssets.size} asset(s)?`)) return;
 
     try {
-      const response = await fetch('/api/media/bulk-delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/media/bulk-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           assetIds: Array.from(selectedAssets),
-          brandId
-        })
+          brandId,
+        }),
       });
 
       if (response.ok) {
-        setAssets(prev => prev.filter(a => !selectedAssets.has(a.id)));
+        setAssets((prev) => prev.filter((a) => !selectedAssets.has(a.id)));
         setSelectedAssets(new Set());
         loadStorageInfo();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Bulk delete failed');
+      setError(err instanceof Error ? err.message : "Bulk delete failed");
     }
   };
 
   const handleDownload = (asset: MediaAsset) => {
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = asset.url;
     link.download = asset.filename;
     link.click();
   };
 
-  const filteredAssets = assets.filter(asset => {
+  const filteredAssets = assets.filter((asset) => {
     if (searchQuery) {
-      return asset.filename.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        asset.metadata.aiTags?.some(tag =>
-          tag.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+      return (
+        asset.filename.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        asset.metadata.aiTags?.some((tag) =>
+          tag.toLowerCase().includes(searchQuery.toLowerCase()),
+        )
+      );
     }
     return true;
   });
 
   const formatBytes = (bytes: number) => {
-    if (bytes === 0) return '0 B';
+    if (bytes === 0) return "0 B";
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const sizes = ["B", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return (bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
+    return (bytes / Math.pow(k, i)).toFixed(2) + " " + sizes[i];
   };
 
   return (
@@ -191,7 +195,9 @@ export default function MediaManagerV2() {
             <Database className="h-8 w-8" />
             Media Manager
           </h1>
-          <p className="text-gray-600">Organize, search, and reuse your brand assets</p>
+          <p className="text-gray-600">
+            Organize, search, and reuse your brand assets
+          </p>
         </div>
       </div>
 
@@ -204,7 +210,8 @@ export default function MediaManagerV2() {
                 <div>
                   <p className="text-sm text-gray-600">Storage Usage</p>
                   <p className="text-2xl font-bold">
-                    {formatBytes(storageInfo.total)} / {formatBytes(storageInfo.limit)}
+                    {formatBytes(storageInfo.total)} /{" "}
+                    {formatBytes(storageInfo.limit)}
                   </p>
                 </div>
                 <div className="text-right">
@@ -216,7 +223,9 @@ export default function MediaManagerV2() {
               {/* Progress Bar */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium">{storageInfo.percentUsed.toFixed(1)}% used</span>
+                  <span className="font-medium">
+                    {storageInfo.percentUsed.toFixed(1)}% used
+                  </span>
                   {storageInfo.percentUsed > 90 && (
                     <Badge variant="destructive">Storage full soon</Badge>
                   )}
@@ -224,24 +233,34 @@ export default function MediaManagerV2() {
                 <div className="w-full bg-gray-200 rounded-full h-3">
                   <div
                     className={cn(
-                      'h-3 rounded-full transition-all',
-                      storageInfo.percentUsed > 90 ? 'bg-red-600' :
-                      storageInfo.percentUsed > 80 ? 'bg-yellow-600' :
-                      'bg-green-600'
+                      "h-3 rounded-full transition-all",
+                      storageInfo.percentUsed > 90
+                        ? "bg-red-600"
+                        : storageInfo.percentUsed > 80
+                          ? "bg-yellow-600"
+                          : "bg-green-600",
                     )}
-                    style={{ width: `${Math.min(storageInfo.percentUsed, 100)}%` }}
+                    style={{
+                      width: `${Math.min(storageInfo.percentUsed, 100)}%`,
+                    }}
                   />
                 </div>
               </div>
 
               {/* Category Breakdown */}
               <div className="grid grid-cols-3 gap-2 pt-2 border-t">
-                {Object.entries(storageInfo.byCategory).map(([category, size]) => (
-                  <div key={category} className="text-center">
-                    <p className="text-xs text-gray-600 capitalize">{category}</p>
-                    <p className="text-sm font-semibold">{formatBytes(size)}</p>
-                  </div>
-                ))}
+                {Object.entries(storageInfo.byCategory).map(
+                  ([category, size]) => (
+                    <div key={category} className="text-center">
+                      <p className="text-xs text-gray-600 capitalize">
+                        {category}
+                      </p>
+                      <p className="text-sm font-semibold">
+                        {formatBytes(size)}
+                      </p>
+                    </div>
+                  ),
+                )}
               </div>
             </div>
           </CardContent>
@@ -274,7 +293,10 @@ export default function MediaManagerV2() {
 
             <div>
               <label className="block text-sm font-medium mb-2">Category</label>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <Select
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
+              >
                 <SelectTrigger className="w-40">
                   <SelectValue />
                 </SelectTrigger>
@@ -293,15 +315,15 @@ export default function MediaManagerV2() {
             {/* View Mode Toggle */}
             <div className="flex gap-2">
               <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
-                onClick={() => setViewMode('grid')}
+                variant={viewMode === "grid" ? "default" : "outline"}
+                onClick={() => setViewMode("grid")}
                 size="sm"
               >
                 <Grid className="h-4 w-4" />
               </Button>
               <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                onClick={() => setViewMode('list')}
+                variant={viewMode === "list" ? "default" : "outline"}
+                onClick={() => setViewMode("list")}
                 size="sm"
               >
                 <List className="h-4 w-4" />
@@ -312,7 +334,9 @@ export default function MediaManagerV2() {
           {/* Bulk Actions */}
           {selectedAssets.size > 0 && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
-              <span className="font-medium">{selectedAssets.size} asset(s) selected</span>
+              <span className="font-medium">
+                {selectedAssets.size} asset(s) selected
+              </span>
               <Button
                 onClick={handleBulkDelete}
                 variant="destructive"
@@ -342,14 +366,16 @@ export default function MediaManagerV2() {
                 <Database className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                 <p className="text-gray-500">No assets found</p>
                 <p className="text-sm text-gray-400">
-                  {searchQuery ? 'Try adjusting your search' : 'Upload files to get started'}
+                  {searchQuery
+                    ? "Try adjusting your search"
+                    : "Upload files to get started"}
                 </p>
               </CardContent>
             </Card>
-          ) : viewMode === 'grid' ? (
+          ) : viewMode === "grid" ? (
             /* Grid View */
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredAssets.map(asset => (
+              {filteredAssets.map((asset) => (
                 <div
                   key={asset.id}
                   className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
@@ -387,7 +413,9 @@ export default function MediaManagerV2() {
 
                   {/* Info */}
                   <div className="p-3 space-y-2">
-                    <p className="text-sm font-medium truncate">{asset.filename}</p>
+                    <p className="text-sm font-medium truncate">
+                      {asset.filename}
+                    </p>
                     <div className="flex flex-wrap gap-1">
                       <Badge variant="outline" className="text-xs">
                         {asset.category}
@@ -398,20 +426,25 @@ export default function MediaManagerV2() {
                     </div>
 
                     {/* Tags */}
-                    {asset.metadata.aiTags && asset.metadata.aiTags.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {asset.metadata.aiTags.slice(0, 2).map((tag, i) => (
-                          <Badge key={i} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                        {asset.metadata.aiTags.length > 2 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{asset.metadata.aiTags.length - 2}
-                          </Badge>
-                        )}
-                      </div>
-                    )}
+                    {asset.metadata.aiTags &&
+                      asset.metadata.aiTags.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {asset.metadata.aiTags.slice(0, 2).map((tag, i) => (
+                            <Badge
+                              key={i}
+                              variant="outline"
+                              className="text-xs"
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                          {asset.metadata.aiTags.length > 2 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{asset.metadata.aiTags.length - 2}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
 
                     {/* Usage */}
                     <p className="text-xs text-gray-600">
@@ -444,7 +477,7 @@ export default function MediaManagerV2() {
           ) : (
             /* List View */
             <div className="space-y-2">
-              {filteredAssets.map(asset => (
+              {filteredAssets.map((asset) => (
                 <div
                   key={asset.id}
                   className="border rounded-lg p-4 flex items-center gap-4 hover:bg-gray-50"

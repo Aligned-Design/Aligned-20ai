@@ -1,15 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Home, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Home,
   BarChart3,
   CheckCircle,
   Upload,
@@ -38,17 +44,22 @@ import {
   Plus,
   X,
   ChevronRight,
-  Sparkles
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { ClientDashboardData, ContentItem, ApprovalAction } from '@shared/client-portal';
-import { WorkflowTracker } from '@/components/workflow/WorkflowTracker';
-import { WorkflowAction } from '@shared/workflow';
+  Sparkles,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  ClientDashboardData,
+  ContentItem,
+  ApprovalAction,
+} from "@shared/client-portal";
+import { WorkflowTracker } from "@/components/workflow/WorkflowTracker";
+import { WorkflowAction } from "@shared/workflow";
 
 export default function ClientPortal() {
-  const [dashboardData, setDashboardData] = useState<ClientDashboardData | null>(null);
+  const [dashboardData, setDashboardData] =
+    useState<ClientDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState('overview');
+  const [activeSection, setActiveSection] = useState("overview");
 
   useEffect(() => {
     loadDashboardData();
@@ -59,13 +70,13 @@ export default function ClientPortal() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/client/dashboard');
+      const response = await fetch("/api/client/dashboard");
       if (response.ok) {
         const data = await response.json();
         setDashboardData(data as any);
       }
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
+      console.error("Failed to load dashboard data:", error);
     } finally {
       setLoading(false);
     }
@@ -74,27 +85,32 @@ export default function ClientPortal() {
   const applyClientBranding = () => {
     // Apply client brand colors and favicon
     if (dashboardData?.brandInfo?.colors?.primary) {
-      document.documentElement.style.setProperty('--color-primary', dashboardData.brandInfo.colors.primary);
+      document.documentElement.style.setProperty(
+        "--color-primary",
+        dashboardData.brandInfo.colors.primary,
+      );
     }
     if (dashboardData?.brandInfo?.favicon) {
-      const link = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
+      const link = document.querySelector(
+        "link[rel*='icon']",
+      ) as HTMLLinkElement;
       if (link) link.href = dashboardData.brandInfo.favicon;
     }
   };
 
   const handleWorkflowAction = async (action: WorkflowAction) => {
     try {
-      const response = await fetch('/api/client/workflow/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(action)
+      const response = await fetch("/api/client/workflow/action", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(action),
       });
 
       if (response.ok) {
         await loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to process workflow action:', error);
+      console.error("Failed to process workflow action:", error);
     }
   };
 
@@ -114,7 +130,9 @@ export default function ClientPortal() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600">Unable to load dashboard</p>
-          <Button onClick={loadDashboardData} className="mt-4">Try Again</Button>
+          <Button onClick={loadDashboardData} className="mt-4">
+            Try Again
+          </Button>
         </div>
       </div>
     );
@@ -128,8 +146,8 @@ export default function ClientPortal() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-6">
               {dashboardData.brandInfo.logo && (
-                <img 
-                  src={dashboardData.brandInfo.logo} 
+                <img
+                  src={dashboardData.brandInfo.logo}
                   alt={dashboardData.brandInfo.name}
                   className="h-16 w-16 rounded-lg object-cover"
                 />
@@ -141,7 +159,7 @@ export default function ClientPortal() {
                 <p className="text-gray-600 mt-1">Social Media Dashboard</p>
               </div>
             </div>
-            
+
             <div className="text-right">
               <Badge variant="outline" className="mb-2">
                 Last sync: {new Date().toLocaleDateString()}
@@ -157,26 +175,29 @@ export default function ClientPortal() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold text-blue-900 mb-2">
-                  Your November plan is {dashboardData.metrics.campaignProgress}% ready
+                  Your November plan is {dashboardData.metrics.campaignProgress}
+                  % ready
                 </h3>
-                <p className="text-blue-700">{dashboardData.aiInsight.description}</p>
+                <p className="text-blue-700">
+                  {dashboardData.aiInsight.description}
+                </p>
               </div>
               <div className="flex gap-3">
-                <ActionChip 
+                <ActionChip
                   icon={<CheckCircle className="h-4 w-4" />}
                   label={`Approve items (${dashboardData.metrics.pendingApprovals})`}
-                  onClick={() => setActiveSection('approvals')}
+                  onClick={() => setActiveSection("approvals")}
                   variant="primary"
                 />
-                <ActionChip 
+                <ActionChip
                   icon={<Upload className="h-4 w-4" />}
                   label="Upload assets"
-                  onClick={() => setActiveSection('uploads')}
+                  onClick={() => setActiveSection("uploads")}
                 />
-                <ActionChip 
+                <ActionChip
                   icon={<Share2 className="h-4 w-4" />}
                   label="Share analytics"
-                  onClick={() => setActiveSection('analytics')}
+                  onClick={() => setActiveSection("analytics")}
                 />
               </div>
             </div>
@@ -189,14 +210,43 @@ export default function ClientPortal() {
         <div className="max-w-7xl mx-auto px-6">
           <nav className="flex space-x-8">
             {[
-              { id: 'overview', label: 'At-a-Glance', icon: <Home className="h-4 w-4" /> },
-              { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="h-4 w-4" /> },
-              { id: 'approvals', label: 'Content Review', icon: <CheckCircle className="h-4 w-4" />, badge: dashboardData.metrics.pendingApprovals },
-              { id: 'uploads', label: 'Upload Assets', icon: <Upload className="h-4 w-4" /> },
-              { id: 'reviews', label: 'Reviews', icon: <Star className="h-4 w-4" /> },
-              { id: 'events', label: 'Events', icon: <Calendar className="h-4 w-4" /> },
-              { id: 'messages', label: 'Updates', icon: <MessageSquare className="h-4 w-4" /> }
-            ].map(item => (
+              {
+                id: "overview",
+                label: "At-a-Glance",
+                icon: <Home className="h-4 w-4" />,
+              },
+              {
+                id: "analytics",
+                label: "Analytics",
+                icon: <BarChart3 className="h-4 w-4" />,
+              },
+              {
+                id: "approvals",
+                label: "Content Review",
+                icon: <CheckCircle className="h-4 w-4" />,
+                badge: dashboardData.metrics.pendingApprovals,
+              },
+              {
+                id: "uploads",
+                label: "Upload Assets",
+                icon: <Upload className="h-4 w-4" />,
+              },
+              {
+                id: "reviews",
+                label: "Reviews",
+                icon: <Star className="h-4 w-4" />,
+              },
+              {
+                id: "events",
+                label: "Events",
+                icon: <Calendar className="h-4 w-4" />,
+              },
+              {
+                id: "messages",
+                label: "Updates",
+                icon: <MessageSquare className="h-4 w-4" />,
+              },
+            ].map((item) => (
               <button
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
@@ -204,7 +254,7 @@ export default function ClientPortal() {
                   "flex items-center gap-2 px-3 py-4 border-b-2 transition-colors",
                   activeSection === item.id
                     ? "border-primary text-primary"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
+                    : "border-transparent text-gray-600 hover:text-gray-900",
                 )}
               >
                 {item.icon}
@@ -222,19 +272,25 @@ export default function ClientPortal() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {activeSection === 'overview' && <OverviewSection data={dashboardData} />}
-        {activeSection === 'analytics' && <AnalyticsSection data={dashboardData} />}
-        {activeSection === 'approvals' && (
-          <ApprovalsSection 
-            data={dashboardData} 
+        {activeSection === "overview" && (
+          <OverviewSection data={dashboardData} />
+        )}
+        {activeSection === "analytics" && (
+          <AnalyticsSection data={dashboardData} />
+        )}
+        {activeSection === "approvals" && (
+          <ApprovalsSection
+            data={dashboardData}
             onUpdate={loadDashboardData}
             onWorkflowAction={handleWorkflowAction}
           />
         )}
-        {activeSection === 'uploads' && <UploadsSection />}
-        {activeSection === 'reviews' && <ReviewsSection />}
-        {activeSection === 'events' && <EventsSection />}
-        {activeSection === 'messages' && <MessagesSection data={dashboardData} />}
+        {activeSection === "uploads" && <UploadsSection />}
+        {activeSection === "reviews" && <ReviewsSection />}
+        {activeSection === "events" && <EventsSection />}
+        {activeSection === "messages" && (
+          <MessagesSection data={dashboardData} />
+        )}
       </div>
 
       {/* Footer */}
@@ -243,11 +299,17 @@ export default function ClientPortal() {
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
               {dashboardData.agencyInfo.logo && (
-                <img src={dashboardData.agencyInfo.logo} alt={dashboardData.agencyInfo.name} className="h-8 w-auto" />
+                <img
+                  src={dashboardData.agencyInfo.logo}
+                  alt={dashboardData.agencyInfo.name}
+                  className="h-8 w-auto"
+                />
               )}
               <div>
                 <p className="font-medium">{dashboardData.agencyInfo.name}</p>
-                <p className="text-sm text-gray-600">{dashboardData.agencyInfo.contactEmail}</p>
+                <p className="text-sm text-gray-600">
+                  {dashboardData.agencyInfo.contactEmail}
+                </p>
               </div>
             </div>
             <p className="text-xs text-gray-500">Powered by Aligned AI</p>
@@ -258,16 +320,21 @@ export default function ClientPortal() {
   );
 }
 
-function ActionChip({ icon, label, onClick, variant = 'default' }: {
+function ActionChip({
+  icon,
+  label,
+  onClick,
+  variant = "default",
+}: {
   icon: React.ReactNode;
   label: string;
   onClick: () => void;
-  variant?: 'default' | 'primary';
+  variant?: "default" | "primary";
 }) {
   return (
     <Button
       onClick={onClick}
-      variant={variant === 'primary' ? 'default' : 'outline'}
+      variant={variant === "primary" ? "default" : "outline"}
       size="sm"
       className="gap-2"
     >
@@ -326,10 +393,17 @@ function OverviewSection({ data }: { data: ClientDashboardData }) {
         <CardContent>
           <div className="space-y-3">
             {data.upcomingPosts.slice(0, 5).map((post) => (
-              <div key={post.id} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+              <div
+                key={post.id}
+                className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg"
+              >
                 <div className="flex-shrink-0 w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
                   {post.thumbnail ? (
-                    <img src={post.thumbnail} alt="" className="w-full h-full object-cover rounded-lg" />
+                    <img
+                      src={post.thumbnail}
+                      alt=""
+                      className="w-full h-full object-cover rounded-lg"
+                    />
                   ) : (
                     <ImageIcon className="h-6 w-6 text-gray-400" />
                   )}
@@ -340,13 +414,18 @@ function OverviewSection({ data }: { data: ClientDashboardData }) {
                       {post.platform}
                     </Badge>
                     <span className="text-sm text-gray-500">
-                      {post.scheduledFor && new Date(post.scheduledFor).toLocaleDateString()}
+                      {post.scheduledFor &&
+                        new Date(post.scheduledFor).toLocaleDateString()}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-700 line-clamp-2">{post.content}</p>
+                  <p className="text-sm text-gray-700 line-clamp-2">
+                    {post.content}
+                  </p>
                 </div>
-                <Badge variant={post.status === 'approved' ? 'default' : 'secondary'}>
-                  {post.status.replace('_', ' ')}
+                <Badge
+                  variant={post.status === "approved" ? "default" : "secondary"}
+                >
+                  {post.status.replace("_", " ")}
                 </Badge>
               </div>
             ))}
@@ -364,7 +443,9 @@ function OverviewSection({ data }: { data: ClientDashboardData }) {
         </CardHeader>
         <CardContent>
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-semibold text-blue-900 mb-2">{data.aiInsight.title}</h4>
+            <h4 className="font-semibold text-blue-900 mb-2">
+              {data.aiInsight.title}
+            </h4>
             <p className="text-blue-800">{data.aiInsight.description}</p>
           </div>
         </CardContent>
@@ -384,7 +465,9 @@ function AnalyticsSection({ data }: { data: ClientDashboardData }) {
         <h2 className="text-2xl font-bold">Shareable Analytics</h2>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Label htmlFor="explain-toggle" className="text-sm">Explain this</Label>
+            <Label htmlFor="explain-toggle" className="text-sm">
+              Explain this
+            </Label>
             <Switch
               id="explain-toggle"
               checked={explainMode}
@@ -418,10 +501,14 @@ function AnalyticsSection({ data }: { data: ClientDashboardData }) {
                 <div className="flex gap-3">
                   <Sparkles className="h-5 w-5 text-blue-500 mt-0.5" />
                   <div>
-                    <h4 className="font-medium text-blue-900 mb-1">AI Summary</h4>
+                    <h4 className="font-medium text-blue-900 mb-1">
+                      AI Summary
+                    </h4>
                     <p className="text-blue-800 text-sm">
-                      Reels drove +31% engagement vs images. Best time: Thu 3–5 pm. Keep testimonial stories weekly.
-                      Your audience responds best to behind-the-scenes content and educational carousels.
+                      Reels drove +31% engagement vs images. Best time: Thu 3–5
+                      pm. Keep testimonial stories weekly. Your audience
+                      responds best to behind-the-scenes content and educational
+                      carousels.
                     </p>
                   </div>
                 </div>
@@ -446,29 +533,32 @@ function AnalyticsSection({ data }: { data: ClientDashboardData }) {
   );
 }
 
-function ApprovalsSection({ 
-  data, 
-  onUpdate, 
-  onWorkflowAction 
-}: { 
-  data: ClientDashboardData; 
+function ApprovalsSection({
+  data,
+  onUpdate,
+  onWorkflowAction,
+}: {
+  data: ClientDashboardData;
   onUpdate: () => void;
   onWorkflowAction: (action: WorkflowAction) => void;
 }) {
   const [selectedApprovals, setSelectedApprovals] = useState<string[]>([]);
   const [previewItem, setPreviewItem] = useState<ContentItem | null>(null);
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>("all");
 
   const handleApproval = async (action: ApprovalAction) => {
     try {
-      const response = await fetch(`/api/client/content/${action.contentId}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          approved: action.action === 'approve',
-          comment: action.comment
-        })
-      });
+      const response = await fetch(
+        `/api/client/content/${action.contentId}/approve`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            approved: action.action === "approve",
+            comment: action.comment,
+          }),
+        },
+      );
 
       if (response.ok) {
         await onUpdate();
@@ -476,12 +566,12 @@ function ApprovalsSection({
         setPreviewItem(null);
       }
     } catch (error) {
-      console.error('Failed to process approval:', error);
+      console.error("Failed to process approval:", error);
     }
   };
 
-  const eligibleForBatch = data.pendingApprovals.filter(item => 
-    (item.bfsScore || 0) >= 0.8 && item.complianceBadges.length === 0
+  const eligibleForBatch = data.pendingApprovals.filter(
+    (item) => (item.bfsScore || 0) >= 0.8 && item.complianceBadges.length === 0,
   );
 
   return (
@@ -520,7 +610,8 @@ function ApprovalsSection({
           </CardHeader>
           <CardContent>
             <p className="text-green-700 text-sm mb-4">
-              These {eligibleForBatch.length} posts have high Brand Fit Scores (≥80%) and pass all compliance checks.
+              These {eligibleForBatch.length} posts have high Brand Fit Scores
+              (≥80%) and pass all compliance checks.
             </p>
             <Button className="gap-2">
               <CheckCircle className="h-4 w-4" />
@@ -542,13 +633,15 @@ function ApprovalsSection({
                   if (selected) {
                     setSelectedApprovals([...selectedApprovals, item.id]);
                   } else {
-                    setSelectedApprovals(selectedApprovals.filter(id => id !== item.id));
+                    setSelectedApprovals(
+                      selectedApprovals.filter((id) => id !== item.id),
+                    );
                   }
                 }}
                 onPreview={() => setPreviewItem(item)}
                 onApproval={handleApproval}
               />
-              
+
               {/* Workflow Progress */}
               {item.workflowInstance && (
                 <div className="mt-4 pt-4 border-t">
@@ -591,22 +684,22 @@ function UploadsSection() {
 
   const handleFileUpload = async (files: FileList) => {
     setUploading(true);
-    
+
     try {
       const formData = new FormData();
-      Array.from(files).forEach(file => formData.append('files', file));
-      
-      const response = await fetch('/api/client/media/upload', {
-        method: 'POST',
-        body: formData
+      Array.from(files).forEach((file) => formData.append("files", file));
+
+      const response = await fetch("/api/client/media/upload", {
+        method: "POST",
+        body: formData,
       });
 
       if (response.ok) {
         const result = await response.json();
-        setUploads(prev => [...prev, ...result.uploads]);
+        setUploads((prev) => [...prev, ...result.uploads]);
       }
     } catch (error) {
-      console.error('Upload failed:', error);
+      console.error("Upload failed:", error);
     } finally {
       setUploading(false);
     }
@@ -616,15 +709,13 @@ function UploadsSection() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Upload Client Assets</h2>
-        <Badge variant="outline">
-          Supported: PNG, JPG, MP4, PDF
-        </Badge>
+        <Badge variant="outline">Supported: PNG, JPG, MP4, PDF</Badge>
       </div>
 
       {/* Upload Zone */}
       <Card>
         <CardContent className="pt-6">
-          <div 
+          <div
             className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-primary transition-colors"
             onDrop={(e) => {
               e.preventDefault();
@@ -635,13 +726,17 @@ function UploadsSection() {
             onDragOver={(e) => e.preventDefault()}
           >
             <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Drag and drop files here</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Drag and drop files here
+            </h3>
             <p className="text-gray-600 mb-4">or click to browse</p>
             <input
               type="file"
               multiple
               accept="image/*,video/*,.pdf"
-              onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
+              onChange={(e) =>
+                e.target.files && handleFileUpload(e.target.files)
+              }
               className="hidden"
               id="file-upload"
             />
@@ -708,19 +803,26 @@ function UploadsSection() {
 
 // ...existing code... (other section components)
 
-function KPICard({ title, value, subtitle, growth, icon, color }: {
+function KPICard({
+  title,
+  value,
+  subtitle,
+  growth,
+  icon,
+  color,
+}: {
   title: string;
   value: string;
   subtitle: string;
   growth?: number;
   icon: React.ReactNode;
-  color: 'blue' | 'red' | 'green' | 'purple';
+  color: "blue" | "red" | "green" | "purple";
 }) {
   const colorClasses = {
-    blue: 'text-blue-600 bg-blue-100',
-    red: 'text-red-600 bg-red-100', 
-    green: 'text-green-600 bg-green-100',
-    purple: 'text-purple-600 bg-purple-100'
+    blue: "text-blue-600 bg-blue-100",
+    red: "text-red-600 bg-red-100",
+    green: "text-green-600 bg-green-100",
+    purple: "text-purple-600 bg-purple-100",
   };
 
   return (
@@ -732,15 +834,20 @@ function KPICard({ title, value, subtitle, growth, icon, color }: {
           </div>
           {growth !== undefined && (
             <div className="flex items-center gap-1">
-              <TrendingUp className={cn(
-                "h-4 w-4",
-                growth > 0 ? "text-green-500" : "text-red-500"
-              )} />
-              <span className={cn(
-                "text-sm font-medium",
-                growth > 0 ? "text-green-600" : "text-red-600"
-              )}>
-                {growth > 0 ? '+' : ''}{growth}%
+              <TrendingUp
+                className={cn(
+                  "h-4 w-4",
+                  growth > 0 ? "text-green-500" : "text-red-500",
+                )}
+              />
+              <span
+                className={cn(
+                  "text-sm font-medium",
+                  growth > 0 ? "text-green-600" : "text-red-600",
+                )}
+              >
+                {growth > 0 ? "+" : ""}
+                {growth}%
               </span>
             </div>
           )}
@@ -755,7 +862,13 @@ function KPICard({ title, value, subtitle, growth, icon, color }: {
   );
 }
 
-function ContentReviewCard({ content, selected, onSelect, onPreview, onApproval }: {
+function ContentReviewCard({
+  content,
+  selected,
+  onSelect,
+  onPreview,
+  onApproval,
+}: {
   content: ContentItem;
   selected: boolean;
   onSelect: (selected: boolean) => void;
@@ -763,7 +876,12 @@ function ContentReviewCard({ content, selected, onSelect, onPreview, onApproval 
   onApproval: (action: ApprovalAction) => void;
 }) {
   return (
-    <Card className={cn("transition-all hover:shadow-md", selected && "ring-2 ring-primary")}>
+    <Card
+      className={cn(
+        "transition-all hover:shadow-md",
+        selected && "ring-2 ring-primary",
+      )}
+    >
       <CardContent className="p-6">
         <div className="flex gap-4">
           <input
@@ -772,29 +890,38 @@ function ContentReviewCard({ content, selected, onSelect, onPreview, onApproval 
             onChange={(e) => onSelect(e.target.checked)}
             className="mt-1"
           />
-          
+
           <div className="flex-shrink-0 w-16 h-16 bg-gray-200 rounded-lg overflow-hidden">
             {content.thumbnail ? (
-              <img src={content.thumbnail} alt="" className="w-full h-full object-cover" />
+              <img
+                src={content.thumbnail}
+                alt=""
+                className="w-full h-full object-cover"
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <ImageIcon className="h-6 w-6 text-gray-400" />
               </div>
             )}
           </div>
-          
+
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <Badge variant="outline" className="capitalize text-xs">
                 {content.platform}
               </Badge>
               {content.bfsScore && (
-                <Badge variant={content.bfsScore >= 0.8 ? 'default' : 'secondary'} className="text-xs">
+                <Badge
+                  variant={content.bfsScore >= 0.8 ? "default" : "secondary"}
+                  className="text-xs"
+                >
                   BFS: {(content.bfsScore * 100).toFixed(0)}%
                 </Badge>
               )}
-              {content.complianceBadges.map(badge => (
-                <Badge key={badge} variant="outline" className="text-xs">{badge}</Badge>
+              {content.complianceBadges.map((badge) => (
+                <Badge key={badge} variant="outline" className="text-xs">
+                  {badge}
+                </Badge>
               ))}
               {content.scheduledFor && (
                 <span className="text-xs text-gray-500">
@@ -802,25 +929,34 @@ function ContentReviewCard({ content, selected, onSelect, onPreview, onApproval 
                 </span>
               )}
             </div>
-            
-            <p className="text-gray-700 text-sm mb-3 line-clamp-2">{content.content}</p>
-            
+
+            <p className="text-gray-700 text-sm mb-3 line-clamp-2">
+              {content.content}
+            </p>
+
             <div className="flex items-center gap-2">
               <Button size="sm" onClick={onPreview} variant="outline">
                 Preview
               </Button>
-              <Button 
+              <Button
                 size="sm"
-                onClick={() => onApproval({ contentId: content.id, action: 'approve' })}
+                onClick={() =>
+                  onApproval({ contentId: content.id, action: "approve" })
+                }
                 className="bg-green-600 hover:bg-green-700 gap-1"
               >
                 <ThumbsUp className="h-3 w-3" />
                 Approve
               </Button>
-              <Button 
+              <Button
                 size="sm"
                 variant="outline"
-                onClick={() => onApproval({ contentId: content.id, action: 'request_changes' })}
+                onClick={() =>
+                  onApproval({
+                    contentId: content.id,
+                    action: "request_changes",
+                  })
+                }
                 className="gap-1"
               >
                 <ThumbsDown className="h-3 w-3" />
@@ -834,12 +970,16 @@ function ContentReviewCard({ content, selected, onSelect, onPreview, onApproval 
   );
 }
 
-function ContentPreviewPanel({ content, onClose, onApproval }: {
+function ContentPreviewPanel({
+  content,
+  onClose,
+  onApproval,
+}: {
   content: ContentItem;
   onClose: () => void;
   onApproval: (action: ApprovalAction) => void;
 }) {
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
   const [showCommentBox, setShowCommentBox] = useState(false);
 
   return (
@@ -854,7 +994,11 @@ function ContentPreviewPanel({ content, onClose, onApproval }: {
         {/* Media Preview */}
         <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
           {content.thumbnail ? (
-            <img src={content.thumbnail} alt="" className="w-full h-full object-cover" />
+            <img
+              src={content.thumbnail}
+              alt=""
+              className="w-full h-full object-cover"
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <ImageIcon className="h-12 w-12 text-gray-400" />
@@ -869,12 +1013,14 @@ function ContentPreviewPanel({ content, onClose, onApproval }: {
               {content.platform}
             </Badge>
             {content.bfsScore && (
-              <Badge variant={content.bfsScore >= 0.8 ? 'default' : 'secondary'}>
+              <Badge
+                variant={content.bfsScore >= 0.8 ? "default" : "secondary"}
+              >
                 BFS: {(content.bfsScore * 100).toFixed(0)}%
               </Badge>
             )}
           </div>
-          
+
           <div className="space-y-3">
             <div>
               <Label className="text-sm font-medium">Caption</Label>
@@ -882,7 +1028,7 @@ function ContentPreviewPanel({ content, onClose, onApproval }: {
                 {content.content}
               </p>
             </div>
-            
+
             <div>
               <Label className="text-sm font-medium">Alt Text</Label>
               <p className="text-sm text-gray-600 mt-1">
@@ -894,7 +1040,9 @@ function ContentPreviewPanel({ content, onClose, onApproval }: {
 
         {/* Compliance Checks */}
         <div>
-          <Label className="text-sm font-medium mb-2 block">Compliance Checks</Label>
+          <Label className="text-sm font-medium mb-2 block">
+            Compliance Checks
+          </Label>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-green-500" />
@@ -913,15 +1061,17 @@ function ContentPreviewPanel({ content, onClose, onApproval }: {
 
         {/* Action Buttons */}
         <div className="space-y-3 pt-4 border-t">
-          <Button 
-            onClick={() => onApproval({ contentId: content.id, action: 'approve' })}
+          <Button
+            onClick={() =>
+              onApproval({ contentId: content.id, action: "approve" })
+            }
             className="w-full bg-green-600 hover:bg-green-700 gap-2"
           >
             <ThumbsUp className="h-4 w-4" />
             Approve & Schedule
           </Button>
-          
-          <Button 
+
+          <Button
             variant="outline"
             onClick={() => setShowCommentBox(!showCommentBox)}
             className="w-full gap-2"
@@ -929,7 +1079,7 @@ function ContentPreviewPanel({ content, onClose, onApproval }: {
             <ThumbsDown className="h-4 w-4" />
             Request Changes
           </Button>
-          
+
           {showCommentBox && (
             <div className="space-y-3">
               <Textarea
@@ -941,12 +1091,12 @@ function ContentPreviewPanel({ content, onClose, onApproval }: {
               <div className="flex gap-2">
                 <Button
                   onClick={() => {
-                    onApproval({ 
-                      contentId: content.id, 
-                      action: 'request_changes',
-                      comment 
+                    onApproval({
+                      contentId: content.id,
+                      action: "request_changes",
+                      comment,
                     });
-                    setComment('');
+                    setComment("");
                     setShowCommentBox(false);
                   }}
                   disabled={!comment.trim()}
@@ -956,8 +1106,8 @@ function ContentPreviewPanel({ content, onClose, onApproval }: {
                   <Send className="h-3 w-3" />
                   Send Feedback
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => setShowCommentBox(false)}
                   size="sm"
                 >
@@ -970,7 +1120,9 @@ function ContentPreviewPanel({ content, onClose, onApproval }: {
 
         {/* Version History */}
         <div>
-          <Label className="text-sm font-medium mb-2 block">Version History</Label>
+          <Label className="text-sm font-medium mb-2 block">
+            Version History
+          </Label>
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm">
               <History className="h-4 w-4 text-gray-400" />
@@ -983,28 +1135,34 @@ function ContentPreviewPanel({ content, onClose, onApproval }: {
   );
 }
 
-function ShareLinkDialog({ onClose, brandId }: { onClose: () => void; brandId: string }) {
-  const [shareUrl, setShareUrl] = useState('');
+function ShareLinkDialog({
+  onClose,
+  brandId,
+}: {
+  onClose: () => void;
+  brandId: string;
+}) {
+  const [shareUrl, setShareUrl] = useState("");
   const [settings, setSettings] = useState({
-    expiry: '30',
+    expiry: "30",
     passcode: false,
     allowDownload: true,
-    watermark: true
+    watermark: true,
   });
 
   const generateShareLink = async () => {
     try {
-      const response = await fetch('/api/client/share-links', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/client/share-links", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           brandId,
-          scope: ['overview', 'channels', 'top-content'],
+          scope: ["overview", "channels", "top-content"],
           expiryDays: parseInt(settings.expiry),
           requirePasscode: settings.passcode,
           allowDownload: settings.allowDownload,
-          showWatermark: settings.watermark
-        })
+          showWatermark: settings.watermark,
+        }),
       });
 
       if (response.ok) {
@@ -1012,7 +1170,7 @@ function ShareLinkDialog({ onClose, brandId }: { onClose: () => void; brandId: s
         setShareUrl(result.shareUrl);
       }
     } catch (error) {
-      console.error('Failed to generate share link:', error);
+      console.error("Failed to generate share link:", error);
     }
   };
 
@@ -1030,7 +1188,12 @@ function ShareLinkDialog({ onClose, brandId }: { onClose: () => void; brandId: s
         <CardContent className="space-y-4">
           <div>
             <Label>Expiry</Label>
-            <Select value={settings.expiry} onValueChange={(value) => setSettings(prev => ({ ...prev, expiry: value }))}>
+            <Select
+              value={settings.expiry}
+              onValueChange={(value) =>
+                setSettings((prev) => ({ ...prev, expiry: value }))
+              }
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -1044,25 +1207,31 @@ function ShareLinkDialog({ onClose, brandId }: { onClose: () => void; brandId: s
 
           <div className="flex items-center justify-between">
             <Label>Require passcode</Label>
-            <Switch 
+            <Switch
               checked={settings.passcode}
-              onCheckedChange={(checked) => setSettings(prev => ({ ...prev, passcode: checked }))}
+              onCheckedChange={(checked) =>
+                setSettings((prev) => ({ ...prev, passcode: checked }))
+              }
             />
           </div>
 
           <div className="flex items-center justify-between">
             <Label>Allow downloads</Label>
-            <Switch 
+            <Switch
               checked={settings.allowDownload}
-              onCheckedChange={(checked) => setSettings(prev => ({ ...prev, allowDownload: checked }))}
+              onCheckedChange={(checked) =>
+                setSettings((prev) => ({ ...prev, allowDownload: checked }))
+              }
             />
           </div>
 
           <div className="flex items-center justify-between">
             <Label>Show watermark</Label>
-            <Switch 
+            <Switch
               checked={settings.watermark}
-              onCheckedChange={(checked) => setSettings(prev => ({ ...prev, watermark: checked }))}
+              onCheckedChange={(checked) =>
+                setSettings((prev) => ({ ...prev, watermark: checked }))
+              }
             />
           </div>
 
@@ -1070,8 +1239,15 @@ function ShareLinkDialog({ onClose, brandId }: { onClose: () => void; brandId: s
             <div className="space-y-3">
               <Label>Share URL</Label>
               <div className="flex gap-2">
-                <Input value={shareUrl} readOnly className="font-mono text-sm" />
-                <Button size="sm" onClick={() => navigator.clipboard.writeText(shareUrl)}>
+                <Input
+                  value={shareUrl}
+                  readOnly
+                  className="font-mono text-sm"
+                />
+                <Button
+                  size="sm"
+                  onClick={() => navigator.clipboard.writeText(shareUrl)}
+                >
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
@@ -1097,7 +1273,11 @@ function UploadedAssetCard({ upload }: { upload: any }) {
       <CardContent className="p-4">
         <div className="aspect-square bg-gray-100 rounded-lg mb-3 overflow-hidden">
           {upload.thumbnail ? (
-            <img src={upload.thumbnail} alt="" className="w-full h-full object-cover" />
+            <img
+              src={upload.thumbnail}
+              alt=""
+              className="w-full h-full object-cover"
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <FileText className="h-8 w-8 text-gray-400" />
@@ -1107,7 +1287,7 @@ function UploadedAssetCard({ upload }: { upload: any }) {
         <div>
           <p className="font-medium text-sm mb-1">{upload.filename}</p>
           <Badge variant="secondary" className="text-xs mb-2">
-            {upload.status || 'In Review'}
+            {upload.status || "In Review"}
           </Badge>
           <p className="text-xs text-gray-600">{upload.size}</p>
         </div>
@@ -1119,15 +1299,27 @@ function UploadedAssetCard({ upload }: { upload: any }) {
 // ...existing code... (placeholder functions for other sections)
 
 function ReviewsSection() {
-  return <div className="text-center py-8 text-gray-500">Reviews section coming soon</div>;
+  return (
+    <div className="text-center py-8 text-gray-500">
+      Reviews section coming soon
+    </div>
+  );
 }
 
 function EventsSection() {
-  return <div className="text-center py-8 text-gray-500">Events section coming soon</div>;
+  return (
+    <div className="text-center py-8 text-gray-500">
+      Events section coming soon
+    </div>
+  );
 }
 
 function MessagesSection({ data }: { data: ClientDashboardData }) {
-  return <div className="text-center py-8 text-gray-500">Messages section coming soon</div>;
+  return (
+    <div className="text-center py-8 text-gray-500">
+      Messages section coming soon
+    </div>
+  );
 }
 
 function formatNumber(num: number): string {

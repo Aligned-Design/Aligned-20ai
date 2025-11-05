@@ -1,6 +1,6 @@
 /**
  * AI Agent Generation Pipeline Orchestrator
- * 
+ *
  * Coordinates the three-step generation process:
  * 1. Advisor Agent analyzes and provides recommendations
  * 2. Doc Agent generates content using advisor context
@@ -9,13 +9,13 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
-import { 
-  AdvisorOutput, 
-  DocInput, 
-  DocOutput, 
-  DesignInput, 
+import {
+  AdvisorOutput,
+  DocInput,
+  DocOutput,
+  DesignInput,
   DesignOutput,
-  BrandSafetyConfig 
+  BrandSafetyConfig,
 } from "../../client/types/agent-config";
 import { generateWithAI, loadPromptTemplate } from "./ai-generation";
 import { calculateBFS } from "../agents/brand-fidelity-scorer";
@@ -48,10 +48,17 @@ export interface PipelineResult {
 /**
  * Orchestrate the full AI pipeline: Advisor → Doc → Design
  */
-export async function runGenerationPipeline(request: PipelineRequest): Promise<PipelineResult> {
+export async function runGenerationPipeline(
+  request: PipelineRequest,
+): Promise<PipelineResult> {
   const startTime = Date.now();
-  const logs: Array<{ step: string; duration_ms: number; success: boolean; error?: string; }> = [];
-  
+  const logs: Array<{
+    step: string;
+    duration_ms: number;
+    success: boolean;
+    error?: string;
+  }> = [];
+
   try {
     // Load brand data
     const { data: brandKit, error: brandError } = await supabase
@@ -80,12 +87,12 @@ export async function runGenerationPipeline(request: PipelineRequest): Promise<P
       brand_links: [],
       disallowed_topics: [],
       allow_topics: [],
-      compliance_pack: "none"
+      compliance_pack: "none",
     };
 
     // Step 1: Advisor Agent (optional, use cache if available)
     let advisorOutput: AdvisorOutput | undefined;
-    
+
     if (request.include_advisor !== false) {
       const advisorStart = Date.now();
       try {
@@ -93,15 +100,18 @@ export async function runGenerationPipeline(request: PipelineRequest): Promise<P
         logs.push({
           step: "advisor",
           duration_ms: Date.now() - advisorStart,
-          success: true
+          success: true,
         });
       } catch (error) {
-        console.warn("Advisor step failed, continuing without advisor context:", error);
+        console.warn(
+          "Advisor step failed, continuing without advisor context:",
+          error,
+        );
         logs.push({
           step: "advisor",
           duration_ms: Date.now() - advisorStart,
           success: false,
-          error: error instanceof Error ? error.message : "Unknown error"
+          error: error instanceof Error ? error.message : "Unknown error",
         });
       }
     }
@@ -109,23 +119,29 @@ export async function runGenerationPipeline(request: PipelineRequest): Promise<P
     // Step 2: Doc Agent
     const docStart = Date.now();
     const docInput: DocInput = {
-      topic: request.topic || (advisorOutput?.topics[0]?.title) || "Share an update",
+      topic:
+        request.topic || advisorOutput?.topics[0]?.title || "Share an update",
       tone: request.tone || brandKit.toneKeywords?.[0] || "professional",
       platform: request.platform,
-      format: request.content_type === "story" ? "story" : 
-               request.content_type === "reel" ? "reel" : 
-               request.content_type === "carousel" ? "carousel" : "post",
+      format:
+        request.content_type === "story"
+          ? "story"
+          : request.content_type === "reel"
+            ? "reel"
+            : request.content_type === "carousel"
+              ? "carousel"
+              : "post",
       max_length: getPlatformMaxLength(request.platform, request.content_type),
       include_cta: true,
       cta_type: "link",
-      advisor_context: advisorOutput
+      advisor_context: advisorOutput,
     };
 
     const docOutput = await runDocStep(docInput, brandKit, brandSafety);
     logs.push({
       step: "doc",
       duration_ms: Date.now() - docStart,
-      success: true
+      success: true,
     });
 
     // Step 3: Design Agent
@@ -136,18 +152,18 @@ export async function runGenerationPipeline(request: PipelineRequest): Promise<P
       brand_colors: [
         brandKit.primaryColor,
         brandKit.secondaryColor,
-        brandKit.accentColor
+        brandKit.accentColor,
       ].filter(Boolean),
       tone: docOutput.tone_used,
       headline: docOutput.headline,
-      doc_context: docOutput
+      doc_context: docOutput,
     };
 
     const designOutput = await runDesignStep(designInput, brandKit);
     logs.push({
       step: "design",
       duration_ms: Date.now() - designStart,
-      success: true
+      success: true,
     });
 
     return {
@@ -155,9 +171,8 @@ export async function runGenerationPipeline(request: PipelineRequest): Promise<P
       doc_output: docOutput,
       design_output: designOutput,
       pipeline_logs: logs,
-      total_duration_ms: Date.now() - startTime
+      total_duration_ms: Date.now() - startTime,
     };
-
   } catch (error) {
     console.error("Pipeline failed:", error);
     throw error;
@@ -182,13 +197,16 @@ async function runAdvisorStep(brand_id: string): Promise<AdvisorOutput> {
 
   // Generate new insights
   const template = await loadPromptTemplate("advisor", "v1.0", "en");
-  
+
   // Load recent performance data
   const { data: posts } = await supabase
     .from("scheduled_content")
     .select("*")
     .eq("brand_id", brand_id)
-    .gte("scheduled_for", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+    .gte(
+      "scheduled_for",
+      new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    )
     .order("scheduled_for", { ascending: false })
     .limit(20);
 
@@ -197,23 +215,25 @@ async function runAdvisorStep(brand_id: string): Promise<AdvisorOutput> {
     .replace(/\{\{recent_posts\}\}/g, JSON.stringify(posts || []));
 
   const aiResponse = await generateWithAI(prompt, "advisor");
-  
+
   let output: AdvisorOutput;
   try {
     output = JSON.parse(aiResponse);
   } catch {
     // Fallback if parsing fails
     output = {
-      topics: [{ 
-        title: "Continue Current Strategy", 
-        rationale: "Maintain consistent approach" 
-      }],
+      topics: [
+        {
+          title: "Continue Current Strategy",
+          rationale: "Maintain consistent approach",
+        },
+      ],
       best_times: [{ day: "Thursday", slot: "18:00", confidence: 0.8 }],
       format_mix: { reel: 0.4, carousel: 0.4, image: 0.2 },
       hashtags: ["#YourBrand"],
       keywords: ["engagement", "growth"],
       cached_at: new Date().toISOString(),
-      valid_until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      valid_until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     };
   }
 
@@ -221,14 +241,12 @@ async function runAdvisorStep(brand_id: string): Promise<AdvisorOutput> {
   const validUntil = new Date();
   validUntil.setHours(validUntil.getHours() + 24);
 
-  await supabase
-    .from("advisor_cache")
-    .upsert({
-      brand_id,
-      output,
-      cached_at: new Date().toISOString(),
-      valid_until: validUntil.toISOString()
-    });
+  await supabase.from("advisor_cache").upsert({
+    brand_id,
+    output,
+    cached_at: new Date().toISOString(),
+    valid_until: validUntil.toISOString(),
+  });
 
   return output;
 }
@@ -237,9 +255,9 @@ async function runAdvisorStep(brand_id: string): Promise<AdvisorOutput> {
  * Run Doc step with BFS and linting
  */
 async function runDocStep(
-  input: DocInput, 
-  brandKit: unknown, 
-  safetyConfig: BrandSafetyConfig
+  input: DocInput,
+  brandKit: unknown,
+  safetyConfig: BrandSafetyConfig,
 ): Promise<DocOutput> {
   const MAX_ATTEMPTS = 3;
   let attempts = 0;
@@ -251,28 +269,34 @@ async function runDocStep(
     const template = await loadPromptTemplate("doc", "v1.0", "en");
     const prompt = template
       .replace(/\{\{brand_name\}\}/g, brandKit.brandName || "Your Brand")
-      .replace(/\{\{tone_keywords\}\}/g, (brandKit.toneKeywords || []).join(", "))
-      .replace(/\{\{writing_style\}\}/g, brandKit.writingStyle || "professional")
+      .replace(
+        /\{\{tone_keywords\}\}/g,
+        (brandKit.toneKeywords || []).join(", "),
+      )
+      .replace(
+        /\{\{writing_style\}\}/g,
+        brandKit.writingStyle || "professional",
+      )
       .replace(/\{\{topic\}\}/g, input.topic)
       .replace(/\{\{platform\}\}/g, input.platform)
       .replace(/\{\{format\}\}/g, input.format)
       .replace(/\{\{max_length\}\}/g, input.max_length?.toString() || "2200");
 
     const aiResponse = await generateWithAI(prompt, "doc");
-    
+
     let parsedOutput;
     try {
       parsedOutput = JSON.parse(aiResponse);
     } catch {
       parsedOutput = {
-        headline: aiResponse.split('\n')[0] || "",
+        headline: aiResponse.split("\n")[0] || "",
         body: aiResponse,
         cta: "Learn more",
         hashtags: ["#YourBrand"],
         post_theme: input.format,
         tone_used: "professional",
         aspect_ratio: getAspectRatio(input.platform, input.format),
-        char_count: aiResponse.length
+        char_count: aiResponse.length,
       };
     }
 
@@ -283,7 +307,7 @@ async function runDocStep(
         headline: parsedOutput.headline,
         cta: parsedOutput.cta,
         hashtags: parsedOutput.hashtags,
-        platform: input.platform
+        platform: input.platform,
       },
       {
         tone_keywords: brandKit.toneKeywords || [],
@@ -292,8 +316,8 @@ async function runDocStep(
         commonPhrases: brandKit.commonPhrases,
         required_disclaimers: safetyConfig.required_disclaimers,
         required_hashtags: safetyConfig.required_hashtags,
-        banned_phrases: safetyConfig.banned_phrases
-      }
+        banned_phrases: safetyConfig.banned_phrases,
+      },
     );
 
     // Run linter
@@ -303,9 +327,9 @@ async function runDocStep(
         headline: parsedOutput.headline,
         cta: parsedOutput.cta,
         hashtags: parsedOutput.hashtags,
-        platform: input.platform
+        platform: input.platform,
       },
-      safetyConfig
+      safetyConfig,
     );
 
     // Auto-fix if possible
@@ -316,12 +340,12 @@ async function runDocStep(
           headline: parsedOutput.headline,
           cta: parsedOutput.cta,
           hashtags: parsedOutput.hashtags,
-          platform: input.platform
+          platform: input.platform,
         },
         linterResult,
-        safetyConfig
+        safetyConfig,
       );
-      
+
       parsedOutput.body = fixedContent.body;
       parsedOutput.headline = fixedContent.headline || parsedOutput.headline;
       parsedOutput.cta = fixedContent.cta || parsedOutput.cta;
@@ -334,17 +358,22 @@ async function runDocStep(
       throw new Error("Content blocked by safety filters");
     }
 
-    if (bfs.passed && (linterResult.passed || linterResult.fixes_applied.length > 0)) {
+    if (
+      bfs.passed &&
+      (linterResult.passed || linterResult.fixes_applied.length > 0)
+    ) {
       return {
         ...parsedOutput,
         char_count: parsedOutput.body.length,
         bfs,
-        linter: linterResult
+        linter: linterResult,
       };
     }
 
     if (attempts >= MAX_ATTEMPTS) {
-      throw new Error("Failed to generate acceptable content after multiple attempts");
+      throw new Error(
+        "Failed to generate acceptable content after multiple attempts",
+      );
     }
   }
 
@@ -354,9 +383,12 @@ async function runDocStep(
 /**
  * Run Design step
  */
-async function runDesignStep(input: DesignInput, brandKit: unknown): Promise<DesignOutput> {
+async function runDesignStep(
+  input: DesignInput,
+  brandKit: unknown,
+): Promise<DesignOutput> {
   const template = await loadPromptTemplate("design", "v1.0", "en");
-  
+
   const prompt = template
     .replace(/\{\{brand_colors\}\}/g, input.brand_colors.join(", "))
     .replace(/\{\{theme\}\}/g, input.theme)
@@ -364,7 +396,7 @@ async function runDesignStep(input: DesignInput, brandKit: unknown): Promise<Des
     .replace(/\{\{headline\}\}/g, input.headline || "");
 
   const aiResponse = await generateWithAI(prompt, "design");
-  
+
   let parsedOutput;
   try {
     parsedOutput = JSON.parse(aiResponse);
@@ -375,7 +407,7 @@ async function runDesignStep(input: DesignInput, brandKit: unknown): Promise<Des
       alt_text: `${input.theme} content template`,
       visual_elements: ["Text overlay", "Brand colors", "Logo placement"],
       color_palette_used: input.brand_colors,
-      font_suggestions: [brandKit.fontFamily || "Inter"]
+      font_suggestions: [brandKit.fontFamily || "Inter"],
     };
   }
 
@@ -386,7 +418,7 @@ async function runDesignStep(input: DesignInput, brandKit: unknown): Promise<Des
     thumbnail_ref: parsedOutput.thumbnail_ref,
     visual_elements: parsedOutput.visual_elements || [],
     color_palette_used: parsedOutput.color_palette_used || [],
-    font_suggestions: parsedOutput.font_suggestions || []
+    font_suggestions: parsedOutput.font_suggestions || [],
   };
 }
 
@@ -398,10 +430,14 @@ function getPlatformMaxLength(platform: string, contentType: string): number {
     instagram: { post: 2200, story: 2200, carousel: 2200, reel: 2200 },
     facebook: { post: 63206, story: 2200, carousel: 2200, reel: 2200 },
     linkedin: { post: 3000, story: 2200, carousel: 3000, reel: 2200 },
-    twitter: { post: 280, story: 280, carousel: 280, reel: 280 }
+    twitter: { post: 280, story: 280, carousel: 280, reel: 280 },
   };
 
-  return limits[platform as keyof typeof limits]?.[contentType as keyof typeof limits.instagram] || 2200;
+  return (
+    limits[platform as keyof typeof limits]?.[
+      contentType as keyof typeof limits.instagram
+    ] || 2200
+  );
 }
 
 /**

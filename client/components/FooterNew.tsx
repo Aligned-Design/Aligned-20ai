@@ -1,6 +1,6 @@
-import React from 'react';
-import { Linkedin, Instagram, Facebook } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Linkedin, Instagram, Facebook } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function FooterNew() {
   return (
@@ -18,7 +18,10 @@ export default function FooterNew() {
             <Link to="/features" className="text-slate-300 hover:text-white">
               Features
             </Link>
-            <Link to="/integrations-marketing" className="text-slate-300 hover:text-white">
+            <Link
+              to="/integrations-marketing"
+              className="text-slate-300 hover:text-white"
+            >
               Integrations
             </Link>
             <Link to="/pricing" className="text-slate-300 hover:text-white">
@@ -39,13 +42,25 @@ export default function FooterNew() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <a aria-label="LinkedIn" href="#" className="text-slate-300 hover:text-white">
+            <a
+              aria-label="LinkedIn"
+              href="#"
+              className="text-slate-300 hover:text-white"
+            >
               <Linkedin className="w-5 h-5" />
             </a>
-            <a aria-label="Instagram" href="#" className="text-slate-300 hover:text-white">
+            <a
+              aria-label="Instagram"
+              href="#"
+              className="text-slate-300 hover:text-white"
+            >
               <Instagram className="w-5 h-5" />
             </a>
-            <a aria-label="Facebook" href="#" className="text-slate-300 hover:text-white">
+            <a
+              aria-label="Facebook"
+              href="#"
+              className="text-slate-300 hover:text-white"
+            >
               <Facebook className="w-5 h-5" />
             </a>
           </div>

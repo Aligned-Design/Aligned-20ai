@@ -1,37 +1,46 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { 
-  Check, 
-  Star, 
-  ArrowRight, 
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Check,
+  Star,
+  ArrowRight,
   Calculator,
   Zap,
   Shield,
   Users,
   BarChart3,
   Clock,
-  Phone
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { PRICING_TIERS, TRIAL_INFO, PricingTier, PricingCalculation } from '@shared/pricing';
+  Phone,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  PRICING_TIERS,
+  TRIAL_INFO,
+  PricingTier,
+  PricingCalculation,
+} from "@shared/pricing";
 
 export default function Pricing() {
   const [brandCount, setBrandCount] = useState(5);
   const [isYearly, setIsYearly] = useState(false);
-  const [calculation, setCalculation] = useState<PricingCalculation | null>(null);
+  const [calculation, setCalculation] = useState<PricingCalculation | null>(
+    null,
+  );
 
   React.useEffect(() => {
     calculatePricing();
   }, [brandCount, isYearly]);
 
   const calculatePricing = () => {
-    const tier = PRICING_TIERS.find(t => 
-      brandCount >= t.minBrands && (t.maxBrands === null || brandCount <= t.maxBrands)
+    const tier = PRICING_TIERS.find(
+      (t) =>
+        brandCount >= t.minBrands &&
+        (t.maxBrands === null || brandCount <= t.maxBrands),
     );
 
     if (!tier) return;
@@ -46,7 +55,7 @@ export default function Pricing() {
       monthlyTotal,
       yearlyTotal: yearlyTotal - yearlySavings,
       yearlySavings,
-      pricePerBrand: tier.pricePerBrand
+      pricePerBrand: tier.pricePerBrand,
     });
   };
 
@@ -65,10 +74,10 @@ export default function Pricing() {
               Simple, Transparent Pricing
             </h1>
             <p className="text-xl text-gray-600 mb-8">
-              Start your 7-day free trial today. No credit card required. 
-              Cancel anytime.
+              Start your 7-day free trial today. No credit card required. Cancel
+              anytime.
             </p>
-            
+
             {/* Trial Highlight */}
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 mb-8">
               <div className="flex items-center justify-center gap-3 mb-4">
@@ -80,14 +89,18 @@ export default function Pricing() {
                     7-Day Free Trial Included
                   </h3>
                   <p className="text-green-700">
-                    Full access to AI content generation across all your channels
+                    Full access to AI content generation across all your
+                    channels
                   </p>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 {TRIAL_INFO.features.map((feature, index) => (
-                  <div key={index} className="flex items-center gap-2 text-green-800">
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 text-green-800"
+                  >
                     <Check className="h-4 w-4 text-green-600" />
                     <span>{feature}</span>
                   </div>
@@ -100,15 +113,15 @@ export default function Pricing() {
               <span className={cn("font-medium", !isYearly && "text-primary")}>
                 Monthly
               </span>
-              <Switch
-                checked={isYearly}
-                onCheckedChange={setIsYearly}
-              />
+              <Switch checked={isYearly} onCheckedChange={setIsYearly} />
               <span className={cn("font-medium", isYearly && "text-primary")}>
                 Yearly
               </span>
               {isYearly && (
-                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                <Badge
+                  variant="secondary"
+                  className="bg-green-100 text-green-800"
+                >
                   Save 2 months
                 </Badge>
               )}
@@ -139,14 +152,17 @@ export default function Pricing() {
                   className="text-center text-lg font-semibold"
                 />
               </div>
-              
+
               {calculation && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
                   <div className="text-sm text-blue-600 mb-1">
                     {calculation.selectedTier.name} Plan
                   </div>
                   <div className="text-3xl font-bold text-blue-900 mb-1">
-                    ${isYearly ? Math.round(calculation.yearlyTotal / 12) : calculation.monthlyTotal}
+                    $
+                    {isYearly
+                      ? Math.round(calculation.yearlyTotal / 12)
+                      : calculation.monthlyTotal}
                     <span className="text-lg font-normal">/month</span>
                   </div>
                   <div className="text-sm text-blue-700">
@@ -183,7 +199,8 @@ export default function Pricing() {
               Why Choose Aligned AI?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Everything you need to scale your social media agency with AI-powered automation
+              Everything you need to scale your social media agency with
+              AI-powered automation
             </p>
           </div>
 
@@ -232,7 +249,7 @@ export default function Pricing() {
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Frequently Asked Questions
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <FAQItem
               question="What's included in the 7-day free trial?"
@@ -268,19 +285,20 @@ export default function Pricing() {
               Ready to Transform Your Agency?
             </h2>
             <p className="text-xl mb-6 text-blue-100">
-              Join 500+ agencies already using Aligned AI to scale their social media operations
+              Join 500+ agencies already using Aligned AI to scale their social
+              media operations
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-white text-blue-600 hover:bg-gray-100"
-                onClick={() => handleStartTrial('growth')}
+                onClick={() => handleStartTrial("growth")}
               >
                 Start 7-Day Free Trial
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
+              <Button
+                size="lg"
+                variant="outline"
                 className="border-white text-white hover:bg-white hover:text-blue-600"
               >
                 Schedule Demo
@@ -303,17 +321,24 @@ interface PricingCardProps {
   onStartTrial: () => void;
 }
 
-function PricingCard({ tier, isYearly, isRecommended, onStartTrial }: PricingCardProps) {
+function PricingCard({
+  tier,
+  isYearly,
+  isRecommended,
+  onStartTrial,
+}: PricingCardProps) {
   const monthlyPrice = tier.pricePerBrand;
   const yearlyPrice = Math.round(monthlyPrice * 10); // 2 months free
   const displayPrice = isYearly ? yearlyPrice : monthlyPrice;
 
   return (
-    <Card className={cn(
-      "relative transition-all hover:shadow-xl",
-      isRecommended && "ring-2 ring-primary shadow-lg",
-      tier.isPopular && "border-primary"
-    )}>
+    <Card
+      className={cn(
+        "relative transition-all hover:shadow-xl",
+        isRecommended && "ring-2 ring-primary shadow-lg",
+        tier.isPopular && "border-primary",
+      )}
+    >
       {tier.isPopular && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
           <Badge className="bg-primary text-white px-4 py-1">
@@ -322,11 +347,11 @@ function PricingCard({ tier, isYearly, isRecommended, onStartTrial }: PricingCar
           </Badge>
         </div>
       )}
-      
+
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">{tier.name}</CardTitle>
         <p className="text-gray-600">{tier.description}</p>
-        
+
         <div className="py-4">
           <div className="text-4xl font-bold text-gray-900">
             ${displayPrice}
@@ -334,22 +359,24 @@ function PricingCard({ tier, isYearly, isRecommended, onStartTrial }: PricingCar
               /brand/month
             </span>
           </div>
-          
+
           <div className="text-sm text-gray-500 mt-1">
-            {tier.minBrands === tier.maxBrands 
-              ? `${tier.minBrands} brand${tier.minBrands > 1 ? 's' : ''}`
-              : `${tier.minBrands}${tier.maxBrands ? `-${tier.maxBrands}` : '+'} brands`
-            }
+            {tier.minBrands === tier.maxBrands
+              ? `${tier.minBrands} brand${tier.minBrands > 1 ? "s" : ""}`
+              : `${tier.minBrands}${tier.maxBrands ? `-${tier.maxBrands}` : "+"} brands`}
           </div>
-          
+
           {tier.savings && (
-            <Badge variant="secondary" className="mt-2 bg-green-100 text-green-800">
+            <Badge
+              variant="secondary"
+              className="mt-2 bg-green-100 text-green-800"
+            >
               {tier.savings}
             </Badge>
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent>
         <ul className="space-y-3 mb-6">
           {tier.features.map((feature, index) => (
@@ -359,20 +386,20 @@ function PricingCard({ tier, isYearly, isRecommended, onStartTrial }: PricingCar
             </li>
           ))}
         </ul>
-        
-        <Button 
+
+        <Button
           onClick={onStartTrial}
           className={cn(
             "w-full",
-            tier.isPopular 
-              ? "bg-primary hover:bg-primary/90" 
-              : "bg-gray-900 hover:bg-gray-800"
+            tier.isPopular
+              ? "bg-primary hover:bg-primary/90"
+              : "bg-gray-900 hover:bg-gray-800",
           )}
         >
           Start Free Trial
           <ArrowRight className="h-4 w-4 ml-2" />
         </Button>
-        
+
         <p className="text-xs text-gray-500 text-center mt-3">
           7-day free trial • No credit card required
         </p>
@@ -390,20 +417,22 @@ interface BenefitCardProps {
 
 function BenefitCard({ icon, title, description, color }: BenefitCardProps) {
   const colorClasses = {
-    blue: 'text-blue-600 bg-blue-100',
-    green: 'text-green-600 bg-green-100',
-    purple: 'text-purple-600 bg-purple-100',
-    orange: 'text-orange-600 bg-orange-100',
-    red: 'text-red-600 bg-red-100',
-    indigo: 'text-indigo-600 bg-indigo-100'
+    blue: "text-blue-600 bg-blue-100",
+    green: "text-green-600 bg-green-100",
+    purple: "text-purple-600 bg-purple-100",
+    orange: "text-orange-600 bg-orange-100",
+    red: "text-red-600 bg-red-100",
+    indigo: "text-indigo-600 bg-indigo-100",
   };
 
   return (
     <div className="text-center">
-      <div className={cn(
-        "w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4",
-        colorClasses[color as keyof typeof colorClasses]
-      )}>
+      <div
+        className={cn(
+          "w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4",
+          colorClasses[color as keyof typeof colorClasses],
+        )}
+      >
         {icon}
       </div>
       <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
@@ -422,17 +451,12 @@ function FAQItem({ question, answer }: FAQItemProps) {
 
   return (
     <div className="border-b border-gray-200 pb-4">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full text-left"
-      >
+      <button onClick={() => setIsOpen(!isOpen)} className="w-full text-left">
         <h3 className="text-lg font-semibold text-gray-900 mb-2 hover:text-primary transition-colors">
           {question}
         </h3>
       </button>
-      {isOpen && (
-        <p className="text-gray-600 leading-relaxed">{answer}</p>
-      )}
+      {isOpen && <p className="text-gray-600 leading-relaxed">{answer}</p>}
     </div>
   );
 }

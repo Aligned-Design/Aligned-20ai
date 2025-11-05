@@ -1,38 +1,41 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Check, ChevronRight, ChevronLeft } from 'lucide-react';
-import { InlineError } from '@/components/ui/error-state';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+} from "@/components/ui/dialog";
+import { Check, ChevronRight, ChevronLeft } from "lucide-react";
+import { InlineError } from "@/components/ui/error-state";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface BrandOnboardingProps {
   open: boolean;
   onComplete: () => void;
 }
 
-export default function BrandOnboarding({ open, onComplete }: BrandOnboardingProps) {
+export default function BrandOnboarding({
+  open,
+  onComplete,
+}: BrandOnboardingProps) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    name: '',
-    website_url: '',
-    industry: '',
-    description: '',
+    name: "",
+    website_url: "",
+    industry: "",
+    description: "",
     tone_keywords: [] as string[],
-    primary_color: '#8B5CF6',
+    primary_color: "#8B5CF6",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -40,14 +43,18 @@ export default function BrandOnboarding({ open, onComplete }: BrandOnboardingPro
     const newErrors: Record<string, string> = {};
 
     if (currentStep === 1) {
-      if (!formData.name.trim()) newErrors.name = 'Brand name is required';
-      if (formData.website_url && !formData.website_url.match(/^https?:\/\/.+/)) {
-        newErrors.website_url = 'Please enter a valid URL';
+      if (!formData.name.trim()) newErrors.name = "Brand name is required";
+      if (
+        formData.website_url &&
+        !formData.website_url.match(/^https?:\/\/.+/)
+      ) {
+        newErrors.website_url = "Please enter a valid URL";
       }
     }
 
     if (currentStep === 2) {
-      if (!formData.industry.trim()) newErrors.industry = 'Industry helps us customize content for you';
+      if (!formData.industry.trim())
+        newErrors.industry = "Industry helps us customize content for you";
     }
 
     setErrors(newErrors);
@@ -70,11 +77,11 @@ export default function BrandOnboarding({ open, onComplete }: BrandOnboardingPro
     setLoading(true);
     try {
       const { data: brandData, error: brandError } = await supabase
-        .from('brands')
+        .from("brands")
         .insert([
           {
             ...formData,
-            slug: formData.name.toLowerCase().replace(/\s+/g, '-'),
+            slug: formData.name.toLowerCase().replace(/\s+/g, "-"),
           },
         ])
         .select()
@@ -82,16 +89,16 @@ export default function BrandOnboarding({ open, onComplete }: BrandOnboardingPro
 
       if (brandError) throw brandError;
 
-      await supabase.from('brand_members').insert([
+      await supabase.from("brand_members").insert([
         {
           brand_id: brandData.id,
           user_id: user.id,
-          role: 'owner',
+          role: "owner",
         },
       ]);
 
       toast({
-        title: 'Brand created!',
+        title: "Brand created!",
         description: `${formData.name} is ready. Let's start creating content.`,
       });
 
@@ -99,9 +106,9 @@ export default function BrandOnboarding({ open, onComplete }: BrandOnboardingPro
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
       toast({
-        title: 'Error creating brand',
-        description: message || 'Please try again.',
-        variant: 'destructive',
+        title: "Error creating brand",
+        description: message || "Please try again.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -109,18 +116,24 @@ export default function BrandOnboarding({ open, onComplete }: BrandOnboardingPro
   };
 
   const steps = [
-    { number: 1, title: 'Basic Info', description: 'Name and website' },
-    { number: 2, title: 'Brand Details', description: 'Industry and voice' },
-    { number: 3, title: 'Customize', description: 'Colors and preferences' },
+    { number: 1, title: "Basic Info", description: "Name and website" },
+    { number: 2, title: "Brand Details", description: "Industry and voice" },
+    { number: 3, title: "Customize", description: "Colors and preferences" },
   ];
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-[600px]" onInteractOutside={(e) => e.preventDefault()}>
+      <DialogContent
+        className="sm:max-w-[600px]"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
-          <DialogTitle className="text-2xl">Create Your First Brand</DialogTitle>
+          <DialogTitle className="text-2xl">
+            Create Your First Brand
+          </DialogTitle>
           <DialogDescription>
-            Follow these 3 quick steps to set up your brand. Takes less than 2 minutes.
+            Follow these 3 quick steps to set up your brand. Takes less than 2
+            minutes.
           </DialogDescription>
         </DialogHeader>
 
@@ -130,8 +143,8 @@ export default function BrandOnboarding({ open, onComplete }: BrandOnboardingPro
               <div
                 className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors ${
                   step >= s.number
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-muted bg-background text-muted-foreground'
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-muted bg-background text-muted-foreground"
                 }`}
               >
                 {step > s.number ? <Check className="h-5 w-5" /> : s.number}
@@ -156,7 +169,7 @@ export default function BrandOnboarding({ open, onComplete }: BrandOnboardingPro
                   value={formData.name}
                   onChange={(e) => {
                     setFormData({ ...formData, name: e.target.value });
-                    if (errors.name) setErrors({ ...errors, name: '' });
+                    if (errors.name) setErrors({ ...errors, name: "" });
                   }}
                   placeholder="Acme Corp"
                   className="min-h-[44px]"
@@ -172,13 +185,16 @@ export default function BrandOnboarding({ open, onComplete }: BrandOnboardingPro
                   value={formData.website_url}
                   onChange={(e) => {
                     setFormData({ ...formData, website_url: e.target.value });
-                    if (errors.website_url) setErrors({ ...errors, website_url: '' });
+                    if (errors.website_url)
+                      setErrors({ ...errors, website_url: "" });
                   }}
                   placeholder="https://acme.com"
                   className="min-h-[44px]"
                   aria-invalid={!!errors.website_url}
                 />
-                {errors.website_url && <InlineError message={errors.website_url} />}
+                {errors.website_url && (
+                  <InlineError message={errors.website_url} />
+                )}
               </div>
             </>
           )}
@@ -194,7 +210,7 @@ export default function BrandOnboarding({ open, onComplete }: BrandOnboardingPro
                   value={formData.industry}
                   onChange={(e) => {
                     setFormData({ ...formData, industry: e.target.value });
-                    if (errors.industry) setErrors({ ...errors, industry: '' });
+                    if (errors.industry) setErrors({ ...errors, industry: "" });
                   }}
                   placeholder="e.g., Technology, Healthcare, Retail"
                   className="min-h-[44px]"
@@ -203,11 +219,15 @@ export default function BrandOnboarding({ open, onComplete }: BrandOnboardingPro
                 {errors.industry && <InlineError message={errors.industry} />}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">Brand Description (optional)</Label>
+                <Label htmlFor="description">
+                  Brand Description (optional)
+                </Label>
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   placeholder="What does your brand do? What makes it unique?"
                   rows={3}
                 />
@@ -224,12 +244,22 @@ export default function BrandOnboarding({ open, onComplete }: BrandOnboardingPro
                     id="color"
                     type="color"
                     value={formData.primary_color}
-                    onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        primary_color: e.target.value,
+                      })
+                    }
                     className="w-20 h-12"
                   />
                   <Input
                     value={formData.primary_color}
-                    onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        primary_color: e.target.value,
+                      })
+                    }
                     placeholder="#8B5CF6"
                     className="min-h-[44px]"
                   />
@@ -259,8 +289,12 @@ export default function BrandOnboarding({ open, onComplete }: BrandOnboardingPro
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
-            <Button onClick={handleComplete} disabled={loading} className="min-h-[44px]">
-              {loading ? 'Creating...' : 'Complete Setup'}
+            <Button
+              onClick={handleComplete}
+              disabled={loading}
+              className="min-h-[44px]"
+            >
+              {loading ? "Creating..." : "Complete Setup"}
             </Button>
           )}
         </div>

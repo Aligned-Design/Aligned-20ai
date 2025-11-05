@@ -112,7 +112,10 @@ export default function BrandIntake() {
     }
   }, [brandId, navigate, toast]);
 
-  const handleFieldChange = (field: keyof BrandIntakeFormData, value: unknown) => {
+  const handleFieldChange = (
+    field: keyof BrandIntakeFormData,
+    value: unknown,
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
@@ -244,7 +247,8 @@ export default function BrandIntake() {
           for (const brand of allBrands) {
             if (brand.brand_kit?.website_url) {
               try {
-                const existingUrl = new URL(brand.brand_kit.website_url).hostname;
+                const existingUrl = new URL(brand.brand_kit.website_url)
+                  .hostname;
                 if (existingUrl === normalizedUrl) {
                   toast({
                     title: "Duplicate Brand",
@@ -281,13 +285,17 @@ export default function BrandIntake() {
 
       const handleUploadProgress = (
         categoryName: string,
-        progress: { currentFile: number; totalFiles: number; progress: number }
+        progress: { currentFile: number; totalFiles: number; progress: number },
       ) => {
         setUploadStatus(
-          `Uploading ${categoryName}: ${progress.currentFile}/${progress.totalFiles} (${progress.progress}%)`
+          `Uploading ${categoryName}: ${progress.currentFile}/${progress.totalFiles} (${progress.progress}%)`,
         );
         setUploadProgress(
-          Math.round(((completedUploadItems + progress.progress / 100) / totalUploadItems) * 100)
+          Math.round(
+            ((completedUploadItems + progress.progress / 100) /
+              totalUploadItems) *
+              100,
+          ),
         );
       };
 
@@ -417,7 +425,9 @@ export default function BrandIntake() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Brand Intake Form</h1>
+              <h1 className="text-2xl font-bold text-slate-900">
+                Brand Intake Form
+              </h1>
               <p className="text-sm text-slate-600">
                 Step {currentStep} of {SECTIONS.length}:{" "}
                 {SECTIONS[currentStep - 1].title}
@@ -440,7 +450,9 @@ export default function BrandIntake() {
           <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-md">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="font-semibold mb-1 text-slate-900">Import from Website</h3>
+                <h3 className="font-semibold mb-1 text-slate-900">
+                  Import from Website
+                </h3>
                 <p className="text-sm text-slate-600">
                   Automatically extract brand colors, voice, and keywords from
                   your website.

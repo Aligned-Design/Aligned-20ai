@@ -1,33 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React, { useState, useEffect } from "react";
+import {
+  Card as _Card,
+  CardContent as _CardContent,
+  CardHeader as _CardHeader,
+  CardTitle as _CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import { HelpCircle, Download, Upload } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { UserPreferences, BasicPreferences, AdvancedPreferences, AgencyOverrides, Language, DateTimeFormat, NotificationFrequency, DashboardDensity, CardAnimation, AnalyticsStyle, FontSize } from '@shared/preferences';
+} from "@/components/ui/accordion";
+import { HelpCircle, Download, Upload } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  UserPreferences,
+  BasicPreferences,
+  AdvancedPreferences,
+  AgencyOverrides,
+  Language,
+  DateTimeFormat,
+  NotificationFrequency,
+  DashboardDensity,
+  CardAnimation,
+  AnalyticsStyle,
+  FontSize,
+} from "@shared/preferences";
 
 interface UserPreferencesProps {
-  userRole: 'admin' | 'manager' | 'client';
+  userRole: "admin" | "manager" | "client";
   className?: string;
 }
 
-export function UserPreferencesComponent({ userRole, className }: UserPreferencesProps) {
+export function UserPreferencesComponent({
+  userRole,
+  className,
+}: UserPreferencesProps) {
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [savedMessage, setSavedMessage] = useState('');
+  const [savedMessage, setSavedMessage] = useState("");
 
   useEffect(() => {
     loadPreferences();
@@ -36,42 +62,48 @@ export function UserPreferencesComponent({ userRole, className }: UserPreference
   const loadPreferences = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/preferences');
+      const response = await fetch("/api/preferences");
       if (response.ok) {
         const data = await response.json();
         setPreferences(data.preferences);
       }
     } catch (error) {
-      console.error('Failed to load preferences:', error);
+      console.error("Failed to load preferences:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const savePreferences = async (section: keyof UserPreferences | 'basic' | 'advanced' | 'agency', updates: any) => {
+  const savePreferences = async (
+    section: keyof UserPreferences | "basic" | "advanced" | "agency",
+    updates: any,
+  ) => {
     try {
       setSaving(true);
       // Map component section names to UserPreferences section names
       const sectionMap: Record<string, keyof UserPreferences> = {
-        'basic': 'interface',
-        'advanced': 'advanced',
-        'agency': 'advanced'
+        basic: "interface",
+        advanced: "advanced",
+        agency: "advanced",
       };
-      const actualSection = sectionMap[section as string] || (section as keyof UserPreferences);
+      const actualSection =
+        sectionMap[section as string] || (section as keyof UserPreferences);
 
-      const response = await fetch('/api/preferences', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section: actualSection, preferences: updates })
+      const response = await fetch("/api/preferences", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ section: actualSection, preferences: updates }),
       });
 
       if (response.ok) {
         await loadPreferences();
-        setSavedMessage('✅ Preferences saved. Changes will take effect immediately.');
-        setTimeout(() => setSavedMessage(''), 3000);
+        setSavedMessage(
+          "✅ Preferences saved. Changes will take effect immediately.",
+        );
+        setTimeout(() => setSavedMessage(""), 3000);
       }
     } catch (error) {
-      console.error('Failed to save preferences:', error);
+      console.error("Failed to save preferences:", error);
     } finally {
       setSaving(false);
     }
@@ -79,13 +111,13 @@ export function UserPreferencesComponent({ userRole, className }: UserPreference
 
   const exportPreferences = () => {
     if (!preferences) return;
-    
+
     const dataStr = JSON.stringify(preferences, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = 'user-preferences.json';
+    link.download = "user-preferences.json";
     link.click();
   };
 
@@ -99,14 +131,18 @@ export function UserPreferencesComponent({ userRole, className }: UserPreference
         const imported = JSON.parse(e.target?.result as string);
         setPreferences(imported);
       } catch (error) {
-        console.error('Invalid preferences file:', error);
+        console.error("Invalid preferences file:", error);
       }
     };
     reader.readAsText(file);
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center p-8">Loading preferences...</div>;
+    return (
+      <div className="flex items-center justify-center p-8">
+        Loading preferences...
+      </div>
+    );
   }
 
   if (!preferences) {
@@ -120,7 +156,7 @@ export function UserPreferencesComponent({ userRole, className }: UserPreference
           <h1 className="text-3xl font-bold">User Preferences</h1>
           <p className="text-gray-600">Customize your Aligned AI experience</p>
         </div>
-        
+
         <div className="flex gap-2">
           <Button variant="outline" onClick={exportPreferences}>
             <Download className="h-4 w-4 mr-2" />
@@ -153,7 +189,7 @@ export function UserPreferencesComponent({ userRole, className }: UserPreference
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="basic">Basic Preferences</TabsTrigger>
           <TabsTrigger value="advanced">Advanced Settings</TabsTrigger>
-          {userRole === 'admin' && (
+          {userRole === "admin" && (
             <TabsTrigger value="agency">Agency Overrides</TabsTrigger>
           )}
         </TabsList>
@@ -161,29 +197,44 @@ export function UserPreferencesComponent({ userRole, className }: UserPreference
         <TabsContent value="basic">
           <BasicPreferencesTab
             preferences={{
-              theme: (preferences.interface?.theme as 'light' | 'dark' | 'auto') || 'auto',
-              language: (preferences.interface?.language as Language) || 'en',
-              timezone: preferences.interface?.timezone || 'UTC',
-              dateTimeFormat: '12h' as DateTimeFormat,
-              homePageView: (preferences.interface?.defaultDashboardView || 'dashboard') as 'dashboard' | 'calendar' | 'analytics',
+              theme:
+                (preferences.interface?.theme as "light" | "dark" | "auto") ||
+                "auto",
+              language: (preferences.interface?.language as Language) || "en",
+              timezone: preferences.interface?.timezone || "UTC",
+              dateTimeFormat: "12h" as DateTimeFormat,
+              homePageView: (preferences.interface?.defaultDashboardView ||
+                "dashboard") as "dashboard" | "calendar" | "analytics",
               emailNotifications: {
-                approvals: preferences.notifications?.email?.types?.contentReady ?? true,
-                newReview: preferences.notifications?.email?.types?.approvalNeeded ?? true,
-                failedPost: preferences.notifications?.email?.types?.analyticsReports ?? false,
-                analyticsDigest: preferences.notifications?.email?.types?.systemUpdates ?? false
+                approvals:
+                  preferences.notifications?.email?.types?.contentReady ?? true,
+                newReview:
+                  preferences.notifications?.email?.types?.approvalNeeded ??
+                  true,
+                failedPost:
+                  preferences.notifications?.email?.types?.analyticsReports ??
+                  false,
+                analyticsDigest:
+                  preferences.notifications?.email?.types?.systemUpdates ??
+                  false,
               },
-              digestFrequency: (preferences.notifications?.email?.frequency as NotificationFrequency) || 'daily',
-              appNotifications: preferences.notifications?.inApp?.enabled ?? true,
+              digestFrequency:
+                (preferences.notifications?.email
+                  ?.frequency as NotificationFrequency) || "daily",
+              appNotifications:
+                preferences.notifications?.inApp?.enabled ?? true,
               inAppMessageSounds: false,
-              dashboardDensity: 'comfortable' as DashboardDensity,
-              cardAnimation: 'smooth' as CardAnimation,
-              analyticsStyle: 'graph-heavy' as AnalyticsStyle,
-              fontSize: 'medium' as FontSize,
-              quickActionsOnHover: true
+              dashboardDensity: "comfortable" as DashboardDensity,
+              cardAnimation: "smooth" as CardAnimation,
+              analyticsStyle: "graph-heavy" as AnalyticsStyle,
+              fontSize: "medium" as FontSize,
+              quickActionsOnHover: true,
             }}
             onSave={(updates) => {
-              if (updates.theme) savePreferences('interface', { theme: updates.theme });
-              if (updates.language) savePreferences('interface', { language: updates.language });
+              if (updates.theme)
+                savePreferences("interface", { theme: updates.theme });
+              if (updates.language)
+                savePreferences("interface", { language: updates.language });
             }}
             saving={saving}
           />
@@ -192,59 +243,62 @@ export function UserPreferencesComponent({ userRole, className }: UserPreference
         <TabsContent value="advanced">
           <AdvancedPreferencesTab
             preferences={{
-              analyticsEmailCadence: 'daily',
-              reportFormat: 'pdf',
-              aiInsightLevel: 'detailed',
+              analyticsEmailCadence: "daily",
+              reportFormat: "pdf",
+              aiInsightLevel: "detailed",
               showBenchmarks: true,
               includeCompetitorMentions: false,
-              tonePreset: preferences.aiSettings?.defaultTone === 'professional' ? 'safe' : 'bold',
-              voiceAdaptationSpeed: 'balanced',
+              tonePreset:
+                preferences.aiSettings?.defaultTone === "professional"
+                  ? "safe"
+                  : "bold",
+              voiceAdaptationSpeed: "balanced",
               autoGenerateNextMonthPlan: false,
               autoApproveAISuggestions: false,
-              languageStyle: 'us-english',
-              aiRegenerationTriggers: 'manual',
-              draftVisibility: 'internal-only',
-              commentTagAlerts: 'digest',
+              languageStyle: "us-english",
+              aiRegenerationTriggers: "manual",
+              draftVisibility: "internal-only",
+              commentTagAlerts: "digest",
               clientCommentVisibility: false,
               autoMeetingSummaries: false,
-              taskIntegration: 'none',
-              meetingNotesToAI: 'ask-each-time',
-              autoSaveInterval: 'manual',
-              approvalWorkflow: '1-step',
+              taskIntegration: "none",
+              meetingNotesToAI: "ask-each-time",
+              autoSaveInterval: "manual",
+              approvalWorkflow: "1-step",
               graceWindowHours: 24,
-              postFailureHandling: 'notify-only',
+              postFailureHandling: "notify-only",
               twoFactorAuth: false,
-              sessionTimeout: '8h',
+              sessionTimeout: "8h",
               ipWhitelist: [],
               autoDataExport: false,
-              dataExportFrequency: 'weekly'
+              dataExportFrequency: "weekly",
             }}
-            onSave={(updates) => savePreferences('advanced', updates)}
+            onSave={(updates) => savePreferences("advanced", updates)}
             saving={saving}
           />
         </TabsContent>
 
-        {userRole === 'admin' && (
+        {userRole === "admin" && (
           <TabsContent value="agency">
             <AgencyOverridesTab
               overrides={{
-                defaultSafetyMode: 'safe',
+                defaultSafetyMode: "safe",
                 globalBrandQuotaTemplate: {},
-                defaultAnalyticsEmailSchedule: 'weekly',
+                defaultAnalyticsEmailSchedule: "weekly",
                 clientAccessControls: {
                   uploads: true,
                   reviews: true,
                   events: true,
                   analytics: true,
-                  pipeline: true
+                  pipeline: true,
                 },
                 whiteLabel: false,
                 defaultReportSections: [],
                 forceMFA: false,
                 disableAutoAIPlan: false,
-                maintenanceMode: false
+                maintenanceMode: false,
               }}
-              onSave={(updates) => savePreferences('advanced', updates)}
+              onSave={(updates) => savePreferences("advanced", updates)}
               saving={saving}
             />
           </TabsContent>
@@ -260,7 +314,11 @@ interface BasicPreferencesTabProps {
   saving: boolean;
 }
 
-function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTabProps) {
+function BasicPreferencesTab({
+  preferences,
+  onSave,
+  saving,
+}: BasicPreferencesTabProps) {
   const [localPrefs, setLocalPrefs] = useState(preferences);
 
   const updatePreference = (key: keyof BasicPreferences, value: any) => {
@@ -270,9 +328,15 @@ function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTa
   };
 
   return (
-    <Accordion type="multiple" defaultValue={["general", "notifications"]} className="space-y-4">
+    <Accordion
+      type="multiple"
+      defaultValue={["general", "notifications"]}
+      className="space-y-4"
+    >
       <AccordionItem value="general">
-        <AccordionTrigger className="text-lg font-semibold">General</AccordionTrigger>
+        <AccordionTrigger className="text-lg font-semibold">
+          General
+        </AccordionTrigger>
         <AccordionContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <PreferenceField
@@ -282,7 +346,7 @@ function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTa
             >
               <Select
                 value={localPrefs.theme}
-                onValueChange={(value) => updatePreference('theme', value)}
+                onValueChange={(value) => updatePreference("theme", value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -302,7 +366,7 @@ function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTa
             >
               <Select
                 value={localPrefs.language}
-                onValueChange={(value) => updatePreference('language', value)}
+                onValueChange={(value) => updatePreference("language", value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -323,7 +387,9 @@ function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTa
             >
               <Select
                 value={localPrefs.dateTimeFormat}
-                onValueChange={(value) => updatePreference('dateTimeFormat', value)}
+                onValueChange={(value) =>
+                  updatePreference("dateTimeFormat", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -342,7 +408,9 @@ function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTa
             >
               <Select
                 value={localPrefs.homePageView}
-                onValueChange={(value) => updatePreference('homePageView', value)}
+                onValueChange={(value) =>
+                  updatePreference("homePageView", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -359,28 +427,34 @@ function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTa
       </AccordionItem>
 
       <AccordionItem value="notifications">
-        <AccordionTrigger className="text-lg font-semibold">Notifications & Communication</AccordionTrigger>
+        <AccordionTrigger className="text-lg font-semibold">
+          Notifications & Communication
+        </AccordionTrigger>
         <AccordionContent className="space-y-6">
           <div className="space-y-4">
             <h4 className="font-medium">Email Notifications</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Object.entries(localPrefs.emailNotifications).map(([key, enabled]) => (
-                <PreferenceField
-                  key={key}
-                  label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                  description={`Email alerts for ${key}`}
-                >
-                  <Switch
-                    checked={enabled}
-                    onCheckedChange={(checked) => 
-                      updatePreference('emailNotifications', {
-                        ...localPrefs.emailNotifications,
-                        [key]: checked
-                      })
-                    }
-                  />
-                </PreferenceField>
-              ))}
+              {Object.entries(localPrefs.emailNotifications).map(
+                ([key, enabled]) => (
+                  <PreferenceField
+                    key={key}
+                    label={key
+                      .replace(/([A-Z])/g, " $1")
+                      .replace(/^./, (str) => str.toUpperCase())}
+                    description={`Email alerts for ${key}`}
+                  >
+                    <Switch
+                      checked={enabled}
+                      onCheckedChange={(checked) =>
+                        updatePreference("emailNotifications", {
+                          ...localPrefs.emailNotifications,
+                          [key]: checked,
+                        })
+                      }
+                    />
+                  </PreferenceField>
+                ),
+              )}
             </div>
           </div>
 
@@ -391,7 +465,9 @@ function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTa
           >
             <Select
               value={localPrefs.digestFrequency}
-              onValueChange={(value) => updatePreference('digestFrequency', value)}
+              onValueChange={(value) =>
+                updatePreference("digestFrequency", value)
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -412,7 +488,9 @@ function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTa
           >
             <Switch
               checked={localPrefs.appNotifications}
-              onCheckedChange={(checked) => updatePreference('appNotifications', checked)}
+              onCheckedChange={(checked) =>
+                updatePreference("appNotifications", checked)
+              }
             />
           </PreferenceField>
 
@@ -423,14 +501,18 @@ function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTa
           >
             <Switch
               checked={localPrefs.inAppMessageSounds}
-              onCheckedChange={(checked) => updatePreference('inAppMessageSounds', checked)}
+              onCheckedChange={(checked) =>
+                updatePreference("inAppMessageSounds", checked)
+              }
             />
           </PreferenceField>
         </AccordionContent>
       </AccordionItem>
 
       <AccordionItem value="display">
-        <AccordionTrigger className="text-lg font-semibold">Display & Layout</AccordionTrigger>
+        <AccordionTrigger className="text-lg font-semibold">
+          Display & Layout
+        </AccordionTrigger>
         <AccordionContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <PreferenceField
@@ -440,7 +522,9 @@ function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTa
             >
               <Select
                 value={localPrefs.dashboardDensity}
-                onValueChange={(value) => updatePreference('dashboardDensity', value)}
+                onValueChange={(value) =>
+                  updatePreference("dashboardDensity", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -459,7 +543,9 @@ function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTa
             >
               <Select
                 value={localPrefs.cardAnimation}
-                onValueChange={(value) => updatePreference('cardAnimation', value)}
+                onValueChange={(value) =>
+                  updatePreference("cardAnimation", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -479,7 +565,9 @@ function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTa
             >
               <Select
                 value={localPrefs.analyticsStyle}
-                onValueChange={(value) => updatePreference('analyticsStyle', value)}
+                onValueChange={(value) =>
+                  updatePreference("analyticsStyle", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -498,7 +586,7 @@ function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTa
             >
               <Select
                 value={localPrefs.fontSize}
-                onValueChange={(value) => updatePreference('fontSize', value)}
+                onValueChange={(value) => updatePreference("fontSize", value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -519,7 +607,9 @@ function BasicPreferencesTab({ preferences, onSave, saving }: BasicPreferencesTa
           >
             <Switch
               checked={localPrefs.quickActionsOnHover}
-              onCheckedChange={(checked) => updatePreference('quickActionsOnHover', checked)}
+              onCheckedChange={(checked) =>
+                updatePreference("quickActionsOnHover", checked)
+              }
             />
           </PreferenceField>
         </AccordionContent>
@@ -534,20 +624,29 @@ interface AdvancedPreferencesTabProps {
   saving: boolean;
 }
 
-function AdvancedPreferencesTab({ preferences, onSave, saving }: AdvancedPreferencesTabProps) {
+function AdvancedPreferencesTab({
+  preferences,
+  onSave,
+  saving,
+}: AdvancedPreferencesTabProps) {
   // ...existing code... Similar structure to BasicPreferencesTab but with advanced settings
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h3 className="font-medium text-blue-900 mb-2">Advanced Settings</h3>
         <p className="text-blue-700 text-sm">
-          These settings provide fine-grained control over AI behavior, workflows, and integrations.
-          Changes here affect how the platform operates for you.
+          These settings provide fine-grained control over AI behavior,
+          workflows, and integrations. Changes here affect how the platform
+          operates for you.
         </p>
       </div>
-      
+
       {/* Advanced settings accordion similar to basic, but with more complex controls */}
-      <Accordion type="multiple" defaultValue={["ai-settings"]} className="space-y-4">
+      <Accordion
+        type="multiple"
+        defaultValue={["ai-settings"]}
+        className="space-y-4"
+      >
         {/* AI & Analytics section */}
         {/* Workflow & Automation section */}
         {/* Security & Privacy section */}
@@ -562,11 +661,17 @@ interface AgencyOverridesTabProps {
   saving: boolean;
 }
 
-function AgencyOverridesTab({ overrides, onSave, saving }: AgencyOverridesTabProps) {
+function AgencyOverridesTab({
+  overrides,
+  onSave,
+  saving,
+}: AgencyOverridesTabProps) {
   if (!overrides) {
     return (
       <div className="text-center p-8">
-        <p className="text-gray-600">Agency overrides are only available for admin users.</p>
+        <p className="text-gray-600">
+          Agency overrides are only available for admin users.
+        </p>
       </div>
     );
   }
@@ -574,13 +679,15 @@ function AgencyOverridesTab({ overrides, onSave, saving }: AgencyOverridesTabPro
   return (
     <div className="space-y-6">
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-        <h3 className="font-medium text-amber-900 mb-2">⚠️ Agency-Level Overrides</h3>
+        <h3 className="font-medium text-amber-900 mb-2">
+          ⚠️ Agency-Level Overrides
+        </h3>
         <p className="text-amber-700 text-sm">
-          These settings apply globally across all brands and users in your agency.
-          Changes here will override individual user preferences.
+          These settings apply globally across all brands and users in your
+          agency. Changes here will override individual user preferences.
         </p>
       </div>
-      
+
       {/* Agency override controls */}
     </div>
   );
@@ -593,7 +700,12 @@ interface PreferenceFieldProps {
   children: React.ReactNode;
 }
 
-function PreferenceField({ label, description, help, children }: PreferenceFieldProps) {
+function PreferenceField({
+  label,
+  description,
+  help,
+  children,
+}: PreferenceFieldProps) {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
@@ -607,9 +719,7 @@ function PreferenceField({ label, description, help, children }: PreferenceField
           </div>
         )}
       </div>
-      {description && (
-        <p className="text-sm text-gray-600">{description}</p>
-      )}
+      {description && <p className="text-sm text-gray-600">{description}</p>}
       {children}
     </div>
   );

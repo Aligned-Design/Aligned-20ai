@@ -14,10 +14,12 @@ export interface ButtonProps
   asChild?: boolean;
 }
 
-const buttonVariants = (props?: {
-  variant?: ButtonProps["variant"];
-  size?: ButtonProps["size"];
-} | null) => {
+const buttonVariants = (
+  props?: {
+    variant?: ButtonProps["variant"];
+    size?: ButtonProps["size"];
+  } | null,
+) => {
   const { variant = "default", size = "default" } = props || {};
 
   const baseStyles =
@@ -42,7 +44,7 @@ const buttonVariants = (props?: {
   return cn(
     baseStyles,
     variantStyles[variant] || variantStyles.default,
-    sizeStyles[size] || sizeStyles.default
+    sizeStyles[size] || sizeStyles.default,
   );
 };
 
@@ -55,7 +57,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       />
     );
-  }
+  },
 );
 Button.displayName = "Button";
 
