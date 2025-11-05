@@ -144,7 +144,7 @@ export function AppLayout({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">{children}</div>
+      <main className="flex-1 flex flex-col overflow-auto bg-gray-50">{children}</main>
     </div>
   );
 }
