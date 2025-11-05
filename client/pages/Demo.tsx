@@ -208,7 +208,7 @@ export default function Demo() {
       </div>
 
       {/* Demo Dashboard */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="dashboard">📊 Dashboard</TabsTrigger>
