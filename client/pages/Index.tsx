@@ -119,7 +119,7 @@ export default function Index() {
               <CardTitle className="text-slate-900">Aligned Strategy</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-200">
+              <p className="text-slate-600">
                 Analyzes performance data and recommends optimal posting times and content strategies.
               </p>
             </CardContent>
