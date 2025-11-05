@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Plus
 } from 'lucide-react';
+import Reveal from '@/components/Reveal';
 
 interface Integration {
   id: string;
@@ -174,6 +175,7 @@ export default function Integrations() {
       </div>
 
       <main className="max-w-7xl mx-auto px-6 py-20 space-y-8">
+        <Reveal>
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold">Available Integrations</h2>
@@ -209,6 +211,7 @@ export default function Integrations() {
             </div>
           );
         })}
+      </Reveal>
       </main>
     </div>
   );
@@ -226,7 +229,7 @@ function IntegrationCard({
   getStatusColor: (status: Integration['status']) => string;
 }) {
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="h-full hover:shadow-lg transition-shadow">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
