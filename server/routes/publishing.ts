@@ -453,3 +453,133 @@ export const refreshToken: RequestHandler = async (req, res) => {
     });
   }
 };
+
+// Publish blog post to WordPress, Squarespace, or Wix
+export const publishBlogPost: RequestHandler = async (req, res) => {
+  try {
+    const { brandId, platform } = req.params;
+    const {
+      title,
+      content,
+      excerpt,
+      mediaUrls,
+      tags,
+      categories,
+      scheduledFor
+    } = req.body;
+
+    if (!title || !content) {
+      return res.status(400).json({
+        error: 'Missing required fields: title, content'
+      });
+    }
+
+    const supportedPlatforms = ['wordpress', 'squarespace', 'wix'];
+    if (!supportedPlatforms.includes(platform)) {
+      return res.status(400).json({
+        error: `Blog publishing not supported for ${platform}`
+      });
+    }
+
+    // Get connection
+    const connection = await connectionsDB.getConnection(brandId, platform as Platform);
+    if (!connection || connection.status !== 'connected') {
+      return res.status(401).json({
+        error: 'Platform not connected or connection expired'
+      });
+    }
+
+    // Import the integration service dynamically to avoid circular dependencies
+    const { IntegrationService } = await import('../lib/integrations/integration-service');
+
+    const result = await IntegrationService.publishBlogPost(
+      platform as any,
+      connection.metadata || {},
+      {
+        title,
+        content,
+        excerpt,
+        mediaUrls,
+        tags,
+        categories,
+        scheduledFor
+      }
+    );
+
+    res.json({
+      success: true,
+      message: `Blog post published to ${platform}${scheduledFor ? ' (scheduled)' : ''}`,
+      result
+    });
+  } catch (error) {
+    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
+      path: req.path,
+      requestId: req.headers['x-request-id'] as string
+    });
+  }
+};
+
+// Publish email campaign to Mailchimp, Squarespace, or Wix
+export const publishEmailCampaign: RequestHandler = async (req, res) => {
+  try {
+    const { brandId, platform } = req.params;
+    const {
+      title,
+      subject,
+      content,
+      htmlContent,
+      listIds,
+      excerpt,
+      scheduledFor
+    } = req.body;
+
+    if (!title || !subject || !content) {
+      return res.status(400).json({
+        error: 'Missing required fields: title, subject, content'
+      });
+    }
+
+    const supportedPlatforms = ['mailchimp', 'squarespace', 'wix'];
+    if (!supportedPlatforms.includes(platform)) {
+      return res.status(400).json({
+        error: `Email publishing not supported for ${platform}`
+      });
+    }
+
+    // Get connection
+    const connection = await connectionsDB.getConnection(brandId, platform as Platform);
+    if (!connection || connection.status !== 'connected') {
+      return res.status(401).json({
+        error: 'Platform not connected or connection expired'
+      });
+    }
+
+    // Import the integration service dynamically
+    const { IntegrationService } = await import('../lib/integrations/integration-service');
+
+    const result = await IntegrationService.publishEmailCampaign(
+      platform as any,
+      connection.metadata || {},
+      {
+        title,
+        subject,
+        content,
+        htmlContent,
+        listIds,
+        excerpt,
+        scheduledFor
+      }
+    );
+
+    res.json({
+      success: true,
+      message: `Email campaign published to ${platform}${scheduledFor ? ' (scheduled)' : ''}`,
+      result
+    });
+  } catch (error) {
+    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
+      path: req.path,
+      requestId: req.headers['x-request-id'] as string
+    });
+  }
+};

@@ -10,6 +10,7 @@ export type PlatformProvider =
   | "squarespace"
   | "mailchimp"
   | "wordpress"
+  | "wix"
   | "shopify"
   | "woocommerce"
   | "faire"
@@ -297,6 +298,17 @@ export const PLATFORM_CONFIGS: Record<PlatformProvider, PlatformConfig> = {
     icon: "📝",
     color: "#21759B",
     supportedContentTypes: ["blog"],
+    requiresAuth: true,
+    supportsScheduling: true,
+  },
+  wix: {
+    provider: "wix",
+    name: "Wix",
+    category: "web_blog",
+    tier: 1,
+    icon: "⚙️",
+    color: "#FFB700",
+    supportedContentTypes: ["blog", "email"],
     requiresAuth: true,
     supportsScheduling: true,
   },
