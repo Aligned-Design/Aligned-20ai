@@ -176,13 +176,33 @@ export function useBrandIntelligence(brandId: string): UseBrandIntelligenceRetur
       const errorMessage = getErrorMessage(err);
       setError(errorMessage);
 
-      // Comprehensive error logging for debugging
-      console.error('[Brand Intelligence] Error:', {
-        error: err,
-        message: errorMessage,
-        brandId,
-        timestamp: new Date().toISOString()
-      });
+      // Comprehensive error logging for debugging — ensure objects are stringified to avoid `[object Object]`
+      try {
+        const serializedError = (function stringifySafe(value: any) {
+          try {
+            return JSON.stringify(value, (_k, v) => {
+              // Convert functions to their names, handle Error objects
+              if (v instanceof Error) {
+                return { message: v.message, stack: v.stack };
+              }
+              if (typeof v === 'function') return `[Function: ${v.name || 'anonymous'}]`;
+              return v;
+            });
+          } catch (e) {
+            return String(value);
+          }
+        })(err);
+
+        console.error(`[Brand Intelligence] Error: ${serializedError}`, {
+          message: errorMessage,
+          brandId,
+          timestamp: new Date().toISOString()
+        });
+      } catch (logErr) {
+        // Fallback logging
+        console.error('[Brand Intelligence] Error (logging failed):', String(logErr));
+        console.error('[Brand Intelligence] Original error:', err);
+      }
 
       // Log to telemetry/monitoring service if available
       if (typeof window !== 'undefined' && (window as any).__telemetry?.error) {
