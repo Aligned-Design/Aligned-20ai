@@ -214,7 +214,7 @@ export default function Index() {
       </div>
 
       {/* Agency Positioning Section */}
-      <div className="bg-gray-50 py-16 border-t border-b border-gray-100 relative z-10">
+      <div className="bg-gray-50 py-20 border-t border-b border-gray-100 relative z-10">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
