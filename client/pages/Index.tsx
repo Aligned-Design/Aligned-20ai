@@ -80,7 +80,7 @@ export default function Index() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 mb-16 items-stretch">
-          <Card className="rounded-2xl bg-white/6 backdrop-blur-sm border border-white/8 p-6 shadow-md transform transition-transform hover:-translate-y-2">
+          <Card className="rounded-2xl bg-white border border-gray-100 p-6 shadow-md transform transition-transform hover:-translate-y-2 h-full">
             <CardHeader>
               <div className="inline-flex items-center gap-2 rounded-lg bg-white/8 px-3 py-1.5 text-xs font-medium text-[#A6E22E] w-fit">
                 <FileText className="h-3 w-3 text-[#A6E22E]" />
@@ -95,7 +95,7 @@ export default function Index() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl bg-white/6 backdrop-blur-sm border border-white/8 p-6 shadow-md transform transition-transform hover:-translate-y-2">
+          <Card className="rounded-2xl bg-white border border-gray-100 p-6 shadow-md transform transition-transform hover:-translate-y-2 h-full">
             <CardHeader>
               <div className="inline-flex items-center gap-2 rounded-lg bg-white/8 px-3 py-1.5 text-xs font-medium text-[#C49CFF] w-fit">
                 <Palette className="h-3 w-3 text-[#C49CFF]" />
@@ -110,7 +110,7 @@ export default function Index() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl bg-white/6 backdrop-blur-sm border border-white/8 p-6 shadow-md transform transition-transform hover:-translate-y-2">
+          <Card className="rounded-2xl bg-white border border-gray-100 p-6 shadow-md transform transition-transform hover:-translate-y-2 h-full">
             <CardHeader>
               <div className="inline-flex items-center gap-2 rounded-lg bg-white/8 px-3 py-1.5 text-xs font-medium text-[#9EFFB8] w-fit">
                 <Brain className="h-3 w-3 text-[#9EFFB8]" />
