@@ -47,7 +47,8 @@ class OAuthStateCache {
       platform,
       codeVerifier,
       createdAt: now,
-      expiresAt: now + ttlSeconds * 1000
+      expiresAt: now + ttlSeconds * 1000,
+      ttlSeconds
     });
 
     console.log(`✅ OAuth state stored: ${state.substring(0, 8)}... for platform ${platform}`);
