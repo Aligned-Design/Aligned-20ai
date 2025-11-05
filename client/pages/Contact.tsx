@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import FooterNew from '@/components/FooterNew';
+import Reveal from '@/components/Reveal';
 
 export default function Contact() {
   return (
@@ -14,6 +15,7 @@ export default function Contact() {
       </div>
 
       <main className="max-w-7xl mx-auto px-6 py-20">
+        <Reveal>
         <div className="grid md:grid-cols-2 gap-12">
           <div>
             <h2 className="text-2xl font-semibold text-slate-900 mb-4">Talk to a human</h2>
@@ -34,6 +36,7 @@ export default function Contact() {
             </Button>
           </div>
         </div>
+        </Reveal>
       </main>
 
       <FooterNew />
