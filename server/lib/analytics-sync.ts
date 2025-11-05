@@ -332,7 +332,7 @@ export class AnalyticsSync {
         throw new Error(`Pinterest API error: ${pinsResponse.statusText}`);
       }
 
-      const pinsData = await pinsResponse.json();
+      const pinsData: any = await pinsResponse.json();
       // Filter by date range
       return (pinsData.data || []).filter((pin: unknown) => {
         const pinTime = new Date(pin.created_at).getTime();
@@ -585,7 +585,7 @@ export class AnalyticsSync {
         throw new Error(`Pinterest API error: ${pinsResponse.statusText}`);
       }
 
-      const pinsData = await pinsResponse.json();
+      const pinsData: any = await pinsResponse.json();
       return pinsData.data || [];
     } catch (error) {
       console.error('Pinterest fetch error:', error);
