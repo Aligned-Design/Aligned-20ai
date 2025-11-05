@@ -84,7 +84,7 @@ export async function sendEmail(options: SendEmailOptions, retryCount = 0): Prom
   const RETRY_DELAY_MS = 1000;
 
   try {
-    let result: unknown;
+    let result: any;
 
     if (USE_SENDGRID) {
       result = await sendViaSegndGrid(options);
