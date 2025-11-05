@@ -40,7 +40,7 @@ export default function Index() {
             Aligned AI Platform
           </div>
 
-          <div className="rounded-2xl bg-white/6 backdrop-blur-md border border-white/8 p-12 shadow-2xl">
+          <Reveal className="mx-auto"><div className="rounded-2xl bg-white/6 backdrop-blur-md border border-white/8 p-12 shadow-2xl">
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
               Intelligent Brand Content
               <span className="text-[#C9F06A]"> at Scale</span>
@@ -65,7 +65,7 @@ export default function Index() {
                 </Link>
               </Button>
             </div>
-          </div>
+          </div></Reveal>
         </div>
       </div>
 
