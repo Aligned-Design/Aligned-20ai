@@ -69,10 +69,11 @@ export default function Events() {
 
       if (error) throw error;
       setEvents(data || []);
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error loading events",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
