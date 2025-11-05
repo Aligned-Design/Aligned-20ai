@@ -13,7 +13,7 @@ class OpenAIProvider implements AIProvider {
     this.apiKey = apiKey
   }
 
-  async generateContent(prompt: string, options: unknown = {}): Promise<string> {
+  async generateContent(prompt: string, options: Record<string, any> = {}): Promise<string> {
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -73,7 +73,7 @@ class AnthropicProvider implements AIProvider {
     this.apiKey = apiKey
   }
 
-  async generateContent(prompt: string, options: unknown = {}): Promise<string> {
+  async generateContent(prompt: string, options: Record<string, any> = {}): Promise<string> {
     try {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
