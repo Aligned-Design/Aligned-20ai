@@ -224,6 +224,7 @@ export default function Index() {
       <div className="bg-gray-50 py-20 border-t border-b border-gray-100 relative z-10">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-3xl mx-auto">
+            <Reveal>
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-700 mb-6 border border-gray-100">
                 <span>🎯</span>
@@ -270,6 +271,7 @@ export default function Index() {
                 not replace it. You stay in the driver's seat while AI handles the repetitive work.
               </p>
             </div>
+            </Reveal>
           </div>
         </div>
       </div>
