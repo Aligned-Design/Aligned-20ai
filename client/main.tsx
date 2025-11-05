@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './global.css';
 import { initializeMonitoring, SentryErrorBoundary } from './utils/monitoring';
+import { AuthProvider } from './contexts/AuthContext';
+import { BrandProvider } from './contexts/BrandContext';
 
 // Initialize error tracking and performance monitoring
 initializeMonitoring();
@@ -45,7 +47,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       )}
       showDialog={true}
     >
-      <App />
+      <AuthProvider>
+        <BrandProvider>
+          <App />
+        </BrandProvider>
+      </AuthProvider>
     </SentryErrorBoundary>
   </React.StrictMode>
 );
