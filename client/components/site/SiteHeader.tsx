@@ -58,7 +58,7 @@ export default function SiteHeader() {
           </Button>
           <Button
             asChild
-            className="bg-gradient-to-r from-violet to-azure text-white shadow-glow hover:shadow-glow-azure"
+            variant="default"
           >
             <Link to="/signup">Get started</Link>
           </Button>
