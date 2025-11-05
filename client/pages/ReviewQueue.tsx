@@ -42,7 +42,7 @@ interface ReviewItem {
   brand_id: string;
   agent: string;
   input: unknown;
-  output: unknown;
+  output: DocOutput | unknown;
   bfs?: BrandFidelityScore;
   linter_results?: LinterResult;
   timestamp: string;
