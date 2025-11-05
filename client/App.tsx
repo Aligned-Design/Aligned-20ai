@@ -107,6 +107,21 @@ function AppContent() {
           <Pricing />
         </Suspense>
       } />
+      <Route path="/features" element={
+        <Suspense fallback={<PageLoader />}>
+          <Features />
+        </Suspense>
+      } />
+      <Route path="/contact" element={
+        <Suspense fallback={<PageLoader />}>
+          <Contact />
+        </Suspense>
+      } />
+      <Route path="/legal" element={
+        <Suspense fallback={<PageLoader />}>
+          <Legal />
+        </Suspense>
+      } />
       <Route path="/demo" element={
         <Suspense fallback={<PageLoader />}>
           <Demo />
