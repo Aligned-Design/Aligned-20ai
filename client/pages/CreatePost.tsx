@@ -79,10 +79,11 @@ export default function CreatePost() {
 
       if (error) throw error;
       setConnections(data || []);
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error loading connections",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
