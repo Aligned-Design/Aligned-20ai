@@ -138,7 +138,8 @@ export function useBrandIntelligence(brandId: string): UseBrandIntelligenceRetur
       );
 
       // Log response diagnostics for debugging
-      console.debug('[Brand Intelligence] fetch response status:', response.status, 'content-type:', response.headers.get('content-type'));
+      const respContentType = response && response.headers && (typeof response.headers.get === 'function' ? response.headers.get('content-type') : response.headers['content-type']) || '';
+      console.debug('[Brand Intelligence] fetch response status:', response.status, 'content-type:', respContentType);
 
       // Handle non-OK status codes
       if (!response.ok) {
