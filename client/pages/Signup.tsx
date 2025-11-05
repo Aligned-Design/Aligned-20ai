@@ -47,10 +47,11 @@ export default function Signup() {
       });
 
       navigate('/dashboard');
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: 'Signup failed',
-        description: error.message || 'Could not create account',
+        description: message || 'Could not create account',
         variant: 'destructive',
       });
     } finally {
