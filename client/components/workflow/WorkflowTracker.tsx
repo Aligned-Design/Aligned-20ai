@@ -14,10 +14,10 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { WorkflowInstance, WorkflowStepInstance, WorkflowAction } from '@shared/workflow';
+import { WorkflowStepInstance, WorkflowAction } from '@shared/workflow';
 
 interface WorkflowTrackerProps {
-  workflow: WorkflowInstance;
+  workflow: any; // workflow may come from external source; validate at runtime
   canTakeAction: boolean;
   onAction: (action: WorkflowAction) => void;
   className?: string;
