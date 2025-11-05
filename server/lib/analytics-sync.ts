@@ -789,10 +789,10 @@ export class AnalyticsSync {
    * Scrub PII from metadata before storing in database
    * Removes email addresses, phone numbers, usernames, and other sensitive data
    */
-  private scrubbePII(metadata: unknown): unknown {
+  private scrubbePII(metadata: any): any {
     if (!metadata) return metadata;
 
-    const scrubbedData = { ...metadata };
+    const scrubbedData: any = { ...(metadata || {}) };
 
     // Patterns for common PII
     const patterns = {
