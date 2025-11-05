@@ -1,0 +1,307 @@
+/**
+ * Audit Log Routes
+ * Provides endpoints for querying, filtering, and exporting audit logs
+ */
+
+import { RequestHandler } from 'express';
+import { z } from 'zod';
+import {
+  queryAuditLogs,
+  getAuditStatistics,
+  exportAuditLogs,
+  getPostAuditTrail,
+} from '../lib/audit-logger';
+import type { AuditLogQuery } from '@shared/approvals';
+
+// ==================== TYPES & VALIDATION ====================
+
+const AuditLogQuerySchema = z.object({
+  brandId: z.string().optional(),
+  postId: z.string().optional(),
+  actorId: z.string().optional(),
+  action: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  limit: z.coerce.number().int().min(1).max(1000).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
+const AuditExportQuerySchema = z.object({
+  brandId: z.string(),
+  startDate: z.string(),
+  endDate: z.string(),
+  format: z.enum(['csv', 'json']).default('csv'),
+});
+
+/**
+ * GET /api/audit/logs
+ * Query audit logs with filtering and pagination
+ */
+export const getAuditLogs: RequestHandler = async (req, res) => {
+  try {
+    const brandId = req.headers['x-brand-id'] as string;
+
+    if (!brandId) {
+      return res.status(400).json({
+        error: 'Missing required header: x-brand-id',
+      });
+    }
+
+    // Validate query parameters
+    const validationResult = AuditLogQuerySchema.safeParse(req.query);
+    if (!validationResult.success) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        details: validationResult.error.errors,
+      });
+    }
+
+    const query: AuditLogQuery = {
+      ...validationResult.data,
+      brandId, // Enforce brand context
+    };
+
+    const { logs, total, hasMore } = await queryAuditLogs(query);
+
+    res.json({
+      success: true,
+      logs,
+      pagination: {
+        total,
+        limit: query.limit || 50,
+        offset: query.offset || 0,
+        hasMore,
+      },
+    });
+  } catch (error) {
+    console.error('[Audit Logs] Query error:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to query audit logs',
+    });
+  }
+};
+
+/**
+ * GET /api/audit/logs/:postId
+ * Get complete audit trail for a specific post
+ */
+export const getPostAuditLog: RequestHandler = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const brandId = req.headers['x-brand-id'] as string;
+
+    if (!brandId) {
+      return res.status(400).json({
+        error: 'Missing required header: x-brand-id',
+      });
+    }
+
+    if (!postId) {
+      return res.status(400).json({
+        error: 'Post ID is required',
+      });
+    }
+
+    const logs = await getPostAuditTrail(brandId, postId);
+
+    res.json({
+      success: true,
+      postId,
+      logs,
+      total: logs.length,
+    });
+  } catch (error) {
+    console.error('[Post Audit Trail] Error:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to get audit trail',
+    });
+  }
+};
+
+/**
+ * GET /api/audit/stats
+ * Get audit statistics and summary metrics
+ */
+export const getAuditStats: RequestHandler = async (req, res) => {
+  try {
+    const brandId = req.headers['x-brand-id'] as string;
+    const { startDate, endDate } = req.query as { startDate?: string; endDate?: string };
+
+    if (!brandId) {
+      return res.status(400).json({
+        error: 'Missing required header: x-brand-id',
+      });
+    }
+
+    const stats = await getAuditStatistics(brandId, startDate, endDate);
+
+    res.json({
+      success: true,
+      stats,
+      period: {
+        startDate: startDate || 'all-time',
+        endDate: endDate || new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error('[Audit Stats] Error:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to get audit statistics',
+    });
+  }
+};
+
+/**
+ * GET /api/audit/export
+ * Export audit logs in CSV or JSON format
+ */
+export const exportAuditLogsHandler: RequestHandler = async (req, res) => {
+  try {
+    const brandId = req.headers['x-brand-id'] as string;
+    const { startDate, endDate, format } = req.query as {
+      startDate?: string;
+      endDate?: string;
+      format?: 'csv' | 'json';
+    };
+
+    if (!brandId) {
+      return res.status(400).json({
+        error: 'Missing required header: x-brand-id',
+      });
+    }
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({
+        error: 'startDate and endDate are required',
+      });
+    }
+
+    const exportFormat = format || 'csv';
+
+    if (exportFormat === 'csv') {
+      const csv = await exportAuditLogs(brandId, startDate, endDate);
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="audit-logs-${brandId}-${Date.now()}.csv"`
+      );
+      res.send(csv);
+    } else {
+      // JSON export
+      const { logs } = await queryAuditLogs({
+        brandId,
+        startDate,
+        endDate,
+        limit: 10000,
+      });
+
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="audit-logs-${brandId}-${Date.now()}.json"`
+      );
+      res.json({
+        exported: new Date().toISOString(),
+        brandId,
+        period: { startDate, endDate },
+        total: logs.length,
+        logs,
+      });
+    }
+  } catch (error) {
+    console.error('[Audit Export] Error:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to export audit logs',
+    });
+  }
+};
+
+/**
+ * POST /api/audit/search
+ * Advanced search with multiple filters
+ */
+export const searchAuditLogs: RequestHandler = async (req, res) => {
+  try {
+    const brandId = req.headers['x-brand-id'] as string;
+    const { postId, actorEmail, action, startDate, endDate, limit = 50, offset = 0 } = req.body;
+
+    if (!brandId) {
+      return res.status(400).json({
+        error: 'Missing required header: x-brand-id',
+      });
+    }
+
+    const query: AuditLogQuery = {
+      brandId,
+      postId,
+      action,
+      startDate,
+      endDate,
+      limit: Math.min(limit, 1000),
+      offset,
+    };
+
+    const { logs, total, hasMore } = await queryAuditLogs(query);
+
+    // Filter by actor email if provided
+    let filtered = logs;
+    if (actorEmail) {
+      filtered = logs.filter((log) => log.actorEmail.toLowerCase().includes(actorEmail.toLowerCase()));
+    }
+
+    res.json({
+      success: true,
+      logs: filtered,
+      pagination: {
+        total,
+        limit,
+        offset,
+        hasMore,
+      },
+      appliedFilters: {
+        postId: postId || null,
+        actorEmail: actorEmail || null,
+        action: action || null,
+        dateRange: startDate && endDate ? { startDate, endDate } : null,
+      },
+    });
+  } catch (error) {
+    console.error('[Audit Search] Error:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to search audit logs',
+    });
+  }
+};
+
+/**
+ * GET /api/audit/actions
+ * Get list of possible audit actions for filtering
+ */
+export const getAuditActions: RequestHandler = async (req, res) => {
+  try {
+    const actions = [
+      'APPROVAL_REQUESTED',
+      'APPROVED',
+      'REJECTED',
+      'BULK_APPROVED',
+      'BULK_REJECTED',
+      'PUBLISH_FAILED',
+      'EMAIL_SENT',
+      'COMMENT_ADDED',
+      'WORKFLOW_STARTED',
+      'SETTINGS_UPDATED',
+      'EMAIL_PREFERENCES_UPDATED',
+    ];
+
+    res.json({
+      success: true,
+      actions,
+    });
+  } catch (error) {
+    console.error('[Audit Actions] Error:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to get audit actions',
+    });
+  }
+};

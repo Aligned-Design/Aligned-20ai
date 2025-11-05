@@ -66,6 +66,14 @@ import {
   lockPostsAfterApproval,
 } from "./routes/bulk-approvals";
 import {
+  getAuditLogs,
+  getPostAuditLog,
+  getAuditStats,
+  exportAuditLogsHandler,
+  searchAuditLogs,
+  getAuditActions,
+} from "./routes/audit";
+import {
   getWorkflowTemplates,
   createWorkflowTemplate,
   startWorkflow,
@@ -557,6 +565,14 @@ export function createServer() {
   app.post("/api/client/unsubscribe", unsubscribeFromEmails);
   app.post("/api/client/settings/resubscribe", resubscribeToEmails);
   app.get("/api/client/settings/verify-unsubscribe", verifyUnsubscribeToken);
+
+  // Audit log routes (PHASE 9: Audit Log Viewer)
+  app.get("/api/audit/logs", getAuditLogs);
+  app.get("/api/audit/logs/:postId", getPostAuditLog);
+  app.get("/api/audit/stats", getAuditStats);
+  app.get("/api/audit/export", exportAuditLogsHandler);
+  app.post("/api/audit/search", searchAuditLogs);
+  app.get("/api/audit/actions", getAuditActions);
 
   // Workflow routes
   app.get("/api/workflow/templates", getWorkflowTemplates);
