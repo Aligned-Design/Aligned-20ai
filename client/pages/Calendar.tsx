@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
+import { HelpTooltip } from '@/components/ui/help-tooltip';
+import {
+  ChevronLeft,
+  ChevronRight,
   Plus,
   Filter,
   Calendar as CalendarIcon
@@ -120,17 +121,26 @@ export default function Calendar() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Content Calendar</h1>
+          <div className="flex items-center gap-2 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900">Content Calendar</h1>
+            <HelpTooltip content="View all your scheduled posts in one place. See what's planned across all your brands and platforms." side="bottom" />
+          </div>
           <p className="text-gray-600">Schedule and manage your content across all platforms</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2 relative group">
             <Filter className="h-4 w-4" />
             Filter
+            <span className="absolute -right-1 -top-1">
+              <HelpTooltip content="Filter by brand, platform, or status to find specific posts quickly." side="bottom" />
+            </span>
           </Button>
-          <Button className="gap-2">
+          <Button className="gap-2 relative group">
             <Plus className="h-4 w-4" />
             Schedule Content
+            <span className="absolute -right-1 -top-1">
+              <HelpTooltip content="Create and schedule a new post. Choose your brand, platform, and timing." side="bottom" />
+            </span>
           </Button>
         </div>
       </div>
@@ -138,10 +148,13 @@ export default function Calendar() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <CalendarIcon className="h-5 w-5" />
-              {monthYear}
-            </CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2">
+                <CalendarIcon className="h-5 w-5" />
+                {monthYear}
+              </CardTitle>
+              <HelpTooltip content="Each cell shows scheduled posts for that day. Blue boxes indicate scheduled content. Click a day to view or edit posts." side="right" />
+            </div>
             <div className="flex gap-2">
               <Button 
                 variant="outline" 
@@ -208,7 +221,10 @@ export default function Calendar() {
       {/* Upcoming Events */}
       <Card>
         <CardHeader>
-          <CardTitle>Upcoming Events</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle>Upcoming Events</CardTitle>
+            <HelpTooltip content="A list of your next scheduled posts. Shows the time, brand, platform, and current status (draft, scheduled, or published)." side="right" />
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">

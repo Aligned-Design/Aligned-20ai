@@ -1,6 +1,7 @@
 import { useBrand } from '@/contexts/BrandContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { HelpTooltip } from '@/components/ui/help-tooltip';
 import { BarChart3, TrendingUp, TrendingDown, Eye, Heart, Share2, MessageCircle } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { DashboardSkeleton } from '@/components/ui/skeletons';
@@ -28,7 +29,10 @@ export default function Analytics() {
     <div className="p-8 space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Analytics & Insights</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-3xl font-bold">Analytics & Insights</h1>
+            <HelpTooltip content="Track your content performance across all platforms. See reach, engagement, and AI-powered recommendations to improve your strategy." side="bottom" />
+          </div>
           <p className="text-muted-foreground mt-1">
             Performance metrics for {currentBrand.name}
           </p>
@@ -43,6 +47,7 @@ export default function Analytics() {
           change="+18%"
           trend="up"
           icon={<Eye className="h-5 w-5" />}
+          tooltip="How many unique people saw your content. Higher reach = bigger audience impact."
         />
         <MetricCard
           title="Engagement"
@@ -50,6 +55,7 @@ export default function Analytics() {
           change="+24%"
           trend="up"
           icon={<Heart className="h-5 w-5" />}
+          tooltip="Calculated as (likes + comments + shares) ÷ impressions. Shows how much your audience interacts with content."
         />
         <MetricCard
           title="Shares"
@@ -57,6 +63,7 @@ export default function Analytics() {
           change="+12%"
           trend="up"
           icon={<Share2 className="h-5 w-5" />}
+          tooltip="How many times your post was shared. Higher shares indicate content worth sharing."
         />
         <MetricCard
           title="Comments"
@@ -64,12 +71,16 @@ export default function Analytics() {
           change="-5%"
           trend="down"
           icon={<MessageCircle className="h-5 w-5" />}
+          tooltip="Direct responses to your content. Shows audience engagement and conversation depth."
         />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-xl border bg-card p-6">
-          <h3 className="text-lg font-semibold mb-4">Top Performing Content</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className="text-lg font-semibold">Top Performing Content</h3>
+            <HelpTooltip content="Your best-performing posts this month. Use these as a template for future content to replicate success." side="right" />
+          </div>
           <div className="space-y-3">
             <PerformanceItem
               title="5 Ways to Boost Productivity"
@@ -93,7 +104,10 @@ export default function Analytics() {
         </div>
 
         <div className="rounded-xl border bg-card p-6">
-          <h3 className="text-lg font-semibold mb-4">Advisor Agent Recommendations</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className="text-lg font-semibold">Advisor Agent Recommendations</h3>
+            <HelpTooltip content="AI-powered suggestions to improve your content strategy. Recommendations are based on your performance data." side="left" />
+          </div>
           <div className="space-y-4">
             <RecommendationItem
               priority="high"
@@ -116,7 +130,10 @@ export default function Analytics() {
 
       <div className="rounded-xl border bg-card p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold">Platform Performance</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold">Platform Performance</h3>
+            <HelpTooltip content="How your content is performing on each platform. Focus efforts on platforms with highest engagement growth." side="right" />
+          </div>
           <Badge variant="outline">Last 30 days</Badge>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
@@ -135,12 +152,14 @@ function MetricCard({
   change,
   trend,
   icon,
+  tooltip,
 }: {
   title: string;
   value: string;
   change: string;
   trend: 'up' | 'down';
   icon: React.ReactNode;
+  tooltip?: string;
 }) {
   const TrendIcon = trend === 'up' ? TrendingUp : TrendingDown;
   const trendColor = trend === 'up' ? 'text-green-600' : 'text-red-600';
@@ -148,7 +167,10 @@ function MetricCard({
   return (
     <div className="rounded-xl border bg-card p-6">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm text-muted-foreground">{title}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">{title}</span>
+          {tooltip && <HelpTooltip content={tooltip} side="right" />}
+        </div>
         <div className="text-muted-foreground">{icon}</div>
       </div>
       <div className="text-2xl font-bold">{value}</div>

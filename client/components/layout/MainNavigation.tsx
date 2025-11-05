@@ -2,17 +2,18 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  LayoutDashboard, 
-  Building2, 
-  Calendar, 
-  FileText, 
-  BarChart3, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Building2,
+  Calendar,
+  FileText,
+  BarChart3,
+  Settings,
   Brain,
   Users,
   Search,
-  LogOut
+  LogOut,
+  HelpCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -141,6 +142,22 @@ export function MainNavigation({ userRole, brandName, onLogout }: MainNavigation
             </Link>
           );
         })}
+      </div>
+
+      {/* Help & Support Section */}
+      <div className="p-4 border-t border-gray-200">
+        <Link
+          to="/help"
+          className={cn(
+            "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+            currentPath === '/help'
+              ? "bg-blue-50 text-blue-700 border border-blue-200"
+              : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+          )}
+        >
+          <HelpCircle className="h-5 w-5" />
+          <span className="flex-1">Help & Support</span>
+        </Link>
       </div>
 
       {/* User Menu */}
