@@ -386,7 +386,8 @@ function MetricCard({ title, current, previous, change, icon, color, isPercentag
   isPercentage?: boolean;
 }) {
   const isPositive = change > 0;
-  const displayValue = isPercentage ? `${current}%` : formatNumber(current);
+  const safeCurrent = typeof current === 'number' && !Number.isNaN(current) ? current : 0;
+  const displayValue = isPercentage ? `${safeCurrent}%` : formatNumber(safeCurrent);
 
   return (
     <Card className="transition-all hover:shadow-lg">
@@ -883,8 +884,10 @@ function ReportBuilderModal({ brandId, onClose, onSave, report }: {
   );
 }
 
-function formatNumber(num: number): string {
-  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-  return num.toString();
+function formatNumber(num?: number | null): string {
+  if (num === null || num === undefined || Number.isNaN(Number(num))) return '0';
+  const n = Number(num);
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+  return n.toString();
 }
