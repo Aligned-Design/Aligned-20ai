@@ -104,8 +104,8 @@ export function AppLayout({
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-blue-50 text-blue-700 border border-blue-200"
-                    : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
+                    ? "bg-[#071025] text-white border border-gray-800"
+                    : "text-slate-200 hover:bg-[#071025]/20 hover:text-white",
                 )}
               >
                 <Icon className="h-5 w-5" />
