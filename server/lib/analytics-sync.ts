@@ -620,7 +620,7 @@ export class AnalyticsSync {
     }
   }
 
-  private normalizeMetrics(brandId: string, platform: Platform, rawData: unknown[]): AnalyticsMetric[] {
+  private normalizeMetrics(brandId: string, platform: Platform, rawData: any[]): AnalyticsMetric[] {
     return rawData.map((item, index) => ({
       id: `${platform}_${brandId}_${Date.now()}_${index}`,
       brandId,
