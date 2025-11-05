@@ -410,13 +410,13 @@ export default function BrandIntake() {
   const progress = (currentStep / SECTIONS.length) * 100;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="border-b bg-card sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
+    <div className="min-h-screen bg-gray-50">
+      <div className="border-b bg-white sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold">Brand Intake Form</h1>
-              <p className="text-sm text-muted-foreground">
+              <h1 className="text-2xl font-bold text-slate-900">Brand Intake Form</h1>
+              <p className="text-sm text-slate-600">
                 Step {currentStep} of {SECTIONS.length}:{" "}
                 {SECTIONS[currentStep - 1].title}
               </p>
@@ -433,13 +433,13 @@ export default function BrandIntake() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {currentStep === 1 && formData.websiteUrl && (
-          <div className="mb-6 rounded-xl border border-border/50 bg-card p-6 shadow-soft">
+          <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-md">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="font-semibold mb-1">Import from Website</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-semibold mb-1 text-slate-900">Import from Website</h3>
+                <p className="text-sm text-slate-600">
                   Automatically extract brand colors, voice, and keywords from
                   your website.
                 </p>
