@@ -162,7 +162,7 @@ export class AnalyticsSync {
         throw new Error(`Instagram API error: ${postsResponse.statusText}`);
       }
 
-      const postsData = await postsResponse.json();
+      const postsData: any = await postsResponse.json();
       return postsData.data || [];
     } catch (error) {
       console.error('Instagram date-range fetch error:', error);
@@ -183,7 +183,7 @@ export class AnalyticsSync {
         throw new Error(`Facebook API error: ${postsResponse.statusText}`);
       }
 
-      const postsData = await postsResponse.json();
+      const postsData: any = await postsResponse.json();
       return postsData.data || [];
     } catch (error) {
       console.error('Facebook date-range fetch error:', error);
@@ -210,7 +210,7 @@ export class AnalyticsSync {
         throw new Error(`LinkedIn API error: ${postsResponse.statusText}`);
       }
 
-      const postsData = await postsResponse.json();
+      const postsData: any = await postsResponse.json();
       // Filter posts by date range
       return (postsData.elements || []).filter((post: unknown) => {
         const postTime = post.createdTime || 0;
@@ -378,7 +378,7 @@ export class AnalyticsSync {
         throw new Error(`Instagram API error: ${postsResponse.statusText}`);
       }
 
-      const postsData = await postsResponse.json();
+      const postsData: any = await postsResponse.json();
       
       // Fetch account insights
       const accountResponse = await fetch(
@@ -409,7 +409,7 @@ export class AnalyticsSync {
         throw new Error(`Facebook API error: ${postsResponse.statusText}`);
       }
 
-      const postsData = await postsResponse.json();
+      const postsData: any = await postsResponse.json();
 
       // Fetch page insights
       const pageInsightsResponse = await fetch(
@@ -446,7 +446,7 @@ export class AnalyticsSync {
         throw new Error(`LinkedIn API error: ${postsResponse.statusText}`);
       }
 
-      const postsData = await postsResponse.json();
+      const postsData: any = await postsResponse.json();
 
       // Fetch organization insights
       const insightsResponse = await fetch(
