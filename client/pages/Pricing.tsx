@@ -59,7 +59,7 @@ export default function Pricing() {
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+        <div className="max-w-7xl mx-auto px-6 py-20 text-center">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Simple, Transparent Pricing
