@@ -5,7 +5,7 @@ import { Sparkles } from "lucide-react";
 export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl shadow-soft">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-6">
         <Link
           to="/"
           className="flex items-center gap-2.5"
