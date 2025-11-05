@@ -30,13 +30,13 @@ export class DatabaseError extends Error {
   }
 }
 
-function handleError(error: unknown, operation: string): DatabaseError {
+function handleError(error: any, operation: string): DatabaseError {
   console.error(`[Database] ${operation} failed:`, error);
 
-  const message = error?.message || error?.error_description || 'Unknown database error';
-  const code = error?.code || 'UNKNOWN';
+  const message = (error && (error.message || error.error_description)) || 'Unknown database error';
+  const code = (error && (error.code || 'UNKNOWN')) || 'UNKNOWN';
 
-  return new DatabaseError(`${operation}: ${message}`, code, error);
+  return new DatabaseError(`${operation}: ${message}`, code, error as Error);
 }
 
 // ==================== CLIENT SETTINGS ====================
