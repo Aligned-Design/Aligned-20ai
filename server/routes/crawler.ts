@@ -10,6 +10,7 @@
 
 import { Router } from "express";
 import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabase";
 import {
   processBrandIntake,
   crawlWebsite,
