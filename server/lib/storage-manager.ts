@@ -94,7 +94,6 @@ export async function deleteAssetWithVariants(
   ];
 
   if (asset.thumbnailPath) pathsToDelete.push(asset.thumbnailPath);
-  if (asset.posterPath) pathsToDelete.push(asset.posterPath);
 
   const { error } = await supabase.storage
     .from(bucketName)

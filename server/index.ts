@@ -53,6 +53,10 @@ import { serverEnv } from '@shared/env';
 import { builderWebhook } from "./routes/builder";
 import { validateAIProviders } from "./workers/ai-generation";
 import { generateContent as generateContentWorker, getProviders } from "./routes/ai-generation";
+import { recoverPublishingJobs } from "./lib/job-recovery";
+import publishingRouter from "./routes/publishing-router";
+import { scheduleAnalyticsSyncJobs, syncBrandAnalytics, generateBrandMonthlyPlan, getSyncStatus } from "./lib/analytics-scheduler";
+import { autoPlanGenerator } from "./lib/auto-plan-generator";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -177,6 +181,9 @@ export function createServer() {
   // Media management routes (PHASE 6)
   app.use("/api/media", mediaManagementRouter);
 
+  // Publishing routes (PHASE 7)
+  app.use("/api/publishing", publishingRouter);
+
   // Legacy media routes (kept for backward compatibility)
   app.post("/api/media/upload", uploadMedia);
   app.get("/api/media/list", listMedia);
@@ -191,7 +198,7 @@ export function createServer() {
   app.get("/api/analytics/:brandId/insights", getInsights);
   app.get("/api/analytics/:brandId/forecast", getForecast);
   app.post("/api/analytics/voice-query", processVoiceQuery);
-  app.post("/api/analytics/insights/:insightId/feedback", provideFeedback);
+  app.post("/api/analytics/:brandId/feedback", provideFeedback);
   app.get("/api/analytics/:brandId/goals", getGoals);
   app.post("/api/analytics/:brandId/goals", createGoal);
   app.post("/api/analytics/:brandId/sync", syncPlatformData);
@@ -199,6 +206,86 @@ export function createServer() {
   app.get("/api/analytics/:brandId/heatmap", getEngagementHeatmap);
   app.get("/api/analytics/:brandId/alerts", getAlerts);
   app.post("/api/analytics/alerts/:alertId/acknowledge", acknowledgeAlert);
+
+  // Auto-plan generation routes
+  app.get("/api/analytics/:brandId/plans/current", async (req, res) => {
+    try {
+      const { brandId } = req.params;
+      const plan = await autoPlanGenerator.getCurrentMonthPlan(brandId);
+      if (!plan) {
+        return res.status(404).json({ error: 'No plan found for current month' });
+      }
+      res.json(plan);
+    } catch (error) {
+      console.error('Failed to fetch current plan:', error);
+      res.status(500).json({ error: 'Failed to fetch current plan' });
+    }
+  });
+
+  app.post("/api/analytics/:brandId/plans/generate", async (req, res) => {
+    try {
+      const { brandId } = req.params;
+      const { month } = req.body;
+      const plan = await generateBrandMonthlyPlan(
+        brandId,
+        brandId,
+        month ? new Date(month) : undefined
+      );
+      res.json(plan);
+    } catch (error) {
+      console.error('Failed to generate plan:', error);
+      res.status(500).json({ error: 'Failed to generate plan' });
+    }
+  });
+
+  app.post("/api/analytics/:brandId/plans/:planId/approve", async (req, res) => {
+    try {
+      const { brandId, planId } = req.params;
+      const userId = (req.query.userId as string) || 'system';
+      const plan = await autoPlanGenerator.approvePlan(brandId, brandId, planId, userId);
+      res.json(plan);
+    } catch (error) {
+      console.error('Failed to approve plan:', error);
+      res.status(500).json({ error: 'Failed to approve plan' });
+    }
+  });
+
+  app.get("/api/analytics/:brandId/plans/history", async (req, res) => {
+    try {
+      const { brandId } = req.params;
+      const limit = parseInt(req.query.limit as string) || 12;
+      const plans = await autoPlanGenerator.getPlanHistory(brandId, limit);
+      res.json(plans);
+    } catch (error) {
+      console.error('Failed to fetch plan history:', error);
+      res.status(500).json({ error: 'Failed to fetch plan history' });
+    }
+  });
+
+  // Analytics scheduler status routes
+  app.post("/api/analytics/:brandId/sync-now", async (req, res) => {
+    try {
+      const { brandId } = req.params;
+      const syncPromise = syncBrandAnalytics(brandId, brandId);
+      // Don't wait for sync to complete, return immediately
+      syncPromise.catch(err => console.error('Async sync error:', err));
+      res.json({ message: 'Sync initiated', status: 'pending' });
+    } catch (error) {
+      console.error('Failed to initiate sync:', error);
+      res.status(500).json({ error: 'Failed to initiate sync' });
+    }
+  });
+
+  app.get("/api/analytics/:brandId/sync-status", async (req, res) => {
+    try {
+      const { brandId } = req.params;
+      const status = await getSyncStatus(brandId);
+      res.json(status);
+    } catch (error) {
+      console.error('Failed to fetch sync status:', error);
+      res.status(500).json({ error: 'Failed to fetch sync status' });
+    }
+  });
 
   // Enhanced Preferences routes
   app.get("/api/preferences", (req, res) => {
@@ -343,10 +430,10 @@ export function createServer() {
 
   app.post("/api/preferences/validate", (req, res) => {
     const { section, updates } = req.body;
-    
-    const errors = [];
-    const warnings = [];
-    
+
+    const errors: Array<{ field: string; message: string }> = [];
+    const warnings: Array<{ field: string; message: string }> = [];
+
     if (section === 'aiSettings') {
       if (updates.creativityLevel === 'experimental') {
         warnings.push({
@@ -1123,7 +1210,22 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const app = createServer();
   const port = parseInt(process.env.PORT || process.env.PORT || '3001', 10);
 
-  app.listen(port, () => {
+  app.listen(port, async () => {
     console.log(`Server running on port ${port}`);
+
+    // Initialize PHASE 7: Job Recovery on startup
+    try {
+      await recoverPublishingJobs();
+    } catch (error) {
+      console.error('Failed to recover publishing jobs:', error);
+    }
+
+    // Initialize PHASE 8: Analytics Scheduler
+    try {
+      scheduleAnalyticsSyncJobs();
+      console.log('📅 Analytics scheduler initialized');
+    } catch (error) {
+      console.error('Failed to initialize analytics scheduler:', error);
+    }
   });
 }

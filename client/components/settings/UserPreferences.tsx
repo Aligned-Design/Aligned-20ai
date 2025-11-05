@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/accordion';
 import { HelpCircle, Check, Download, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { UserPreferences, BasicPreferences, AdvancedPreferences, AgencyOverrides } from '@shared/preferences';
+import { UserPreferences, BasicPreferences, AdvancedPreferences, AgencyOverrides, Language, DateTimeFormat, NotificationFrequency, DashboardDensity, CardAnimation, AnalyticsStyle, FontSize } from '@shared/preferences';
 
 interface UserPreferencesProps {
   userRole: 'admin' | 'manager' | 'client';
@@ -48,13 +48,21 @@ export function UserPreferencesComponent({ userRole, className }: UserPreference
     }
   };
 
-  const savePreferences = async (section: 'basic' | 'advanced' | 'agency', updates: any) => {
+  const savePreferences = async (section: keyof UserPreferences | 'basic' | 'advanced' | 'agency', updates: any) => {
     try {
       setSaving(true);
+      // Map component section names to UserPreferences section names
+      const sectionMap: Record<string, keyof UserPreferences> = {
+        'basic': 'interface',
+        'advanced': 'advanced',
+        'agency': 'advanced'
+      };
+      const actualSection = sectionMap[section as string] || (section as keyof UserPreferences);
+
       const response = await fetch('/api/preferences', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section, preferences: updates })
+        body: JSON.stringify({ section: actualSection, preferences: updates })
       });
 
       if (response.ok) {
@@ -152,15 +160,65 @@ export function UserPreferencesComponent({ userRole, className }: UserPreference
 
         <TabsContent value="basic">
           <BasicPreferencesTab
-            preferences={preferences.basic}
-            onSave={(updates) => savePreferences('basic', updates)}
+            preferences={{
+              theme: (preferences.interface?.theme as 'light' | 'dark' | 'auto') || 'auto',
+              language: (preferences.interface?.language as Language) || 'en',
+              timezone: preferences.interface?.timezone || 'UTC',
+              dateTimeFormat: '12h' as DateTimeFormat,
+              homePageView: (preferences.interface?.defaultDashboardView || 'dashboard') as 'dashboard' | 'calendar' | 'analytics',
+              emailNotifications: {
+                approvals: preferences.notifications?.email?.types?.contentReady ?? true,
+                newReview: preferences.notifications?.email?.types?.approvalNeeded ?? true,
+                failedPost: preferences.notifications?.email?.types?.analyticsReports ?? false,
+                analyticsDigest: preferences.notifications?.email?.types?.systemUpdates ?? false
+              },
+              digestFrequency: (preferences.notifications?.email?.frequency as NotificationFrequency) || 'daily',
+              appNotifications: preferences.notifications?.inApp?.enabled ?? true,
+              inAppMessageSounds: false,
+              dashboardDensity: 'comfortable' as DashboardDensity,
+              cardAnimation: 'smooth' as CardAnimation,
+              analyticsStyle: 'graph-heavy' as AnalyticsStyle,
+              fontSize: 'medium' as FontSize,
+              quickActionsOnHover: true
+            }}
+            onSave={(updates) => {
+              if (updates.theme) savePreferences('interface', { theme: updates.theme });
+              if (updates.language) savePreferences('interface', { language: updates.language });
+            }}
             saving={saving}
           />
         </TabsContent>
 
         <TabsContent value="advanced">
           <AdvancedPreferencesTab
-            preferences={preferences.advanced}
+            preferences={{
+              analyticsEmailCadence: 'daily',
+              reportFormat: 'pdf',
+              aiInsightLevel: 'detailed',
+              showBenchmarks: true,
+              includeCompetitorMentions: false,
+              tonePreset: preferences.aiSettings?.defaultTone === 'professional' ? 'safe' : 'bold',
+              voiceAdaptationSpeed: 'balanced',
+              autoGenerateNextMonthPlan: false,
+              autoApproveAISuggestions: false,
+              languageStyle: 'us-english',
+              aiRegenerationTriggers: 'manual',
+              draftVisibility: 'internal-only',
+              commentTagAlerts: 'digest',
+              clientCommentVisibility: false,
+              autoMeetingSummaries: false,
+              taskIntegration: 'none',
+              meetingNotesToAI: 'ask-each-time',
+              autoSaveInterval: 'manual',
+              approvalWorkflow: '1-step',
+              graceWindowHours: 24,
+              postFailureHandling: 'notify-only',
+              twoFactorAuth: false,
+              sessionTimeout: '8h',
+              ipWhitelist: [],
+              autoDataExport: false,
+              dataExportFrequency: 'weekly'
+            }}
             onSave={(updates) => savePreferences('advanced', updates)}
             saving={saving}
           />
@@ -169,8 +227,24 @@ export function UserPreferencesComponent({ userRole, className }: UserPreference
         {userRole === 'admin' && (
           <TabsContent value="agency">
             <AgencyOverridesTab
-              overrides={preferences.agencyOverrides}
-              onSave={(updates) => savePreferences('agency', updates)}
+              overrides={{
+                defaultSafetyMode: 'safe',
+                globalBrandQuotaTemplate: {},
+                defaultAnalyticsEmailSchedule: 'weekly',
+                clientAccessControls: {
+                  uploads: true,
+                  reviews: true,
+                  events: true,
+                  analytics: true,
+                  pipeline: true
+                },
+                whiteLabel: false,
+                defaultReportSections: [],
+                forceMFA: false,
+                disableAutoAIPlan: false,
+                maintenanceMode: false
+              }}
+              onSave={(updates) => savePreferences('advanced', updates)}
               saving={saving}
             />
           </TabsContent>

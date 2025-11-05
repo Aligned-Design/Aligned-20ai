@@ -10,6 +10,7 @@ import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import { readFile } from "fs/promises";
 import { join } from "path";
+import type { AIGenerationRequest, AIGenerationResponse } from "@shared/api";
 
 export type AIProvider = "openai" | "claude";
 
@@ -204,6 +205,69 @@ export async function loadPromptTemplate(
     
     // Fallback templates
     return getFallbackTemplate(agent);
+  }
+}
+
+/**
+ * Generate Builder.io compatible content
+ * Optimized for visual content blocks and structured data
+ */
+export async function generateBuilderContent(
+  request: AIGenerationRequest
+): Promise<AIGenerationResponse> {
+  const { prompt, agentType, provider } = request;
+
+  const builderPrompt = `${prompt}
+
+Generate content optimized for Builder.io visual editor with these requirements:
+- Return structured content that works well in visual blocks
+- Include metadata for Builder.io field mapping
+- Consider responsive design needs
+- Generate content that's easily editable in visual editor
+- Follow AGENTS.md Fusion Starter specifications
+
+Agent type: ${agentType}
+
+Return as valid JSON with this structure:
+{
+  "content": "Generated content here",
+  "title": "Content title",
+  "description": "Brief description",
+  "tags": ["tag1", "tag2"],
+  "builderFields": {
+    "heading": "Main heading",
+    "subheading": "Subheading if applicable",
+    "cta": "Call to action text",
+    "ctaUrl": "/target-url"
+  }
+}`;
+
+  try {
+    const result = await generateWithAI(builderPrompt, agentType, provider);
+
+    // Try to parse as JSON first
+    try {
+      const parsed = JSON.parse(result);
+      return {
+        content: parsed.content || result,
+        provider: provider || "openai",
+        agentType: agentType
+      };
+    } catch (parseError) {
+      // Fallback if not valid JSON
+      return {
+        content: result,
+        provider: provider || "openai",
+        agentType: agentType
+      };
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Generation failed';
+    return {
+      content: `Error: ${errorMessage}`,
+      provider: provider || "openai",
+      agentType: agentType
+    };
   }
 }
 

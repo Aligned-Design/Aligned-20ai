@@ -1,313 +1,257 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { 
+  Sparkles, 
+  Users, 
+  Calendar, 
+  BarChart3, 
+  Shield, 
+  Lock,
+  LinkIcon,
+  ArrowRight,
+  Brain,
+  FileText,
+  Palette
+} from 'lucide-react';
 
-function Index() {
+export default function Index() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-      <div className="max-w-md mx-auto text-center p-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Aligned 20 AI
-        </h1>
-        <p className="text-lg text-gray-600 mb-8">
-          Fusion Starter Template Ready for Builder.io
-        </p>
-        <div className="space-y-4">
-          <button className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
-            Get Started
-          </button>
-          <p className="text-sm text-gray-500">
-            Built with React Router 6 SPA + TypeScript + Vite
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Hero Section */}
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 mb-6">
+            <Sparkles className="h-4 w-4" />
+            Aligned AI Platform
+          </div>
+          
+          <h1 className="text-5xl font-bold text-gray-900 mb-6">
+            Intelligent Brand Content
+            <span className="text-blue-600"> at Scale</span>
+          </h1>
+          
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Three specialized AI agents working together to create, review, and publish 
+            on-brand content across all your social platforms.
           </p>
+          
+          <div className="flex gap-4 justify-center">
+            <Button asChild size="lg" className="gap-2">
+              <Link to="/login">
+                Get Started
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button variant="outline" size="lg" asChild>
+              <Link to="/demo">
+                View Demo
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
 
-export default Index;
-          <p className="text-lg text-gray-600 mb-8">
-            Fusion Starter Template Ready for Builder.io
+      {/* Features Section */}
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Three Specialized AI Agents
+          </h2>
+          <p className="text-lg text-gray-600">
+            One platform, three roles—working in sync
           </p>
-          <div className="space-y-4">
-            <button className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
-              Get Started
-            </button>
-            <p className="text-sm text-gray-500">
-              Built with React Router 6 SPA + TypeScript + Vite
-            </p>
-          </div>
         </div>
-      </div>
-      <SiteFooter />
-    </>
-  );
-}
 
-export default Index;
-
-function Feature({
-  icon,
-  title,
-  desc,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-}) {
-  return (
-    <div className="group rounded-2xl border border-border/50 bg-background p-8 shadow-soft transition-all hover:shadow-md hover:border-border">
-      <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-violet/10 text-violet transition-all group-hover:bg-violet/20">
-        {icon}
-      </div>
-      <h4 className="text-base font-semibold">{title}</h4>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-        {desc}
-      </p>
-    </div>
-  );
-}
-
-function Step({
-  index,
-  title,
-  desc,
-}: {
-  index: number;
-  title: string;
-  desc: string;
-}) {
-  return (
-    <li className="rounded-2xl border border-border/50 bg-background p-7 shadow-soft">
-      <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-violet/10 text-sm font-semibold text-violet">
-        {index}
-      </div>
-      <h5 className="mt-4 text-base font-semibold">{title}</h5>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-        {desc}
-      </p>
-    </li>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-border/50 bg-background/80 p-6 text-center backdrop-blur-sm shadow-soft">
-      <div className="text-3xl font-semibold text-foreground">{value}</div>
-      <div className="mt-2 text-sm text-muted-foreground">{label}</div>
-    </div>
-  );
-}
-              Specialized AI Agents
-            </div>
-            <h3 className="text-3xl font-semibold tracking-tight md:text-4xl">
-              One platform, three roles—working in sync
-            </h3>
-            <p className="text-lg text-muted-foreground">
-              Each agent learns your brand and collaborates to deliver on‑brand
-              content at scale.
-            </p>
-          </div>
-          <div className="grid gap-8 md:grid-cols-3">
-            <div className="group relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-background to-muted/30 p-8 shadow-soft transition-all hover:shadow-md hover:border-violet/50">
-              <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-violet/10 blur-3xl transition-all group-hover:bg-violet/20" />
-              <div className="relative">
-                <div className="inline-flex items-center gap-2 rounded-lg bg-violet/10 px-3 py-1.5 text-xs font-medium text-violet">
-                  Doc Agent
-                </div>
-                <h4 className="mt-4 text-xl font-semibold">Aligned Words</h4>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  Writes captions, blogs, emails, and CTA variations in your
-                  brand voice.
-                </p>
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <Card className="border-2 hover:border-blue-200 transition-colors">
+            <CardHeader>
+              <div className="inline-flex items-center gap-2 rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 w-fit">
+                <FileText className="h-3 w-3" />
+                Doc Agent
               </div>
-            </div>
-            <div className="group relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-background to-muted/30 p-8 shadow-soft transition-all hover:shadow-md hover:border-coral/50">
-              <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-coral/10 blur-3xl transition-all group-hover:bg-coral/20" />
-              <div className="relative">
-                <div className="inline-flex items-center gap-2 rounded-lg bg-coral/10 px-3 py-1.5 text-xs font-medium text-coral">
-                  Design Agent
-                </div>
-                <h4 className="mt-4 text-xl font-semibold">Aligned Creative</h4>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  Produces visuals, templates, and video prompts that fit your
-                  look and message.
-                </p>
-              </div>
-            </div>
-            <div className="group relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-background to-muted/30 p-8 shadow-soft transition-all hover:shadow-md hover:border-azure/50">
-              <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-azure/10 blur-3xl transition-all group-hover:bg-azure/20" />
-              <div className="relative">
-                <div className="inline-flex items-center gap-2 rounded-lg bg-azure/10 px-3 py-1.5 text-xs font-medium text-azure">
-                  Advisor Agent
-                </div>
-                <h4 className="mt-4 text-xl font-semibold">Aligned Insights</h4>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  Studies analytics and trends, recommending what to post, when,
-                  and why.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Intelligent Brand Kits & Features */}
-        <section
-          id="features"
-          className="relative border-y border-border/50 bg-gradient-to-b from-muted/20 to-background"
-        >
-          <div className="container mx-auto grid gap-12 px-4 py-20 md:py-28">
-            <span
-              id="security"
-              className="absolute -top-16 block h-1 w-1 opacity-0"
-            />
-            <div className="mx-auto max-w-3xl text-center space-y-4">
-              <h3 className="text-3xl font-semibold tracking-tight md:text-4xl">
-                Intelligent Brand Kits and seamless workflows
-              </h3>
-              <p className="text-lg text-muted-foreground">
-                Upload once. Aligned AI learns your tone, style, and compliance
-                rules—then keeps every asset on‑brand.
+              <CardTitle>Aligned Words</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">
+                Writes captions, blogs, emails, and CTA variations in your exact brand voice.
               </p>
-            </div>
-            <div className="grid gap-6 md:grid-cols-3">
-              <Feature
-                icon={<FileText className="h-5 w-5" />}
-                title="Intelligent Brand Kits"
-                desc="Create a digital brand brain from your site, docs, and brand guides."
-              />
-              <Feature
-                icon={<Users className="h-5 w-5" />}
-                title="Seamless Approval"
-                desc="Threaded feedback, audit trails, and one‑click approvals."
-              />
-              <Feature
-                icon={<LinkIcon className="h-5 w-5" />}
-                title="Auto Publishing"
-                desc="Push approved posts to Instagram, Facebook, LinkedIn, X, and GMB."
-              />
-              <Feature
-                icon={<Shield className="h-5 w-5" />}
-                title="Brand Isolation"
-                desc="Separate, secure workspaces—no crossover, no confusion."
-              />
-              <Feature
-                icon={<Lock className="h-5 w-5" />}
-                title="Enterprise‑grade Security"
-                desc="Role‑based permissions and encryption for privacy and control."
-              />
-              <Feature
-                icon={<BarChart3 className="h-5 w-5" />}
-                title="Real‑time Analytics"
-                desc="Interactive dashboards with AI‑powered recommendations."
-              />
-            </div>
-          </div>
-        </section>
+            </CardContent>
+          </Card>
 
-        {/* Monthly Engine */}
-        <section
-          id="engine"
-          className="container mx-auto grid gap-12 px-4 py-20 md:py-28"
-        >
-          <div className="mx-auto max-w-3xl text-center space-y-4">
-            <h3 className="text-3xl font-semibold tracking-tight md:text-4xl">
-              Automated Monthly Content Engine
-            </h3>
-            <p className="text-lg text-muted-foreground">
-              By the 10th of each month, Aligned AI analyzes last month's
-              results, drafts all blogs, emails, and social posts for next
-              month, and schedules them for approval.
+          <Card className="border-2 hover:border-purple-200 transition-colors">
+            <CardHeader>
+              <div className="inline-flex items-center gap-2 rounded-lg bg-purple-100 px-3 py-1.5 text-xs font-medium text-purple-700 w-fit">
+                <Palette className="h-3 w-3" />
+                Design Agent
+              </div>
+              <CardTitle>Aligned Creative</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">
+                Creates templates, graphics, and visual content that matches your brand guidelines.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 hover:border-green-200 transition-colors">
+            <CardHeader>
+              <div className="inline-flex items-center gap-2 rounded-lg bg-green-100 px-3 py-1.5 text-xs font-medium text-green-700 w-fit">
+                <Brain className="h-3 w-3" />
+                Advisor Agent
+              </div>
+              <CardTitle>Aligned Strategy</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">
+                Analyzes performance data and recommends optimal posting times and content strategies.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Workflow Section */}
+      <div className="bg-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Streamlined Workflow
+            </h2>
+            <p className="text-lg text-gray-600">
+              From brand input to published content in four simple steps
             </p>
           </div>
-          <ol className="mx-auto grid max-w-5xl gap-6 md:grid-cols-4">
-            <Step
-              index={1}
-              title="Analyze"
-              desc="Ingests last month's performance across channels."
+
+          <div className="grid md:grid-cols-4 gap-8">
+            <WorkflowStep
+              number={1}
+              title="Create"
+              description="AI generates content based on your brand guidelines"
+              color="blue"
             />
-            <Step
-              index={2}
-              title="Draft"
-              desc="Creates on‑brand blogs, emails, and posts."
-            />
-            <Step
-              index={3}
+            <WorkflowStep
+              number={2}
               title="Review"
-              desc="Threaded feedback with version history."
+              description="Threaded feedback with version history"
+              color="purple"
             />
-            <Step
-              index={4}
+            <WorkflowStep
+              number={3}
+              title="Approve"
+              description="One-click approvals with audit trails"
+              color="green"
+            />
+            <WorkflowStep
+              number={4}
               title="Schedule"
-              desc="Auto‑publishes after one‑click approvals."
+              description="Auto-publishes after one-click approvals"
+              color="orange"
             />
-          </ol>
-          <div className="mx-auto max-w-3xl rounded-2xl border border-border/50 bg-muted/30 p-8 text-center shadow-soft backdrop-blur-sm">
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              Advisor Agent continuously learns from results to improve tone,
-              timing, and formats.
-            </p>
           </div>
-        </section>
-
-        {/* Analytics */}
-        <section
-          id="analytics"
-          className="relative overflow-hidden border-t border-border/50"
-        >
-          <div className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute left-1/2 top-[-30%] h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-gradient-to-br from-azure/10 via-mint/5 to-violet/10 blur-3xl animate-glow" />
-          </div>
-          <div className="container mx-auto grid gap-10 px-4 py-20 md:py-28">
-            <div className="mx-auto max-w-3xl text-center space-y-4">
-              <h3 className="text-3xl font-semibold tracking-tight md:text-4xl">
-                Real‑Time Analytics & AI Recommendations
-              </h3>
-              <p className="text-lg text-muted-foreground">
-                Interactive dashboards display engagement, reach, and
-                top‑performing content. Advisor Agent turns insights into
-                action—suggesting new topics, times, and formats for growth.
-              </p>
-            </div>
-            <div className="mx-auto grid max-w-4xl grid-cols-2 gap-6 md:grid-cols-4">
-              <Stat label="Engagement" value="↑ 32%" />
-              <Stat label="Reach" value="↑ 21%" />
-              <Stat label="Brand fidelity" value="> 80%" />
-              <Stat label="Time saved" value="− 50%" />
-            </div>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section
-          id="how-it-works"
-          className="container mx-auto grid gap-8 px-4 py-20 md:py-28"
-        >
-          <div className="mx-auto max-w-3xl text-center space-y-6">
-            <h3 className="text-3xl font-semibold tracking-tight md:text-4xl">
-              Make marketing flow—on‑brand, on‑time, and one step ahead
-            </h3>
-            <p className="text-lg text-muted-foreground">
-              One login. Infinite clarity. Switch between clients without losing
-              context, content, or consistency.
-            </p>
-            <div className="mt-8 flex items-center justify-center gap-4">
-              <Button
-                asChild
-                size="lg"
-                className="bg-gradient-to-r from-violet to-azure text-white shadow-glow hover:shadow-glow-azure"
-              >
-                <a href="#contact" className="inline-flex items-center">
-                  Request a demo <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <a href="#features">See features</a>
-              </Button>
-            </div>
-          </div>
-        </section>
+        </div>
       </div>
-      <SiteFooter />
-    </>
+
+      {/* Features Grid */}
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Everything You Need
+          </h2>
+          <p className="text-lg text-gray-600">
+            Professional-grade features for agencies and brands
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <Feature
+            icon={<Users className="h-5 w-5" />}
+            title="Seamless Approval"
+            desc="Threaded feedback, audit trails, and one-click approvals."
+          />
+          <Feature
+            icon={<LinkIcon className="h-5 w-5" />}
+            title="Auto Publishing"
+            desc="Push approved posts to Instagram, Facebook, LinkedIn, X, and GMB."
+          />
+          <Feature
+            icon={<Shield className="h-5 w-5" />}
+            title="Brand Isolation"
+            desc="Separate, secure workspaces—no crossover, no confusion."
+          />
+          <Feature
+            icon={<Lock className="h-5 w-5" />}
+            title="Enterprise Security"
+            desc="Role-based permissions and encryption for privacy and control."
+          />
+          <Feature
+            icon={<BarChart3 className="h-5 w-5" />}
+            title="Real-time Analytics"
+            desc="Interactive dashboards with AI-powered recommendations."
+          />
+          <Feature
+            icon={<Calendar className="h-5 w-5" />}
+            title="Smart Scheduling"
+            desc="AI-optimized posting times based on audience insights."
+          />
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="bg-blue-600 py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Ready to Scale Your Content?
+          </h2>
+          <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
+            Join leading agencies and brands using AI to create consistent, 
+            on-brand content at scale.
+          </p>
+          <div className="flex gap-4 justify-center">
+            <Button size="lg" variant="secondary">
+              <Link to="/signup">
+                Start Free Trial
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600">
+              <Link to="/demo">
+                Schedule Demo
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WorkflowStep({
+  number,
+  title,
+  description,
+  color,
+}: {
+  number: number;
+  title: string;
+  description: string;
+  color: 'blue' | 'purple' | 'green' | 'orange';
+}) {
+  const colorClasses = {
+    blue: 'bg-blue-100 text-blue-600',
+    purple: 'bg-purple-100 text-purple-600',
+    green: 'bg-green-100 text-green-600',
+    orange: 'bg-orange-100 text-orange-600',
+  };
+
+  return (
+    <div className="text-center">
+      <div className={`w-12 h-12 ${colorClasses[color]} rounded-full flex items-center justify-center mx-auto mb-4`}>
+        <span className="font-semibold">{number}</span>
+      </div>
+      <h3 className="font-semibold mb-2">{title}</h3>
+      <p className="text-sm text-gray-600">{description}</p>
+    </div>
   );
 }
 
@@ -321,48 +265,12 @@ function Feature({
   desc: string;
 }) {
   return (
-    <div className="group rounded-2xl border border-border/50 bg-background p-8 shadow-soft transition-all hover:shadow-md hover:border-border">
-      <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-violet/10 text-violet transition-all group-hover:bg-violet/20">
+    <div className="p-6 rounded-lg border bg-white hover:shadow-md transition-shadow">
+      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4 text-blue-600">
         {icon}
       </div>
-      <h4 className="text-base font-semibold">{title}</h4>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-        {desc}
-      </p>
-    </div>
-  );
-}
-
-function Step({
-  index,
-  title,
-  desc,
-}: {
-  index: number;
-  title: string;
-  desc: string;
-}) {
-  return (
-    <li className="rounded-2xl border border-border/50 bg-background p-7 shadow-soft">
-      <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-violet/10 text-sm font-semibold text-violet">
-        {index}
-      </div>
-      <h5 className="mt-4 text-base font-semibold">{title}</h5>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-        {desc}
-      </p>
-    </li>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-border/50 bg-background/80 p-6 text-center backdrop-blur-sm shadow-soft">
-      <div className="text-3xl font-semibold text-foreground">{value}</div>
-      <div className="mt-2 text-sm text-muted-foreground">{label}</div>
-    </div>
-  );
-}
+      <h3 className="font-semibold mb-2">{title}</h3>
+      <p className="text-gray-600 text-sm">{desc}</p>
     </div>
   );
 }

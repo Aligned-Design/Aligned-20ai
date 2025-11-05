@@ -41,4 +41,3 @@ export function TopBar({ userRole }: TopBarProps) {
     </header>
   );
 }
-}

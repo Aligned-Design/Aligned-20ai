@@ -179,13 +179,17 @@ export function WorkflowBuilder({ brandId, template, onSave, onCancel }: Workflo
                 <Input
                   type="number"
                   value={workflowTemplate.notifications?.reminderAfterHours || 24}
-                  onChange={(e) => setWorkflowTemplate(prev => ({
-                    ...prev,
-                    notifications: { 
-                      ...prev.notifications, 
-                      reminderAfterHours: parseInt(e.target.value) 
-                    }
-                  }))}
+                  onChange={(e) => setWorkflowTemplate(prev => {
+                    const notifications = prev.notifications || { emailOnStageChange: false };
+                    return {
+                      ...prev,
+                      notifications: {
+                        emailOnStageChange: notifications.emailOnStageChange ?? false,
+                        slackIntegration: notifications.slackIntegration,
+                        reminderAfterHours: parseInt(e.target.value)
+                      }
+                    };
+                  })}
                 />
               </div>
             </div>

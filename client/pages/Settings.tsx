@@ -57,12 +57,12 @@ export default function Settings() {
   const updatePreference = async (section: keyof UserPreferences, updates: Record<string, any>) => {
     if (!preferences) return;
 
+    const currentValue = preferences[section];
     const newPreferences = {
       ...preferences,
-      [section]: {
-        ...preferences[section],
-        ...updates
-      }
+      [section]: typeof currentValue === 'object' && currentValue !== null
+        ? { ...(currentValue as any), ...updates }
+        : updates
     };
 
     setPreferences(newPreferences);
@@ -638,7 +638,7 @@ function AdvancedSettings({ preferences, onUpdate }: {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3">
-            {preferences.advanced.experimental.betaFeatures.map((feature) => (
+            {preferences.advanced?.experimental?.betaFeatures?.map((feature: string) => (
               <div key={feature} className="flex items-center justify-between">
                 <div>
                   <span className="text-sm font-medium">{feature}</span>
@@ -651,10 +651,10 @@ function AdvancedSettings({ preferences, onUpdate }: {
 
           <div>
             <Label>AI Model Version</Label>
-            <Select 
-              value={preferences.advanced.experimental.aiModelVersion} 
-              onValueChange={(value) => onUpdate({ 
-                experimental: { ...preferences.advanced.experimental, aiModelVersion: value }
+            <Select
+              value={preferences.advanced?.experimental?.aiModelVersion || 'stable'}
+              onValueChange={(value) => onUpdate({
+                experimental: { ...(preferences.advanced?.experimental || {}), aiModelVersion: value }
               })}
             >
               <SelectTrigger>

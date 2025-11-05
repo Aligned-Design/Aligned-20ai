@@ -134,7 +134,7 @@ export function MainNavigation({ userRole, brandName, onLogout }: MainNavigation
               <Icon className="h-5 w-5" />
               <span className="flex-1">{item.label}</span>
               {item.badge && (
-                <Badge variant={item.badge.variant} size="sm">
+                <Badge variant={item.badge.variant}>
                   {item.badge.count}
                 </Badge>
               )}
@@ -155,17 +155,6 @@ export function MainNavigation({ userRole, brandName, onLogout }: MainNavigation
           </div>
           <Button variant="ghost" size="sm" onClick={onLogout}>
             <LogOut className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-    </nav>
-  );
-}
-            <p className="text-sm font-medium text-gray-900">John Doe</p>
-            <p className="text-xs text-gray-500">john@agency.com</p>
-          </div>
-          <Button variant="ghost" size="sm">
-            <Settings className="h-4 w-4" />
           </Button>
         </div>
       </div>

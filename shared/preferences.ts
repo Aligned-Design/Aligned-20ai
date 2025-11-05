@@ -114,7 +114,18 @@ export interface UserPreferences {
   id: string;
   userId: string;
   brandId?: string; // null for global user preferences
-  
+
+  // UI & Experience
+  interface: {
+    theme: 'light' | 'dark' | 'auto';
+    language: string;
+    timezone: string;
+    dateFormat: string;
+    showAdvancedOptions: boolean;
+    defaultDashboardView: string;
+    compactMode: boolean;
+  };
+
   // AI & Content Generation
   aiSettings: {
     defaultTone: 'professional' | 'casual' | 'friendly' | 'authoritative' | 'playful';
@@ -129,7 +140,7 @@ export interface UserPreferences {
     autoGenerateHashtags: boolean;
     maxContentLength: { [platform: string]: number };
   };
-  
+
   // Publishing & Automation
   publishing: {
     defaultPlatforms: string[];
@@ -150,7 +161,7 @@ export interface UserPreferences {
     };
     schedulingBuffer: number; // hours before auto-publish
   };
-  
+
   // Notifications & Alerts
   notifications: {
     email: {
@@ -173,7 +184,7 @@ export interface UserPreferences {
       channelMentions: boolean;
     };
   };
-  
+
   // Team & Permissions
   teamSettings: {
     role: 'admin' | 'manager' | 'creator' | 'viewer';
@@ -190,9 +201,9 @@ export interface UserPreferences {
       approvalWorkflow: string[]; // ordered list of approval steps
     };
   };
-  
-  // Advanced Settings
-  advanced: {
+
+  // Advanced Settings with experimental section
+  advanced?: {
     analytics: {
       reportingInterval: 'daily' | 'weekly' | 'monthly';
       customMetrics: string[];
@@ -202,24 +213,13 @@ export interface UserPreferences {
       rateLimits: { [endpoint: string]: number };
       webhookEndpoints: string[];
     };
-    experimental: {
+    experimental?: {
       betaFeatures: string[];
       aiModelVersion: string;
       advancedPromptSettings: boolean;
     };
   };
-  
-  // UI & Experience
-  interface: {
-    theme: 'light' | 'dark' | 'auto';
-    language: string;
-    timezone: string;
-    dateFormat: string;
-    showAdvancedOptions: boolean;
-    defaultDashboardView: string;
-    compactMode: boolean;
-  };
-  
+
   createdAt: string;
   updatedAt: string;
   lastSyncedAt: string;

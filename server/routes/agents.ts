@@ -89,7 +89,7 @@ router.post("/generate/doc", async (req, res) => {
     }
 
     let attempts = 0;
-    let output: DocOutput | null = null;
+    let output: DocOutput | undefined;
     let blocked = false;
     let needsReview = false;
 
@@ -135,7 +135,7 @@ router.post("/generate/doc", async (req, res) => {
         // Auto-fix if possible
         let finalContent = {
           body: aiOutput.body,
-          headline: finalOutput.headline || "",
+          headline: aiOutput.headline || "",
           cta: aiOutput.cta,
           hashtags: aiOutput.hashtags,
           platform: docInput.platform

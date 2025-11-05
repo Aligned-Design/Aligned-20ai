@@ -3,6 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Plus,
   Search,
@@ -11,22 +20,11 @@ import {
   Calendar,
   ExternalLink,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabase, type Brand } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useBrand } from "@/contexts/BrandContext";
-
-interface Brand {
-  id: string;
-  name: string;
-  logo: string;
-  status: "active" | "paused" | "setup";
-  platforms: string[];
-  lastActivity: string;
-  contentCount: number;
-  engagement: number;
-}
 
 export default function Brands() {
   const { brands, refreshBrands, setCurrentBrand, loading } = useBrand();
@@ -50,44 +48,11 @@ export default function Brands() {
 
   const loadBrands = async () => {
     try {
-      // Mock data - replace with actual API call
-      const mockBrands: Brand[] = [
-        {
-          id: "1",
-          name: "Nike",
-          logo: "👟",
-          status: "active",
-          platforms: ["Instagram", "Facebook", "Twitter"],
-          lastActivity: new Date().toISOString(),
-          contentCount: 24,
-          engagement: 4.2,
-        },
-        {
-          id: "2",
-          name: "Apple",
-          logo: "🍎",
-          status: "active",
-          platforms: ["Instagram", "LinkedIn"],
-          lastActivity: new Date(Date.now() - 86400000).toISOString(),
-          contentCount: 18,
-          engagement: 3.8,
-        },
-        {
-          id: "3",
-          name: "Tesla",
-          logo: "🚗",
-          status: "setup",
-          platforms: ["Twitter"],
-          lastActivity: new Date(Date.now() - 172800000).toISOString(),
-          contentCount: 5,
-          engagement: 0,
-        },
-      ];
-      setBrands(mockBrands);
+      // Brands are loaded from context via useBrand hook
+      // This component just displays them
+      refreshBrands();
     } catch (error) {
       console.error("Failed to load brands:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -301,30 +266,43 @@ export default function Brands() {
 }
 
 function BrandCard({ brand }: { brand: Brand }) {
-  const getStatusColor = (status: Brand["status"]) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800";
-      case "paused":
-        return "bg-yellow-100 text-yellow-800";
-      case "setup":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+  const nav = useNavigate();
+  const { setCurrentBrand } = useBrand();
+
+  const handleClick = () => {
+    setCurrentBrand(brand);
+    nav(`/brands/${brand.id}`);
+  };
+
+  const getLogoEmoji = () => {
+    if (brand.logo_url) {
+      return "📷";
     }
+    const industries: Record<string, string> = {
+      "technology": "💻",
+      "healthcare": "⚕️",
+      "finance": "💰",
+      "retail": "🛍️",
+      "food": "🍔",
+      "education": "🎓",
+      "entertainment": "🎭",
+      "sports": "⚽",
+      "travel": "✈️",
+    };
+    return industries[brand.industry?.toLowerCase() || ""] || "🏢";
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={handleClick}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="text-2xl">{brand.logo}</div>
+            <div className="text-2xl">{getLogoEmoji()}</div>
             <div>
               <CardTitle className="text-lg">{brand.name}</CardTitle>
-              <Badge className={getStatusColor(brand.status)}>
-                {brand.status}
-              </Badge>
+              {brand.industry && (
+                <p className="text-sm text-gray-600">{brand.industry}</p>
+              )}
             </div>
           </div>
           <Button variant="ghost" size="sm">
@@ -333,27 +311,27 @@ function BrandCard({ brand }: { brand: Brand }) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div>
-          <p className="text-sm text-gray-600 mb-2">Connected Platforms</p>
-          <div className="flex flex-wrap gap-1">
-            {brand.platforms.map((platform) => (
-              <Badge key={platform} variant="outline" className="text-xs">
-                {platform}
-              </Badge>
-            ))}
+        {brand.website_url && (
+          <div className="text-sm">
+            <p className="text-gray-600 mb-1">Website</p>
+            <a
+              href={brand.website_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline flex items-center gap-1"
+            >
+              {brand.website_url}
+              <ExternalLink className="h-3 w-3" />
+            </a>
           </div>
-        </div>
+        )}
 
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <p className="text-gray-600">Content</p>
-            <p className="font-semibold">{brand.contentCount} posts</p>
+        {brand.description && (
+          <div className="text-sm">
+            <p className="text-gray-600 mb-1">Description</p>
+            <p className="text-gray-800 line-clamp-2">{brand.description}</p>
           </div>
-          <div>
-            <p className="text-gray-600">Engagement</p>
-            <p className="font-semibold">{brand.engagement}%</p>
-          </div>
-        </div>
+        )}
 
         <div className="flex gap-2">
           <Button size="sm" variant="outline" className="flex-1 gap-1">
@@ -367,94 +345,7 @@ function BrandCard({ brand }: { brand: Brand }) {
         </div>
 
         <p className="text-xs text-gray-500">
-          Last activity:{" "}
-          {new Date(brand.lastActivity).toLocaleDateString()}
-        </p>
-      </CardContent>
-    </Card>
-  );
-}
-          title="No brands yet"
-          description="Create your first brand to unlock AI-powered content generation, automated scheduling, and intelligent analytics."
-          action={{
-            label: "Create Your First Brand",
-            onClick: () => setOpen(true),
-          }}
-        />
-      )}
-    </div>
-  );
-}
-
-function BrandCard({ brand }: { brand: Brand }) {
-  const getStatusColor = (status: Brand["status"]) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800";
-      case "paused":
-        return "bg-yellow-100 text-yellow-800";
-      case "setup":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  return (
-    <Card className="hover:shadow-lg transition-shadow">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="text-2xl">{brand.logo}</div>
-            <div>
-              <CardTitle className="text-lg">{brand.name}</CardTitle>
-              <Badge className={getStatusColor(brand.status)}>
-                {brand.status}
-              </Badge>
-            </div>
-          </div>
-          <Button variant="ghost" size="sm">
-            <Settings className="h-4 w-4" />
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <p className="text-sm text-gray-600 mb-2">Connected Platforms</p>
-          <div className="flex flex-wrap gap-1">
-            {brand.platforms.map((platform) => (
-              <Badge key={platform} variant="outline" className="text-xs">
-                {platform}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <p className="text-gray-600">Content</p>
-            <p className="font-semibold">{brand.contentCount} posts</p>
-          </div>
-          <div>
-            <p className="text-gray-600">Engagement</p>
-            <p className="font-semibold">{brand.engagement}%</p>
-          </div>
-        </div>
-
-        <div className="flex gap-2">
-          <Button size="sm" variant="outline" className="flex-1 gap-1">
-            <BarChart3 className="h-3 w-3" />
-            Analytics
-          </Button>
-          <Button size="sm" variant="outline" className="flex-1 gap-1">
-            <Calendar className="h-3 w-3" />
-            Calendar
-          </Button>
-        </div>
-
-        <p className="text-xs text-gray-500">
-          Last activity:{" "}
-          {new Date(brand.lastActivity).toLocaleDateString()}
+          Created: {new Date(brand.created_at).toLocaleDateString()}
         </p>
       </CardContent>
     </Card>

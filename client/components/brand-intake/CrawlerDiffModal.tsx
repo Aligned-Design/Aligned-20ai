@@ -185,7 +185,7 @@ export function CrawlerDiffModal({
                   className="h-8 w-8 rounded-lg border shadow-sm"
                   style={{ backgroundColor: color as string }}
                 />
-                <span className="text-sm">{color}</span>
+                <span className="text-sm">{String(color)}</span>
               </div>
             ))}
           </div>

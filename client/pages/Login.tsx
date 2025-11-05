@@ -78,11 +78,3 @@ export function LoginPage() {
     </div>
   );
 }
-              Sign up
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}

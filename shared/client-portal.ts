@@ -57,6 +57,7 @@ export interface ContentItem {
   approvedAt?: string;
   requestedChanges?: string;
   version: number;
+  workflowInstance?: any; // WorkflowInstance - using any to avoid circular imports
 }
 
 export interface ContentComment {
@@ -74,6 +75,7 @@ export interface ClientDashboardData {
   brandInfo: {
     name: string;
     logo?: string;
+    favicon?: string;
     colors: {
       primary: string;
       secondary: string;

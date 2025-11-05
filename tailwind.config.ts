@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
+  darkMode: ["class"],
   content: [
     "./client/**/*.{js,ts,jsx,tsx}",
   ],
@@ -53,12 +54,6 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
-    },
-  },
-  plugins: [],
-} satisfies Config;
-        soft: "0 2px 8px -2px rgba(0, 0, 0, 0.05)",
-      },
       keyframes: {
         "accordion-down": {
           from: {
@@ -91,32 +86,6 @@ export default {
             opacity: "0.5",
           },
           "50%": {
-            opacity: "0.8",
-          },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.5s ease-out",
-        glow: "glow 3s ease-in-out infinite",
-      },
-    },
-  },
-  plugins: [require("tailwindcss-animate")],
-} satisfies Config;
-
-export default config;
-        "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.5s ease-out",
-        glow: "glow 3s ease-in-out infinite",
-      },
-    },
-  },
-  plugins: [require("tailwindcss-animate")],
-} satisfies Config;
-
-export default config;
             opacity: "0.8",
           },
         },

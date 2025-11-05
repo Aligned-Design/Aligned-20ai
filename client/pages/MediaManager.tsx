@@ -241,10 +241,3 @@ function AssetCard({
     </Card>
   );
 }
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}

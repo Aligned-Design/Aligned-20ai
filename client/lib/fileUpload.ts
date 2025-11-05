@@ -9,61 +9,99 @@ export interface UploadedFile {
 }
 
 /**
- * Upload file to Supabase Storage
+ * Upload file to Supabase Storage with progress tracking
  * @param file File to upload
  * @param brandId Brand ID for path organization
  * @param category Category subfolder (logos, imagery, references, etc.)
+ * @param onProgress Optional callback for progress updates (0-100)
  * @returns Upload result with public URL
  */
 export async function uploadBrandFile(
   file: File,
   brandId: string,
   category: string,
+  onProgress?: (progress: number) => void,
 ): Promise<UploadedFile> {
   const fileExt = file.name.split(".").pop();
   const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
   const filePath = `${brandId}/${category}/${fileName}`;
 
-  // Upload to Supabase Storage
-  const { data, error } = await supabase.storage
-    .from("brand-assets")
-    .upload(filePath, file, {
-      cacheControl: "3600",
-      upsert: false,
-    });
+  // Simulate progress for better UX (actual Supabase SDK doesn't expose granular progress)
+  const progressInterval = setInterval(() => {
+    if (onProgress) {
+      onProgress(Math.min(80, (Math.random() * 100) * 0.3)); // Simulate up to 80%
+    }
+  }, 200);
 
-  if (error) {
-    throw new Error(`Upload failed: ${error.message}`);
+  try {
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from("brand-assets")
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    clearInterval(progressInterval);
+
+    if (error) {
+      throw new Error(`Upload failed: ${error.message}`);
+    }
+
+    // Get public URL
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("brand-assets").getPublicUrl(filePath);
+
+    // Signal completion
+    if (onProgress) onProgress(100);
+
+    return {
+      name: file.name,
+      url: publicUrl,
+      path: filePath,
+      type: file.type,
+      size: file.size,
+    };
+  } catch (error) {
+    clearInterval(progressInterval);
+    throw error;
   }
-
-  // Get public URL
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from("brand-assets").getPublicUrl(filePath);
-
-  return {
-    name: file.name,
-    url: publicUrl,
-    path: filePath,
-    type: file.type,
-    size: file.size,
-  };
 }
 
 /**
- * Upload multiple files and create brand_assets records
+ * Upload multiple files and create brand_assets records with progress tracking
+ * @param onProgress Optional callback with {currentFile, totalFiles, progress: 0-100}
  */
 export async function uploadBrandFiles(
   files: File[],
   brandId: string,
   category: string,
   assetType: string,
+  onProgress?: (progress: { currentFile: number; totalFiles: number; progress: number }) => void,
 ): Promise<UploadedFile[]> {
-  const uploadPromises = files.map((file) =>
-    uploadBrandFile(file, brandId, category),
-  );
+  const uploadedFiles: UploadedFile[] = [];
 
-  const uploadedFiles = await Promise.all(uploadPromises);
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const uploadedFile = await uploadBrandFile(
+      file,
+      brandId,
+      category,
+      (fileProgress) => {
+        // Calculate overall progress
+        const overallProgress = ((i + fileProgress / 100) / files.length) * 100;
+        if (onProgress) {
+          onProgress({
+            currentFile: i + 1,
+            totalFiles: files.length,
+            progress: Math.round(overallProgress),
+          });
+        }
+      },
+    );
+    uploadedFiles.push(uploadedFile);
+  }
 
   // Create brand_assets records
   const assetRecords = uploadedFiles.map((file) => ({

@@ -1,29 +1,31 @@
 import { RequestHandler } from "express";
 import { generateWithAI, getAvailableProviders, getDefaultProvider, validateAIProviders } from "../workers/ai-generation";
-import { AIGenerationRequest, AIGenerationResponse, AIProviderStatus, ErrorResponse } from "@shared/api";
+import { AIGenerationRequest, AIGenerationResponse, AIProviderStatus } from "@shared/api";
 
 export const generateContent: RequestHandler = async (req, res) => {
   try {
     if (!validateAIProviders()) {
-      const errorResponse: ErrorResponse = {
+      return res.status(500).json({
         error: "No AI providers configured",
-        details: "Please set OPENAI_API_KEY or ANTHROPIC_API_KEY environment variables"
-      };
-      return res.status(500).json(errorResponse);
+        content: "",
+        provider: "",
+        agentType: ""
+      });
     }
 
-    const { prompt, agentType, provider }: AIGenerationRequest = req.body;
+    const { prompt, agentType, provider } = req.body as AIGenerationRequest;
 
     if (!prompt || !agentType) {
-      const errorResponse: ErrorResponse = {
-        error: "Missing required fields",
-        details: "prompt and agentType are required"
-      };
-      return res.status(400).json(errorResponse);
+      return res.status(400).json({
+        error: "Missing required fields: prompt and agentType",
+        content: "",
+        provider: "",
+        agentType: ""
+      });
     }
 
     const content = await generateWithAI(prompt, agentType, provider);
-    
+
     const response: AIGenerationResponse = {
       content,
       provider: provider || getDefaultProvider(),
@@ -33,11 +35,12 @@ export const generateContent: RequestHandler = async (req, res) => {
     res.json(response);
   } catch (error) {
     console.error("AI generation error:", error);
-    const errorResponse: ErrorResponse = {
-      error: "Failed to generate content",
-      details: error instanceof Error ? error.message : "Unknown error"
-    };
-    res.status(500).json(errorResponse);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : "Failed to generate content",
+      content: "",
+      provider: "",
+      agentType: ""
+    });
   }
 };
 

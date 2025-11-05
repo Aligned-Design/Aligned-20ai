@@ -72,24 +72,30 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
 
     // In production, upload to your storage service
     const mockUrl = URL.createObjectURL(file);
-    
-    setLocalConfig(prev => ({
-      ...prev,
-      branding: {
-        ...prev.branding,
-        [type === 'logo' ? 'logoUrl' : 'favicon']: mockUrl
-      }
-    }));
+
+    setLocalConfig(prev => {
+      const branding = prev.branding || {};
+      return {
+        ...prev,
+        branding: {
+          ...branding,
+          [type === 'logo' ? 'logoUrl' : 'favicon']: mockUrl
+        } as Partial<WhiteLabelConfig>['branding']
+      };
+    });
   };
 
   const updateLocalConfig = (section: keyof WhiteLabelConfig, updates: any) => {
-    setLocalConfig(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        ...updates
-      }
-    }));
+    setLocalConfig(prev => {
+      const currentSection = prev[section] || {};
+      return {
+        ...prev,
+        [section]: {
+          ...currentSection,
+          ...updates
+        }
+      };
+    });
   };
 
   return (
@@ -292,25 +298,28 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
                     { key: 'success', label: 'Success' },
                     { key: 'warning', label: 'Warning' },
                     { key: 'error', label: 'Error' },
-                  ].map(({ key, label }) => (
-                    <div key={key}>
-                      <Label className="text-sm">{label}</Label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="color"
-                          value={localConfig.colors?.[key as keyof typeof localConfig.colors] || '#000000'}
-                          onChange={(e) => updateLocalConfig('colors', { [key]: e.target.value })}
-                          className="w-12 h-8 rounded border"
-                        />
-                        <Input
-                          value={localConfig.colors?.[key as keyof typeof localConfig.colors] || ''}
-                          onChange={(e) => updateLocalConfig('colors', { [key]: e.target.value })}
-                          placeholder="#000000"
-                          className="font-mono text-sm"
-                        />
+                  ].map(({ key, label }) => {
+                    const colorValue = (localConfig.colors?.[key as keyof Omit<typeof localConfig.colors, 'text'>] as string | undefined) || '#000000';
+                    return (
+                      <div key={key}>
+                        <Label className="text-sm">{label}</Label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={colorValue}
+                            onChange={(e) => updateLocalConfig('colors', { [key]: e.target.value })}
+                            className="w-12 h-8 rounded border"
+                          />
+                          <Input
+                            value={colorValue}
+                            onChange={(e) => updateLocalConfig('colors', { [key]: e.target.value })}
+                            placeholder="#000000"
+                            className="font-mono text-sm"
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>

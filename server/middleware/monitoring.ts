@@ -27,7 +27,7 @@ interface AuditLogEntry {
 }
 
 class MonitoringService {
-  private performanceEntries = new Map<string, PerformanceEntry>();
+  performanceEntries = new Map<string, PerformanceEntry>();
   private auditLogs: AuditLogEntry[] = [];
 
   logPerformance(entry: PerformanceEntry): void {
@@ -85,7 +85,7 @@ class MonitoringService {
     }
     
     if (filters.action) {
-      filtered = filtered.filter(log => log.action.includes(filters.action));
+      filtered = filtered.filter(log => log.action.includes(filters.action!));
     }
     
     return filtered.slice(-(filters.limit || 100));
@@ -139,7 +139,7 @@ export const auditLogger = (req: Request, res: Response, next: NextFunction) => 
     action: `${req.method} ${req.path}`,
     resource: req.path,
     method: req.method,
-    ip: req.ip || req.connection.remoteAddress || 'unknown',
+    ip: (req.ip || (req.connection && (req.connection.remoteAddress || 'unknown')) || 'unknown') as string,
     userAgent: req.headers['user-agent'] || 'unknown',
     requestId: res.getHeader('X-Request-ID') as string,
     metadata: {
@@ -178,19 +178,6 @@ export const errorHandler = (error: Error, req: Request, res: Response, next: Ne
     });
   }
   
-  const isDevelopment = process.env.NODE_ENV === 'development';
-  
-  res.status(500).json({
-    error: 'Internal Server Error',
-    requestId: res.getHeader('X-Request-ID'),
-    ...(isDevelopment && { 
-      message: error.message,
-      stack: error.stack 
-    })
-  });
-};
-
-export { monitoringService };
   const isDevelopment = process.env.NODE_ENV === 'development';
   
   res.status(500).json({

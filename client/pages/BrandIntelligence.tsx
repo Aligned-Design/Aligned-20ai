@@ -691,24 +691,3 @@ function formatNumber(num: number): string {
   if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
   return num.toString();
 }
-            className="gap-1"
-          >
-            <ThumbsDown className="h-3 w-3" />
-            Skip
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Memoize expensive chart components
-const MemoizedContentIntelligence = React.memo(ContentIntelligence);
-const MemoizedCompetitorAnalysis = React.memo(CompetitorAnalysis);
-const MemoizedAudienceInsights = React.memo(AudienceInsights);
-
-function formatNumber(num: number): string {
-  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-  return num.toString();
-}

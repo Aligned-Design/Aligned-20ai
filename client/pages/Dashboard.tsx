@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  LayoutDashboard, 
-  TrendingUp, 
-  Users, 
+import {
+  LayoutDashboard,
+  TrendingUp,
+  Users,
   Calendar,
   Plus,
   BarChart3,
@@ -13,6 +13,7 @@ import {
   CheckCircle,
   AlertTriangle
 } from 'lucide-react';
+import { AdvisorInsightsTile } from '@/components/insights/AdvisorInsightsTile';
 
 interface DashboardData {
   metrics: {
@@ -103,12 +104,9 @@ export default function Dashboard() {
   if (!data) return <div>Failed to load dashboard</div>;
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Welcome back! Here's what's happening with your campaigns.</p>
-        </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
         <Button className="gap-2">
           <Plus className="h-4 w-4" />
           Create Content
@@ -143,7 +141,12 @@ export default function Dashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* AI Insights Section */}
+      <div className="mt-8">
+        <AdvisorInsightsTile maxInsights={6} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         {/* Recent Activity */}
         <Card>
           <CardHeader>
@@ -227,21 +230,5 @@ function MetricCard({ title, value, icon, color }: {
         </div>
       </CardContent>
     </Card>
-  );
-}
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">{title}</p>
-            <p className="text-3xl font-bold text-gray-900">{value}</p>
-          </div>
-          <div className={`p-3 rounded-full ${colorClasses[color]}`}>
-            {icon}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
   );
 }

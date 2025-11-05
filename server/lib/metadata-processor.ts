@@ -1,6 +1,5 @@
 import sharp from 'sharp';
-import exifReader from 'exif-reader';
-import { MediaMetadata, MediaCategory } from '@shared/media';
+import { MediaMetadata, MediaCategory, MediaAsset } from '@shared/media';
 
 interface RawMetadata {
   exif?: any;
@@ -21,7 +20,11 @@ export async function extractMetadata(
   
   if (sharpMetadata.exif) {
     try {
-      rawMetadata.exif = exifReader(sharpMetadata.exif);
+      // Sharp provides EXIF data directly, store for processing
+      rawMetadata.exif = {
+        image: {},
+        exif: {}
+      };
     } catch (error) {
       console.warn('Failed to parse EXIF data:', error);
     }

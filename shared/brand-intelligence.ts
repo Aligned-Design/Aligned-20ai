@@ -157,7 +157,6 @@ export interface BrandIntelligenceUpdate {
     feedback?: string;
   }[];
 }
-}
 
 export interface BrandIntelligenceUpdate {
   brandId: string;

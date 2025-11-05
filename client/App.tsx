@@ -5,6 +5,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy, useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
+import '@/lib/builder';
+import { BuilderPage } from '@/components/BuilderPage';
+import { Builder } from '@builder.io/react';
 
 // Import existing components
 import Index from "./pages/Index";
@@ -27,6 +30,14 @@ const Integrations = lazy(() => import("./pages/Integrations"));
 const MediaManager = lazy(() => import("./pages/MediaManager"));
 const TeamManagement = lazy(() => import("./pages/TeamManagement"));
 const Billing = lazy(() => import("./pages/Billing"));
+
+// Register custom components with Builder.io
+Builder.registerComponent(BuilderPage, {
+  name: 'Custom Page',
+  inputs: [
+    { name: 'model', type: 'string', defaultValue: 'page' }
+  ]
+});
 
 function App() {
   return (
@@ -202,8 +213,21 @@ function AppContent() {
         </Suspense>
       } />
 
+      {/* Builder.io dynamic routes */}
+      <Route 
+        path="/builder/*" 
+        element={<BuilderPage model="page" />} 
+      />
+
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-      <Route path="*" element={<div className="p-8 text-center">Page Not Found</div>} />
+      <Route path="*" element={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900">Page Not Found</h1>
+            <p className="text-gray-600 mt-2">The page you're looking for doesn't exist.</p>
+          </div>
+        </div>
+      } />
     </Routes>
   );
 }

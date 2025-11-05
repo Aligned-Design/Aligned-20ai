@@ -12,6 +12,10 @@ interface MediaAsset {
   bucketPath: string;
   createdAt: string;
   updatedAt: string;
+  hash?: string;
+  tags?: string[];
+  variants?: any[];
+  metadata?: Record<string, any>;
 }
 
 interface MediaUploadResponse {
@@ -36,6 +40,52 @@ interface StorageUsageResponse {
   bucketName: string;
   categoryBreakdown: Record<string, { count: number; size: number }>;
   lastUpdated: string;
+}
+
+interface DuplicateCheckResponse {
+  isDuplicate: boolean;
+  existingAsset?: MediaAsset;
+  similarity: number;
+}
+
+interface SEOMetadataRequest {
+  assetId: string;
+  context?: string;
+  targetKeywords?: string[];
+}
+
+interface SEOMetadataResponse {
+  altText: string;
+  title: string;
+  description: string;
+  keywords: string[];
+  optimizedMetadata: Record<string, any>;
+}
+
+// Helper function stubs
+async function getCategoryUsage(bucketName: string, brandId: string): Promise<Record<string, { count: number; size: number }>> {
+  return {
+    graphics: { count: 0, size: 0 },
+    images: { count: 0, size: 0 },
+    logos: { count: 0, size: 0 },
+    videos: { count: 0, size: 0 }
+  };
+}
+
+async function getSignedUrl(bucketName: string, assetPath: string, expirationSeconds: number): Promise<string> {
+  return `https://storage.example.com/${bucketName}/${assetPath}?expires=${expirationSeconds}`;
+}
+
+async function checkDuplicate(bucketName: string, hash: string, brandId: string): Promise<MediaAsset | null> {
+  return null;
+}
+
+function generateSEOMetadata(asset: MediaAsset, context: string): { altText: string; title: string; description: string } {
+  return {
+    altText: asset.originalName,
+    title: `Image: ${asset.originalName}`,
+    description: `Digital asset: ${asset.originalName}`
+  };
 }
 
 export const uploadMedia: RequestHandler = async (req, res) => {
@@ -213,7 +263,6 @@ export const generateSEOMetadataRoute: RequestHandler = async (req, res) => {
         usedIn: [],
         usageCount: 0
       },
-      isOptimizedForSEO: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -224,8 +273,8 @@ export const generateSEOMetadataRoute: RequestHandler = async (req, res) => {
       altText: seoData.altText,
       title: seoData.title,
       description: seoData.description,
-      keywords: [...asset.metadata.keywords, ...targetKeywords],
-      optimizedMetadata: asset.metadata
+      keywords: [...(asset.metadata?.keywords || []), ...targetKeywords],
+      optimizedMetadata: asset.metadata || {}
     };
 
     res.json(response);

@@ -21,6 +21,8 @@ const CRAWL_TIMEOUT_MS = parseInt(process.env.CRAWL_TIMEOUT_MS || "30000", 10);
 const CRAWL_USER_AGENT = process.env.CRAWL_USER_AGENT || "AlignedAIBot/1.0";
 const MAX_DEPTH = 3;
 const CRAWL_DELAY_MS = 1000;
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1000;
 
 interface CrawlResult {
   url: string;
@@ -57,6 +59,37 @@ interface BrandKitData {
 }
 
 /**
+ * Retry helper with exponential backoff
+ */
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = MAX_RETRIES,
+  delayMs: number = RETRY_DELAY_MS,
+): Promise<T> {
+  let lastError: Error | null = null;
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+      console.warn(
+        `[Brand Crawler] Attempt ${i + 1}/${maxRetries} failed: ${lastError.message}. Retrying in ${delayMs * Math.pow(2, i)}ms...`,
+      );
+
+      // Exponential backoff
+      if (i < maxRetries - 1) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, delayMs * Math.pow(2, i)),
+        );
+      }
+    }
+  }
+
+  throw lastError || new Error("Max retries exceeded");
+}
+
+/**
  * Main orchestrator for brand intake processing
  */
 export async function processBrandIntake(
@@ -67,13 +100,23 @@ export async function processBrandIntake(
   console.log(`[Brand Crawler] Starting intake for brand ${brandId}`);
 
   try {
-    // Step 1: Crawl website
-    const crawlResults = await crawlWebsite(websiteUrl);
-    console.log(`[Brand Crawler] Crawled ${crawlResults.length} pages`);
+    // Step 1: Crawl website with retry logic
+    const crawlResults = await retryWithBackoff(
+      () => crawlWebsite(websiteUrl),
+      MAX_RETRIES,
+      RETRY_DELAY_MS,
+    );
+    console.log(
+      `[Brand Crawler] Crawled ${crawlResults.length} pages (with retries)`,
+    );
 
-    // Step 2: Extract colors
-    const colors = await extractColors(websiteUrl);
-    console.log(`[Brand Crawler] Extracted color palette`);
+    // Step 2: Extract colors with retry logic
+    const colors = await retryWithBackoff(
+      () => extractColors(websiteUrl),
+      MAX_RETRIES,
+      RETRY_DELAY_MS,
+    );
+    console.log(`[Brand Crawler] Extracted color palette (with retries)`);
 
     // Step 3: Generate AI summaries (or fallback)
     const brandKit = await generateBrandKit(crawlResults, colors, websiteUrl);
@@ -81,8 +124,16 @@ export async function processBrandIntake(
 
     // Step 4: Create embeddings (if OpenAI available)
     if (OPENAI_API_KEY) {
-      await createEmbeddings(brandId, brandKit, crawlResults, supabase);
-      console.log(`[Brand Crawler] Created embeddings`);
+      try {
+        await createEmbeddings(brandId, brandKit, crawlResults, supabase);
+        console.log(`[Brand Crawler] Created embeddings`);
+      } catch (embeddingError) {
+        console.warn(
+          "[Brand Crawler] Error creating embeddings (non-critical):",
+          embeddingError,
+        );
+        // Don't fail the entire process if embeddings fail
+      }
     } else {
       console.warn(
         "[Brand Crawler] OPENAI_API_KEY not set, skipping embeddings",
@@ -142,10 +193,16 @@ export async function crawlWebsite(startUrl: string): Promise<CrawlResult[]> {
           userAgent: CRAWL_USER_AGENT,
         });
 
-        await page.goto(url, {
-          timeout: CRAWL_TIMEOUT_MS,
-          waitUntil: "networkidle",
-        });
+        // Fetch page with retry logic
+        await retryWithBackoff(
+          () =>
+            page.goto(url, {
+              timeout: CRAWL_TIMEOUT_MS,
+              waitUntil: "networkidle",
+            }),
+          2, // Fewer retries per page (max 3 total with main retries)
+          500, // Shorter delay for individual page fetches
+        );
 
         // Extract content
         const crawlData = await extractPageContent(page, url);

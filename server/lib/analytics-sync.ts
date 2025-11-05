@@ -32,6 +32,14 @@ export class AnalyticsSync {
 
   private async syncPlatform(brandId: string, config: SyncConfig, type: 'incremental' | 'full'): Promise<void> {
     try {
+      // Validate required credentials
+      if (!config.accessToken || config.accessToken.trim() === '') {
+        throw new Error(`Missing access token for ${config.platform}`);
+      }
+      if (!config.accountId || config.accountId.trim() === '') {
+        throw new Error(`Missing account ID for ${config.platform}`);
+      }
+
       // Check rate limits
       if (this.isRateLimited(config.platform)) {
         console.log(`Rate limited for ${config.platform}, scheduling retry`);
@@ -40,16 +48,17 @@ export class AnalyticsSync {
 
       const metrics = await this.fetchPlatformMetrics(config, type);
       const normalizedMetrics = this.normalizeMetrics(brandId, config.platform, metrics);
-      
+
       // Store in database
       await this.storeMetrics(normalizedMetrics);
-      
+
       // Update rate limit info
       this.updateRateLimit(config.platform);
-      
-      console.log(`Synced ${normalizedMetrics.length} metrics for ${config.platform}`);
+
+      console.log(`✅ Synced ${normalizedMetrics.length} metrics for ${config.platform}`);
     } catch (error) {
-      console.error(`Sync failed for ${config.platform}:`, error);
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error(`❌ Sync failed for ${config.platform}: ${errorMsg}`);
       await this.logSyncError(brandId, config.platform, error);
     }
   }
@@ -110,8 +119,247 @@ export class AnalyticsSync {
   }
 
   private async fetchPlatformMetricsDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
-    // Implementation would be similar to fetchPlatformMetrics but with date range
-    return [];
+    // Delegate to platform-specific handlers with date range support
+    // Most platforms use incremental sync, so we create a temporary config with the date range
+    const dateRangeConfig = {
+      ...config,
+      lastSyncAt: startDate.toISOString()
+    };
+
+    switch (config.platform) {
+      case 'instagram':
+        return this.fetchInstagramMetricsForDateRange(dateRangeConfig, startDate, endDate);
+      case 'facebook':
+        return this.fetchFacebookMetricsForDateRange(dateRangeConfig, startDate, endDate);
+      case 'linkedin':
+        return this.fetchLinkedInMetricsForDateRange(dateRangeConfig, startDate, endDate);
+      case 'twitter':
+        return this.fetchTwitterMetricsForDateRange(dateRangeConfig, startDate, endDate);
+      case 'tiktok':
+        return this.fetchTikTokMetricsForDateRange(dateRangeConfig, startDate, endDate);
+      case 'google_business':
+        return this.fetchGoogleBusinessMetricsForDateRange(dateRangeConfig, startDate, endDate);
+      case 'pinterest':
+        return this.fetchPinterestMetricsForDateRange(dateRangeConfig, startDate, endDate);
+      case 'youtube':
+        return this.fetchYouTubeMetricsForDateRange(dateRangeConfig, startDate, endDate);
+      default:
+        throw new Error(`Unsupported platform: ${config.platform}`);
+    }
+  }
+
+  // Date-range specific methods for each platform
+  private async fetchInstagramMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+    const startStr = startDate.toISOString();
+    const endStr = endDate.toISOString();
+
+    try {
+      const postsResponse = await fetch(
+        `https://graph.instagram.com/${config.accountId}/media?fields=id,caption,media_type,timestamp,like_count,comments_count,insights.metric(reach,impressions,engagement)&since=${startStr}&until=${endStr}&access_token=${config.accessToken}`
+      );
+
+      if (!postsResponse.ok) {
+        throw new Error(`Instagram API error: ${postsResponse.statusText}`);
+      }
+
+      const postsData = await postsResponse.json();
+      return postsData.data || [];
+    } catch (error) {
+      console.error('Instagram date-range fetch error:', error);
+      return [];
+    }
+  }
+
+  private async fetchFacebookMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+    const startUnix = Math.floor(startDate.getTime() / 1000);
+    const endUnix = Math.floor(endDate.getTime() / 1000);
+
+    try {
+      const postsResponse = await fetch(
+        `https://graph.facebook.com/v18.0/${config.accountId}/posts?fields=id,created_time,type,story,permalink_url,insights.metric(engagement,impressions,reach)&since=${startUnix}&until=${endUnix}&access_token=${config.accessToken}`
+      );
+
+      if (!postsResponse.ok) {
+        throw new Error(`Facebook API error: ${postsResponse.statusText}`);
+      }
+
+      const postsData = await postsResponse.json();
+      return postsData.data || [];
+    } catch (error) {
+      console.error('Facebook date-range fetch error:', error);
+      return [];
+    }
+  }
+
+  private async fetchLinkedInMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+    const startMs = startDate.getTime();
+    const endMs = endDate.getTime();
+
+    try {
+      const postsResponse = await fetch(
+        `https://api.linkedin.com/v2/organizationalActs?q=actors&actors=List(urn:li:organization:${config.accountId})&sortBy=CREATED_TIME_DESC&start=0&count=100`,
+        {
+          headers: {
+            'Authorization': `Bearer ${config.accessToken}`,
+            'X-Restli-Protocol-Version': '2.0.0'
+          }
+        }
+      );
+
+      if (!postsResponse.ok) {
+        throw new Error(`LinkedIn API error: ${postsResponse.statusText}`);
+      }
+
+      const postsData = await postsResponse.json();
+      // Filter posts by date range
+      return (postsData.elements || []).filter((post: any) => {
+        const postTime = post.createdTime || 0;
+        return postTime >= startMs && postTime <= endMs;
+      });
+    } catch (error) {
+      console.error('LinkedIn date-range fetch error:', error);
+      return [];
+    }
+  }
+
+  private async fetchTwitterMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+    const startStr = startDate.toISOString();
+    const endStr = endDate.toISOString();
+
+    try {
+      const tweetsResponse = await fetch(
+        `https://api.twitter.com/2/tweets/search/recent?query=from:${config.accountId} -is:retweet&max_results=100&start_time=${startStr}&end_time=${endStr}&tweet.fields=created_at,public_metrics,author_id&expansions=author_id`,
+        {
+          headers: {
+            'Authorization': `Bearer ${config.accessToken}`
+          }
+        }
+      );
+
+      if (!tweetsResponse.ok) {
+        throw new Error(`Twitter API error: ${tweetsResponse.statusText}`);
+      }
+
+      const tweetsData = await tweetsResponse.json();
+      return tweetsData.data || [];
+    } catch (error) {
+      console.error('Twitter date-range fetch error:', error);
+      return [];
+    }
+  }
+
+  private async fetchTikTokMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+    try {
+      const videosResponse = await fetch(
+        'https://open.tiktokapis.com/v1/video/list/',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${config.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            filters: {
+              creation_date_range: {
+                start_date: Math.floor(startDate.getTime() / 1000),
+                end_date: Math.floor(endDate.getTime() / 1000)
+              }
+            },
+            fields: ['id', 'create_time', 'share_count', 'view_count', 'like_count', 'comment_count', 'download_count']
+          })
+        }
+      );
+
+      if (!videosResponse.ok) {
+        throw new Error(`TikTok API error: ${videosResponse.statusText}`);
+      }
+
+      const videosData = await videosResponse.json();
+      return videosData.data || [];
+    } catch (error) {
+      console.error('TikTok date-range fetch error:', error);
+      return [];
+    }
+  }
+
+  private async fetchGoogleBusinessMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+    try {
+      const insightsResponse = await fetch(
+        `https://mybusiness.googleapis.com/v1/accounts/*/locations/${config.accountId}/insights:reportInsights?pageSize=100`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${config.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            locationNames: [`locations/${config.accountId}`],
+            basicRequest: {
+              timeRange: {
+                startTime: startDate.toISOString(),
+                endTime: endDate.toISOString()
+              },
+              metricRequests: [
+                { metric: 'QUERY_DIRECT', options: ['ALL'] },
+                { metric: 'VIEWS_MAPS', options: ['ALL'] },
+                { metric: 'VIEWS_SEARCH', options: ['ALL'] },
+                { metric: 'ACTIONS_PHONE', options: ['ALL'] }
+              ]
+            }
+          })
+        }
+      );
+
+      if (!insightsResponse.ok) {
+        throw new Error(`Google Business API error: ${insightsResponse.statusText}`);
+      }
+
+      const insightsData = await insightsResponse.json();
+      return insightsData.locationInsights || [];
+    } catch (error) {
+      console.error('Google Business date-range fetch error:', error);
+      return [];
+    }
+  }
+
+  private async fetchPinterestMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+    try {
+      const pinsResponse = await fetch(
+        `https://api.pinterest.com/v1/user/${config.accountId}/pins?access_token=${config.accessToken}&fields=id,created_at,note,stats`
+      );
+
+      if (!pinsResponse.ok) {
+        throw new Error(`Pinterest API error: ${pinsResponse.statusText}`);
+      }
+
+      const pinsData = await pinsResponse.json();
+      // Filter by date range
+      return (pinsData.data || []).filter((pin: any) => {
+        const pinTime = new Date(pin.created_at).getTime();
+        return pinTime >= startDate.getTime() && pinTime <= endDate.getTime();
+      });
+    } catch (error) {
+      console.error('Pinterest date-range fetch error:', error);
+      return [];
+    }
+  }
+
+  private async fetchYouTubeMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+    try {
+      const videosResponse = await fetch(
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&forMine=true&type=video&maxResults=50&publishedAfter=${startDate.toISOString()}&publishedBefore=${endDate.toISOString()}&access_token=${config.accessToken}`
+      );
+
+      if (!videosResponse.ok) {
+        throw new Error(`YouTube API error: ${videosResponse.statusText}`);
+      }
+
+      const videosData = await videosResponse.json();
+      return videosData.items || [];
+    } catch (error) {
+      console.error('YouTube date-range fetch error:', error);
+      return [];
+    }
   }
 
   // Platform-specific implementations
@@ -147,38 +395,229 @@ export class AnalyticsSync {
   }
 
   private async fetchFacebookMetrics(config: SyncConfig, type: string): Promise<any[]> {
-    // Facebook Graph API implementation
-    return [];
+    const sinceDate = type === 'incremental' && config.lastSyncAt
+      ? Math.floor(new Date(config.lastSyncAt).getTime() / 1000)
+      : Math.floor((Date.now() - 24 * 60 * 60 * 1000) / 1000);
+
+    try {
+      // Fetch posts with insights
+      const postsResponse = await fetch(
+        `https://graph.facebook.com/v18.0/${config.accountId}/posts?fields=id,created_time,type,story,permalink_url,insights.metric(engagement,impressions,reach)&since=${sinceDate}&access_token=${config.accessToken}`
+      );
+
+      if (!postsResponse.ok) {
+        throw new Error(`Facebook API error: ${postsResponse.statusText}`);
+      }
+
+      const postsData = await postsResponse.json();
+
+      // Fetch page insights
+      const pageInsightsResponse = await fetch(
+        `https://graph.facebook.com/v18.0/${config.accountId}/insights?metric=page_views,page_engaged_users,page_fans&period=day&since=${sinceDate}&access_token=${config.accessToken}`
+      );
+
+      const pageInsightsData = pageInsightsResponse.ok ? await pageInsightsResponse.json() : { data: [] };
+
+      return [...(postsData.data || []), ...(pageInsightsData.data || [])];
+    } catch (error) {
+      console.error('Facebook fetch error:', error);
+      return [];
+    }
   }
 
   private async fetchLinkedInMetrics(config: SyncConfig, type: string): Promise<any[]> {
-    // LinkedIn API implementation
-    return [];
+    const sinceDate = type === 'incremental' && config.lastSyncAt
+      ? new Date(config.lastSyncAt).toISOString()
+      : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+    try {
+      // Fetch organization posts
+      const postsResponse = await fetch(
+        `https://api.linkedin.com/v2/organizationalActs?q=actors&actors=List(urn:li:organization:${config.accountId})&sortBy=CREATED_TIME_DESC&start=0&count=100`,
+        {
+          headers: {
+            'Authorization': `Bearer ${config.accessToken}`,
+            'X-Restli-Protocol-Version': '2.0.0'
+          }
+        }
+      );
+
+      if (!postsResponse.ok) {
+        throw new Error(`LinkedIn API error: ${postsResponse.statusText}`);
+      }
+
+      const postsData = await postsResponse.json();
+
+      // Fetch organization insights
+      const insightsResponse = await fetch(
+        `https://api.linkedin.com/v2/organizationalPageStatistics?q=organizationalPageId&organizationalPageId=urn:li:organization:${config.accountId}&timeIntervals.timeGranularity=DAY&timeIntervals.timeRange.start=${Math.floor(new Date(sinceDate).getTime())}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${config.accessToken}`,
+            'X-Restli-Protocol-Version': '2.0.0'
+          }
+        }
+      );
+
+      const insightsData = insightsResponse.ok ? await insightsResponse.json() : { elements: [] };
+
+      return [...(postsData.elements || []), ...(insightsData.elements || [])];
+    } catch (error) {
+      console.error('LinkedIn fetch error:', error);
+      return [];
+    }
   }
 
   private async fetchTwitterMetrics(config: SyncConfig, type: string): Promise<any[]> {
-    // Twitter API v2 implementation
-    return [];
+    const sinceDate = type === 'incremental' && config.lastSyncAt
+      ? new Date(config.lastSyncAt).toISOString()
+      : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+    try {
+      // Fetch recent tweets with metrics
+      const tweetsResponse = await fetch(
+        `https://api.twitter.com/2/tweets/search/recent?query=from:${config.accountId} -is:retweet&max_results=100&start_time=${sinceDate}&tweet.fields=created_at,public_metrics,author_id&expansions=author_id`,
+        {
+          headers: {
+            'Authorization': `Bearer ${config.accessToken}`
+          }
+        }
+      );
+
+      if (!tweetsResponse.ok) {
+        throw new Error(`Twitter API error: ${tweetsResponse.statusText}`);
+      }
+
+      const tweetsData = await tweetsResponse.json();
+      return tweetsData.data || [];
+    } catch (error) {
+      console.error('Twitter fetch error:', error);
+      return [];
+    }
   }
 
   private async fetchTikTokMetrics(config: SyncConfig, type: string): Promise<any[]> {
-    // TikTok Business API implementation
-    return [];
+    try {
+      // Fetch video statistics
+      const videosResponse = await fetch(
+        'https://open.tiktokapis.com/v1/video/list/',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${config.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            fields: ['id', 'create_time', 'share_count', 'view_count', 'like_count', 'comment_count', 'download_count']
+          })
+        }
+      );
+
+      if (!videosResponse.ok) {
+        throw new Error(`TikTok API error: ${videosResponse.statusText}`);
+      }
+
+      const videosData = await videosResponse.json();
+      return videosData.data || [];
+    } catch (error) {
+      console.error('TikTok fetch error:', error);
+      return [];
+    }
   }
 
   private async fetchGoogleBusinessMetrics(config: SyncConfig, type: string): Promise<any[]> {
-    // Google My Business API implementation
-    return [];
+    try {
+      // Fetch location insights
+      const insightsResponse = await fetch(
+        `https://mybusiness.googleapis.com/v1/accounts/*/locations/${config.accountId}/insights:reportInsights?pageSize=100`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${config.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            locationNames: [`locations/${config.accountId}`],
+            basicRequest: {
+              metricRequests: [
+                {
+                  metric: 'QUERY_DIRECT',
+                  options: ['ALL']
+                },
+                {
+                  metric: 'VIEWS_MAPS',
+                  options: ['ALL']
+                },
+                {
+                  metric: 'VIEWS_SEARCH',
+                  options: ['ALL']
+                },
+                {
+                  metric: 'ACTIONS_PHONE',
+                  options: ['ALL']
+                }
+              ]
+            }
+          })
+        }
+      );
+
+      if (!insightsResponse.ok) {
+        throw new Error(`Google Business API error: ${insightsResponse.statusText}`);
+      }
+
+      const insightsData = await insightsResponse.json();
+      return insightsData.locationInsights || [];
+    } catch (error) {
+      console.error('Google Business fetch error:', error);
+      return [];
+    }
   }
 
   private async fetchPinterestMetrics(config: SyncConfig, type: string): Promise<any[]> {
-    // Pinterest API implementation
-    return [];
+    try {
+      // Fetch pin analytics
+      const pinsResponse = await fetch(
+        `https://api.pinterest.com/v1/user/${config.accountId}/pins?access_token=${config.accessToken}&fields=id,created_at,note,stats`,
+      );
+
+      if (!pinsResponse.ok) {
+        throw new Error(`Pinterest API error: ${pinsResponse.statusText}`);
+      }
+
+      const pinsData = await pinsResponse.json();
+      return pinsData.data || [];
+    } catch (error) {
+      console.error('Pinterest fetch error:', error);
+      return [];
+    }
   }
 
   private async fetchYouTubeMetrics(config: SyncConfig, type: string): Promise<any[]> {
-    // YouTube Analytics API implementation
-    return [];
+    try {
+      // Fetch channel and video statistics
+      const videosResponse = await fetch(
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&forMine=true&type=video&maxResults=50&access_token=${config.accessToken}`
+      );
+
+      if (!videosResponse.ok) {
+        throw new Error(`YouTube API error: ${videosResponse.statusText}`);
+      }
+
+      const videosData = await videosResponse.json();
+
+      // Fetch analytics report
+      const analyticsResponse = await fetch(
+        `https://youtubeanalytics.googleapis.com/v2/reports?ids=channel=${config.accountId}&start-date=2024-01-01&end-date=2024-12-31&metrics=views,estimatedMinutesWatched,likes,comments,shares&access_token=${config.accessToken}`
+      );
+
+      const analyticsData = analyticsResponse.ok ? await analyticsResponse.json() : { rows: [] };
+
+      return [...(videosData.items || []), ...(analyticsData.rows || [])];
+    } catch (error) {
+      console.error('YouTube fetch error:', error);
+      return [];
+    }
   }
 
   private normalizeMetrics(brandId: string, platform: Platform, rawData: any[]): AnalyticsMetric[] {
@@ -261,13 +700,130 @@ export class AnalyticsSync {
   }
 
   private async storeMetrics(metrics: AnalyticsMetric[]): Promise<void> {
-    // TODO: Implement database storage
-    console.log(`Storing ${metrics.length} normalized metrics`);
+    if (metrics.length === 0) return;
+
+    try {
+      // Import supabase for database operations
+      const { supabase } = await import('./supabase');
+
+      // Scrub PII from metrics before storing
+      const scrubbedMetrics = metrics.map(metric => ({
+        ...metric,
+        metadata: this.scrubbePII(metric.metadata)
+      }));
+
+      // Batch insert in chunks to avoid oversized requests
+      const chunkSize = 100;
+      for (let i = 0; i < scrubbedMetrics.length; i += chunkSize) {
+        const chunk = scrubbedMetrics.slice(i, i + chunkSize);
+
+        const { error: dbError } = await supabase
+          .from('analytics_metrics')
+          .upsert(
+            chunk.map(metric => ({
+              brand_id: metric.brandId,
+              tenant_id: metric.brandId, // Assuming tenant_id = brand_id for now
+              platform: metric.platform,
+              post_id: metric.postId,
+              date: metric.date,
+              metrics: metric.metrics,
+              metadata: metric.metadata
+            })),
+            { onConflict: 'brand_id,platform,post_id,date' }
+          );
+
+        if (dbError) {
+          throw new Error(`Failed to store metrics: ${dbError.message}`);
+        }
+      }
+
+      console.log(`✅ Stored ${metrics.length} metrics to database`);
+    } catch (error) {
+      console.error('Error storing metrics:', error);
+      throw error;
+    }
   }
 
   private async logSyncError(brandId: string, platform: Platform, error: any): Promise<void> {
-    console.error(`Sync error for ${brandId}/${platform}:`, error);
-    // TODO: Store in sync_logs table
+    try {
+      const { supabase } = await import('./supabase');
+
+      // Safely extract error information
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      const errorCode = (error as any)?.code || undefined;
+
+      const { error: dbError } = await supabase
+        .from('analytics_sync_logs')
+        .insert({
+          brand_id: brandId,
+          tenant_id: brandId,
+          platform,
+          sync_type: 'incremental',
+          status: 'failed',
+          items_synced: 0,
+          items_failed: 1,
+          error_message: errorMessage,
+          error_details: {
+            stack: errorStack,
+            code: errorCode,
+            timestamp: new Date().toISOString(),
+            platform,
+            brandId
+          }
+        });
+
+      if (dbError) {
+        console.error(`❌ Failed to log sync error for ${platform}:`, dbError);
+      } else {
+        console.log(`📋 Sync error logged for ${brandId}/${platform}: ${errorMessage}`);
+      }
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.error(`❌ Error logging sync error: ${errMsg}`);
+    }
+  }
+
+  /**
+   * Scrub PII from metadata before storing in database
+   * Removes email addresses, phone numbers, usernames, and other sensitive data
+   */
+  private scrubbePII(metadata: any): any {
+    if (!metadata) return metadata;
+
+    const scrubbedData = { ...metadata };
+
+    // Patterns for common PII
+    const patterns = {
+      email: /[\w\.-]+@[\w\.-]+\.\w+/g,
+      phone: /(\+?1?\d{9,15})/g,
+      ssn: /\d{3}-\d{2}-\d{4}/g,
+      username: /@\w+/g,
+      url: /(https?:\/\/[^\s]+)/g
+    };
+
+    // Scrub text fields
+    if (scrubbedData.hashtags && Array.isArray(scrubbedData.hashtags)) {
+      scrubbedData.hashtags = scrubbedData.hashtags.map((tag: string) => {
+        // Remove @mentions that could be usernames
+        return tag.replace(patterns.username, '[redacted]');
+      });
+    }
+
+    // Scrub caption/text if present
+    if (scrubbedData.caption) {
+      scrubbedData.caption = scrubbedData.caption
+        .replace(patterns.email, '[email]')
+        .replace(patterns.phone, '[phone]')
+        .replace(patterns.ssn, '[ssn]')
+        .replace(patterns.username, '[username]');
+    }
+
+    // Mark that PII has been processed
+    scrubbedData.pii_scrubbed = true;
+    scrubbedData.scrubbed_at = new Date().toISOString();
+
+    return scrubbedData;
   }
 
   private isRateLimited(platform: Platform): boolean {

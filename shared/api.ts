@@ -215,11 +215,6 @@ export interface AIProviderStatus {
   default: string;
 }
 
-export interface ErrorResponse {
-  error: string;
-  details?: string;
-}
-
 // Shared API interfaces for type safety between client and server
 
 export interface PingResponse {
@@ -227,8 +222,346 @@ export interface PingResponse {
   timestamp: string;
 }
 
-export interface DemoResponse {
-  message: string;
-  environment: string;
+export interface AIProvidersResponse {
+  success: boolean;
+  providers: Array<"openai" | "claude">;
+  default: "openai" | "claude" | null;
+  error?: string;
+}
+
+// PHASE 3: Brand Kit Builder API Types
+export interface BrandIntakeRequest {
+  // Basic Info
+  brandName: string;
+  industry: string;
+  companySize: "startup" | "small" | "medium" | "large" | "enterprise";
+  website?: string;
+  
+  // Brand Voice & Messaging
+  missionStatement: string;
+  valueProposition: string;
+  targetAudience: string;
+  brandPersonality: string[];
+  toneOfVoice: string[];
+  keyMessages: string[];
+  
+  // Visual Identity
+  primaryColors: string[];
+  secondaryColors: string[];
+  logoUrls: string[];
+  fontFamilies: string[];
+  visualStyle: string;
+  
+  // Content Guidelines
+  contentTopics: string[];
+  avoidTopics: string[];
+  competitorBrands: string[];
+  uniqueDifferentiators: string[];
+  
+  // Compliance & Legal
+  legalGuidelines: string;
+  brandGuidelines: string;
+  approvalProcess: string;
+}
+
+export interface BrandKitResponse {
+  success: boolean;
+  brandKit: {
+    id: string;
+    brandName: string;
+    version: number;
+    createdAt: string;
+    updatedAt: string;
+    
+    // Brand Identity
+    identity: {
+      mission: string;
+      values: string[];
+      personality: string[];
+      voice: string[];
+    };
+    
+    // Visual System
+    visual: {
+      colors: {
+        primary: string[];
+        secondary: string[];
+        palette: { name: string; hex: string; usage: string }[];
+      };
+      typography: {
+        primary: string;
+        secondary: string;
+        fonts: { name: string; weight: string; usage: string }[];
+      };
+      logos: { url: string; variant: string; usage: string }[];
+      style: string;
+    };
+    
+    // Content Guidelines
+    content: {
+      topics: string[];
+      avoidTopics: string[];
+      tone: string[];
+      messaging: string[];
+      competitors: string[];
+      differentiators: string[];
+    };
+    
+    // AI Context
+    aiContext: {
+      brandSummary: string;
+      voiceProfile: string;
+      contentStyle: string;
+      restrictions: string[];
+    };
+  };
+  error?: string;
+}
+
+export interface AssetUploadRequest {
+  brandId: string;
+  file: File;
+  category: "logo" | "font" | "image" | "document";
+  metadata?: {
+    name?: string;
+    description?: string;
+    usage?: string;
+  };
+}
+
+export interface AssetUploadResponse {
+  success: boolean;
+  asset: {
+    id: string;
+    url: string;
+    filename: string;
+    category: string;
+    size: number;
+    metadata?: Record<string, any>;
+  };
+  error?: string;
+}
+
+export interface WebsiteCrawlRequest {
+  url: string;
+  brandId: string;
+  extractColors?: boolean;
+  extractFonts?: boolean;
+  maxPages?: number;
+}
+
+export interface WebsiteCrawlResponse {
+  success: boolean;
+  data: {
+    colors: { hex: string; frequency: number }[];
+    fonts: { family: string; weights: string[] }[];
+    content: { title: string; description: string; headings: string[] };
+    images: { url: string; alt: string }[];
+  };
+  error?: string;
+}
+
+export interface BrandValidationResponse {
+  valid: boolean;
+  errors: {
+    field: string;
+    message: string;
+    severity: "error" | "warning";
+  }[];
+  aiCompatible: boolean;
+}
+
+// PHASE 4: Content Creation Workflows API Types
+export interface PostModel {
+  id: string;
+  brandId: string;
+  status: 'draft' | 'review' | 'approved' | 'scheduled' | 'published' | 'failed';
+  assigneeId?: string;
+  platform: 'instagram' | 'facebook' | 'twitter' | 'linkedin' | 'tiktok';
+  
+  // Content
+  caption: string;
+  hashtags: string[];
+  assetIds: string[];
+  
+  // Scheduling
+  scheduledAt?: string;
+  publishedAt?: string;
+  timeZone: string;
+  
+  // Workflow
+  approvedBy?: string;
+  approvedAt?: string;
+  rejectedBy?: string;
+  rejectedAt?: string;
+  rejectionReason?: string;
+  
+  // Compliance
+  complianceScore: number; // Brand Fidelity Score 0-1
+  linterResults: {
+    profanityCheck: boolean;
+    lengthCheck: boolean;
+    brandVoiceFit: number;
+    warnings: string[];
+    errors: string[];
+  };
+  
+  // Timestamps
+  createdAt: string;
+  updatedAt: string;
+  
+  // History
+  revisionCount: number;
+  lastEditedBy: string;
+}
+
+export interface PostCreateRequest {
+  brandId: string;
+  platform: PostModel['platform'];
+  caption?: string;
+  hashtags?: string[];
+  assetIds?: string[];
+  scheduledAt?: string;
+  timeZone?: string;
+}
+
+export interface PostUpdateRequest {
+  caption?: string;
+  hashtags?: string[];
+  assetIds?: string[];
+  scheduledAt?: string;
+  status?: PostModel['status'];
+}
+
+export interface PostHistory {
+  id: string;
+  postId: string;
+  action: 'created' | 'updated' | 'approved' | 'rejected' | 'scheduled' | 'published';
+  userId: string;
+  userName: string;
+  timestamp: string;
+  changes?: {
+    field: string;
+    oldValue: any;
+    newValue: any;
+  }[];
+  comment?: string;
+}
+
+export interface CommentThread {
+  id: string;
+  postId: string;
+  userId: string;
+  userName: string;
+  content: string;
+  mentions: string[]; // user IDs mentioned
+  timestamp: string;
+  replies: CommentThread[];
+  resolved: boolean;
+}
+
+export interface ApprovalRequest {
+  postId: string;
+  action: 'approve' | 'reject';
+  comment?: string;
+  changes?: PostUpdateRequest;
+}
+
+export interface CalendarEvent {
+  id: string;
+  postId: string;
+  brandId: string;
+  brandName: string;
+  platform: PostModel['platform'];
+  status: PostModel['status'];
+  title: string;
+  scheduledAt: string;
+  duration: number; // minutes
+  color: string; // brand color
+}
+
+export interface CalendarFilter {
+  brands?: string[];
+  platforms?: PostModel['platform'][];
+  statuses?: PostModel['status'][];
+  dateRange: {
+    start: string;
+    end: string;
+  };
+}
+
+export interface AutosaveState {
+  postId: string;
+  content: PostUpdateRequest;
+  timestamp: string;
+  userId: string;
+}
+
+export interface UndoRedoState {
+  postId: string;
+  states: {
+    content: PostUpdateRequest;
+    timestamp: string;
+    action: string;
+  }[];
+  currentIndex: number;
+  maxStates: number; // 20 as per requirement
+}
+
+export interface PublishPreview {
+  platform: PostModel['platform'];
+  preview: {
+    caption: string;
+    hashtags: string[];
+    characterCount: number;
+    maxCharacters: number;
+    truncated: boolean;
+    assets: {
+      id: string;
+      url: string;
+      type: 'image' | 'video';
+      aspectRatio: string;
+    }[];
+    estimatedReach: number;
+    suggestedTime: string;
+  };
+  validation: {
+    valid: boolean;
+    errors: string[];
+    warnings: string[];
+  };
+}
+
+export interface ComplianceLinterResult {
+  postId: string;
+  brandFidelityScore: number; // 0-1, must be ≥ 0.8
+  checks: {
+    profanity: {
+      passed: boolean;
+      flaggedWords: string[];
+    };
+    length: {
+      passed: boolean;
+      characterCount: number;
+      maxCharacters: number;
+      platform: string;
+    };
+    brandVoice: {
+      score: number; // 0-1
+      passed: boolean; // must be ≥ 0.8
+      analysis: string;
+    };
+    disclaimers: {
+      required: boolean;
+      present: boolean;
+      missing: string[];
+    };
+    ratios: {
+      textToHashtag: number;
+      passed: boolean;
+    };
+  };
   timestamp: string;
 }
+
+// ...existing code... (rest of your interfaces)

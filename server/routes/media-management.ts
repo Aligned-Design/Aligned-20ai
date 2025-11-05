@@ -7,7 +7,6 @@ import { Router, Request, Response } from 'express';
 import { mediaService } from '../lib/media-service';
 import { supabase } from '../lib/supabase';
 import multer from 'multer';
-import crypto from 'crypto';
 
 const router = Router();
 

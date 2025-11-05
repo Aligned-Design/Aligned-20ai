@@ -1,5 +1,8 @@
 import { PublishingJob, Platform, PostContent, JobStatusUpdate } from '@shared/publishing';
 import { validatePostContent } from './platform-validators';
+import { connectionsDB } from './connections-db-service';
+import { publishingDBService } from './publishing-db-service';
+import { getPlatformAPI } from './platform-apis';
 
 interface PublishResult {
   success: boolean;
@@ -102,78 +105,303 @@ export class PublishingQueue {
   }
 
   private async publishToInstagram(job: PublishingJob): Promise<PublishResult> {
-    // TODO: Implement Instagram publishing via Graph API
-    // This is a simplified mock implementation
-    
-    const delay = Math.random() * 2000 + 1000; // 1-3 seconds
-    await new Promise(resolve => setTimeout(resolve, delay));
-    
-    // Simulate occasional failures for testing
-    if (Math.random() < 0.1) {
-      throw new Error('Instagram API rate limit exceeded');
+    try {
+      // Get connection from database
+      const connection = await connectionsDB.getConnection(job.brandId, 'instagram');
+      if (!connection) {
+        throw new Error('Instagram account not connected');
+      }
+
+      if (connection.status !== 'connected') {
+        throw new Error(`Instagram connection status: ${connection.status}`);
+      }
+
+      // Get Instagram API client
+      const instagramAPI = getPlatformAPI('instagram', connection.access_token, connection.account_id);
+
+      // Publish to Instagram
+      const result = await instagramAPI.publishPost(job.content);
+
+      if (result.success) {
+        // Create audit log entry
+        await publishingDBService.createPublishingLog(
+          job.id,
+          job.brandId,
+          'instagram',
+          'published',
+          1,
+          {
+            platformPostId: result.platformPostId,
+            platformPostUrl: result.platformUrl,
+            contentSnapshot: job.content
+          }
+        );
+
+        return result;
+      } else {
+        // Log failure
+        await publishingDBService.createPublishingLog(
+          job.id,
+          job.brandId,
+          'instagram',
+          'failed',
+          1,
+          {
+            errorCode: result.errorCode,
+            errorMessage: result.error,
+            contentSnapshot: job.content
+          }
+        );
+
+        throw new Error(result.error || 'Instagram publish failed');
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Instagram publishing failed',
+        errorDetails: error
+      };
     }
-    
-    return {
-      success: true,
-      platformPostId: `ig_${Date.now()}`,
-      platformUrl: `https://instagram.com/p/mock_${job.id}`
-    };
   }
 
   private async publishToFacebook(job: PublishingJob): Promise<PublishResult> {
-    // TODO: Implement Facebook publishing via Graph API
-    const delay = Math.random() * 1500 + 500;
-    await new Promise(resolve => setTimeout(resolve, delay));
-    
-    if (Math.random() < 0.05) {
-      throw new Error('Facebook connection expired');
+    try {
+      // Get connection from database
+      const connection = await connectionsDB.getConnection(job.brandId, 'facebook');
+      if (!connection) {
+        throw new Error('Facebook account not connected');
+      }
+
+      if (connection.status !== 'connected') {
+        throw new Error(`Facebook connection status: ${connection.status}`);
+      }
+
+      // Get Facebook API client
+      const facebookAPI = getPlatformAPI('facebook', connection.access_token, connection.account_id);
+
+      // Publish to Facebook
+      const result = await facebookAPI.publishPost(job.content);
+
+      if (result.success) {
+        // Create audit log entry
+        await publishingDBService.createPublishingLog(
+          job.id,
+          job.brandId,
+          'facebook',
+          'published',
+          1,
+          {
+            platformPostId: result.platformPostId,
+            platformPostUrl: result.platformUrl,
+            contentSnapshot: job.content
+          }
+        );
+
+        return result;
+      } else {
+        // Log failure
+        await publishingDBService.createPublishingLog(
+          job.id,
+          job.brandId,
+          'facebook',
+          'failed',
+          1,
+          {
+            errorCode: result.errorCode,
+            errorMessage: result.error,
+            contentSnapshot: job.content
+          }
+        );
+
+        throw new Error(result.error || 'Facebook publish failed');
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Facebook publishing failed',
+        errorDetails: error
+      };
     }
-    
-    return {
-      success: true,
-      platformPostId: `fb_${Date.now()}`,
-      platformUrl: `https://facebook.com/posts/mock_${job.id}`
-    };
   }
 
   private async publishToLinkedIn(job: PublishingJob): Promise<PublishResult> {
-    // TODO: Implement LinkedIn publishing via API
-    const delay = Math.random() * 2500 + 1000;
-    await new Promise(resolve => setTimeout(resolve, delay));
-    
-    return {
-      success: true,
-      platformPostId: `li_${Date.now()}`,
-      platformUrl: `https://linkedin.com/posts/mock_${job.id}`
-    };
+    try {
+      // Get connection from database
+      const connection = await connectionsDB.getConnection(job.brandId, 'linkedin');
+      if (!connection) {
+        throw new Error('LinkedIn account not connected');
+      }
+
+      if (connection.status !== 'connected') {
+        throw new Error(`LinkedIn connection status: ${connection.status}`);
+      }
+
+      // Get LinkedIn API client
+      const linkedinAPI = getPlatformAPI('linkedin', connection.access_token, connection.account_id);
+
+      // Publish to LinkedIn
+      const result = await linkedinAPI.publishPost(job.content);
+
+      if (result.success) {
+        // Create audit log entry
+        await publishingDBService.createPublishingLog(
+          job.id,
+          job.brandId,
+          'linkedin',
+          'published',
+          1,
+          {
+            platformPostId: result.platformPostId,
+            platformPostUrl: result.platformUrl,
+            contentSnapshot: job.content
+          }
+        );
+
+        return result;
+      } else {
+        // Log failure
+        await publishingDBService.createPublishingLog(
+          job.id,
+          job.brandId,
+          'linkedin',
+          'failed',
+          1,
+          {
+            errorCode: result.errorCode,
+            errorMessage: result.error,
+            contentSnapshot: job.content
+          }
+        );
+
+        throw new Error(result.error || 'LinkedIn publish failed');
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'LinkedIn publishing failed',
+        errorDetails: error
+      };
+    }
   }
 
   private async publishToTwitter(job: PublishingJob): Promise<PublishResult> {
-    // TODO: Implement Twitter publishing via API v2
-    const delay = Math.random() * 1000 + 500;
-    await new Promise(resolve => setTimeout(resolve, delay));
-    
-    if (Math.random() < 0.08) {
-      throw new Error('Tweet contains prohibited content');
+    try {
+      // Get connection from database
+      const connection = await connectionsDB.getConnection(job.brandId, 'twitter');
+      if (!connection) {
+        throw new Error('Twitter account not connected');
+      }
+
+      if (connection.status !== 'connected') {
+        throw new Error(`Twitter connection status: ${connection.status}`);
+      }
+
+      // Get Twitter API client
+      const twitterAPI = getPlatformAPI('twitter', connection.access_token, connection.account_id);
+
+      // Publish to Twitter
+      const result = await twitterAPI.publishPost(job.content);
+
+      if (result.success) {
+        // Create audit log entry
+        await publishingDBService.createPublishingLog(
+          job.id,
+          job.brandId,
+          'twitter',
+          'published',
+          1,
+          {
+            platformPostId: result.platformPostId,
+            platformPostUrl: result.platformUrl,
+            contentSnapshot: job.content
+          }
+        );
+
+        return result;
+      } else {
+        // Log failure
+        await publishingDBService.createPublishingLog(
+          job.id,
+          job.brandId,
+          'twitter',
+          'failed',
+          1,
+          {
+            errorCode: result.errorCode,
+            errorMessage: result.error,
+            contentSnapshot: job.content
+          }
+        );
+
+        throw new Error(result.error || 'Twitter publish failed');
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Twitter publishing failed',
+        errorDetails: error
+      };
     }
-    
-    return {
-      success: true,
-      platformPostId: `tw_${Date.now()}`,
-      platformUrl: `https://twitter.com/status/mock_${job.id}`
-    };
   }
 
   private async publishToGoogleBusiness(job: PublishingJob): Promise<PublishResult> {
-    // TODO: Implement Google Business Posts via My Business API
-    const delay = Math.random() * 3000 + 1500;
-    await new Promise(resolve => setTimeout(resolve, delay));
-    
-    return {
-      success: true,
-      platformPostId: `gbp_${Date.now()}`,
-      platformUrl: `https://business.google.com/posts/mock_${job.id}`
-    };
+    try {
+      // Get connection from database
+      const connection = await connectionsDB.getConnection(job.brandId, 'google_business');
+      if (!connection) {
+        throw new Error('Google Business Profile not connected');
+      }
+
+      if (connection.status !== 'connected') {
+        throw new Error(`Google Business connection status: ${connection.status}`);
+      }
+
+      // Get Google Business API client
+      const googleAPI = getPlatformAPI('google_business', connection.access_token, connection.account_id);
+
+      // Publish to Google Business
+      const result = await googleAPI.publishPost(job.content);
+
+      if (result.success) {
+        // Create audit log entry
+        await publishingDBService.createPublishingLog(
+          job.id,
+          job.brandId,
+          'google_business',
+          'published',
+          1,
+          {
+            platformPostId: result.platformPostId,
+            platformPostUrl: result.platformUrl,
+            contentSnapshot: job.content
+          }
+        );
+
+        return result;
+      } else {
+        // Log failure
+        await publishingDBService.createPublishingLog(
+          job.id,
+          job.brandId,
+          'google_business',
+          'failed',
+          1,
+          {
+            errorCode: result.errorCode,
+            errorMessage: result.error,
+            contentSnapshot: job.content
+          }
+        );
+
+        throw new Error(result.error || 'Google Business publish failed');
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Google Business publishing failed',
+        errorDetails: error
+      };
+    }
   }
 
   private async handleJobFailure(jobId: string, error: string, errorDetails?: any): Promise<void> {
@@ -209,8 +437,12 @@ export class PublishingQueue {
     Object.assign(job, update);
     job.updatedAt = new Date().toISOString();
 
-    // TODO: Persist to database
-    // await db.publishingJobs.update(jobId, job);
+    // Persist to database
+    try {
+      await publishingDBService.updateJobStatus(jobId, update.status as any);
+    } catch (error) {
+      console.error(`Failed to update job status in database: ${error}`);
+    }
 
     // Emit status update event
     this.emitStatusUpdate(job);

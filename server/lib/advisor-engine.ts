@@ -15,11 +15,29 @@ interface InsightContext {
   userFeedback: Array<{ insightId: string; feedback: string; timestamp: string }>;
 }
 
+interface MetricAnomaly {
+  metric: string;
+  category: 'content' | 'platform' | 'audience' | 'timing' | 'campaign';
+  type: string;
+  severity: 'low' | 'medium' | 'high';
+  suggestions: string[];
+  change: number;
+  current: number;
+  expected: number;
+}
+
 export class AdvisorEngine {
   private feedbackWeights = new Map<string, number>();
+  private weightsLoadedFor = new Set<string>(); // Track which brands have loaded weights
 
   async generateInsights(context: InsightContext): Promise<AdvisorInsight[]> {
     const insights: AdvisorInsight[] = [];
+
+    // Load feedback weights from database if not already loaded for this brand
+    if (!this.weightsLoadedFor.has(context.brandId)) {
+      await this.loadFeedbackWeights(context.brandId);
+      this.weightsLoadedFor.add(context.brandId);
+    }
 
     // Generate different types of insights
     insights.push(...await this.analyzeTrends(context));
@@ -38,6 +56,26 @@ export class AdvisorEngine {
     return insights
       .sort((a, b) => b.priority - a.priority)
       .slice(0, 20); // Limit to top 20 insights
+  }
+
+  /**
+   * Load feedback weights from database for a specific brand
+   */
+  private async loadFeedbackWeights(brandId: string): Promise<void> {
+    try {
+      const { analyticsDB } = await import('./analytics-db-service');
+      const weights = await analyticsDB.getAverageWeights(brandId);
+
+      // Load weights into memory
+      Object.entries(weights).forEach(([key, weight]) => {
+        this.feedbackWeights.set(key, weight);
+      });
+
+      console.log(`✅ Loaded ${Object.keys(weights).length} feedback weights for brand ${brandId}`);
+    } catch (error) {
+      console.error(`Failed to load feedback weights for brand ${brandId}:`, error);
+      // Continue with default weights (1.0) if loading fails
+    }
   }
 
   private async analyzeTrends(context: InsightContext): Promise<AdvisorInsight[]> {
@@ -226,7 +264,7 @@ export class AdvisorEngine {
         suggestions: [
           `Schedule posts during peak times: ${timingAnalysis.optimalTimes.slice(0, 3).join(', ')}`,
           'Test posting 30 minutes before and after peak times',
-          'Consider your audience's timezone distribution',
+          'Consider your audience timezone distribution',
           'Use scheduling tools to maintain consistency'
         ],
         evidence: {
@@ -557,9 +595,29 @@ export class AdvisorEngine {
     };
   }
 
-  private detectMetricAnomalies(current: AnalyticsMetric[], historical: AnalyticsMetric[]) {
+  private detectMetricAnomalies(current: AnalyticsMetric[], historical: AnalyticsMetric[]): MetricAnomaly[] {
     // Simplified anomaly detection
-    return [];
+    const anomalies: MetricAnomaly[] = [];
+
+    const currentAgg = this.aggregateMetrics(current);
+    const historicalAgg = this.aggregateMetrics(historical);
+
+    // Detect engagement anomalies
+    const engagementChange = this.calculatePercentChange(currentAgg.engagement, historicalAgg.engagement);
+    if (Math.abs(engagementChange) > 30) {
+      anomalies.push({
+        metric: 'engagement',
+        category: 'audience',
+        type: engagementChange > 0 ? 'spike' : 'drop',
+        severity: Math.abs(engagementChange) > 50 ? 'high' : 'medium',
+        suggestions: ['Review content strategy', 'Analyze audience behavior'],
+        change: engagementChange,
+        current: currentAgg.engagement,
+        expected: historicalAgg.engagement
+      });
+    }
+
+    return anomalies;
   }
 
   private prepareTimeSeriesData(metrics: AnalyticsMetric[]) {
@@ -666,10 +724,16 @@ export class AdvisorEngine {
     return this.feedbackWeights.get(key) || 1.0;
   }
 
-  async processFeedback(insightId: string, feedback: 'accepted' | 'rejected' | 'implemented', category: string, type: string): Promise<void> {
+  async processFeedback(
+    brandId: string,
+    insightId: string,
+    feedback: 'accepted' | 'rejected' | 'implemented',
+    category: string,
+    type: string
+  ): Promise<void> {
     const key = `${category}_${type}`;
     const currentWeight = this.feedbackWeights.get(key) || 1.0;
-    
+
     // Adjust weights based on feedback
     let newWeight = currentWeight;
     switch (feedback) {
@@ -681,11 +745,29 @@ export class AdvisorEngine {
         newWeight = Math.max(0.5, currentWeight - 0.1);
         break;
     }
-    
+
+    // Update in-memory weights
     this.feedbackWeights.set(key, newWeight);
-    
-    // TODO: Persist feedback weights to database
-    console.log(`Updated weight for ${key}: ${newWeight}`);
+
+    // Persist feedback weights to database
+    try {
+      const { analyticsDB } = await import('./analytics-db-service');
+      await analyticsDB.logFeedback(
+        brandId,
+        brandId, // tenant_id (using brand_id as tenant_id)
+        insightId,
+        category,
+        type,
+        feedback,
+        currentWeight,
+        newWeight
+      );
+
+      console.log(`✅ Updated and persisted weight for ${key}: ${currentWeight.toFixed(2)} → ${newWeight.toFixed(2)}`);
+    } catch (error) {
+      console.error(`Failed to persist feedback weight for ${key}:`, error);
+      throw error;
+    }
   }
 }
 

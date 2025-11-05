@@ -83,6 +83,3 @@ function DefaultErrorFallback({ error, reset, goHome }: {
     </div>
   );
 }
-    </div>
-  );
-}

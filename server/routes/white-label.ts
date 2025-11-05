@@ -96,7 +96,7 @@ export const getConfigByDomain: RequestHandler = async (req, res) => {
 
     const response: WhiteLabelResponse = {
       success: true,
-      config: config || null
+      config: config || undefined
     };
 
     res.json(response);

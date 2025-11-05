@@ -333,18 +333,26 @@ router.post("/webhooks/:type", (async (req, res) => {
 
 // Helper functions
 function generateOAuthUrl(type: IntegrationType, brandId: string, redirectUrl?: string): string {
-  const baseUrls = {
+  const baseUrls: Record<IntegrationType, string> = {
     slack: 'https://slack.com/oauth/v2/authorize',
     hubspot: 'https://app.hubspot.com/oauth/authorize',
     meta: 'https://www.facebook.com/v18.0/dialog/oauth',
-    google_business: 'https://accounts.google.com/oauth/authorize'
+    google_business: 'https://accounts.google.com/oauth/authorize',
+    zapier: 'https://zapier.com/oauth/authorize',
+    asana: 'https://app.asana.com/-/oauth_authorize',
+    trello: 'https://trello.com/app-key',
+    salesforce: 'https://login.salesforce.com/services/oauth2/authorize'
   };
 
-  const scopes = {
+  const scopes: Record<IntegrationType, string> = {
     slack: 'channels:read,chat:write,files:read',
     hubspot: 'contacts,content,social',
     meta: 'pages_manage_posts,pages_read_engagement',
-    google_business: 'business.manage'
+    google_business: 'business.manage',
+    zapier: 'user:read',
+    asana: 'default',
+    trello: 'read,write',
+    salesforce: 'full'
   };
 
   const params = new URLSearchParams({

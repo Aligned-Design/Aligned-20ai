@@ -17,6 +17,8 @@ const mockDashboardData: ClientDashboardData = {
     followers: 52847,
     postsThisMonth: 24,
     engagementRate: 7.2,
+    pendingApprovals: 3,
+    campaignProgress: 65,
     growth: {
       reach: 12.4,
       engagement: 18.7,
@@ -35,8 +37,11 @@ const mockDashboardData: ClientDashboardData = {
         reach: 45230,
         engagement: 3420,
         likes: 2890,
-        comments: 430
+        comments: 430,
+        shares: 156
       },
+      complianceBadges: [],
+      version: 1,
       comments: [
         {
           id: 'comment_1',
@@ -60,7 +65,9 @@ const mockDashboardData: ClientDashboardData = {
       status: 'scheduled',
       scheduledFor: '2024-01-16T14:00:00Z',
       comments: [],
-      approvalRequired: false
+      approvalRequired: false,
+      complianceBadges: [],
+      version: 1
     }
   ],
   pendingApprovals: [
@@ -68,7 +75,7 @@ const mockDashboardData: ClientDashboardData = {
       id: 'content_3',
       platform: 'linkedin',
       content: 'Behind every great athlete is years of dedication, training, and the right gear. Here\'s how Nike supports champions at every level.',
-      status: 'pending_approval',
+      status: 'in_review',
       comments: [
         {
           id: 'comment_2',
@@ -81,7 +88,9 @@ const mockDashboardData: ClientDashboardData = {
           createdAt: '2024-01-15T16:00:00Z'
         }
       ],
-      approvalRequired: true
+      approvalRequired: true,
+      complianceBadges: [],
+      version: 1
     }
   ],
   recentComments: [
@@ -95,7 +104,44 @@ const mockDashboardData: ClientDashboardData = {
       isInternal: false,
       createdAt: '2024-01-15T10:00:00Z'
     }
-  ]
+  ],
+  agencyInfo: {
+    name: 'Nike Marketing Agency',
+    logo: '🎯',
+    contactEmail: 'contact@nikeagency.com',
+    supportUrl: 'https://support.nikeagency.com'
+  },
+  aiInsight: {
+    title: 'Peak Engagement Opportunity',
+    description: 'Your audience is most active on Instagram between 6-8 PM EST. Consider scheduling high-engagement content during these hours.',
+    impact: 'actionable'
+  },
+  topPerformingContent: [
+    {
+      id: 'content_1',
+      platform: 'instagram',
+      content: 'New Air Max collection drops tomorrow!',
+      status: 'published',
+      publishedAt: '2024-01-15T09:00:00Z',
+      thumbnail: '🏃‍♂️',
+      metrics: {
+        reach: 45230,
+        engagement: 3420,
+        likes: 2890,
+        comments: 430,
+        shares: 156
+      },
+      comments: [],
+      approvalRequired: false,
+      complianceBadges: [],
+      version: 1
+    }
+  ],
+  quickActions: {
+    approvalsNeeded: 3,
+    reviewsAvailable: 2,
+    eventsUpcoming: 1
+  }
 };
 
 export const getClientDashboard: RequestHandler = async (req, res) => {

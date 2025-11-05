@@ -403,7 +403,7 @@ function MetricCard({ title, value, growth, icon, color }: MetricCardProps) {
 }
 
 function ContentPipelineView({ posts }: { posts: any[] }) {
-  const statusGroups = posts.reduce((groups, post) => {
+  const statusGroups = posts.reduce((groups: Record<string, any[]>, post: any) => {
     const status = post.status;
     if (!groups[status]) groups[status] = [];
     groups[status].push(post);
@@ -412,7 +412,7 @@ function ContentPipelineView({ posts }: { posts: any[] }) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {Object.entries(statusGroups).map(([status, statusPosts]) => (
+      {Object.entries(statusGroups).map(([status, statusPosts]: [string, any[]]) => (
         <Card key={status}>
           <CardHeader>
             <CardTitle className="capitalize flex items-center gap-2">
@@ -423,7 +423,7 @@ function ContentPipelineView({ posts }: { posts: any[] }) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {statusPosts.map((post) => (
+            {statusPosts.map((post: any) => (
               <div key={post.id} className="p-3 border rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-2xl">{post.image}</span>

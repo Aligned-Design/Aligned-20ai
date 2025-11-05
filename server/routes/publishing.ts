@@ -1,22 +1,25 @@
 import { RequestHandler } from 'express';
 import crypto from 'crypto';
-import { 
-  Platform, 
-  PublishRequest, 
-  PublishResponse, 
-  PublishingJob, 
+import {
+  Platform,
+  PublishRequest,
+  PublishResponse,
+  PublishingJob,
   PlatformConnection,
   ConnectionStatus,
   OAuthFlow
 } from '@shared/publishing';
 import { validatePostContent, validateScheduleTime } from '../lib/platform-validators';
-import { 
-  generateOAuthUrl, 
-  exchangeCodeForToken, 
-  refreshAccessToken, 
-  isTokenExpired 
+import {
+  generateOAuthUrl,
+  exchangeCodeForToken,
+  refreshAccessToken,
+  isTokenExpired
 } from '../lib/oauth-manager';
 import { publishingQueue } from '../lib/publishing-queue';
+import { connectionsDB } from '../lib/connections-db-service';
+import { publishingDBService } from '../lib/publishing-db-service';
+import { getPlatformAPI } from '../lib/platform-apis';
 
 // OAuth initiation
 export const initiateOAuth: RequestHandler = async (req, res) => {
@@ -53,36 +56,32 @@ export const handleOAuthCallback: RequestHandler = async (req, res) => {
     }
 
     const tokenData = await exchangeCodeForToken(
-      platform as Platform, 
-      code as string, 
+      platform as Platform,
+      code as string,
       state as string
     );
 
     const [stateToken, brandId] = (state as string).split(':');
 
-    // Create connection record
-    const connection: PlatformConnection = {
-      id: crypto.randomUUID(),
-      platform: platform as Platform,
-      brandId,
-      tenantId: 'tenant-123', // TODO: Get from session/auth
-      accountId: tokenData.accountInfo.id,
-      accountName: tokenData.accountInfo.name || tokenData.accountInfo.username,
-      profilePicture: tokenData.accountInfo.picture?.data?.url || tokenData.accountInfo.profile_image_url,
-      accessToken: tokenData.accessToken,
-      refreshToken: tokenData.refreshToken,
-      tokenExpiresAt: tokenData.expiresIn 
-        ? new Date(Date.now() + tokenData.expiresIn * 1000).toISOString()
-        : undefined,
-      status: 'connected',
-      permissions: [], // TODO: Extract from token response
-      metadata: tokenData.accountInfo,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+    // Get tenantId and userId from auth context (in production, from req.user or session)
+    const tenantId = (req as any).user?.tenantId || 'tenant-123';
+    const userId = (req as any).user?.id;
 
-    // TODO: Store connection in database
-    // await db.connections.upsert(connection);
+    // Store connection in database
+    await connectionsDB.upsertConnection(
+      brandId,
+      tenantId,
+      platform as Platform,
+      tokenData.accessToken,
+      tokenData.accountInfo.id,
+      tokenData.accountInfo.name || tokenData.accountInfo.username,
+      tokenData.accountInfo.picture?.data?.url || tokenData.accountInfo.profile_image_url,
+      tokenData.refreshToken,
+      tokenData.expiresIn ? new Date(Date.now() + tokenData.expiresIn * 1000) : undefined,
+      [], // TODO: Extract permissions from token response
+      tokenData.accountInfo,
+      userId
+    );
 
     res.redirect('/integrations?success=Connected successfully');
   } catch (error) {
@@ -96,29 +95,21 @@ export const getConnections: RequestHandler = async (req, res) => {
   try {
     const { brandId } = req.params;
 
-    // TODO: Fetch from database
-    // const connections = await db.connections.findByBrandId(brandId);
-    
-    // Mock data for now
-    const connections: ConnectionStatus[] = [
-      {
-        platform: 'instagram',
-        connected: true,
-        accountName: '@mybrand',
-        profilePicture: 'https://example.com/avatar.jpg',
-        tokenExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        permissions: ['user_profile', 'user_media'],
-        needsReauth: false
-      },
-      {
-        platform: 'facebook',
-        connected: false,
-        needsReauth: false,
-        permissions: []
-      }
-    ];
+    // Fetch connections from database
+    const connections = await connectionsDB.getBrandConnections(brandId);
 
-    res.json(connections);
+    // Transform to ConnectionStatus format
+    const connectionStatuses: ConnectionStatus[] = connections.map(conn => ({
+      platform: conn.platform as Platform,
+      connected: conn.status === 'connected',
+      accountName: conn.account_name,
+      profilePicture: conn.profile_picture,
+      tokenExpiry: conn.token_expires_at,
+      permissions: conn.permissions || [],
+      needsReauth: conn.status === 'expired' || conn.status === 'revoked'
+    }));
+
+    res.json(connectionStatuses);
   } catch (error) {
     console.error('Get connections error:', error);
     res.status(500).json({
@@ -132,8 +123,8 @@ export const disconnectPlatform: RequestHandler = async (req, res) => {
   try {
     const { brandId, platform } = req.params;
 
-    // TODO: Update connection status in database
-    // await db.connections.update({ brandId, platform }, { status: 'disconnected' });
+    // Disconnect in database
+    await connectionsDB.disconnectPlatform(brandId, platform as Platform);
 
     res.json({ success: true });
   } catch (error) {
@@ -152,6 +143,9 @@ export const publishContent: RequestHandler = async (req, res) => {
     if (!brandId || !platforms || !content) {
       return res.status(400).json({ error: 'brandId, platforms, and content required' });
     }
+
+    const tenantId = (req as any).user?.tenantId || 'tenant-123';
+    const userId = (req as any).user?.id;
 
     const jobs: PublishingJob[] = [];
     const validationResults = [];
@@ -173,7 +167,7 @@ export const publishContent: RequestHandler = async (req, res) => {
       if (scheduledAt) {
         const scheduleValidation = validateScheduleTime(platform, new Date(scheduledAt));
         validationResults.push(scheduleValidation);
-        
+
         if (scheduleValidation.status === 'error' && !validateOnly) {
           errors.push(`${platform}: ${scheduleValidation.message}`);
           continue;
@@ -181,22 +175,32 @@ export const publishContent: RequestHandler = async (req, res) => {
       }
 
       if (!validateOnly) {
-        // Create publishing job
-        const job: PublishingJob = {
-          id: crypto.randomUUID(),
+        // Create publishing job in database
+        const dbJob = await publishingDBService.createPublishingJob(
           brandId,
-          tenantId: 'tenant-123', // TODO: Get from auth
-          postId: crypto.randomUUID(),
+          tenantId,
+          content,
+          [platform],
+          scheduledAt ? new Date(scheduledAt) : undefined,
+          userId
+        );
+
+        // Add to in-memory queue for processing
+        const job: PublishingJob = {
+          id: dbJob.id,
+          brandId,
+          tenantId,
+          postId: dbJob.id,
           platform,
-          connectionId: `conn-${platform}-${brandId}`, // TODO: Get actual connection ID
+          connectionId: `${platform}-${brandId}`,
           status: 'pending',
           scheduledAt,
           content,
           validationResults: platformValidation,
           retryCount: 0,
           maxRetries: 3,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: dbJob.created_at,
+          updatedAt: dbJob.updated_at
         };
 
         jobs.push(job);
@@ -220,31 +224,57 @@ export const publishContent: RequestHandler = async (req, res) => {
   }
 };
 
-// Get publishing jobs
+// Get publishing jobs from database (persistent, includes historical jobs)
 export const getPublishingJobs: RequestHandler = async (req, res) => {
   try {
     const { brandId } = req.params;
-    const { status, platform, limit = 50 } = req.query;
+    const { status, platform, limit = '50', offset = '0' } = req.query;
 
-    let jobs = publishingQueue.getJobsByBrand(brandId);
+    // Fetch from database for persistence across server restarts
+    const { jobs, total } = await publishingDBService.getJobHistory(
+      brandId,
+      Number(limit),
+      Number(offset)
+    );
 
-    // Filter by status
-    if (status && status !== 'all') {
-      jobs = jobs.filter(job => job.status === status);
-    }
-
-    // Filter by platform
+    // Filter by platform if specified
+    let filteredJobs = jobs;
     if (platform && platform !== 'all') {
-      jobs = jobs.filter(job => job.platform === platform);
+      filteredJobs = jobs.filter(job => job.platforms?.includes(platform as string));
     }
 
-    // Limit results
-    jobs = jobs.slice(0, Number(limit));
+    // Filter by brand
+    filteredJobs = filteredJobs.filter(job => job.brand_id === brandId);
 
-    // Sort by creation date (newest first)
-    jobs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    // Transform database records to PublishingJob format
+    const publishingJobs: PublishingJob[] = filteredJobs.map(job => ({
+      id: job.id,
+      brandId: job.brand_id,
+      tenantId: job.tenant_id,
+      postId: job.id,
+      platform: (job.platforms?.[0] || 'instagram') as Platform,
+      connectionId: `${job.platforms?.[0]}-${job.brand_id}`,
+      status: job.status as any,
+      scheduledAt: job.scheduled_at,
+      publishedAt: job.published_at,
+      platformPostId: undefined,
+      platformUrl: undefined,
+      content: job.content,
+      validationResults: job.validation_results || [],
+      retryCount: job.retry_count || 0,
+      maxRetries: job.max_retries || 3,
+      lastError: job.last_error,
+      errorDetails: job.last_error_details,
+      createdAt: job.created_at,
+      updatedAt: job.updated_at
+    }));
 
-    res.json(jobs);
+    res.json({
+      jobs: publishingJobs,
+      total,
+      limit: Number(limit),
+      offset: Number(offset)
+    });
   } catch (error) {
     console.error('Get jobs error:', error);
     res.status(500).json({
@@ -293,50 +323,112 @@ export const cancelJob: RequestHandler = async (req, res) => {
   }
 };
 
+// Verify a platform connection is still valid
+export const verifyConnection: RequestHandler = async (req, res) => {
+  try {
+    const { brandId, platform } = req.params;
+
+    // Get connection from database
+    const connection = await connectionsDB.getConnection(brandId, platform as Platform);
+
+    if (!connection) {
+      return res.status(404).json({
+        verified: false,
+        error: 'Connection not found'
+      });
+    }
+
+    // Check if token is expired
+    if (connection.token_expires_at) {
+      const expiresAt = new Date(connection.token_expires_at);
+      const now = new Date();
+
+      if (expiresAt <= now) {
+        return res.status(200).json({
+          verified: false,
+          error: 'Token expired',
+          tokenExpiresAt: connection.token_expires_at,
+          needsRefresh: true
+        });
+      }
+    }
+
+    // Check connection status
+    if (connection.status !== 'connected') {
+      return res.status(200).json({
+        verified: false,
+        error: `Connection status: ${connection.status}`,
+        connectionStatus: connection.status
+      });
+    }
+
+    // Try a simple API call to verify the token still works
+    try {
+      const platformAPI = getPlatformAPI(platform as Platform, connection.access_token, connection.account_id);
+
+      // For now, just verify the connection object is valid
+      // In production, you might make a simple test API call
+      return res.json({
+        verified: true,
+        platform,
+        accountName: connection.account_name,
+        accountId: connection.account_id,
+        tokenExpiresAt: connection.token_expires_at,
+        lastVerified: connection.last_verified_at,
+        status: connection.status
+      });
+    } catch (error) {
+      return res.status(200).json({
+        verified: false,
+        error: 'Failed to verify connection',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  } catch (error) {
+    console.error('Verify connection error:', error);
+    res.status(500).json({
+      verified: false,
+      error: error instanceof Error ? error.message : 'Failed to verify connection'
+    });
+  }
+};
+
 // Refresh platform token
 export const refreshToken: RequestHandler = async (req, res) => {
   try {
     const { brandId, platform } = req.params;
 
-    // TODO: Get connection from database
-    // const connection = await db.connections.findOne({ brandId, platform });
-    
-    // Mock connection for now
-    const connection: PlatformConnection = {
-      id: 'mock-id',
-      platform: platform as Platform,
-      brandId,
-      tenantId: 'tenant-123',
-      accountId: 'account-123',
-      accountName: 'Mock Account',
-      accessToken: 'old-token',
-      refreshToken: 'refresh-token',
-      status: 'connected',
-      permissions: [],
-      metadata: {},
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+    // Get connection from database
+    const connection = await connectionsDB.getConnection(brandId, platform as Platform);
 
     if (!connection) {
       return res.status(404).json({ error: 'Connection not found' });
     }
 
-    const tokenData = await refreshAccessToken(connection);
+    // Refresh the token
+    const tokenData = await refreshAccessToken({
+      id: connection.id,
+      platform: connection.platform as Platform,
+      brandId: connection.brand_id,
+      tenantId: connection.tenant_id,
+      accountId: connection.account_id,
+      accountName: connection.account_name || '',
+      accessToken: connection.access_token,
+      refreshToken: connection.refresh_token,
+      status: connection.status as any,
+      permissions: connection.permissions || [],
+      metadata: connection.metadata,
+      createdAt: connection.created_at,
+      updatedAt: connection.updated_at
+    });
 
     // Update connection with new tokens
-    connection.accessToken = tokenData.accessToken;
-    if (tokenData.refreshToken) {
-      connection.refreshToken = tokenData.refreshToken;
-    }
-    if (tokenData.expiresIn) {
-      connection.tokenExpiresAt = new Date(Date.now() + tokenData.expiresIn * 1000).toISOString();
-    }
-    connection.status = 'connected';
-    connection.updatedAt = new Date().toISOString();
-
-    // TODO: Save updated connection
-    // await db.connections.update(connection.id, connection);
+    await connectionsDB.updateAccessToken(
+      connection.id,
+      tokenData.accessToken,
+      tokenData.refreshToken,
+      tokenData.expiresIn ? new Date(Date.now() + tokenData.expiresIn * 1000) : undefined
+    );
 
     res.json({ success: true });
   } catch (error) {

@@ -69,6 +69,8 @@ export default function BrandIntake() {
   const [submitting, setSubmitting] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importProgress, setImportProgress] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState("");
 
   // Auto-save functionality
   const {
@@ -170,8 +172,9 @@ export default function BrandIntake() {
         data: { session },
       } = await supabase.auth.getSession();
 
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const response = await fetch(
-        `${supabase.supabaseUrl}/functions/v1/process-brand-intake`,
+        `${supabaseUrl}/functions/v1/process-brand-intake`,
         {
           method: "POST",
           headers: {
@@ -227,14 +230,78 @@ export default function BrandIntake() {
   const handleSubmit = async () => {
     if (!validateCurrentStep() || !brandId || !user) return;
 
+    // Check for duplicate brand by website URL
+    if (formData.websiteUrl) {
+      try {
+        const normalizedUrl = new URL(formData.websiteUrl).hostname;
+        const { data: allBrands } = await supabase
+          .from("brands")
+          .select("id, brand_name, brand_kit")
+          .neq("id", brandId); // Exclude current brand
+
+        if (allBrands && allBrands.length > 0) {
+          for (const brand of allBrands) {
+            if (brand.brand_kit?.website_url) {
+              try {
+                const existingUrl = new URL(brand.brand_kit.website_url).hostname;
+                if (existingUrl === normalizedUrl) {
+                  toast({
+                    title: "Duplicate Brand",
+                    description: `A brand with website "${normalizedUrl}" already exists (${brand.brand_name}). Please use a different website or contact support to merge brands.`,
+                    variant: "destructive",
+                  });
+                  return;
+                }
+              } catch {
+                // Invalid URL in existing brand, skip
+              }
+            }
+          }
+        }
+      } catch (error) {
+        // If URL parsing fails, allow submission (user will see validation error)
+        console.warn("Error checking for duplicate brands:", error);
+      }
+    }
+
     setSubmitting(true);
     try {
-      // Upload all files
+      // Upload all files with progress tracking
       const uploadPromises: Promise<any>[] = [];
+      let totalUploadItems = 0;
+      let completedUploadItems = 0;
+
+      // Count total upload items
+      if (formData.logoFiles?.length) totalUploadItems += 1;
+      if (formData.brandImageryFiles?.length) totalUploadItems += 1;
+      if (formData.textReferenceFiles?.length) totalUploadItems += 1;
+      if (formData.visualReferenceFiles?.length) totalUploadItems += 1;
+      if (formData.previousContentFiles?.length) totalUploadItems += 1;
+
+      const handleUploadProgress = (
+        categoryName: string,
+        progress: { currentFile: number; totalFiles: number; progress: number }
+      ) => {
+        setUploadStatus(
+          `Uploading ${categoryName}: ${progress.currentFile}/${progress.totalFiles} (${progress.progress}%)`
+        );
+        setUploadProgress(
+          Math.round(((completedUploadItems + progress.progress / 100) / totalUploadItems) * 100)
+        );
+      };
 
       if (formData.logoFiles?.length) {
         uploadPromises.push(
-          uploadBrandFiles(formData.logoFiles, brandId, "logos", "logo"),
+          uploadBrandFiles(
+            formData.logoFiles,
+            brandId,
+            "logos",
+            "logo",
+            (progress) => handleUploadProgress("Logo", progress),
+          ).then((result) => {
+            completedUploadItems += 1;
+            return result;
+          }),
         );
       }
 
@@ -245,7 +312,11 @@ export default function BrandIntake() {
             brandId,
             "imagery",
             "imagery",
-          ),
+            (progress) => handleUploadProgress("Imagery", progress),
+          ).then((result) => {
+            completedUploadItems += 1;
+            return result;
+          }),
         );
       }
 
@@ -256,7 +327,11 @@ export default function BrandIntake() {
             brandId,
             "references",
             "text_reference",
-          ),
+            (progress) => handleUploadProgress("Text References", progress),
+          ).then((result) => {
+            completedUploadItems += 1;
+            return result;
+          }),
         );
       }
 
@@ -267,7 +342,11 @@ export default function BrandIntake() {
             brandId,
             "references",
             "visual_reference",
-          ),
+            (progress) => handleUploadProgress("Visual References", progress),
+          ).then((result) => {
+            completedUploadItems += 1;
+            return result;
+          }),
         );
       }
 
@@ -278,11 +357,17 @@ export default function BrandIntake() {
             brandId,
             "content",
             "previous_content",
-          ),
+            (progress) => handleUploadProgress("Previous Content", progress),
+          ).then((result) => {
+            completedUploadItems += 1;
+            return result;
+          }),
         );
       }
 
       await Promise.all(uploadPromises);
+      setUploadProgress(0);
+      setUploadStatus("");
 
       // Save final form data
       const {
@@ -417,6 +502,16 @@ export default function BrandIntake() {
             errors={errors}
           />
         </div>
+
+        {uploadProgress > 0 && (
+          <div className="mt-6 rounded-lg border border-border bg-card p-4">
+            <p className="text-sm font-medium mb-2">{uploadStatus}</p>
+            <Progress value={uploadProgress} className="h-2" />
+            <p className="text-xs text-muted-foreground mt-2">
+              {uploadProgress}% complete
+            </p>
+          </div>
+        )}
 
         <div className="flex justify-between mt-8">
           <Button

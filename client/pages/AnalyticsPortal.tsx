@@ -658,23 +658,36 @@ function CustomReportsManager({ brandId, reports, onUpdate }: {
   );
 }
 
+interface ReportFormData {
+  name: string;
+  description: string;
+  frequency: 'daily' | 'weekly' | 'monthly' | 'quarterly';
+  dayOfWeek: number;
+  time: string;
+  recipients: string;
+  subject: string;
+  includeMetrics: string[];
+  includePlatforms: string[];
+  format: 'html' | 'pdf' | 'csv';
+}
+
 function ReportBuilderModal({ brandId, onClose, onSave, report }: {
   brandId: string;
   onClose: () => void;
   onSave: () => void;
   report?: CustomReport;
 }) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ReportFormData>({
     name: report?.name || '',
     description: report?.description || '',
-    frequency: report?.schedule.frequency || 'weekly',
+    frequency: (report?.schedule.frequency as 'daily' | 'weekly' | 'monthly' | 'quarterly') || 'weekly',
     dayOfWeek: report?.schedule.dayOfWeek || 1,
     time: report?.schedule.time || '09:00',
     recipients: report?.delivery.recipients.join(', ') || '',
     subject: report?.delivery.subject || '',
     includeMetrics: report?.content.includeMetrics || ['reach', 'engagement'],
     includePlatforms: report?.content.includePlatforms || ['instagram', 'facebook'],
-    format: report?.delivery.format || 'pdf'
+    format: (report?.delivery.format as 'html' | 'pdf' | 'csv') || 'pdf'
   });
 
   const handleSave = async () => {
@@ -684,7 +697,7 @@ function ReportBuilderModal({ brandId, onClose, onSave, report }: {
         description: formData.description,
         brandId,
         schedule: {
-          frequency: formData.frequency as any,
+          frequency: formData.frequency,
           dayOfWeek: formData.dayOfWeek,
           time: formData.time,
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -695,7 +708,7 @@ function ReportBuilderModal({ brandId, onClose, onSave, report }: {
           includeCharts: ['reachOverTime', 'engagementByPlatform']
         },
         delivery: {
-          format: formData.format as any,
+          format: formData.format,
           recipients: formData.recipients.split(',').map(email => email.trim()),
           subject: formData.subject,
           attachAnalytics: true
@@ -744,9 +757,9 @@ function ReportBuilderModal({ brandId, onClose, onSave, report }: {
             </div>
             <div>
               <Label>Frequency</Label>
-              <Select 
-                value={formData.frequency} 
-                onValueChange={(value) => setFormData(prev => ({ ...prev, frequency: value }))}
+              <Select
+                value={formData.frequency}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, frequency: value as 'daily' | 'weekly' | 'monthly' | 'quarterly' }))}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -781,9 +794,9 @@ function ReportBuilderModal({ brandId, onClose, onSave, report }: {
             </div>
             <div>
               <Label>Format</Label>
-              <Select 
-                value={formData.format} 
-                onValueChange={(value) => setFormData(prev => ({ ...prev, format: value }))}
+              <Select
+                value={formData.format}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, format: value as 'html' | 'pdf' | 'csv' }))}
               >
                 <SelectTrigger>
                   <SelectValue />

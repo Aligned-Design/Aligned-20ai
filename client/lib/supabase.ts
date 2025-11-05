@@ -20,6 +20,9 @@ export type Brand = {
   description: string | null;
   tone_keywords: string[] | null;
   compliance_rules: string | null;
+  brand_kit?: any;
+  voice_summary?: any;
+  visual_summary?: any;
   created_at: string;
   updated_at: string;
 };

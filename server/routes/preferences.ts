@@ -1,9 +1,20 @@
 import { RequestHandler } from 'express';
-import { UserPreferences, PreferencesUpdateRequest, PreferencesResponse } from '@shared/preferences';
+import { UserPreferences } from '@shared/preferences';
+
+interface PreferencesUpdateRequest {
+  [key: string]: any;
+}
+
+interface PreferencesResponse {
+  success: boolean;
+  preferences?: UserPreferences;
+  error?: string;
+}
 
 // Mock user preferences - in production this would come from database
-const mockPreferences: UserPreferences = {
+const mockPreferences: any = {
   userId: 'user-123',
+  id: 'pref-123',
   basic: {
     theme: 'auto',
     language: 'en',
@@ -26,7 +37,7 @@ const mockPreferences: UserPreferences = {
     quickActionsOnHover: true
   },
   advanced: {
-    analyticsEmailCadence: '0 9 * * 1', // Weekly on Monday at 9 AM
+    analyticsEmailCadence: '0 9 * * 1',
     reportFormat: 'html',
     aiInsightLevel: 'detailed',
     showBenchmarks: true,
@@ -53,8 +64,10 @@ const mockPreferences: UserPreferences = {
     autoDataExport: false,
     dataExportFrequency: 'monthly'
   },
+  agencyOverrides: {},
   createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString()
+  updatedAt: new Date().toISOString(),
+  lastSyncedAt: new Date().toISOString()
 };
 
 export const getPreferences: RequestHandler = async (req, res) => {
