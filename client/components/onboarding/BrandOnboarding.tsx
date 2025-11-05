@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Check, ChevronRight as _ChevronRight, ChevronLeft } from 'lucide-react';
+import { Check, ChevronRight, ChevronLeft } from 'lucide-react';
 import { InlineError } from '@/components/ui/error-state';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
