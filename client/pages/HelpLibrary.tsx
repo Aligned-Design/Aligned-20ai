@@ -19,6 +19,11 @@ import {
   searchHelpArticles,
   getCategoryById,
   getArticleById,
+  HELP_CATEGORIES,
+  searchHelpArticles,
+  getCategoryById,
+  getArticleById,
+  HelpArticle
 } from '@shared/tooltip-library';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
