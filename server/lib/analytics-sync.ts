@@ -385,7 +385,7 @@ export class AnalyticsSync {
         `https://graph.instagram.com/${config.accountId}/insights?metric=reach,impressions,profile_views&period=day&since=${sinceDate}&access_token=${config.accessToken}`
       );
       
-      const accountData = accountResponse.ok ? await accountResponse.json() : { data: [] };
+      const accountData: any = accountResponse.ok ? await accountResponse.json() : { data: [] };
 
       return [...(postsData.data || []), ...(accountData.data || [])];
     } catch (error) {
