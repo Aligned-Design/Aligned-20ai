@@ -304,12 +304,23 @@ export const submitRecommendationFeedback: RequestHandler = async (req, res) => 
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('[Brand Intelligence Feedback] Error:', {
-      error,
-      message: error instanceof Error ? error.message : 'Unknown error',
-      recommendationId: (req.body as any)?.recommendationId,
-      timestamp: new Date().toISOString()
-    });
+    try {
+      const safeStringify = (v: any) => {
+        try {
+          return JSON.stringify(v, (_k, val) => (val instanceof Error ? { message: val.message, stack: val.stack } : val));
+        } catch (e) {
+          return String(v);
+        }
+      };
+      console.error(`[Brand Intelligence Feedback] Error: ${safeStringify(error)}`, {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        recommendationId: (req.body as any)?.recommendationId,
+        timestamp: new Date().toISOString()
+      });
+    } catch (logErr) {
+      console.error('[Brand Intelligence Feedback] Error (logging failed):', String(logErr));
+      console.error('[Brand Intelligence Feedback] Original error:', error);
+    }
 
     return sendJsonError(res, 500, {
       error: error instanceof Error ? error.message : 'Failed to record feedback',
