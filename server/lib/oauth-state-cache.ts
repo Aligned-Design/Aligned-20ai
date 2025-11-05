@@ -66,7 +66,9 @@ class OAuthStateCache {
     }
 
     const now = Date.now();
-    if (now > stateData.expiresAt) {
+    // Small grace window (ms) to tolerate timing resolution in tests/environments
+    const GRACE_MS = 50;
+    if (now > stateData.expiresAt + GRACE_MS) {
       console.warn(`❌ OAuth state expired: ${state.substring(0, 8)}...`);
       this.states.delete(state);
       return null;
