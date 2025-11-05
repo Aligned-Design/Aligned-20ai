@@ -3,7 +3,7 @@
  * Tests the full flow: AI Generation → Brand Application → BFS Scoring → Scheduling
  */
 
-import { describe, it, expect, beforeEach, afterEach} from 'test';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   mockAIGeneratedContent,
   mockBrandGuide,
