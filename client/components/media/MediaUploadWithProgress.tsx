@@ -126,7 +126,7 @@ export function MediaUploadWithProgress({
           }
 
           const error = data.errors?.find(
-            (e: unknown) => e.file === uf.file.name
+            (e: any) => e.file === uf.file.name
           );
           if (error) {
             return {
