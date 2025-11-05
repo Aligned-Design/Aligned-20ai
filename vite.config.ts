@@ -13,6 +13,15 @@ export default defineConfig({
   server: {
     port: 8080,
     strictPort: true,
+    proxy: {
+      // Proxy API requests to the local backend server running on port 3001
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '/api')
+      }
+    }
   },
   resolve: {
     alias: {
