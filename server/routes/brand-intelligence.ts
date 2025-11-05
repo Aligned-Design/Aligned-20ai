@@ -252,12 +252,23 @@ export const getBrandIntelligence: RequestHandler = async (req, res) => {
     return res.status(200).json(intelligence);
   } catch (error) {
     // Log error for debugging
-    console.error('[Brand Intelligence API] Error:', {
-      error,
-      message: error instanceof Error ? error.message : 'Unknown error',
-      brandId: req.params.brandId,
-      timestamp: new Date().toISOString()
-    });
+    try {
+      const safeStringify = (v: any) => {
+        try {
+          return JSON.stringify(v, (_k, val) => (val instanceof Error ? { message: val.message, stack: val.stack } : val));
+        } catch (e) {
+          return String(v);
+        }
+      };
+      console.error(`[Brand Intelligence API] Error: ${safeStringify(error)}`, {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        brandId: req.params.brandId,
+        timestamp: new Date().toISOString()
+      });
+    } catch (logErr) {
+      console.error('[Brand Intelligence API] Error (logging failed):', String(logErr));
+      console.error('[Brand Intelligence API] Original error:', error);
+    }
 
     // Return structured JSON error response
     return sendJsonError(res, 500, {
