@@ -64,7 +64,7 @@ export class ConnectionsDBService {
       .eq('platform', platform)
       .limit(1);
 
-    const connectionData: unknown = {
+    const connectionData: any = {
       brand_id: brandId,
       tenant_id: tenantId,
       platform,
