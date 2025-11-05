@@ -405,17 +405,17 @@ function MetricCard({ title, value, growth, icon, color }: MetricCardProps) {
   );
 }
 
-function ContentPipelineView({ posts }: { posts: unknown[] }) {
-  const statusGroups = posts.reduce((groups: Record<string, unknown[]>, post: unknown) => {
+function ContentPipelineView({ posts }: { posts: DemoPost[] }) {
+  const statusGroups = posts.reduce((groups: Record<string, DemoPost[]>, post: DemoPost) => {
     const status = post.status;
     if (!groups[status]) groups[status] = [];
     groups[status].push(post);
     return groups;
-  }, {} as Record<string, unknown[]>);
+  }, {} as Record<string, DemoPost[]>);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {Object.entries(statusGroups).map(([status, statusPosts]: [string, unknown[]]) => (
+      {Object.entries(statusGroups).map(([status, statusPosts]: [string, DemoPost[]]) => (
         <Card key={status}>
           <CardHeader>
             <CardTitle className="capitalize flex items-center gap-2">
@@ -426,7 +426,7 @@ function ContentPipelineView({ posts }: { posts: unknown[] }) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {statusPosts.map((post: unknown) => (
+            {statusPosts.map((post: DemoPost) => (
               <div key={post.id} className="p-3 border rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-2xl">{post.image}</span>
@@ -435,7 +435,7 @@ function ContentPipelineView({ posts }: { posts: unknown[] }) {
                 <p className="text-sm text-gray-700 mb-2 line-clamp-3">{post.content}</p>
                 {post.metrics && (
                   <div className="text-xs text-gray-500">
-                    {formatNumber(post.metrics.likes)} likes • {formatNumber(post.metrics.comments)} comments
+                    {formatNumber(post.metrics.likes ?? 0)} likes • {formatNumber(post.metrics.comments ?? 0)} comments
                   </div>
                 )}
               </div>
