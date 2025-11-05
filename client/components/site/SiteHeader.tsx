@@ -20,36 +20,11 @@ export default function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm md:flex">
-          <a
-            href="#features"
-            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
-          >
-            Features
-          </a>
-          <a
-            href="#agents"
-            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
-          >
-            Agents
-          </a>
-          <a
-            href="#engine"
-            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
-          >
-            Monthly Engine
-          </a>
-          <a
-            href="#security"
-            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
-          >
-            Security
-          </a>
-          <a
-            href="#analytics"
-            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
-          >
-            Analytics
-          </a>
+          <Link to="/features" className="text-muted-foreground hover:text-foreground transition-colors font-medium">Features</Link>
+          <Link to="/integrations" className="text-muted-foreground hover:text-foreground transition-colors font-medium">Integrations</Link>
+          <Link to="/pricing" className="text-muted-foreground hover:text-foreground transition-colors font-medium">Pricing</Link>
+          <Link to="/help" className="text-muted-foreground hover:text-foreground transition-colors font-medium">Help</Link>
+          <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors font-medium">Contact</Link>
         </nav>
 
         <div className="flex items-center gap-3">
