@@ -233,9 +233,9 @@ function calculateKeywordToneAlignment(brandKit: any): number {
 /**
  * Terminology match scoring
  */
-function calculateTerminologyMatch(content: unknown, brandKit: unknown): number {
-  const preferredTerms = brandKit.commonPhrases?.split(',') || [];
-  const contentLower = `${content.body} ${content.cta || ''}`.toLowerCase();
+function calculateTerminologyMatch(content: any, brandKit: any): number {
+  const preferredTerms: string[] = (brandKit && brandKit.commonPhrases) ? (brandKit.commonPhrases as string).split(',') : [];
+  const contentLower = `${content?.body || ''} ${content?.cta || ''}`.toLowerCase();
 
   if (preferredTerms.length === 0) {
     return 0.7; // Default if no terminology specified
