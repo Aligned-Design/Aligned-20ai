@@ -103,11 +103,12 @@ export default function NewDashboard() {
           });
         }
       }
-    } catch (error: unknown) {
-      console.error("Error loading dashboard:", error);
+    } catch (err: unknown) {
+      console.error("Error loading dashboard:", err);
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error loading dashboard",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
