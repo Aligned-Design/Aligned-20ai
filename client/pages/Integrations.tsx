@@ -151,54 +151,65 @@ export default function Integrations() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-6">
-        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-48 bg-gray-200 rounded-lg animate-pulse" />
-          ))}
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-48 bg-gray-200 rounded-lg animate-pulse" />
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Integrations</h1>
-          <p className="text-gray-600">Connect your favorite tools to streamline your workflow</p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <h1 className="text-3xl font-bold text-slate-900">Integrations</h1>
+          <p className="text-slate-600">Connect your favorite tools to streamline your workflow</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Browse Integrations
-        </Button>
       </div>
 
-      {categories.map(category => {
-        const categoryIntegrations = integrations.filter(i => i.category === category.id);
-        
-        return (
-          <div key={category.id} className="space-y-4">
-            <h2 className="text-xl font-semibold flex items-center gap-2">
-              <span>{category.icon}</span>
-              {category.name}
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {categoryIntegrations.map(integration => (
-                <IntegrationCard
-                  key={integration.id}
-                  integration={integration}
-                  onToggle={toggleIntegration}
-                  getStatusIcon={getStatusIcon}
-                  getStatusColor={getStatusColor}
-                />
-              ))}
-            </div>
+      <main className="max-w-7xl mx-auto px-6 py-20 space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold">Available Integrations</h2>
+            <p className="text-slate-600">Browse and connect integrations for each brand</p>
           </div>
-        );
-      })}
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" />
+            Browse Integrations
+          </Button>
+        </div>
+
+        {categories.map(category => {
+          const categoryIntegrations = integrations.filter(i => i.category === category.id);
+
+          return (
+            <div key={category.id} className="space-y-4">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <span>{category.icon}</span>
+                {category.name}
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {categoryIntegrations.map(integration => (
+                  <IntegrationCard
+                    key={integration.id}
+                    integration={integration}
+                    onToggle={toggleIntegration}
+                    getStatusIcon={getStatusIcon}
+                    getStatusColor={getStatusColor}
+                  />
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </main>
     </div>
   );
 }
