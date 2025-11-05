@@ -40,7 +40,8 @@ export default function Assets() {
       setAssets(data || []);
     } catch (err: unknown) {
       console.error('Error fetching assets:', err);
-      setError(err.message || 'Failed to load asset library');
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message || 'Failed to load asset library');
       toast({
         title: 'Error loading assets',
         description: 'We couldn\'t load your assets. Please try again.',
