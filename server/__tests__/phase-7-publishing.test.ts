@@ -6,7 +6,10 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import crypto from 'crypto';
-import { oauthStateCache } from '../lib/oauth-state-cache';
+import { createOAuthStateCache } from '../lib/oauth-state-cache';
+
+// Create isolated cache instance for tests to avoid shared state between test suites
+const oauthStateCache = createOAuthStateCache();
 
 // ==================== OAuth Flow Tests (10 tests) ====================
 
