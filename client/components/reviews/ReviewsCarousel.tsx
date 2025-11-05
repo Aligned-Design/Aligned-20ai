@@ -74,13 +74,13 @@ export default function ReviewsCarousel() {
   }, []);
 
   return (
-    <section aria-labelledby="reviews-heading" className="py-16 bg-white/6">
+    <section aria-labelledby="reviews-heading" className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-8">
-          <h3 id="reviews-heading" className="text-2xl md:text-3xl font-extrabold text-white">
+          <h3 id="reviews-heading" className="text-2xl md:text-3xl font-extrabold text-slate-900">
             What agencies are saying
           </h3>
-          <p className="text-slate-200 mt-2">Real teams. Real results. Honest reviews.</p>
+          <p className="text-slate-600 mt-2">Real teams. Real results. Honest reviews.</p>
         </div>
 
         <div
@@ -91,12 +91,12 @@ export default function ReviewsCarousel() {
           {reviews.map((r, idx) => (
             <article
               key={idx}
-              className="snap-start flex-shrink-0 w-[min(480px,80%)] md:w-1/3 rounded-2xl bg-white/6 backdrop-blur-sm border border-white/8 p-6 shadow-md"
+              className="snap-start flex-shrink-0 w-[min(480px,80%)] md:w-1/3 rounded-2xl bg-white border border-gray-100 p-6 shadow-md"
               aria-roledescription="testimonial"
             >
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-full bg-white/8 flex items-center justify-center text-sm font-semibold text-white">
+                  <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-sm font-semibold text-slate-900">
                     {r.initials}
                   </div>
                 </div>
@@ -108,11 +108,11 @@ export default function ReviewsCarousel() {
                     <Star className="w-4 h-4" />
                     <Star className="w-4 h-4" />
                   </div>
-                  <p className="mt-3 text-slate-200 leading-relaxed">{r.quote}</p>
+                  <p className="mt-3 text-slate-700 leading-relaxed">{r.quote}</p>
 
                   <div className="mt-4">
-                    <div className="text-white font-semibold">{r.name}</div>
-                    <div className="text-sm text-slate-300">{r.title}</div>
+                    <div className="text-slate-900 font-semibold">{r.name}</div>
+                    <div className="text-sm text-slate-500">{r.title}</div>
                   </div>
                 </div>
               </div>
@@ -123,7 +123,7 @@ export default function ReviewsCarousel() {
         {/* small pager dots */}
         <div className="flex items-center justify-center gap-2 mt-6">
           {reviews.map((_, i) => (
-            <span key={i} className="w-2 h-2 rounded-full bg-white/20" />
+            <span key={i} className="w-2 h-2 rounded-full bg-gray-300" />
           ))}
         </div>
       </div>
