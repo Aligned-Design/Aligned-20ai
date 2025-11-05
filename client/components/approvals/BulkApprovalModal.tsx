@@ -17,7 +17,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CheckCircle as _CheckCircle, AlertCircle as _AlertCircle, XCircle, Loader } from 'lucide-react';
+import { CheckCircle, AlertCircle, XCircle, Loader } from 'lucide-react';
 
 export interface BulkApprovalModalProps {
   isOpen: boolean;
