@@ -215,10 +215,11 @@ export default function BrandIntake() {
         description:
           "Website data has been imported. Review and adjust as needed.",
       });
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Import failed",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
