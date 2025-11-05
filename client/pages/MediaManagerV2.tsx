@@ -196,7 +196,7 @@ export default function MediaManagerV2() {
 
       {/* Storage Info */}
       {storageInfo && (
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50">
+        <Card className="bg-white border border-gray-100">
           <CardContent className="pt-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
