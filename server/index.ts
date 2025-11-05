@@ -1048,10 +1048,10 @@ export function createServer() {
   });
 
   app.put("/api/analytics-portal/:brandId/reports/:reportId", (req, res) => {
-    const { _brandId, _reportId } = req.params;
-    const _updates = req.body;
-    
-    // TODO: Update report in database
+    const { brandId, reportId } = req.params;
+    const updates = req.body;
+
+    // TODO: Update report in database for brandId/reportId
     res.json({ success: true, message: 'Report updated successfully' });
   });
 
