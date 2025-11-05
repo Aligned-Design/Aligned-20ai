@@ -24,8 +24,9 @@ interface WorkflowTrackerProps {
 }
 
 export function WorkflowTracker({ workflow, canTakeAction, onAction, className }: WorkflowTrackerProps) {
-  const completedSteps = workflow.steps.filter(step => step.status === 'completed').length;
-  const totalSteps = workflow.steps.length;
+  const steps = Array.isArray(workflow?.steps) ? workflow.steps : [];
+  const completedSteps = steps.filter((step: any) => step?.status === 'completed').length;
+  const totalSteps = steps.length || 1;
   const progress = (completedSteps / totalSteps) * 100;
 
   const getStepStatusIcon = (status: WorkflowStepInstance['status']) => {
