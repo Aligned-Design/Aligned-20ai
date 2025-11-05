@@ -240,7 +240,7 @@ export class AnalyticsSync {
         throw new Error(`Twitter API error: ${tweetsResponse.statusText}`);
       }
 
-      const tweetsData = await tweetsResponse.json();
+      const tweetsData: any = await tweetsResponse.json();
       return tweetsData.data || [];
     } catch (error) {
       console.error('Twitter date-range fetch error:', error);
@@ -488,7 +488,7 @@ export class AnalyticsSync {
         throw new Error(`Twitter API error: ${tweetsResponse.statusText}`);
       }
 
-      const tweetsData = await tweetsResponse.json();
+      const tweetsData: any = await tweetsResponse.json();
       return tweetsData.data || [];
     } catch (error) {
       console.error('Twitter fetch error:', error);
