@@ -42,12 +42,22 @@ import {
   uploadClientMedia,
 } from "./routes/client-portal";
 import {
+  bulkApproveContent,
+  approveSingleContent,
+  rejectContent,
+  getApprovalHistory,
+  requestApproval,
+  getPendingApprovals,
+  sendApprovalReminder,
+} from "./routes/approvals";
+import {
   getWorkflowTemplates,
   createWorkflowTemplate,
   startWorkflow,
   processWorkflowAction,
   getWorkflowNotifications,
 } from "./routes/workflow";
+import { initializeEmailService } from "./lib/email-service";
 import { generateContent, getProviderStatus } from "./routes/ai";
 import { serverEnv } from '@shared/env';
 import { builderWebhook } from "./routes/builder";
@@ -508,6 +518,15 @@ export function createServer() {
   app.post("/api/client/content/:contentId/approve", approveContent);
   app.post("/api/client/content/:contentId/comments", addContentComment);
   app.post("/api/client/media/upload", uploadClientMedia);
+
+  // Approval workflow routes (PHASE 8: Client Collaboration)
+  app.post("/api/approvals/bulk", bulkApproveContent);
+  app.post("/api/approvals/:postId/approve", approveSingleContent);
+  app.post("/api/approvals/:postId/reject", rejectContent);
+  app.get("/api/approvals/:postId/history", getApprovalHistory);
+  app.post("/api/approvals/request", requestApproval);
+  app.get("/api/approvals/pending", getPendingApprovals);
+  app.post("/api/approvals/send-reminder", sendApprovalReminder);
 
   // Workflow routes
   app.get("/api/workflow/templates", getWorkflowTemplates);
@@ -1226,6 +1245,14 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       console.log('📅 Analytics scheduler initialized');
     } catch (error) {
       console.error('Failed to initialize analytics scheduler:', error);
+    }
+
+    // Initialize PHASE 9: Email Service for Client Collaboration
+    try {
+      await initializeEmailService();
+      console.log('📧 Email service initialized');
+    } catch (error) {
+      console.error('Failed to initialize email service:', error);
     }
   });
 }
