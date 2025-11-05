@@ -51,6 +51,15 @@ import {
   sendApprovalReminder,
 } from "./routes/approvals";
 import {
+  getClientSettings,
+  updateClientSettings,
+  updateEmailPreferences,
+  generateUnsubscribeLink,
+  unsubscribeFromEmails,
+  resubscribeToEmails,
+  verifyUnsubscribeToken,
+} from "./routes/client-settings";
+import {
   getWorkflowTemplates,
   createWorkflowTemplate,
   startWorkflow,
@@ -519,7 +528,7 @@ export function createServer() {
   app.post("/api/client/content/:contentId/comments", addContentComment);
   app.post("/api/client/media/upload", uploadClientMedia);
 
-  // Approval workflow routes (PHASE 8: Client Collaboration)
+  // Approval workflow routes (PHASE 9: Client Collaboration)
   app.post("/api/approvals/bulk", bulkApproveContent);
   app.post("/api/approvals/:postId/approve", approveSingleContent);
   app.post("/api/approvals/:postId/reject", rejectContent);
@@ -527,6 +536,15 @@ export function createServer() {
   app.post("/api/approvals/request", requestApproval);
   app.get("/api/approvals/pending", getPendingApprovals);
   app.post("/api/approvals/send-reminder", sendApprovalReminder);
+
+  // Client settings routes (PHASE 9: Client Collaboration)
+  app.get("/api/client/settings", getClientSettings);
+  app.put("/api/client/settings", updateClientSettings);
+  app.post("/api/client/settings/email-preferences", updateEmailPreferences);
+  app.post("/api/client/settings/generate-unsubscribe-link", generateUnsubscribeLink);
+  app.post("/api/client/unsubscribe", unsubscribeFromEmails);
+  app.post("/api/client/settings/resubscribe", resubscribeToEmails);
+  app.get("/api/client/settings/verify-unsubscribe", verifyUnsubscribeToken);
 
   // Workflow routes
   app.get("/api/workflow/templates", getWorkflowTemplates);

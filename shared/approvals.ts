@@ -13,7 +13,9 @@ export type AuditAction =
   | 'PUBLISH_FAILED'
   | 'EMAIL_SENT'
   | 'COMMENT_ADDED'
-  | 'WORKFLOW_STARTED';
+  | 'WORKFLOW_STARTED'
+  | 'SETTINGS_UPDATED'
+  | 'EMAIL_PREFERENCES_UPDATED';
 
 export interface AuditLog {
   id: string;

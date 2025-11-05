@@ -31,6 +31,7 @@ const Integrations = lazy(() => import("./pages/Integrations"));
 const MediaManager = lazy(() => import("./pages/MediaManager"));
 const TeamManagement = lazy(() => import("./pages/TeamManagement"));
 const Billing = lazy(() => import("./pages/Billing"));
+const ClientSettings = lazy(() => import("./pages/ClientSettings"));
 
 // Register custom components with Builder.io
 Builder.registerComponent(BuilderPage, {
@@ -201,6 +202,13 @@ function AppContent() {
         <AppLayout userRole="client">
           <Suspense fallback={<PageLoader />}>
             <ClientPortal />
+          </Suspense>
+        </AppLayout>
+      } />
+      <Route path="/client/settings" element={
+        <AppLayout userRole="client">
+          <Suspense fallback={<PageLoader />}>
+            <ClientSettings />
           </Suspense>
         </AppLayout>
       } />
