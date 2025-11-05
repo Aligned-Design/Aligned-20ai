@@ -21,7 +21,7 @@ const buttonVariants = (props?: {
   const { variant = "default", size = "default" } = props || {};
 
   const baseStyles =
-    "inline-flex items-center justify-center rounded-3xl text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9F06A] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background shadow-sm";
+    "inline-flex items-center justify-center rounded-3xl text-sm font-semibold transform transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9F06A] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background shadow-sm hover:-translate-y-0.5";
 
   const variantStyles: Record<string, string> = {
     default: "bg-[#C9F06A] text-black hover:shadow-lg",
