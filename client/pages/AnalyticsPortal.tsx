@@ -311,8 +311,8 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {data.charts.topContent.map((content, index) => (
-                    <div key={content.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  {(data.charts?.topContent ?? []).map((content: any, index: number) => (
+                    <div key={content.id || index} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex items-center gap-4">
                         <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold">
                           {index + 1}
