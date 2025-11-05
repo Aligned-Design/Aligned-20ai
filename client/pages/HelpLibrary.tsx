@@ -66,15 +66,15 @@ function HelpLibrary() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4">
+      <div className="bg-white border-b py-12">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-3 mb-4">
-            <BookOpen className="h-8 w-8" />
-            <h1 className="text-4xl font-bold">Help Library</h1>
+            <BookOpen className="h-8 w-8 text-slate-900" />
+            <h1 className="text-4xl font-bold text-slate-900">Help Library</h1>
           </div>
-          <p className="text-blue-100 text-lg">
+          <p className="text-slate-600 text-lg">
             Everything you need to know about using Aligned AI
           </p>
         </div>
