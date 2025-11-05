@@ -236,7 +236,7 @@ export async function checkEmailServiceHealth(): Promise<{
     } else {
       // Verify Nodemailer connection
       if (transporter) {
-        await transporter.verify();
+        await (transporter as any).verify();
         return {
           healthy: true,
           provider: 'nodemailer',
