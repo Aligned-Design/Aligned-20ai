@@ -26,7 +26,7 @@ import { useNavigate } from "react-router-dom";
 import { useBrand } from "@/contexts/BrandContext";
 
 export default function Brands() {
-  const { brands, refreshBrands, _setCurrentBrand, loading } = useBrand();
+  const { brands, refreshBrands, setCurrentBrand, loading } = useBrand();
   const { user } = useAuth();
   const { toast } = useToast();
   const _navigate = useNavigate();
@@ -97,9 +97,10 @@ export default function Brands() {
       });
       refreshBrands();
     } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       toast({
         title: "Error creating brand",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     }

@@ -12,7 +12,7 @@ initializeMonitoring();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <SentryErrorBoundary
-      fallback={({ error, resetError }: unknown) => (
+      fallback={(props: any) => (
         <div style={{
           display: 'flex',
           flexDirection: 'column',
@@ -27,10 +27,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             Something went wrong
           </h1>
           <p style={{ color: '#666', marginBottom: '1rem' }}>
-            {(error as Error)?.message || 'An unexpected error occurred. Our team has been notified.'}
+            {(props.error as Error)?.message || 'An unexpected error occurred. Our team has been notified.'}
           </p>
           <button
-            onClick={resetError}
+            onClick={props.resetError}
             style={{
               padding: '0.75rem 1.5rem',
               backgroundColor: '#8B5CF6',

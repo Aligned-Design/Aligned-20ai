@@ -35,7 +35,7 @@ export async function uploadBrandFile(
 
   try {
     // Upload to Supabase Storage
-    const { __data, error } = await supabase.storage
+    const { data, error } = await supabase.storage
       .from("brand-assets")
       .upload(filePath, file, {
         cacheControl: "3600",

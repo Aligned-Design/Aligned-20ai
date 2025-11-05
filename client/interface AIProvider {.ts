@@ -1,5 +1,5 @@
 interface AIProvider {
-  generateContent(prompt: string, options?: unknown): Promise<string>
+  generateContent(prompt: string, options?: Record<string, any>): Promise<string>
   analyzeContent(content: string): Promise<unknown>
 }
 

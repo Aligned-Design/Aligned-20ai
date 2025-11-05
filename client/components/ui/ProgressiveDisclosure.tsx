@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronRight as _ChevronRight, HelpCircle, Settings, Zap } from 'lucide-react';
+import { ChevronDown, ChevronRight, HelpCircle, Settings, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProgressiveDisclosureProps {

@@ -35,7 +35,7 @@ export function useAutosave<T>({
         await onSave(dataRef.current);
         setLastSaved(new Date());
       } catch (err: unknown) {
-        const errorMessage = err.message || 'Failed to autosave';
+        const errorMessage = err instanceof Error ? err.message : String(err) || 'Failed to autosave';
         setError(errorMessage);
         toast({
           title: 'Autosave failed',

@@ -364,7 +364,7 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
 }
 
 // Component implementations for MetricCard, ContentPerformanceView, etc.
-function MetricCard({ title, current, _previous, change, icon, color, isPercentage = false }: {
+function MetricCard({ title, current, previous, change, icon, color, isPercentage = false }: {
   title: string;
   current: number;
   previous: number;
@@ -407,9 +407,9 @@ function MetricCard({ title, current, _previous, change, icon, color, isPercenta
   );
 }
 
-function ContentPerformanceView({ data, _onFeedback }: { 
-  data: AnalyticsPortalData; 
-  onFeedback: (contentId?: string) => void; 
+function ContentPerformanceView({ data, onFeedback }: {
+  data: AnalyticsPortalData;
+  onFeedback: (contentId?: string) => void;
 }) {
   return (
     <div className="space-y-4">
