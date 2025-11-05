@@ -185,6 +185,12 @@ class OAuthStateCache {
   }
 }
 
-// Export singleton instance
-export const oauthStateCache = new OAuthStateCache();
+// Factory to create isolated cache instances (useful for testing)
+export function createOAuthStateCache() {
+  return new OAuthStateCache();
+}
+
+// Default singleton instance for runtime
+export const oauthStateCache = createOAuthStateCache();
+
 export type { OAuthStateData };
