@@ -33,7 +33,7 @@ const ClientPortal = lazy(() => import("./pages/ClientPortal"));
 // Additional pages
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Brands = lazy(() => import("./pages/Brands"));
-const _Calendar = lazy(() => import("./pages/Calendar"));
+const Calendar = lazy(() => import("./pages/Calendar"));
 const Integrations = lazy(() => import("./pages/Integrations"));
 const MediaManager = lazy(() => import("./pages/MediaManager"));
 const TeamManagement = lazy(() => import("./pages/TeamManagement"));
