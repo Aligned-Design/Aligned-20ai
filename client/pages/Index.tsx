@@ -86,7 +86,7 @@ export default function Index() {
                 <FileText className="h-3 w-3 text-[#A6E22E]" />
                 Doc Agent
               </div>
-              <CardTitle className="text-white">Aligned Words</CardTitle>
+              <CardTitle className="text-slate-900">Aligned Words</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-slate-200">
@@ -101,7 +101,7 @@ export default function Index() {
                 <Palette className="h-3 w-3 text-[#C49CFF]" />
                 Design Agent
               </div>
-              <CardTitle className="text-white">Aligned Creative</CardTitle>
+              <CardTitle className="text-slate-900">Aligned Creative</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-slate-200">
@@ -116,7 +116,7 @@ export default function Index() {
                 <Brain className="h-3 w-3 text-[#9EFFB8]" />
                 Advisor Agent
               </div>
-              <CardTitle className="text-white">Aligned Strategy</CardTitle>
+              <CardTitle className="text-slate-900">Aligned Strategy</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-slate-200">
