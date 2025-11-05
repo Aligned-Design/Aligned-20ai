@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { Platform, OAuthFlow, PlatformConnection } from '@shared/publishing';
+import { oauthStateCache } from './oauth-state-cache';
 
 interface OAuthConfig {
   authUrl: string;
@@ -57,16 +58,10 @@ export function generateOAuthUrl(platform: Platform, brandId: string): OAuthFlow
   const config = OAUTH_CONFIGS[platform];
   const state = crypto.randomBytes(32).toString('hex');
   const codeVerifier = crypto.randomBytes(32).toString('base64url');
-  
-  // Store state and code verifier temporarily (in production, use Redis or database)
-  const stateData = {
-    brandId,
-    platform,
-    codeVerifier,
-    createdAt: new Date().toISOString()
-  };
-  
-  // TODO: Store stateData in cache with expiration
+
+  // Store state and code verifier in secure cache with 10-minute expiration
+  // This prevents CSRF attacks and ensures state can only be used once
+  oauthStateCache.store(state, brandId, platform, codeVerifier);
   
   const params = new URLSearchParams({
     client_id: config.clientId,
@@ -108,10 +103,25 @@ export async function exchangeCodeForToken(
   accountInfo: any;
 }> {
   const config = OAUTH_CONFIGS[platform];
-  const [stateToken, brandId] = state.split(':');
-  
-  // TODO: Retrieve and validate state from cache
-  
+
+  // ✅ SECURE: Retrieve and validate state from cache
+  // This prevents CSRF attacks and verifies we initiated this OAuth flow
+  const stateData = oauthStateCache.retrieve(state);
+  if (!stateData) {
+    throw new Error(
+      'Invalid or expired OAuth state. The authorization request may have expired. Please start again.'
+    );
+  }
+
+  // Verify platform matches
+  if (stateData.platform !== platform) {
+    throw new Error(
+      `Platform mismatch: expected ${stateData.platform}, got ${platform}`
+    );
+  }
+
+  const { brandId, codeVerifier } = stateData;
+
   const tokenParams = new URLSearchParams({
     client_id: config.clientId,
     client_secret: config.clientSecret,
@@ -119,11 +129,11 @@ export async function exchangeCodeForToken(
     code,
     grant_type: 'authorization_code'
   });
-  
+
   // Add platform-specific parameters
   if (platform === 'twitter') {
-    // TODO: Retrieve code_verifier from cache
-    const codeVerifier = 'stored_code_verifier';
+    // ✅ SECURE: Retrieve code_verifier from cache (PKCE verification)
+    // This ensures the token exchange came from the same client that initiated the OAuth flow
     tokenParams.append('code_verifier', codeVerifier);
   }
   
