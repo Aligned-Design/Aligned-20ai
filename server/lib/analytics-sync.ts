@@ -416,7 +416,7 @@ export class AnalyticsSync {
         `https://graph.facebook.com/v18.0/${config.accountId}/insights?metric=page_views,page_engaged_users,page_fans&period=day&since=${sinceDate}&access_token=${config.accessToken}`
       );
 
-      const pageInsightsData = pageInsightsResponse.ok ? await pageInsightsResponse.json() : { data: [] };
+      const pageInsightsData: any = pageInsightsResponse.ok ? await pageInsightsResponse.json() : { data: [] };
 
       return [...(postsData.data || []), ...(pageInsightsData.data || [])];
     } catch (error) {
