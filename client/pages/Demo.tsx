@@ -500,7 +500,7 @@ function AnalyticsView({ metrics }: { metrics: any }) {
   );
 }
 
-function CalendarView({ calendar }: { calendar: unknown[] }) {
+function CalendarView({ calendar }: { calendar: { date: string; posts: number; status: string }[] }) {
   return (
     <Card>
       <CardHeader>
