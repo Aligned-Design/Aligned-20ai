@@ -20,6 +20,11 @@ const HelpLibrary = lazy(() => import("./pages/HelpLibrary"));
 const Features = lazy(() => import("./pages/Features"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Legal = lazy(() => import("./pages/Legal"));
+const IntegrationsMarketing = lazy(() => import("./pages/IntegrationsMarketing"));
+const About = lazy(() => import("./pages/About"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Support = lazy(() => import("./pages/Support"));
 const ContentDashboard = lazy(() => import("./pages/ContentDashboard"));
 const BrandIntelligence = lazy(() => import("./pages/BrandIntelligence"));
 const AnalyticsPortal = lazy(() => import("./pages/AnalyticsPortal"));
@@ -133,6 +138,33 @@ function AppContent() {
       <Route path="/help" element={
         <Suspense fallback={<PageLoader />}>
           <HelpLibrary />
+        </Suspense>
+      } />
+
+      {/* Newly added marketing pages */}
+      <Route path="/integrations-marketing" element={
+        <Suspense fallback={<PageLoader />}>
+          <IntegrationsMarketing />
+        </Suspense>
+      } />
+      <Route path="/about" element={
+        <Suspense fallback={<PageLoader />}>
+          <About />
+        </Suspense>
+      } />
+      <Route path="/terms" element={
+        <Suspense fallback={<PageLoader />}>
+          <Terms />
+        </Suspense>
+      } />
+      <Route path="/privacy" element={
+        <Suspense fallback={<PageLoader />}>
+          <Privacy />
+        </Suspense>
+      } />
+      <Route path="/support" element={
+        <Suspense fallback={<PageLoader />}>
+          <Support />
         </Suspense>
       } />
 
