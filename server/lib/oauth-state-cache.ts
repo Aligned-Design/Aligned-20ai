@@ -12,6 +12,7 @@ interface OAuthStateData {
   codeVerifier: string;
   createdAt: number;
   expiresAt: number;
+  ttlSeconds?: number;
 }
 
 class OAuthStateCache {
