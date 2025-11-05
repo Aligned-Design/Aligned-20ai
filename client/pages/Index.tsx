@@ -21,6 +21,7 @@ import {
 
 import ReviewsCarousel from '@/components/reviews/ReviewsCarousel';
 import FooterNew from '@/components/FooterNew';
+import Reveal from '@/components/Reveal';
 
 export default function Index() {
   return (
