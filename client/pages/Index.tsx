@@ -51,14 +51,14 @@ export default function Index() {
             </p>
 
             <div className="flex gap-4 justify-center">
-              <Button asChild size="lg" className="rounded-3xl px-6 py-3 bg-[#C9F06A] text-black font-semibold shadow-lg hover:shadow-xl transition-transform transform hover:-translate-y-0.5">
+              <Button asChild size="lg" variant="default">
                 <Link to="/login" className="inline-flex items-center gap-2">
                   Get Started
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
 
-              <Button variant="outline" size="lg" asChild className="rounded-3xl px-6 py-3 border border-white/30 text-white hover:bg-white/8 transition">
+              <Button variant="outline" size="lg" asChild>
                 <Link to="/demo" className="inline-flex items-center gap-2">
                   View Demo
                 </Link>
