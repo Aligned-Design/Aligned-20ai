@@ -73,7 +73,7 @@ export default function Index() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
+        <div className="grid md:grid-cols-3 gap-8 mb-16 items-stretch">
           <Card className="rounded-2xl bg-white/6 backdrop-blur-sm border border-white/8 p-6 shadow-md transform transition-transform hover:-translate-y-2">
             <CardHeader>
               <div className="inline-flex items-center gap-2 rounded-lg bg-white/8 px-3 py-1.5 text-xs font-medium text-[#A6E22E] w-fit">
@@ -133,7 +133,7 @@ export default function Index() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-4 gap-8 items-stretch">
             <WorkflowStep
               number={1}
               title="Create"
@@ -173,7 +173,7 @@ export default function Index() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           <Feature
             icon={<Users className="h-5 w-5 text-[#C9F06A]" />}
             title="Seamless Approval"
@@ -225,7 +225,7 @@ export default function Index() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-6 items-stretch">
               <div className="bg-white/6 rounded-2xl p-6 shadow-md border border-white/6">
                 <div className="text-2xl mb-3">🔀</div>
                 <h3 className="font-semibold text-white mb-2">Multi-Client at Scale</h3>
@@ -263,7 +263,7 @@ export default function Index() {
 
       {/* CTA Section */}
       <div className="py-20 relative z-10" style={{ background: 'linear-gradient(90deg,#14223a 0%, #3a1466 100%)' }}>
-        <div className="container mx-auto px-4 text-center">
+        <div className="max-w-7xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
             Ready to Scale Your Content?
           </h2>
