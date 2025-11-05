@@ -100,28 +100,35 @@ export default function BrandIntelligencePage() {
               </div>
               
               <div className="flex items-center gap-3">
-                <Badge 
-                  variant="outline" 
-                  className={cn(
+                {(() => {
+                  const confScore = typeof intelligence.confidenceScore === 'number' && Number.isFinite(intelligence.confidenceScore) ? intelligence.confidenceScore : null;
+                  const confPercent = confScore !== null ? Math.round(confScore * 100) : null;
+                  const badgeClass = cn(
                     "text-sm font-medium",
-                    intelligence.confidenceScore >= 0.8 ? "bg-green-50 text-green-700 border-green-200" :
-                    intelligence.confidenceScore >= 0.6 ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
+                    confScore === null ? "bg-gray-50 text-gray-700 border-gray-200" :
+                    confScore >= 0.8 ? "bg-green-50 text-green-700 border-green-200" :
+                    confScore >= 0.6 ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
                     "bg-red-50 text-red-700 border-red-200"
-                  )}
-                  aria-label={`Confidence score: ${Math.round(intelligence.confidenceScore * 100)} percent`}
-                >
-                  Confidence: {Math.round(intelligence.confidenceScore * 100)}%
-                </Badge>
-                <Button 
-                  onClick={refresh} 
-                  variant="outline" 
-                  size="sm" 
-                  className="gap-2"
-                  aria-label="Refresh brand intelligence data"
-                >
-                  <RefreshCw className="h-4 w-4" aria-hidden="true" />
-                  <span className="hidden sm:inline">Refresh</span>
-                </Button>
+                  );
+                  const ariaLabel = confPercent !== null ? `Confidence score: ${confPercent} percent` : 'Confidence score: unavailable';
+                  return (
+                    <>
+                      <Badge variant="outline" className={badgeClass} aria-label={ariaLabel}>
+                        Confidence: {confPercent !== null ? `${confPercent}%` : 'N/A'}
+                      </Badge>
+                      <Button
+                        onClick={refresh}
+                        variant="outline"
+                        size="sm"
+                        className="gap-2"
+                        aria-label="Refresh brand intelligence data"
+                      >
+                        <RefreshCw className="h-4 w-4" aria-hidden="true" />
+                        <span className="hidden sm:inline">Refresh</span>
+                      </Button>
+                    </>
+                  );
+                })()}
               </div>
             </div>
 
