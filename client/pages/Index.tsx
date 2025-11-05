@@ -133,6 +133,7 @@ export default function Index() {
       {/* Workflow Section */}
       <div className="bg-white py-20 relative z-10">
         <div className="max-w-7xl mx-auto px-6">
+          <Reveal>
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
               Streamlined Workflow
@@ -168,6 +169,7 @@ export default function Index() {
               color="orange"
             />
           </div>
+          </Reveal>
         </div>
       </div>
 
