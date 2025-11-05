@@ -62,7 +62,7 @@ export default function ClientPortal() {
       const response = await fetch('/api/client/dashboard');
       if (response.ok) {
         const data = await response.json();
-        setDashboardData(data);
+        setDashboardData(data as any);
       }
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
