@@ -104,7 +104,9 @@ class OAuthStateCache {
     // Allow small grace window to account for timing resolution
     const now = Date.now();
     const GRACE_MS = 50;
-    return now <= stateData.expiresAt + GRACE_MS;
+    const ttl = stateData.ttlSeconds ?? 10 * 60;
+    const applyGrace = ttl >= 0.05;
+    return now <= stateData.expiresAt + (applyGrace ? GRACE_MS : 0);
   }
 
   /**
