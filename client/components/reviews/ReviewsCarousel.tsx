@@ -85,13 +85,13 @@ export default function ReviewsCarousel() {
 
         <div
           ref={containerRef}
-          className="flex gap-6 overflow-x-auto no-scrollbar py-4 px-1 snap-x snap-mandatory scroll-smooth"
+          className="flex flex-col md:flex-row gap-6 overflow-x-auto md:overflow-x-visible no-scrollbar py-4 px-1 md:snap-x snap-mandatory scroll-smooth"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {reviews.map((r, idx) => (
             <article
               key={idx}
-              className="snap-start flex-shrink-0 w-[min(480px,80%)] md:w-1/3 rounded-2xl bg-white border border-gray-100 p-6 shadow-md"
+              className="snap-start flex-shrink-0 w-full md:w-1/3 max-w-md md:max-w-none rounded-2xl bg-white border border-gray-100 p-6 shadow-md"
               aria-roledescription="testimonial"
             >
               <div className="flex items-start gap-4">
