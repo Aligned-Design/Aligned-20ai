@@ -88,6 +88,11 @@ import publishingRouter from "./routes/publishing-router";
 import { scheduleAnalyticsSyncJobs, syncBrandAnalytics, generateBrandMonthlyPlan, getSyncStatus } from "./lib/analytics-scheduler";
 import { autoPlanGenerator } from "./lib/auto-plan-generator";
 
+// Log critical environment variables to help debug Supabase initialization
+console.log('SERVER ENV VITE_SUPABASE_URL=', process.env.VITE_SUPABASE_URL);
+console.log('SERVER ENV SUPABASE_URL=', process.env.SUPABASE_URL);
+console.log('SERVER ENV SUPABASE_SERVICE_ROLE_KEY=', Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY));
+
 const __filename = fileURLToPath(import.meta.url);
 const ___dirname = path.dirname(__filename);
 
