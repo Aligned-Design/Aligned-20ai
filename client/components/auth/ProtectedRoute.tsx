@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { LoginPage } from '@/pages/Login';
+import LoginPage from '@/pages/Login';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
