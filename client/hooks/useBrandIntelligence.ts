@@ -152,8 +152,15 @@ export function useBrandIntelligence(brandId: string): UseBrandIntelligenceRetur
         try {
           errorData = await safeJsonParse(response);
         } catch (parseErr) {
-          // If JSON parsing fails, surface the HTTP status as the error (matches expected behavior in tests)
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          // If JSON parsing fails, attempt to read text body for debugging and include URL
+          let bodyPreview = '';
+          try {
+            bodyPreview = await response.text();
+          } catch (e) {
+            bodyPreview = '<unable to read response body>';
+          }
+          const preview = bodyPreview.slice(0, 500).replace(/\s+/g, ' ');
+          throw new Error(`HTTP ${response.status}: ${response.statusText || response.url}. Response preview: ${preview}`);
         }
 
         // Handle specific HTTP status codes with friendly messages for auth/permission/not found
