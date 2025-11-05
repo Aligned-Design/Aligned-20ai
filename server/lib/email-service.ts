@@ -16,8 +16,8 @@ const USE_SENDGRID = process.env.EMAIL_PROVIDER === 'sendgrid' && SENDGRID_API_K
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Nodemailer test account (for development)
-let testAccount: unknown = null;
-let transporter: unknown = null;
+let testAccount: any = null;
+let transporter: any = null;
 
 /**
  * Initialize email service based on environment and provider
