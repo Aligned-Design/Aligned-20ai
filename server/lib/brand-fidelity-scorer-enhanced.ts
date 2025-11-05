@@ -251,9 +251,9 @@ function calculateTerminologyMatch(content: any, brandKit: any): number {
 /**
  * Compliance scoring
  */
-function calculateCompliance(content: unknown, brandKit: unknown): number {
-  const contentLower = content.body.toLowerCase();
-  const bannedPhrases = brandKit.banned_phrases || [];
+function calculateCompliance(content: any, brandKit: any): number {
+  const contentLower = `${content?.body || ''}`.toLowerCase();
+  const bannedPhrases: string[] = (brandKit && brandKit.banned_phrases) || [];
 
   // Check for banned phrases
   const hasBanned = bannedPhrases.some((phrase: string) =>
@@ -265,7 +265,7 @@ function calculateCompliance(content: unknown, brandKit: unknown): number {
   }
 
   // Check for required disclaimers
-  const requiredDisclaimers = brandKit.required_disclaimers || [];
+  const requiredDisclaimers: string[] = (brandKit && brandKit.required_disclaimers) || [];
   const hasRequired = requiredDisclaimers.every((disclaimer: string) =>
     contentLower.includes(disclaimer.toLowerCase())
   );
