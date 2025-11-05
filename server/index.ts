@@ -60,6 +60,12 @@ import {
   verifyUnsubscribeToken,
 } from "./routes/client-settings";
 import {
+  bulkApproveOrReject,
+  getApprovalStatus,
+  getBatchApprovalStatus,
+  lockPostsAfterApproval,
+} from "./routes/bulk-approvals";
+import {
   getWorkflowTemplates,
   createWorkflowTemplate,
   startWorkflow,
@@ -536,6 +542,12 @@ export function createServer() {
   app.post("/api/approvals/request", requestApproval);
   app.get("/api/approvals/pending", getPendingApprovals);
   app.post("/api/approvals/send-reminder", sendApprovalReminder);
+
+  // Bulk approval routes (PHASE 9: Bulk Approve Feature)
+  app.post("/api/client/approvals/bulk", bulkApproveOrReject);
+  app.get("/api/client/approvals/status/:postId", getApprovalStatus);
+  app.post("/api/client/approvals/batch-status", getBatchApprovalStatus);
+  app.post("/api/client/approvals/lock", lockPostsAfterApproval);
 
   // Client settings routes (PHASE 9: Client Collaboration)
   app.get("/api/client/settings", getClientSettings);
