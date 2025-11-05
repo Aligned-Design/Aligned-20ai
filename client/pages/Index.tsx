@@ -26,7 +26,7 @@ export default function Index() {
       </div>
 
       {/* Hero Section */}
-      <div className="container mx-auto px-4 py-20 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 py-20 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-3 rounded-full bg-white/6 backdrop-blur-sm px-4 py-2 text-sm font-medium text-[#C9F06A] mb-6 border border-white/10 shadow-sm">
             <Sparkles className="h-4 w-4 text-[#C9F06A]" />
