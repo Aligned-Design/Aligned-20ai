@@ -11,7 +11,7 @@ export default function SiteHeader() {
           className="flex items-center gap-2.5"
           aria-label="Aligned AI"
         >
-          <div className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet to-azure text-white shadow-soft">
+          <div className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#071025] text-white shadow-soft">
             <Sparkles className="h-4 w-4" />
           </div>
           <span className="text-lg font-semibold tracking-tight">
