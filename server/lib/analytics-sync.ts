@@ -274,7 +274,7 @@ export class AnalyticsSync {
         throw new Error(`TikTok API error: ${videosResponse.statusText}`);
       }
 
-      const videosData = await videosResponse.json();
+      const videosData: any = await videosResponse.json();
       return videosData.data || [];
     } catch (error) {
       console.error('TikTok date-range fetch error:', error);
@@ -354,7 +354,7 @@ export class AnalyticsSync {
         throw new Error(`YouTube API error: ${videosResponse.statusText}`);
       }
 
-      const videosData = await videosResponse.json();
+      const videosData: any = await videosResponse.json();
       return videosData.items || [];
     } catch (error) {
       console.error('YouTube date-range fetch error:', error);
@@ -517,7 +517,7 @@ export class AnalyticsSync {
         throw new Error(`TikTok API error: ${videosResponse.statusText}`);
       }
 
-      const videosData = await videosResponse.json();
+      const videosData: any = await videosResponse.json();
       return videosData.data || [];
     } catch (error) {
       console.error('TikTok fetch error:', error);
@@ -604,7 +604,7 @@ export class AnalyticsSync {
         throw new Error(`YouTube API error: ${videosResponse.statusText}`);
       }
 
-      const videosData = await videosResponse.json();
+      const videosData: any = await videosResponse.json();
 
       // Fetch analytics report
       const analyticsResponse = await fetch(
