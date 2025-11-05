@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Badge as _Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, X, Sparkles } from "lucide-react";
 import { CrawlerSuggestion, FieldChange } from "@/types/brand-kit-field";
@@ -195,9 +195,9 @@ export function CrawlerDiffModal({
         <div className="flex items-center gap-2">
           <div
             className="h-8 w-8 rounded-lg border shadow-sm"
-            style={{ backgroundColor: value }}
+            style={{ backgroundColor: String(value) }}
           />
-          <span className="text-sm">{value}</span>
+          <span className="text-sm">{String(value)}</span>
         </div>
       );
     }

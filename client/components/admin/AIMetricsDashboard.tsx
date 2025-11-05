@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge as _Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BarChart,
   Bar,
@@ -14,8 +14,8 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell
-} from 'recharts';
+  Cell,
+} from "recharts";
 import {
   TrendingUp,
   TrendingDown,
@@ -23,9 +23,9 @@ import {
   RefreshCw,
   Loader2,
   Check,
-  AlertCircle
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  AlertCircle,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AIMetricsSnapshot {
   agentType: string;
@@ -52,7 +52,7 @@ interface AIMetricsSnapshot {
 }
 
 interface Alert {
-  severity: 'low' | 'medium' | 'high';
+  severity: "low" | "medium" | "high";
   type: string;
   message: string;
   metric: number;
@@ -81,8 +81,8 @@ export function AIMetricsDashboard() {
     try {
       setLoading(true);
       const [summaryRes, alertsRes] = await Promise.all([
-        fetch('/api/metrics/ai/summary'),
-        fetch('/api/metrics/ai/alerts')
+        fetch("/api/metrics/ai/summary"),
+        fetch("/api/metrics/ai/alerts"),
       ]);
 
       if (summaryRes.ok && alertsRes.ok) {
@@ -94,7 +94,7 @@ export function AIMetricsDashboard() {
         setLastUpdate(new Date().toLocaleTimeString());
       }
     } catch (error) {
-      console.error('Error loading metrics:', error);
+      console.error("Error loading metrics:", error);
     } finally {
       setLoading(false);
     }
@@ -113,41 +113,45 @@ export function AIMetricsDashboard() {
   const current = summary.current;
   const daily = summary.daily;
 
-  const latencyTrendUp = summary.trend.latencyTrend === 'up';
-  const successTrendUp = summary.trend.successTrend === 'up';
-  const qualityTrendUp = summary.trend.qualityTrend === 'up';
+  const latencyTrendUp = summary.trend.latencyTrend === "up";
+  const successTrendUp = summary.trend.successTrend === "up";
+  const qualityTrendUp = summary.trend.qualityTrend === "up";
 
   const providerData = [
     {
-      name: 'OpenAI',
+      name: "OpenAI",
       requests: current.byProvider.openai.requestCount,
       avgLatency: Math.round(current.byProvider.openai.avgLatency),
-      successRate: (current.byProvider.openai.successRate * 100).toFixed(1)
+      successRate: (current.byProvider.openai.successRate * 100).toFixed(1),
     },
     {
-      name: 'Claude',
+      name: "Claude",
       requests: current.byProvider.claude.requestCount,
       avgLatency: Math.round(current.byProvider.claude.avgLatency),
-      successRate: (current.byProvider.claude.successRate * 100).toFixed(1)
-    }
+      successRate: (current.byProvider.claude.successRate * 100).toFixed(1),
+    },
   ];
 
   const qualityData = [
     {
-      name: 'BFS Pass Rate',
+      name: "BFS Pass Rate",
       value: Math.round(current.bfsPassRate * 100),
-      fill: '#22c55e'
+      fill: "#22c55e",
     },
     {
-      name: 'Compliance Pass Rate',
+      name: "Compliance Pass Rate",
       value: Math.round(current.compliancePassRate * 100),
-      fill: '#3b82f6'
+      fill: "#3b82f6",
     },
     {
-      name: 'Failed/At Risk',
-      value: 100 - Math.round((current.bfsPassRate + current.compliancePassRate) / 2 * 100),
-      fill: '#ef4444'
-    }
+      name: "Failed/At Risk",
+      value:
+        100 -
+        Math.round(
+          ((current.bfsPassRate + current.compliancePassRate) / 2) * 100,
+        ),
+      fill: "#ef4444",
+    },
   ];
 
   return (
@@ -156,9 +160,7 @@ export function AIMetricsDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">AI Generation Metrics</h2>
-          <p className="text-sm text-gray-600">
-            Last updated: {lastUpdate}
-          </p>
+          <p className="text-sm text-gray-600">Last updated: {lastUpdate}</p>
         </div>
         <Button onClick={loadMetrics} variant="outline" size="sm">
           <RefreshCw className="h-4 w-4 mr-2" />
@@ -178,27 +180,43 @@ export function AIMetricsDashboard() {
           <CardContent>
             <div className="space-y-3">
               {alerts.map((alert, idx) => (
-                <div key={idx} className="flex items-start gap-3 pb-3 border-b last:border-b-0">
-                  <div className={cn(
-                    'p-2 rounded',
-                    alert.severity === 'high' ? 'bg-red-200' :
-                    alert.severity === 'medium' ? 'bg-yellow-200' :
-                    'bg-blue-200'
-                  )}>
-                    <AlertCircle className={cn(
-                      'h-4 w-4',
-                      alert.severity === 'high' ? 'text-red-700' :
-                      alert.severity === 'medium' ? 'text-yellow-700' :
-                      'text-blue-700'
-                    )} />
+                <div
+                  key={idx}
+                  className="flex items-start gap-3 pb-3 border-b last:border-b-0"
+                >
+                  <div
+                    className={cn(
+                      "p-2 rounded",
+                      alert.severity === "high"
+                        ? "bg-red-200"
+                        : alert.severity === "medium"
+                          ? "bg-yellow-200"
+                          : "bg-blue-200",
+                    )}
+                  >
+                    <AlertCircle
+                      className={cn(
+                        "h-4 w-4",
+                        alert.severity === "high"
+                          ? "text-red-700"
+                          : alert.severity === "medium"
+                            ? "text-yellow-700"
+                            : "text-blue-700",
+                      )}
+                    />
                   </div>
                   <div className="flex-1">
                     <p className="font-medium text-sm">{alert.message}</p>
                     <p className="text-xs text-gray-600">
-                      Current: {alert.metric.toFixed(2)} | Threshold: {alert.threshold.toFixed(2)}
+                      Current: {alert.metric.toFixed(2)} | Threshold:{" "}
+                      {alert.threshold.toFixed(2)}
                     </p>
                   </div>
-                  <Badge variant={alert.severity === 'high' ? 'destructive' : 'secondary'}>
+                  <Badge
+                    variant={
+                      alert.severity === "high" ? "destructive" : "secondary"
+                    }
+                  >
                     {alert.severity}
                   </Badge>
                 </div>
@@ -284,9 +302,7 @@ export function AIMetricsDashboard() {
             <p className="text-3xl font-bold">
               {(current.compliancePassRate * 100).toFixed(1)}%
             </p>
-            <p className="text-xs text-gray-600 mt-2">
-              Passing linter checks
-            </p>
+            <p className="text-xs text-gray-600 mt-2">Passing linter checks</p>
           </CardContent>
         </Card>
       </div>
@@ -308,15 +324,17 @@ export function AIMetricsDashboard() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={[
-                  {
-                    name: 'Latency (ms)',
-                    P50: current.latencyP50,
-                    P95: current.latencyP95,
-                    P99: current.latencyP99,
-                    avg: current.averageLatency
-                  }
-                ]}>
+                <BarChart
+                  data={[
+                    {
+                      name: "Latency (ms)",
+                      P50: current.latencyP50,
+                      P95: current.latencyP95,
+                      P99: current.latencyP99,
+                      avg: current.averageLatency,
+                    },
+                  ]}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
@@ -377,7 +395,9 @@ export function AIMetricsDashboard() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Compliance Pass Rate</p>
+                  <p className="text-sm text-gray-600 mb-1">
+                    Compliance Pass Rate
+                  </p>
                   <p className="text-lg font-semibold">
                     {(current.compliancePassRate * 100).toFixed(1)}%
                     <span className="text-xs text-gray-600 ml-2">
@@ -410,8 +430,23 @@ export function AIMetricsDashboard() {
                 <BarChart data={providerData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
-                  <YAxis yAxisId="left" label={{ value: 'Requests', angle: -90, position: 'insideLeft' }} />
-                  <YAxis yAxisId="right" orientation="right" label={{ value: 'Latency (ms)', angle: 90, position: 'insideRight' }} />
+                  <YAxis
+                    yAxisId="left"
+                    label={{
+                      value: "Requests",
+                      angle: -90,
+                      position: "insideLeft",
+                    }}
+                  />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    label={{
+                      value: "Latency (ms)",
+                      angle: 90,
+                      position: "insideRight",
+                    }}
+                  />
                   <Tooltip />
                   <Legend />
                   <Bar yAxisId="left" dataKey="requests" fill="#3b82f6" />
@@ -435,11 +470,15 @@ export function AIMetricsDashboard() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Avg Latency</span>
-                    <span className="font-semibold">{provider.avgLatency}ms</span>
+                    <span className="font-semibold">
+                      {provider.avgLatency}ms
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Success Rate</span>
-                    <span className="font-semibold">{provider.successRate}%</span>
+                    <span className="font-semibold">
+                      {provider.successRate}%
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -455,17 +494,25 @@ export function AIMetricsDashboard() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={[
-                  {
-                    stage: 'Timing',
-                    'AI Provider': Math.round(current.averageProviderLatency),
-                    'BFS Calculation': Math.round(current.averageBFSTime),
-                    'Linter Check': Math.round(current.averageLinterTime)
-                  }
-                ]}>
+                <BarChart
+                  data={[
+                    {
+                      stage: "Timing",
+                      "AI Provider": Math.round(current.averageProviderLatency),
+                      "BFS Calculation": Math.round(current.averageBFSTime),
+                      "Linter Check": Math.round(current.averageLinterTime),
+                    },
+                  ]}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="stage" />
-                  <YAxis label={{ value: 'Time (ms)', angle: -90, position: 'insideLeft' }} />
+                  <YAxis
+                    label={{
+                      value: "Time (ms)",
+                      angle: -90,
+                      position: "insideLeft",
+                    }}
+                  />
                   <Tooltip />
                   <Legend />
                   <Bar dataKey="AI Provider" fill="#3b82f6" />
@@ -477,19 +524,29 @@ export function AIMetricsDashboard() {
               <div className="mt-6 space-y-3">
                 <div className="flex justify-between items-center p-3 bg-blue-50 rounded">
                   <span className="text-sm font-medium">AI Provider Call</span>
-                  <span className="text-lg font-semibold">{Math.round(current.averageProviderLatency)}ms</span>
+                  <span className="text-lg font-semibold">
+                    {Math.round(current.averageProviderLatency)}ms
+                  </span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-green-50 rounded">
-                  <span className="text-sm font-medium">BFS Score Calculation</span>
-                  <span className="text-lg font-semibold">{Math.round(current.averageBFSTime)}ms</span>
+                  <span className="text-sm font-medium">
+                    BFS Score Calculation
+                  </span>
+                  <span className="text-lg font-semibold">
+                    {Math.round(current.averageBFSTime)}ms
+                  </span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-yellow-50 rounded">
                   <span className="text-sm font-medium">Compliance Linter</span>
-                  <span className="text-lg font-semibold">{Math.round(current.averageLinterTime)}ms</span>
+                  <span className="text-lg font-semibold">
+                    {Math.round(current.averageLinterTime)}ms
+                  </span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-purple-50 rounded font-medium">
                   <span className="text-sm">Total Average</span>
-                  <span className="text-lg font-bold">{Math.round(current.averageLatency)}ms</span>
+                  <span className="text-lg font-bold">
+                    {Math.round(current.averageLatency)}ms
+                  </span>
                 </div>
               </div>
             </CardContent>

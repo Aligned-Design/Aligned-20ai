@@ -1,12 +1,15 @@
-import { useState, useEffect, useCallback } from 'react';
-import { BrandIntelligence } from '@shared/brand-intelligence';
+import React, { useState, useEffect, useCallback } from "react";
+import { BrandIntelligence } from "@shared/brand-intelligence";
 
 interface UseBrandIntelligenceReturn {
   intelligence: BrandIntelligence | null;
   loading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
-  submitFeedback: (recommendationId: string, action: 'accepted' | 'rejected') => Promise<void>;
+  submitFeedback: (
+    recommendationId: string,
+    action: "accepted" | "rejected",
+  ) => Promise<void>;
 }
 
 interface ApiErrorResponse {
@@ -22,29 +25,82 @@ interface ApiErrorResponse {
  * @param response Fetch response object
  * @returns Parsed JSON data or throws descriptive error
  */
-async function safeJsonParse(response: Response): Promise<unknown> {
-  const contentType = response.headers.get('content-type') || '';
+async function safeJsonParse(response: any): Promise<unknown> {
+  // Helper to read content-type from Headers-like or plain object
+  const getContentType = () => {
+    try {
+      if (response && response.headers) {
+        if (typeof response.headers.get === "function") {
+          return response.headers.get("content-type") || "";
+        }
+        if (typeof response.headers["content-type"] === "string") {
+          return response.headers["content-type"];
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+    return "";
+  };
 
-  // Validate content-type header
-  if (!contentType.includes('application/json')) {
-    const bodyText = await response.text();
-    const preview = bodyText.slice(0, 300);
+  const contentType = getContentType();
+
+  // If content-type explicitly not JSON, prefer to read text and throw
+  if (contentType && !contentType.includes("application/json")) {
+    if (typeof response.text === "function") {
+      const bodyText = await response.text();
+      const preview = bodyText.slice(0, 300).replace(/\s+/g, " ");
+      throw new Error(
+        `Invalid response format: expected JSON but got ${contentType || "no content-type header"}. Response preview: ${preview}`,
+      );
+    }
     throw new Error(
-      `Invalid response format: expected JSON but got ${contentType || 'no content-type header'}. ` +
-      `Response preview: ${preview}`
+      `Invalid response format: expected JSON but got ${contentType || "no content-type header"}.`,
     );
   }
 
-  try {
-    return await response.json();
-  } catch (parseError) {
-    const bodyText = await response.text();
-    const preview = bodyText.slice(0, 200);
-    throw new Error(
-      `Failed to parse JSON: ${parseError instanceof Error ? parseError.message : 'unknown error'}. ` +
-      `Body: ${preview}`
-    );
+  // If response.json exists, try it first (covers native Response and many mocks)
+  if (response && typeof response.json === "function") {
+    try {
+      return await response.json();
+    } catch (jsonErr) {
+      // If json() fails, try to fallback to text and parse
+      if (typeof response.text === "function") {
+        const bodyText = await response.text();
+        const preview = bodyText.slice(0, 500).replace(/\s+/g, " ");
+        try {
+          return JSON.parse(bodyText);
+        } catch (parseErr) {
+          throw new Error(
+            `Failed to parse JSON: ${parseErr instanceof Error ? parseErr.message : "unknown error"}. Body preview: ${preview}`,
+          );
+        }
+      }
+      throw new Error(
+        `Failed to parse JSON: ${jsonErr instanceof Error ? jsonErr.message : String(jsonErr)}`,
+      );
+    }
   }
+
+  // If only text() is available, attempt to parse it
+  if (response && typeof response.text === "function") {
+    const bodyText = await response.text();
+    const preview = bodyText.slice(0, 500).replace(/\s+/g, " ");
+    try {
+      return JSON.parse(bodyText);
+    } catch (parseErr) {
+      throw new Error(
+        `Failed to parse JSON from text response: ${parseErr instanceof Error ? parseErr.message : "unknown error"}. Body preview: ${preview}`,
+      );
+    }
+  }
+
+  // Last resort: return response as-is if it appears to be a plain object
+  if (response && typeof response === "object") {
+    return response;
+  }
+
+  throw new Error("Response does not support json() or text() parsing");
 }
 
 /**
@@ -59,17 +115,21 @@ function getErrorMessage(err: unknown): string {
   }
 
   // Handle API error response objects
-  if (typeof err === 'object' && err !== null) {
+  if (typeof err === "object" && err !== null) {
     const apiError = err as ApiErrorResponse;
-    return apiError.error || apiError.message || 'An unknown error occurred';
+    return apiError.error || apiError.message || "An unknown error occurred";
   }
 
   // Fallback
-  return 'An unknown error occurred. Please try again.';
+  return "An unknown error occurred. Please try again.";
 }
 
-export function useBrandIntelligence(brandId: string): UseBrandIntelligenceReturn {
-  const [intelligence, setIntelligence] = useState<BrandIntelligence | null>(null);
+export function useBrandIntelligence(
+  brandId: string,
+): UseBrandIntelligenceReturn {
+  const [intelligence, setIntelligence] = useState<BrandIntelligence | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -78,14 +138,36 @@ export function useBrandIntelligence(brandId: string): UseBrandIntelligenceRetur
       setLoading(true);
       setError(null);
 
-      // Make request with explicit JSON acceptance
+      // Make request with explicit JSON acceptance, using configured API base URL
+      const envBase = import.meta.env.VITE_API_BASE_URL ?? "/api";
+      // When running in remote preview, a client-side env pointing to localhost isn't reachable from the browser.
+      // Prefer a relative `/api` path when the configured base targets localhost (dev machine).
+      const apiBase =
+        envBase.startsWith("http") &&
+        (envBase.includes("localhost") || envBase.includes("127.0.0.1"))
+          ? "/api"
+          : envBase.replace(/\/$/, "");
       const response = await fetch(
-        `/api/brand-intelligence/${brandId}`,
+        `${apiBase}/brand-intelligence/${encodeURIComponent(brandId)}`,
         {
           headers: {
-            'Accept': 'application/json'
-          }
-        }
+            Accept: "application/json",
+          },
+        },
+      );
+
+      // Log response diagnostics for debugging
+      const respContentType =
+        response &&
+        response.headers &&
+        typeof (response.headers as any).get === "function"
+          ? (response.headers as any).get("content-type") || ""
+          : "";
+      console.debug(
+        "[Brand Intelligence] fetch response status:",
+        response.status,
+        "content-type:",
+        respContentType,
       );
 
       // Handle non-OK status codes
@@ -95,24 +177,38 @@ export function useBrandIntelligence(brandId: string): UseBrandIntelligenceRetur
         try {
           errorData = await safeJsonParse(response);
         } catch (parseErr) {
-          // If JSON parsing fails, fall back to status code error
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          // If JSON parsing fails, attempt to read text body for debugging and include URL
+          let bodyPreview = "";
+          try {
+            bodyPreview = await response.text();
+          } catch (e) {
+            bodyPreview = "<unable to read response body>";
+          }
+          const preview = bodyPreview.slice(0, 500).replace(/\s+/g, " ");
+          throw new Error(
+            `HTTP ${response.status}: ${response.statusText || response.url}. Response preview: ${preview}`,
+          );
         }
 
-        // Handle specific HTTP status codes
+        // Handle specific HTTP status codes with friendly messages for auth/permission/not found
         if (response.status === 401) {
-          throw new Error('Authentication required. Please log in.');
+          throw new Error("Authentication required. Please log in.");
         } else if (response.status === 403) {
-          throw new Error('You do not have permission to view this brand intelligence.');
+          throw new Error(
+            "You do not have permission to view this brand intelligence.",
+          );
         } else if (response.status === 404) {
-          throw new Error('Brand intelligence data not found.');
+          throw new Error("Brand intelligence data not found.");
         } else if (response.status >= 500) {
-          throw new Error('Server error occurred. Please try again later.');
+          // For server errors prefer returning the HTTP status message to the caller
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
         // Try to extract error message from API response
         const apiError = errorData as ApiErrorResponse;
-        throw new Error(apiError.error || `HTTP ${response.status}: ${response.statusText}`);
+        throw new Error(
+          apiError.error || `HTTP ${response.status}: ${response.statusText}`,
+        );
       }
 
       // Parse successful response with validation
@@ -122,20 +218,44 @@ export function useBrandIntelligence(brandId: string): UseBrandIntelligenceRetur
       const errorMessage = getErrorMessage(err);
       setError(errorMessage);
 
-      // Comprehensive error logging for debugging
-      console.error('[Brand Intelligence] Error:', {
-        error: err,
-        message: errorMessage,
-        brandId,
-        timestamp: new Date().toISOString()
-      });
+      // Comprehensive error logging for debugging — ensure objects are stringified to avoid `[object Object]`
+      try {
+        const serializedError = (function stringifySafe(value: any) {
+          try {
+            return JSON.stringify(value, (_k, v) => {
+              // Convert functions to their names, handle Error objects
+              if (v instanceof Error) {
+                return { message: v.message, stack: v.stack };
+              }
+              if (typeof v === "function")
+                return `[Function: ${v.name || "anonymous"}]`;
+              return v;
+            });
+          } catch (e) {
+            return String(value);
+          }
+        })(err);
 
-      // Log to telemetry/monitoring service if available
-      if (typeof window !== 'undefined' && (window as any).__telemetry?.error) {
-        (window as any).__telemetry.error('brand_intelligence_fetch_failed', {
+        console.error(`[Brand Intelligence] Error: ${serializedError}`, {
           message: errorMessage,
           brandId,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+        });
+      } catch (logErr) {
+        // Fallback logging
+        console.error(
+          "[Brand Intelligence] Error (logging failed):",
+          String(logErr),
+        );
+        console.error("[Brand Intelligence] Original error:", err);
+      }
+
+      // Log to telemetry/monitoring service if available
+      if (typeof window !== "undefined" && (window as any).__telemetry?.error) {
+        (window as any).__telemetry.error("brand_intelligence_fetch_failed", {
+          message: errorMessage,
+          brandId,
+          timestamp: new Date().toISOString(),
         });
       }
     } finally {
@@ -143,55 +263,88 @@ export function useBrandIntelligence(brandId: string): UseBrandIntelligenceRetur
     }
   }, [brandId]);
 
-  const submitFeedback = useCallback(async (recommendationId: string, action: 'accepted' | 'rejected') => {
-    try {
-      const response = await fetch('/api/brand-intelligence/feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ recommendationId, action })
-      });
-
-      if (!response.ok) {
-        // Try to parse error response
-        let errorData: unknown;
-        try {
-          errorData = await safeJsonParse(response);
-        } catch (parseErr) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        const apiError = errorData as ApiErrorResponse;
-        throw new Error(apiError.error || 'Failed to submit feedback');
-      }
-
-      // Verify response is valid JSON
-      await safeJsonParse(response);
-
-      // Reload data after successful feedback
-      await loadBrandIntelligence();
-    } catch (err) {
-      const errorMessage = getErrorMessage(err);
-      setError(errorMessage);
-
-      console.error('[Brand Intelligence Feedback] Error:', {
-        error: err,
-        message: errorMessage,
-        recommendationId,
-        action,
-        timestamp: new Date().toISOString()
-      });
-
-      if (typeof window !== 'undefined' && (window as any).__telemetry?.error) {
-        (window as any).__telemetry.error('brand_intelligence_feedback_failed', {
-          message: errorMessage,
-          recommendationId,
-          timestamp: new Date().toISOString()
+  const submitFeedback = useCallback(
+    async (recommendationId: string, action: "accepted" | "rejected") => {
+      try {
+        const response = await fetch("/api/brand-intelligence/feedback", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ recommendationId, action }),
         });
+
+        if (!response.ok) {
+          // Try to parse error response
+          let errorData: unknown;
+          try {
+            errorData = await safeJsonParse(response);
+          } catch (parseErr) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          const apiError = errorData as ApiErrorResponse;
+          throw new Error(apiError.error || "Failed to submit feedback");
+        }
+
+        // Verify response is valid JSON
+        await safeJsonParse(response);
+
+        // Reload data after successful feedback
+        await loadBrandIntelligence();
+      } catch (err) {
+        const errorMessage = getErrorMessage(err);
+        setError(errorMessage);
+
+        try {
+          const serializedError = (function stringifySafe(value: any) {
+            try {
+              return JSON.stringify(value, (_k, v) => {
+                if (v instanceof Error) {
+                  return { message: v.message, stack: v.stack };
+                }
+                if (typeof v === "function")
+                  return `[Function: ${v.name || "anonymous"}]`;
+                return v;
+              });
+            } catch (e) {
+              return String(value);
+            }
+          })(err);
+
+          console.error(
+            `[Brand Intelligence Feedback] Error: ${serializedError}`,
+            {
+              message: errorMessage,
+              recommendationId,
+              action,
+              timestamp: new Date().toISOString(),
+            },
+          );
+        } catch (logErr) {
+          console.error(
+            "[Brand Intelligence Feedback] Error (logging failed):",
+            String(logErr),
+          );
+          console.error("[Brand Intelligence Feedback] Original error:", err);
+        }
+
+        if (
+          typeof window !== "undefined" &&
+          (window as any).__telemetry?.error
+        ) {
+          (window as any).__telemetry.error(
+            "brand_intelligence_feedback_failed",
+            {
+              message: errorMessage,
+              recommendationId,
+              timestamp: new Date().toISOString(),
+            },
+          );
+        }
       }
-    }
-  }, [loadBrandIntelligence]);
+    },
+    [loadBrandIntelligence],
+  );
 
   useEffect(() => {
     loadBrandIntelligence();
@@ -202,6 +355,6 @@ export function useBrandIntelligence(brandId: string): UseBrandIntelligenceRetur
     loading,
     error,
     refresh: loadBrandIntelligence,
-    submitFeedback
+    submitFeedback,
   };
 }

@@ -1,36 +1,42 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
-import { Badge as _Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronRight as _ChevronRight, HelpCircle, Settings, Zap } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  ChevronDown,
+  ChevronRight,
+  HelpCircle,
+  Settings,
+  Zap,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ProgressiveDisclosureProps {
   title: string;
   description?: string;
-  level: 'beginner' | 'intermediate' | 'advanced';
+  level: "beginner" | "intermediate" | "advanced";
   children: React.ReactNode;
   advancedContent?: React.ReactNode;
   helpContent?: string;
   className?: string;
 }
 
-export function ProgressiveDisclosure({ 
-  title, 
-  description, 
-  level, 
-  children, 
-  advancedContent, 
+export function ProgressiveDisclosure({
+  title,
+  description,
+  level,
+  children,
+  advancedContent,
   helpContent,
-  className 
+  className,
 }: ProgressiveDisclosureProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
   const levelColors = {
-    beginner: 'bg-green-100 text-green-800',
-    intermediate: 'bg-yellow-100 text-yellow-800',
-    advanced: 'bg-red-100 text-red-800'
+    beginner: "bg-green-100 text-green-800",
+    intermediate: "bg-yellow-100 text-yellow-800",
+    advanced: "bg-red-100 text-red-800",
   };
 
   return (
@@ -61,7 +67,11 @@ export function ProgressiveDisclosure({
                 className="gap-1"
               >
                 <Settings className="h-4 w-4" />
-                {showAdvanced ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+                {showAdvanced ? (
+                  <ChevronDown className="h-3 w-3" />
+                ) : (
+                  <ChevronRight className="h-3 w-3" />
+                )}
               </Button>
             )}
           </div>
@@ -75,17 +85,19 @@ export function ProgressiveDisclosure({
           </div>
         )}
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* Basic Content */}
         <div>{children}</div>
-        
+
         {/* Advanced Content */}
         {showAdvanced && advancedContent && (
           <div className="border-t pt-4">
             <div className="flex items-center gap-2 mb-3">
               <Zap className="h-4 w-4 text-orange-500" />
-              <span className="text-sm font-medium text-gray-700">Advanced Options</span>
+              <span className="text-sm font-medium text-gray-700">
+                Advanced Options
+              </span>
             </div>
             {advancedContent}
           </div>

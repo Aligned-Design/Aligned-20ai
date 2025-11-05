@@ -5,13 +5,13 @@ import { Sparkles } from "lucide-react";
 export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl shadow-soft">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-6">
         <Link
           to="/"
           className="flex items-center gap-2.5"
           aria-label="Aligned AI"
         >
-          <div className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet to-azure text-white shadow-soft">
+          <div className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#071025] text-white shadow-soft">
             <Sparkles className="h-4 w-4" />
           </div>
           <span className="text-lg font-semibold tracking-tight">
@@ -20,46 +20,43 @@ export default function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm md:flex">
-          <a
-            href="#features"
+          <Link
+            to="/features"
             className="text-muted-foreground hover:text-foreground transition-colors font-medium"
           >
             Features
-          </a>
-          <a
-            href="#agents"
+          </Link>
+          <Link
+            to="/integrations"
             className="text-muted-foreground hover:text-foreground transition-colors font-medium"
           >
-            Agents
-          </a>
-          <a
-            href="#engine"
+            Integrations
+          </Link>
+          <Link
+            to="/pricing"
             className="text-muted-foreground hover:text-foreground transition-colors font-medium"
           >
-            Monthly Engine
-          </a>
-          <a
-            href="#security"
+            Pricing
+          </Link>
+          <Link
+            to="/help"
             className="text-muted-foreground hover:text-foreground transition-colors font-medium"
           >
-            Security
-          </a>
-          <a
-            href="#analytics"
+            Help
+          </Link>
+          <Link
+            to="/contact"
             className="text-muted-foreground hover:text-foreground transition-colors font-medium"
           >
-            Analytics
-          </a>
+            Contact
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">
           <Button asChild variant="ghost" className="hidden md:inline-flex">
             <Link to="/login">Sign in</Link>
           </Button>
-          <Button
-            asChild
-            className="bg-gradient-to-r from-violet to-azure text-white shadow-glow hover:shadow-glow-azure"
-          >
+          <Button asChild variant="default">
             <Link to="/signup">Get started</Link>
           </Button>
         </div>

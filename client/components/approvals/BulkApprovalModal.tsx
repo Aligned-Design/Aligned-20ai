@@ -3,7 +3,7 @@
  * Provides UI for bulk approving or rejecting multiple posts with confirmation dialog
  */
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,22 +13,21 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { CheckCircle as _CheckCircle, AlertCircle as _AlertCircle, XCircle, Loader } from 'lucide-react';
+} from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { CheckCircle, AlertCircle, XCircle, Loader } from "lucide-react";
 
 export interface BulkApprovalModalProps {
   isOpen: boolean;
-  action: 'approve' | 'reject';
+  action: "approve" | "reject";
   selectedPostIds: string[];
   onConfirm: (note?: string) => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
   error?: string | null;
 }
-
 
 export function BulkApprovalModal({
   isOpen,
@@ -39,7 +38,7 @@ export function BulkApprovalModal({
   isLoading = false,
   error = null,
 }: BulkApprovalModalProps) {
-  const [note, setNote] = useState('');
+  const [note, setNote] = useState("");
   const [acknowledged, setAcknowledged] = useState(false);
   const [localLoading, setLocalLoading] = useState(false);
 
@@ -48,7 +47,7 @@ export function BulkApprovalModal({
     try {
       await onConfirm(note);
       // Reset state after successful submission
-      setNote('');
+      setNote("");
       setAcknowledged(false);
     } finally {
       setLocalLoading(false);
@@ -58,8 +57,8 @@ export function BulkApprovalModal({
   const isSubmitting = isLoading || localLoading;
   const canSubmit = acknowledged && !isSubmitting;
 
-  const actionColor = action === 'approve' ? 'green' : 'red';
-  const actionIcon = action === 'approve' ? CheckCircle : XCircle;
+  const actionColor = action === "approve" ? "green" : "red";
+  const actionIcon = action === "approve" ? CheckCircle : XCircle;
   const ActionIcon = actionIcon;
 
   return (
@@ -70,10 +69,11 @@ export function BulkApprovalModal({
             <ActionIcon className={`h-6 w-6 text-${actionColor}-600`} />
             <div>
               <AlertDialogTitle>
-                {action === 'approve' ? 'Approve Items' : 'Reject Items'}
+                {action === "approve" ? "Approve Items" : "Reject Items"}
               </AlertDialogTitle>
               <AlertDialogDescription>
-                {selectedPostIds.length} post{selectedPostIds.length !== 1 ? 's' : ''} selected
+                {selectedPostIds.length} post
+                {selectedPostIds.length !== 1 ? "s" : ""} selected
               </AlertDialogDescription>
             </div>
           </div>
@@ -81,15 +81,18 @@ export function BulkApprovalModal({
 
         <div className="space-y-4 py-4">
           {/* Summary */}
-          <div className={`p-4 rounded-lg border-2 border-${actionColor}-200 bg-${actionColor}-50`}>
+          <div
+            className={`p-4 rounded-lg border-2 border-${actionColor}-200 bg-${actionColor}-50`}
+          >
             <p className={`text-${actionColor}-900 font-medium text-lg`}>
-              {selectedPostIds.length} {selectedPostIds.length === 1 ? 'post' : 'posts'} will be{' '}
-              {action === 'approve' ? 'approved' : 'rejected'}
+              {selectedPostIds.length}{" "}
+              {selectedPostIds.length === 1 ? "post" : "posts"} will be{" "}
+              {action === "approve" ? "approved" : "rejected"}
             </p>
             <p className={`text-${actionColor}-700 text-sm mt-1`}>
-              {action === 'approve'
-                ? 'This action will immediately schedule these posts for publication.'
-                : 'This action will remove these posts from the review queue.'}
+              {action === "approve"
+                ? "This action will immediately schedule these posts for publication."
+                : "This action will remove these posts from the review queue."}
             </p>
           </div>
 
@@ -101,7 +104,7 @@ export function BulkApprovalModal({
             <Textarea
               id="bulk-note"
               placeholder={
-                action === 'approve'
+                action === "approve"
                   ? 'e.g., "Posts look great, ready to publish"'
                   : 'e.g., "Needs more brand alignment adjustments"'
               }
@@ -126,9 +129,11 @@ export function BulkApprovalModal({
               htmlFor="bulk-acknowledge"
               className="text-sm text-gray-700 leading-tight cursor-pointer"
             >
-              I understand that this action will{' '}
-              {action === 'approve' ? 'immediately approve and schedule' : 'reject'} all selected
-              posts. This action cannot be easily undone.
+              I understand that this action will{" "}
+              {action === "approve"
+                ? "immediately approve and schedule"
+                : "reject"}{" "}
+              all selected posts. This action cannot be easily undone.
             </Label>
           </div>
 
@@ -137,7 +142,9 @@ export function BulkApprovalModal({
             <div className="p-3 rounded-lg bg-red-50 border border-red-200 flex gap-3">
               <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-red-900 font-medium text-sm">Action failed</p>
+                <p className="text-red-900 font-medium text-sm">
+                  Action failed
+                </p>
                 <p className="text-red-700 text-sm mt-1">{error}</p>
               </div>
             </div>
@@ -148,7 +155,9 @@ export function BulkApprovalModal({
             <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 flex gap-3">
               <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-amber-900 font-medium text-sm">Large batch action</p>
+                <p className="text-amber-900 font-medium text-sm">
+                  Large batch action
+                </p>
                 <p className="text-amber-700 text-sm mt-1">
                   Processing {selectedPostIds.length} posts may take a moment.
                 </p>
@@ -163,13 +172,14 @@ export function BulkApprovalModal({
             onClick={handleConfirm}
             disabled={!canSubmit}
             className={`gap-2 ${
-              action === 'approve'
-                ? 'bg-green-600 hover:bg-green-700'
-                : 'bg-red-600 hover:bg-red-700'
+              action === "approve"
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-red-600 hover:bg-red-700"
             }`}
           >
             {isSubmitting && <Loader className="h-4 w-4 animate-spin" />}
-            {action === 'approve' ? 'Approve' : 'Reject'} ({selectedPostIds.length})
+            {action === "approve" ? "Approve" : "Reject"} (
+            {selectedPostIds.length})
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -182,12 +192,15 @@ export function BulkApprovalModal({
  */
 export function useBulkApprovalModal() {
   const [isOpen, setIsOpen] = useState(false);
-  const [action, setAction] = useState<'approve' | 'reject'>('approve');
+  const [action, setAction] = useState<"approve" | "reject">("approve");
   const [selectedPostIds, setSelectedPostIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const openModal = (postIds: string[], actionType: 'approve' | 'reject' = 'approve') => {
+  const openModal = (
+    postIds: string[],
+    actionType: "approve" | "reject" = "approve",
+  ) => {
     setSelectedPostIds(postIds);
     setAction(actionType);
     setError(null);
@@ -200,7 +213,9 @@ export function useBulkApprovalModal() {
     setError(null);
   };
 
-  const handleConfirm = async (onConfirmCallback: (note?: string) => Promise<void>) => {
+  const handleConfirm = async (
+    onConfirmCallback: (note?: string) => Promise<void>,
+  ) => {
     return async (note?: string) => {
       setIsLoading(true);
       setError(null);
@@ -208,7 +223,7 @@ export function useBulkApprovalModal() {
         await onConfirmCallback(note);
         closeModal();
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setIsLoading(false);
       }

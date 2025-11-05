@@ -3,21 +3,34 @@
  * Manages email preferences, notification settings, and account preferences
  */
 
-import React, { useState, useEffect } from 'react';
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle, CardDescription as _CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { AlertCircle as _AlertCircle, Check, Copy, Mail, Bell, Settings as SettingsIcon } from 'lucide-react';
-import type { ClientSettings } from '@shared/client-settings';
-import { TIMEZONE_OPTIONS, LANGUAGE_OPTIONS } from '@shared/client-settings';
+} from "@/components/ui/select";
+import {
+  AlertCircle,
+  Check,
+  Copy,
+  Mail,
+  Bell,
+  Settings as SettingsIcon,
+} from "lucide-react";
+import type { ClientSettings } from "@shared/client-settings";
+import { TIMEZONE_OPTIONS, LANGUAGE_OPTIONS } from "@shared/client-settings";
 
 export default function ClientSettings() {
   const [settings, setSettings] = useState<ClientSettings | null>(null);
@@ -33,21 +46,21 @@ export default function ClientSettings() {
 
   const loadSettings = async () => {
     try {
-      const response = await fetch('/api/client/settings', {
+      const response = await fetch("/api/client/settings", {
         headers: {
-          'x-client-id': 'current-client',
-          'x-brand-id': 'current-brand',
+          "x-client-id": "current-client",
+          "x-brand-id": "current-brand",
         },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to load settings');
+        throw new Error("Failed to load settings");
       }
 
       const data = await response.json();
       setSettings(data.settings);
     } catch (error) {
-      console.error('Failed to load settings:', error);
+      console.error("Failed to load settings:", error);
     } finally {
       setLoading(false);
     }
@@ -60,18 +73,18 @@ export default function ClientSettings() {
     setSaveSuccess(false);
 
     try {
-      const response = await fetch('/api/client/settings', {
-        method: 'PUT',
+      const response = await fetch("/api/client/settings", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'x-client-id': 'current-client',
-          'x-brand-id': 'current-brand',
+          "Content-Type": "application/json",
+          "x-client-id": "current-client",
+          "x-brand-id": "current-brand",
         },
         body: JSON.stringify(settings),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save settings');
+        throw new Error("Failed to save settings");
       }
 
       const data = await response.json();
@@ -81,7 +94,7 @@ export default function ClientSettings() {
       // Reset success message after 3 seconds
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      console.error("Failed to save settings:", error);
     } finally {
       setSaving(false);
     }
@@ -91,22 +104,25 @@ export default function ClientSettings() {
     if (!settings) return;
 
     try {
-      const response = await fetch('/api/client/settings/generate-unsubscribe-link', {
-        method: 'POST',
-        headers: {
-          'x-client-id': 'current-client',
-          'x-brand-id': 'current-brand',
+      const response = await fetch(
+        "/api/client/settings/generate-unsubscribe-link",
+        {
+          method: "POST",
+          headers: {
+            "x-client-id": "current-client",
+            "x-brand-id": "current-brand",
+          },
         },
-      });
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to generate unsubscribe link');
+        throw new Error("Failed to generate unsubscribe link");
       }
 
       const data = await response.json();
       setUnsubscribeUrl(data.unsubscribeUrl);
     } catch (error) {
-      console.error('Failed to generate unsubscribe link:', error);
+      console.error("Failed to generate unsubscribe link:", error);
     }
   };
 
@@ -136,7 +152,9 @@ export default function ClientSettings() {
           <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
           <div>
             <p className="font-medium text-red-900">Failed to load settings</p>
-            <p className="text-sm text-red-700">Please try refreshing the page.</p>
+            <p className="text-sm text-red-700">
+              Please try refreshing the page.
+            </p>
           </div>
         </div>
       </div>
@@ -151,14 +169,18 @@ export default function ClientSettings() {
           <SettingsIcon className="h-8 w-8" />
           Account Settings
         </h1>
-        <p className="text-gray-600 mt-1">Manage your email preferences and notification settings</p>
+        <p className="text-gray-600 mt-1">
+          Manage your email preferences and notification settings
+        </p>
       </div>
 
       {/* Success message */}
       {saveSuccess && (
         <div className="rounded-lg bg-green-50 border border-green-200 p-4 flex gap-3">
           <Check className="h-5 w-5 text-green-600 flex-shrink-0" />
-          <p className="text-green-700 font-medium">Settings saved successfully</p>
+          <p className="text-green-700 font-medium">
+            Settings saved successfully
+          </p>
         </div>
       )}
 
@@ -169,17 +191,25 @@ export default function ClientSettings() {
             <Mail className="h-5 w-5" />
             Email Preferences
           </CardTitle>
-          <CardDescription>Choose which emails you want to receive and how often</CardDescription>
+          <CardDescription>
+            Choose which emails you want to receive and how often
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Approval emails */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-gray-900">Approval Notifications</h3>
+            <h3 className="font-semibold text-gray-900">
+              Approval Notifications
+            </h3>
             <div className="space-y-3 pl-4 border-l-2 border-blue-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">Posts Needing Approval</p>
-                  <p className="text-sm text-gray-600">Get notified when content is ready for your review</p>
+                  <p className="font-medium text-gray-900">
+                    Posts Needing Approval
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Get notified when content is ready for your review
+                  </p>
                 </div>
                 <Switch
                   checked={settings.emailPreferences.approvalsNeeded}
@@ -198,8 +228,12 @@ export default function ClientSettings() {
 
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">Approval Reminders</p>
-                  <p className="text-sm text-gray-600">Receive reminders for pending approvals</p>
+                  <p className="font-medium text-gray-900">
+                    Approval Reminders
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Receive reminders for pending approvals
+                  </p>
                 </div>
                 <Switch
                   checked={settings.emailPreferences.approvalReminders}
@@ -218,7 +252,9 @@ export default function ClientSettings() {
 
               {settings.emailPreferences.approvalReminders && (
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Reminder Frequency</label>
+                  <label className="text-sm font-medium text-gray-700">
+                    Reminder Frequency
+                  </label>
                   <Select
                     value={settings.emailPreferences.reminderFrequency}
                     onValueChange={(value) =>
@@ -248,12 +284,18 @@ export default function ClientSettings() {
 
           {/* Publishing notifications */}
           <div className="space-y-4 pt-6 border-t">
-            <h3 className="font-semibold text-gray-900">Publishing Notifications</h3>
+            <h3 className="font-semibold text-gray-900">
+              Publishing Notifications
+            </h3>
             <div className="space-y-3 pl-4 border-l-2 border-purple-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">Publishing Failures</p>
-                  <p className="text-sm text-gray-600">Alert me when content fails to publish</p>
+                  <p className="font-medium text-gray-900">
+                    Publishing Failures
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Alert me when content fails to publish
+                  </p>
                 </div>
                 <Switch
                   checked={settings.emailPreferences.publishFailures}
@@ -272,8 +314,12 @@ export default function ClientSettings() {
 
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">Publishing Success</p>
-                  <p className="text-sm text-gray-600">Confirm when content is successfully published</p>
+                  <p className="font-medium text-gray-900">
+                    Publishing Success
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Confirm when content is successfully published
+                  </p>
                 </div>
                 <Switch
                   checked={settings.emailPreferences.publishSuccess}
@@ -299,7 +345,9 @@ export default function ClientSettings() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-gray-900">Weekly Digest</p>
-                  <p className="text-sm text-gray-600">Get a weekly summary of your content performance</p>
+                  <p className="text-sm text-gray-600">
+                    Get a weekly summary of your content performance
+                  </p>
                 </div>
                 <Switch
                   checked={settings.emailPreferences.weeklyDigest}
@@ -319,7 +367,9 @@ export default function ClientSettings() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-gray-900">Daily Digest</p>
-                  <p className="text-sm text-gray-600">Get a daily summary of your content activity</p>
+                  <p className="text-sm text-gray-600">
+                    Get a daily summary of your content activity
+                  </p>
                 </div>
                 <Switch
                   checked={settings.emailPreferences.dailyDigest}
@@ -347,7 +397,9 @@ export default function ClientSettings() {
             <Bell className="h-5 w-5" />
             Account Preferences
           </CardTitle>
-          <CardDescription>Customize your account settings and preferences</CardDescription>
+          <CardDescription>
+            Customize your account settings and preferences
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
@@ -371,7 +423,7 @@ export default function ClientSettings() {
                 <SelectContent>
                   {TIMEZONE_OPTIONS.map((tz) => (
                     <SelectItem key={tz} value={tz}>
-                      {tz.replace(/_/g, ' ')}
+                      {tz.replace(/_/g, " ")}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -409,10 +461,12 @@ export default function ClientSettings() {
           {/* Max emails per day */}
           <div>
             <Label className="text-sm font-medium">
-              Maximum Emails Per Day: {settings.emailPreferences.maxEmailsPerDay}
+              Maximum Emails Per Day:{" "}
+              {settings.emailPreferences.maxEmailsPerDay}
             </Label>
             <p className="text-xs text-gray-600 mt-1">
-              We'll consolidate excess emails into a digest to avoid overwhelming your inbox
+              We'll consolidate excess emails into a digest to avoid
+              overwhelming your inbox
             </p>
             <input
               type="range"
@@ -439,11 +493,14 @@ export default function ClientSettings() {
       <Card>
         <CardHeader>
           <CardTitle>Unsubscribe Management</CardTitle>
-          <CardDescription>Generate and share your personal unsubscribe link</CardDescription>
+          <CardDescription>
+            Generate and share your personal unsubscribe link
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-gray-600">
-            Use this link to unsubscribe from emails without logging in. Share it securely with anyone who needs it.
+            Use this link to unsubscribe from emails without logging in. Share
+            it securely with anyone who needs it.
           </p>
 
           <div>
@@ -459,7 +516,9 @@ export default function ClientSettings() {
 
           {unsubscribeUrl && (
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
-              <p className="text-sm font-medium text-gray-900">Your Unsubscribe Link</p>
+              <p className="text-sm font-medium text-gray-900">
+                Your Unsubscribe Link
+              </p>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -475,11 +534,12 @@ export default function ClientSettings() {
                   className="gap-2"
                 >
                   <Copy className="h-4 w-4" />
-                  {copiedToClipboard ? 'Copied' : 'Copy'}
+                  {copiedToClipboard ? "Copied" : "Copy"}
                 </Button>
               </div>
               <p className="text-xs text-gray-600">
-                ⚠️ Keep this link private. Anyone with this link can unsubscribe from your emails.
+                ⚠️ Keep this link private. Anyone with this link can unsubscribe
+                from your emails.
               </p>
             </div>
           )}
@@ -488,9 +548,12 @@ export default function ClientSettings() {
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-3">
               <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium text-amber-900">You're unsubscribed from all emails</p>
+                <p className="font-medium text-amber-900">
+                  You're unsubscribed from all emails
+                </p>
                 <p className="text-sm text-amber-700 mt-1">
-                  To resubscribe to notifications, update your email preferences above and save your settings.
+                  To resubscribe to notifications, update your email preferences
+                  above and save your settings.
                 </p>
               </div>
             </div>
@@ -500,11 +563,7 @@ export default function ClientSettings() {
 
       {/* Save button */}
       <div className="flex justify-end gap-3 pt-6 border-t">
-        <Button
-          onClick={loadSettings}
-          variant="outline"
-          disabled={saving}
-        >
+        <Button onClick={loadSettings} variant="outline" disabled={saving}>
           Reset
         </Button>
         <Button

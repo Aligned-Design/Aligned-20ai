@@ -10,6 +10,7 @@
 
 import { Router } from "express";
 import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabase";
 import {
   processBrandIntake,
   crawlWebsite,
@@ -25,10 +26,7 @@ import {
 
 const router = Router();
 
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+// Use shared supabase client from server/lib/supabase.ts
 
 // In-memory job store (use Redis in production)
 const crawlJobs = new Map<string, unknown>();

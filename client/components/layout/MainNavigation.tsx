@@ -1,7 +1,7 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Badge as _Badge } from '@/components/ui/badge';
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   LayoutDashboard,
   Building2,
@@ -13,75 +13,79 @@ import {
   Users,
   Search,
   LogOut,
-  HelpCircle
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  HelpCircle,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface MainNavigationProps {
-  userRole: 'agency' | 'client';
+  userRole: "agency" | "client";
   brandName?: string;
   onLogout?: () => void;
 }
 
-export function MainNavigation({ userRole, brandName, onLogout }: MainNavigationProps) {
+export function MainNavigation({
+  userRole,
+  brandName,
+  onLogout,
+}: MainNavigationProps) {
   const location = useLocation();
   const currentPath = location.pathname;
 
   const agencyNavItems = [
-    { 
-      path: '/', 
-      label: 'Dashboard', 
+    {
+      path: "/",
+      label: "Dashboard",
       icon: LayoutDashboard,
-      badge: null
+      badge: null,
     },
-    { 
-      path: '/content', 
-      label: 'Content', 
+    {
+      path: "/content",
+      label: "Content",
       icon: FileText,
-      badge: { count: 3, variant: 'destructive' as const }
+      badge: { count: 3, variant: "destructive" as const },
     },
-    { 
-      path: '/analytics/brand_1', 
-      label: 'Analytics', 
+    {
+      path: "/analytics/brand_1",
+      label: "Analytics",
       icon: BarChart3,
-      badge: null
+      badge: null,
     },
-    { 
-      path: '/brand-intelligence', 
-      label: 'Intelligence', 
+    {
+      path: "/brand-intelligence",
+      label: "Intelligence",
       icon: Brain,
-      badge: null
+      badge: null,
     },
-    { 
-      path: '/settings', 
-      label: 'Settings', 
+    {
+      path: "/settings",
+      label: "Settings",
       icon: Settings,
-      badge: null
-    }
+      badge: null,
+    },
   ];
 
   const clientNavItems = [
-    { 
-      path: '/client', 
-      label: 'Overview', 
+    {
+      path: "/client",
+      label: "Overview",
       icon: LayoutDashboard,
-      badge: null
+      badge: null,
     },
-    { 
-      path: '/client/analytics', 
-      label: 'Analytics', 
+    {
+      path: "/client/analytics",
+      label: "Analytics",
       icon: BarChart3,
-      badge: null
+      badge: null,
     },
-    { 
-      path: '/client/approvals', 
-      label: 'Approvals', 
+    {
+      path: "/client/approvals",
+      label: "Approvals",
       icon: FileText,
-      badge: { count: 2, variant: 'default' as const }
-    }
+      badge: { count: 2, variant: "default" as const },
+    },
   ];
 
-  const navItems = userRole === 'agency' ? agencyNavItems : clientNavItems;
+  const navItems = userRole === "agency" ? agencyNavItems : clientNavItems;
 
   return (
     <nav className="flex flex-col h-full bg-white border-r border-gray-200">
@@ -93,15 +97,19 @@ export function MainNavigation({ userRole, brandName, onLogout }: MainNavigation
           </div>
           <div>
             <h2 className="font-semibold text-gray-900">
-              {userRole === 'agency' ? 'Aligned AI' : brandName || 'Brand Portal'}
+              {userRole === "agency"
+                ? "Aligned AI"
+                : brandName || "Brand Portal"}
             </h2>
-            <p className="text-xs text-gray-500 capitalize">{userRole} Portal</p>
+            <p className="text-xs text-gray-500 capitalize">
+              {userRole} Portal
+            </p>
           </div>
         </div>
       </div>
 
       {/* Search - Agency only */}
-      {userRole === 'agency' && (
+      {userRole === "agency" && (
         <div className="p-4 border-b border-gray-200">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -118,8 +126,9 @@ export function MainNavigation({ userRole, brandName, onLogout }: MainNavigation
       <div className="flex-1 p-4 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = currentPath === item.path || 
-            (item.path !== '/' && currentPath.startsWith(item.path));
+          const isActive =
+            currentPath === item.path ||
+            (item.path !== "/" && currentPath.startsWith(item.path));
 
           return (
             <Link
@@ -127,17 +136,15 @@ export function MainNavigation({ userRole, brandName, onLogout }: MainNavigation
               to={item.path}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                isActive 
-                  ? "bg-blue-50 text-blue-700 border border-blue-200" 
-                  : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                isActive
+                  ? "bg-blue-50 text-blue-700 border border-blue-200"
+                  : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
               )}
             >
               <Icon className="h-5 w-5" />
               <span className="flex-1">{item.label}</span>
               {item.badge && (
-                <Badge variant={item.badge.variant}>
-                  {item.badge.count}
-                </Badge>
+                <Badge variant={item.badge.variant}>{item.badge.count}</Badge>
               )}
             </Link>
           );
@@ -150,9 +157,9 @@ export function MainNavigation({ userRole, brandName, onLogout }: MainNavigation
           to="/help"
           className={cn(
             "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-            currentPath === '/help'
+            currentPath === "/help"
               ? "bg-blue-50 text-blue-700 border border-blue-200"
-              : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+              : "text-gray-700 hover:bg-gray-50 hover:text-gray-900",
           )}
         >
           <HelpCircle className="h-5 w-5" />

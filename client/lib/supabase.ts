@@ -1,10 +1,40 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const rawSupabaseUrl = (import.meta.env.VITE_SUPABASE_URL ?? "").toString();
+const supabaseAnonKey = (
+  import.meta.env.VITE_SUPABASE_ANON_KEY ?? ""
+).toString();
+
+// Normalize common accidental typos (e.g. leading extra 'h' -> 'hhttps://') and trim whitespace
+function normalizeUrl(url: string): string {
+  const trimmed = url.trim();
+  // Fix accidental duplicate leading character like 'hhttps://'
+  return trimmed
+    .replace(/^hhttps:\/\//i, "https://")
+    .replace(/^hhttp:\/\//i, "http://");
+}
+
+function isValidHttpUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch (err) {
+    return false;
+  }
+}
+
+const supabaseUrl = normalizeUrl(rawSupabaseUrl);
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  throw new Error(
+    "Missing Supabase environment variables: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY. Please check your .env and runtime environment.",
+  );
+}
+
+if (!isValidHttpUrl(supabaseUrl)) {
+  throw new Error(
+    `Invalid VITE_SUPABASE_URL: "${supabaseUrl}". Must be a valid HTTP or HTTPS URL.`,
+  );
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -31,7 +61,7 @@ export type BrandMember = {
   id: string;
   brand_id: string;
   user_id: string;
-  role: 'owner' | 'admin' | 'manager' | 'creator' | 'approver' | 'viewer';
+  role: "owner" | "admin" | "manager" | "creator" | "approver" | "viewer";
   created_at: string;
 };
 
@@ -39,12 +69,12 @@ export type ContentItem = {
   id: string;
   brand_id: string;
   title: string;
-  content_type: 'post' | 'blog' | 'email' | 'caption';
+  content_type: "post" | "blog" | "email" | "caption";
   platform: string | null;
   body: string | null;
   media_urls: string[] | null;
   scheduled_for: string | null;
-  status: 'draft' | 'pending_review' | 'approved' | 'published' | 'rejected';
+  status: "draft" | "pending_review" | "approved" | "published" | "rejected";
   generated_by_agent: string | null;
   created_by: string | null;
   approved_by: string | null;
@@ -58,7 +88,7 @@ export type ApprovalThread = {
   content_item_id: string;
   user_id: string | null;
   comment: string;
-  action: 'comment' | 'request_changes' | 'approve' | 'reject' | null;
+  action: "comment" | "request_changes" | "approve" | "reject" | null;
   created_at: string;
 };
 

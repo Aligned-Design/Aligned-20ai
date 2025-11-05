@@ -1,36 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge as _Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Plus, 
-  Settings, 
-  RefreshCw, 
-  AlertCircle, 
-  CheckCircle, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Plus,
+  Settings,
+  RefreshCw,
+  AlertCircle,
+  CheckCircle,
   Clock,
   ExternalLink,
   Trash2,
   Activity,
-  Zap
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Integration, IntegrationTemplate } from '@shared/integrations';
+  Zap,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Integration, IntegrationTemplate } from "@shared/integrations";
 
 interface IntegrationsManagerProps {
   brandId: string;
   className?: string;
 }
 
-export function IntegrationsManager({ brandId, className }: IntegrationsManagerProps) {
+export function IntegrationsManager({
+  brandId,
+  className,
+}: IntegrationsManagerProps) {
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [templates, setTemplates] = useState<IntegrationTemplate[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedIntegration, setSelectedIntegration] = useState<string | null>(null);
+  const [selectedIntegration, setSelectedIntegration] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     loadIntegrations();
@@ -45,19 +56,19 @@ export function IntegrationsManager({ brandId, className }: IntegrationsManagerP
         setIntegrations(data);
       }
     } catch (error) {
-      console.error('Failed to load integrations:', error);
+      console.error("Failed to load integrations:", error);
     }
   };
 
   const loadTemplates = async () => {
     try {
-      const response = await fetch('/api/integrations/templates');
+      const response = await fetch("/api/integrations/templates");
       if (response.ok) {
         const data = await response.json();
         setTemplates(data);
       }
     } catch (error) {
-      console.error('Failed to load templates:', error);
+      console.error("Failed to load templates:", error);
     } finally {
       setLoading(false);
     }
@@ -65,74 +76,74 @@ export function IntegrationsManager({ brandId, className }: IntegrationsManagerP
 
   const handleConnect = async (template: IntegrationTemplate) => {
     try {
-      const response = await fetch('/api/integrations/oauth/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/integrations/oauth/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: template.type,
           brandId,
-          redirectUrl: `${window.location.origin}/integrations/callback`
-        })
+          redirectUrl: `${window.location.origin}/integrations/callback`,
+        }),
       });
 
       if (response.ok) {
         const { authUrl } = await response.json();
-        window.open(authUrl, '_blank', 'width=600,height=700');
+        window.open(authUrl, "_blank", "width=600,height=700");
       }
     } catch (error) {
-      console.error('Failed to start OAuth:', error);
+      console.error("Failed to start OAuth:", error);
     }
   };
 
   const handleSync = async (integrationId: string) => {
     try {
       await fetch(`/api/integrations/${integrationId}/sync`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'full' })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "full" }),
       });
-      
+
       await loadIntegrations();
     } catch (error) {
-      console.error('Failed to sync:', error);
+      console.error("Failed to sync:", error);
     }
   };
 
   const handleDisconnect = async (integrationId: string) => {
     try {
       await fetch(`/api/integrations/${integrationId}`, {
-        method: 'DELETE'
+        method: "DELETE",
       });
-      
+
       await loadIntegrations();
     } catch (error) {
-      console.error('Failed to disconnect:', error);
+      console.error("Failed to disconnect:", error);
     }
   };
 
-  const _getStatusIcon = (status: Integration['status']) => {
+  const _getStatusIcon = (status: Integration["status"]) => {
     switch (status) {
-      case 'connected':
+      case "connected":
         return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'error':
+      case "error":
         return <AlertCircle className="h-4 w-4 text-red-500" />;
-      case 'pending':
+      case "pending":
         return <Clock className="h-4 w-4 text-yellow-500" />;
       default:
         return <AlertCircle className="h-4 w-4 text-gray-500" />;
     }
   };
 
-  const _getStatusColor = (status: Integration['status']) => {
+  const _getStatusColor = (status: Integration["status"]) => {
     switch (status) {
-      case 'connected':
-        return 'bg-green-100 text-green-800';
-      case 'error':
-        return 'bg-red-100 text-red-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+      case "connected":
+        return "bg-green-100 text-green-800";
+      case "error":
+        return "bg-red-100 text-red-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -149,10 +160,13 @@ export function IntegrationsManager({ brandId, className }: IntegrationsManagerP
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Integrations</h2>
-          <p className="text-gray-600">Connect your tools for seamless automation</p>
+          <p className="text-gray-600">
+            Connect your tools for seamless automation
+          </p>
         </div>
         <Badge variant="outline">
-          {integrations.filter(i => i.status === 'connected').length} connected
+          {integrations.filter((i) => i.status === "connected").length}{" "}
+          connected
         </Badge>
       </div>
 
@@ -190,7 +204,10 @@ export function IntegrationsManager({ brandId, className }: IntegrationsManagerP
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {templates
-              .filter(template => !integrations.some(int => int.type === template.type))
+              .filter(
+                (template) =>
+                  !integrations.some((int) => int.type === template.type),
+              )
               .map((template) => (
                 <IntegrationTemplateCard
                   key={template.type}
@@ -205,7 +222,7 @@ export function IntegrationsManager({ brandId, className }: IntegrationsManagerP
       {/* Integration Settings Modal */}
       {selectedIntegration && (
         <IntegrationSettings
-          integration={integrations.find(i => i.id === selectedIntegration)!}
+          integration={integrations.find((i) => i.id === selectedIntegration)!}
           onClose={() => setSelectedIntegration(null)}
           onUpdate={loadIntegrations}
         />
@@ -221,7 +238,12 @@ interface IntegrationCardProps {
   onConfigure: () => void;
 }
 
-function IntegrationCard({ integration, onSync, onDisconnect, onConfigure }: IntegrationCardProps) {
+function IntegrationCard({
+  integration,
+  onSync,
+  onDisconnect,
+  onConfigure,
+}: IntegrationCardProps) {
   return (
     <div className="flex items-center justify-between p-4 border rounded-lg">
       <div className="flex items-center gap-4">
@@ -230,7 +252,9 @@ function IntegrationCard({ integration, onSync, onDisconnect, onConfigure }: Int
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <h4 className="font-medium capitalize">{integration.type.replace('_', ' ')}</h4>
+            <h4 className="font-medium capitalize">
+              {integration.type.replace("_", " ")}
+            </h4>
             <Badge className={getStatusColor(integration.status)}>
               {getStatusIcon(integration.status)}
               <span className="ml-1">{integration.status}</span>
@@ -268,7 +292,10 @@ interface IntegrationTemplateCardProps {
   onConnect: () => void;
 }
 
-function IntegrationTemplateCard({ template, onConnect }: IntegrationTemplateCardProps) {
+function IntegrationTemplateCard({
+  template,
+  onConnect,
+}: IntegrationTemplateCardProps) {
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-6">
@@ -280,13 +307,16 @@ function IntegrationTemplateCard({ template, onConnect }: IntegrationTemplateCar
             {template.category}
           </Badge>
         </div>
-        
+
         <h3 className="font-semibold mb-2">{template.name}</h3>
         <p className="text-sm text-gray-600 mb-4">{template.description}</p>
-        
+
         <div className="space-y-2 mb-4">
           {template.features.slice(0, 3).map((feature, index) => (
-            <div key={index} className="flex items-center gap-2 text-xs text-gray-600">
+            <div
+              key={index}
+              className="flex items-center gap-2 text-xs text-gray-600"
+            >
               <CheckCircle className="h-3 w-3 text-green-500" />
               {feature}
             </div>
@@ -307,21 +337,25 @@ interface IntegrationSettingsProps {
   onUpdate: () => void;
 }
 
-function IntegrationSettings({ integration, onClose, onUpdate }: IntegrationSettingsProps) {
+function IntegrationSettings({
+  integration,
+  onClose,
+  onUpdate,
+}: IntegrationSettingsProps) {
   const [settings, setSettings] = useState(integration.settings);
 
   const handleSave = async () => {
     try {
       await fetch(`/api/integrations/${integration.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ settings })
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ settings }),
       });
-      
+
       onUpdate();
       onClose();
     } catch (error) {
-      console.error('Failed to update settings:', error);
+      console.error("Failed to update settings:", error);
     }
   };
 
@@ -331,7 +365,9 @@ function IntegrationSettings({ integration, onClose, onUpdate }: IntegrationSett
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             {integration.name} Settings
-            <Button variant="ghost" size="sm" onClick={onClose}>×</Button>
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              ×
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -339,15 +375,19 @@ function IntegrationSettings({ integration, onClose, onUpdate }: IntegrationSett
             <Label>Enable Sync</Label>
             <Switch
               checked={settings.syncEnabled}
-              onCheckedChange={(checked) => setSettings(prev => ({ ...prev, syncEnabled: checked }))}
+              onCheckedChange={(checked) =>
+                setSettings((prev) => ({ ...prev, syncEnabled: checked }))
+              }
             />
           </div>
 
           <div>
             <Label>Sync Frequency</Label>
-            <Select 
-              value={settings.syncFrequency} 
-              onValueChange={(value: any) => setSettings(prev => ({ ...prev, syncFrequency: value }))}
+            <Select
+              value={settings.syncFrequency}
+              onValueChange={(value: any) =>
+                setSettings((prev) => ({ ...prev, syncFrequency: value }))
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -362,9 +402,11 @@ function IntegrationSettings({ integration, onClose, onUpdate }: IntegrationSett
 
           <div>
             <Label>Sync Direction</Label>
-            <Select 
-              value={settings.syncDirection} 
-              onValueChange={(value: any) => setSettings(prev => ({ ...prev, syncDirection: value }))}
+            <Select
+              value={settings.syncDirection}
+              onValueChange={(value: any) =>
+                setSettings((prev) => ({ ...prev, syncDirection: value }))
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -381,13 +423,19 @@ function IntegrationSettings({ integration, onClose, onUpdate }: IntegrationSett
             <Label>Auto Sync</Label>
             <Switch
               checked={settings.autoSync}
-              onCheckedChange={(checked) => setSettings(prev => ({ ...prev, autoSync: checked }))}
+              onCheckedChange={(checked) =>
+                setSettings((prev) => ({ ...prev, autoSync: checked }))
+              }
             />
           </div>
 
           <div className="flex gap-2 pt-4">
-            <Button onClick={handleSave} className="flex-1">Save Changes</Button>
-            <Button variant="outline" onClick={onClose}>Cancel</Button>
+            <Button onClick={handleSave} className="flex-1">
+              Save Changes
+            </Button>
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -395,28 +443,28 @@ function IntegrationSettings({ integration, onClose, onUpdate }: IntegrationSett
   );
 }
 
-function getStatusIcon(status: Integration['status']) {
+function getStatusIcon(status: Integration["status"]) {
   switch (status) {
-    case 'connected':
+    case "connected":
       return <CheckCircle className="h-4 w-4 text-green-500" />;
-    case 'error':
+    case "error":
       return <AlertCircle className="h-4 w-4 text-red-500" />;
-    case 'pending':
+    case "pending":
       return <Clock className="h-4 w-4 text-yellow-500" />;
     default:
       return <AlertCircle className="h-4 w-4 text-gray-500" />;
   }
 }
 
-function getStatusColor(status: Integration['status']) {
+function getStatusColor(status: Integration["status"]) {
   switch (status) {
-    case 'connected':
-      return 'bg-green-100 text-green-800';
-    case 'error':
-      return 'bg-red-100 text-red-800';
-    case 'pending':
-      return 'bg-yellow-100 text-yellow-800';
+    case "connected":
+      return "bg-green-100 text-green-800";
+    case "error":
+      return "bg-red-100 text-red-800";
+    case "pending":
+      return "bg-yellow-100 text-yellow-800";
     default:
-      return 'bg-gray-100 text-gray-800';
+      return "bg-gray-100 text-gray-800";
   }
 }

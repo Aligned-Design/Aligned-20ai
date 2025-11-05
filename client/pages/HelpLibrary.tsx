@@ -5,7 +5,7 @@
  * Accessible from the main navigation and as a contextual help resource.
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from "react";
 import {
   Search,
   BookOpen,
@@ -13,29 +13,32 @@ import {
   Tag,
   AlertCircle,
   Lightbulb,
-} from 'lucide-react';
+} from "lucide-react";
 import {
   HELP_CATEGORIES,
   searchHelpArticles,
   getCategoryById,
   getArticleById,
-} from '@shared/tooltip-library';
+  HelpArticle,
+} from "@shared/tooltip-library";
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  'getting-started': '🚀',
-  'brand-setup': '🎨',
-  'content-creation': '✏️',
-  scheduling: '📅',
-  analytics: '📊',
-  teams: '👥',
-  'white-label': '🛡️',
-  agencies: '💼',
+  "getting-started": "🚀",
+  "brand-setup": "🎨",
+  "content-creation": "✏️",
+  scheduling: "📅",
+  analytics: "📊",
+  teams: "👥",
+  "white-label": "🛡️",
+  agencies: "💼",
 };
 
 function HelpLibrary() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedArticle, setSelectedArticle] = useState<HelpArticle | null>(null);
+  const [selectedArticle, setSelectedArticle] = useState<HelpArticle | null>(
+    null,
+  );
 
   // Search or filter articles
   const filteredArticles = useMemo(() => {
@@ -56,8 +59,8 @@ function HelpLibrary() {
   const handleArticleClick = (article: HelpArticle) => {
     setSelectedArticle(article);
     // Scroll to article detail
-    const element = document.getElementById('article-detail');
-    element?.scrollIntoView({ behavior: 'smooth' });
+    const element = document.getElementById("article-detail");
+    element?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleBackClick = () => {
@@ -65,22 +68,22 @@ function HelpLibrary() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4">
+      <div className="bg-white border-b py-12">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-3 mb-4">
-            <BookOpen className="h-8 w-8" />
-            <h1 className="text-4xl font-bold">Help Library</h1>
+            <BookOpen className="h-8 w-8 text-slate-900" />
+            <h1 className="text-4xl font-bold text-slate-900">Help Library</h1>
           </div>
-          <p className="text-blue-100 text-lg">
+          <p className="text-slate-600 text-lg">
             Everything you need to know about using Aligned AI
           </p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid md:grid-cols-[300px_1fr] gap-8">
           {/* Sidebar */}
           <div className="space-y-6">
@@ -106,10 +109,10 @@ function HelpLibrary() {
                 <button
                   onClick={() => setSelectedCategory(null)}
                   className={cn(
-                    'w-full text-left px-4 py-2 rounded-lg transition-colors',
+                    "w-full text-left px-4 py-2 rounded-lg transition-colors",
                     selectedCategory === null
-                      ? 'bg-blue-50 text-blue-600 font-medium'
-                      : 'text-gray-700 hover:bg-gray-50'
+                      ? "bg-blue-50 text-blue-600 font-medium"
+                      : "text-gray-700 hover:bg-gray-50",
                   )}
                 >
                   All Articles
@@ -119,13 +122,15 @@ function HelpLibrary() {
                     key={category.id}
                     onClick={() => setSelectedCategory(category.id)}
                     className={cn(
-                      'w-full text-left px-4 py-2 rounded-lg transition-colors flex items-center gap-2',
+                      "w-full text-left px-4 py-2 rounded-lg transition-colors flex items-center gap-2",
                       selectedCategory === category.id
-                        ? 'bg-blue-50 text-blue-600 font-medium'
-                        : 'text-gray-700 hover:bg-gray-50'
+                        ? "bg-blue-50 text-blue-600 font-medium"
+                        : "text-gray-700 hover:bg-gray-50",
                     )}
                   >
-                    <span className="text-lg">{CATEGORY_ICONS[category.id]}</span>
+                    <span className="text-lg">
+                      {CATEGORY_ICONS[category.id]}
+                    </span>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium truncate">
                         {category.name}
@@ -157,9 +162,16 @@ function HelpLibrary() {
           {/* Main Content Area */}
           <div className="space-y-6">
             {selectedArticle ? (
-              <ArticleDetail article={selectedArticle} onBack={handleBackClick} />
+              <ArticleDetail
+                article={selectedArticle}
+                onBack={handleBackClick}
+              />
             ) : (
-              <ArticleList articles={filteredArticles} onArticleClick={handleArticleClick} searchQuery={searchQuery} />
+              <ArticleList
+                articles={filteredArticles}
+                onArticleClick={handleArticleClick}
+                searchQuery={searchQuery}
+              />
             )}
           </div>
         </div>
@@ -176,7 +188,8 @@ function HelpLibrary() {
                   Can't find what you're looking for?
                 </h3>
                 <p className="text-gray-600 text-sm mb-4">
-                  Our support team is here to help. Email us or start a chat in the app.
+                  Our support team is here to help. Email us or start a chat in
+                  the app.
                 </p>
                 <div className="flex gap-3">
                   <a
@@ -206,7 +219,11 @@ interface ArticleListProps {
   searchQuery: string;
 }
 
-function ArticleList({ articles, onArticleClick, searchQuery }: ArticleListProps) {
+function ArticleList({
+  articles,
+  onArticleClick,
+  searchQuery,
+}: ArticleListProps) {
   if (articles.length === 0) {
     return (
       <div className="text-center py-12">
@@ -225,8 +242,8 @@ function ArticleList({ articles, onArticleClick, searchQuery }: ArticleListProps
     <div className="space-y-4">
       <div className="text-sm text-gray-600">
         {searchQuery
-          ? `Found ${articles.length} article${articles.length === 1 ? '' : 's'} for "${searchQuery}"`
-          : `Showing ${articles.length} article${articles.length === 1 ? '' : 's'}`}
+          ? `Found ${articles.length} article${articles.length === 1 ? "" : "s"} for "${searchQuery}"`
+          : `Showing ${articles.length} article${articles.length === 1 ? "" : "s"}`}
       </div>
 
       <div className="grid gap-4">
@@ -260,9 +277,7 @@ function ArticleCard({ article, onClick }: ArticleCardProps) {
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">
-              {CATEGORY_ICONS[article.category]}
-            </span>
+            <span className="text-lg">{CATEGORY_ICONS[article.category]}</span>
             <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
               {category?.name}
             </span>
@@ -271,7 +286,7 @@ function ArticleCard({ article, onClick }: ArticleCardProps) {
             {article.title}
           </h3>
           <p className="text-gray-600 text-sm mt-1 line-clamp-2">
-            {article.content.split('\n')[0]}
+            {article.content.split("\n")[0]}
           </p>
           {article.tags.length > 0 && (
             <div className="flex gap-2 mt-3 flex-wrap">
@@ -352,7 +367,7 @@ function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
       {/* Article Content */}
       <div className="prose prose-sm max-w-none">
-        {article.content.split('\n\n').map((paragraph, idx) => (
+        {article.content.split("\n\n").map((paragraph, idx) => (
           <div key={idx} className="text-gray-700 whitespace-pre-wrap">
             {paragraph}
           </div>
@@ -379,7 +394,7 @@ function ArticleDetail({ article, onBack }: ArticleDetailProps) {
                 key={relatedArticle.id}
                 onClick={() => {
                   // In a real app, this would navigate or update the displayed article
-                  console.log('Navigate to:', relatedArticle.id);
+                  console.log("Navigate to:", relatedArticle.id);
                 }}
                 className="text-left p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all"
               >
@@ -390,7 +405,7 @@ function ArticleDetail({ article, onBack }: ArticleDetailProps) {
                       {relatedArticle.title}
                     </h4>
                     <p className="text-sm text-gray-600 line-clamp-1">
-                      {relatedArticle.content.split('\n')[0]}
+                      {relatedArticle.content.split("\n")[0]}
                     </p>
                   </div>
                 </div>
@@ -406,7 +421,7 @@ function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 // ==================== UTILITY FUNCTION ====================
 
 function cn(...classes: (string | boolean | undefined)[]): string {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 export default HelpLibrary;

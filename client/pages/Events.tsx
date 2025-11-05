@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useBrand } from "@/contexts/BrandContext";
 import { Button } from "@/components/ui/button";
-import { Badge as _Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -69,10 +69,11 @@ export default function Events() {
 
       if (error) throw error;
       setEvents(data || []);
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error loading events",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -93,8 +94,8 @@ export default function Events() {
 
       if (error) throw error;
       setConnections(data || []);
-    } catch (error: unknown) {
-      console.error("Error loading connections:", error);
+    } catch (err: unknown) {
+      console.error("Error loading connections:", err);
     }
   };
 
@@ -451,10 +452,11 @@ function CreateEventForm({
         description: "Your event has been saved as a draft",
       });
       onSuccess();
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     }

@@ -1,41 +1,52 @@
-import React, { useState, useRef } from 'react';
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge as _Badge } from '@/components/ui/badge';
-import { Upload, Eye, Save, RotateCcw, Palette, Globe} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useWhiteLabel } from '@/hooks/useWhiteLabel';
-import { WhiteLabelConfig, BRANDING_THEMES } from '@shared/branding';
+import React, { useState, useRef } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Upload, Eye, Save, RotateCcw, Palette, Globe } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useWhiteLabel } from "@/hooks/useWhiteLabel";
+import { WhiteLabelConfig, BRANDING_THEMES } from "@shared/branding";
 
 interface WhiteLabelSettingsProps {
-  userRole: 'admin' | 'manager' | 'client';
+  userRole: "admin" | "manager" | "client";
   className?: string;
 }
 
-export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsProps) {
+export function WhiteLabelSettings({
+  userRole,
+  className,
+}: WhiteLabelSettingsProps) {
   const { config, loading, updateConfig, applyTheme } = useWhiteLabel();
   const [previewMode, setPreviewMode] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [localConfig, setLocalConfig] = useState<Partial<WhiteLabelConfig>>(config || {});
+  const [localConfig, setLocalConfig] = useState<Partial<WhiteLabelConfig>>(
+    config || {},
+  );
   const logoUploadRef = useRef<HTMLInputElement>(null);
   const faviconUploadRef = useRef<HTMLInputElement>(null);
 
   // Only admins can access white-label settings
-  if (userRole !== 'admin') {
+  if (userRole !== "admin") {
     return (
       <div className="text-center p-8">
-        <p className="text-gray-600">White-label settings are only available for agency administrators.</p>
+        <p className="text-gray-600">
+          White-label settings are only available for agency administrators.
+        </p>
       </div>
     );
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center p-8">Loading white-label settings...</div>;
+    return (
+      <div className="flex items-center justify-center p-8">
+        Loading white-label settings...
+      </div>
+    );
   }
 
   const handleSave = async () => {
@@ -44,7 +55,7 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
       await updateConfig(localConfig);
       setPreviewMode(false);
     } catch (error) {
-      console.error('Failed to save white-label config:', error);
+      console.error("Failed to save white-label config:", error);
     } finally {
       setSaving(false);
     }
@@ -57,43 +68,46 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
     }
   };
 
-  const handleThemeSelect = (theme: typeof BRANDING_THEMES[0]) => {
+  const handleThemeSelect = (theme: (typeof BRANDING_THEMES)[0]) => {
     const updatedConfig = {
       ...localConfig,
-      colors: theme.colors
+      colors: theme.colors,
     };
     setLocalConfig(updatedConfig);
     applyTheme(theme.colors);
   };
 
-  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'favicon') => {
+  const handleLogoUpload = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    type: "logo" | "favicon",
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     // In production, upload to your storage service
     const mockUrl = URL.createObjectURL(file);
 
-    setLocalConfig(prev => {
+    setLocalConfig((prev) => {
       const branding = prev.branding || {};
       return {
         ...prev,
         branding: {
           ...branding,
-          [type === 'logo' ? 'logoUrl' : 'favicon']: mockUrl
-        } as Partial<WhiteLabelConfig>['branding']
+          [type === "logo" ? "logoUrl" : "favicon"]: mockUrl,
+        } as Partial<WhiteLabelConfig>["branding"],
       };
     });
   };
 
   const updateLocalConfig = (section: keyof WhiteLabelConfig, updates: any) => {
-    setLocalConfig(prev => {
+    setLocalConfig((prev) => {
       const currentSection = prev[section] || {};
       return {
         ...prev,
         [section]: {
           ...currentSection,
-          ...updates
-        }
+          ...updates,
+        },
       };
     });
   };
@@ -103,9 +117,11 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">White-Label Settings</h1>
-          <p className="text-gray-600">Customize the platform appearance for your agency and clients</p>
+          <p className="text-gray-600">
+            Customize the platform appearance for your agency and clients
+          </p>
         </div>
-        
+
         <div className="flex gap-2">
           {previewMode && (
             <Button variant="outline" onClick={() => setPreviewMode(false)}>
@@ -119,7 +135,7 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
           </Button>
           <Button onClick={handleSave} disabled={saving}>
             <Save className="h-4 w-4 mr-2" />
-            {saving ? 'Saving...' : 'Save Changes'}
+            {saving ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </div>
@@ -127,7 +143,10 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
       {previewMode && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-blue-800 font-medium">Preview Mode Active</p>
-          <p className="text-blue-700 text-sm">You're seeing how your changes will look. Click "Save Changes" to apply them permanently.</p>
+          <p className="text-blue-700 text-sm">
+            You're seeing how your changes will look. Click "Save Changes" to
+            apply them permanently.
+          </p>
         </div>
       )}
 
@@ -149,8 +168,12 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
                 <div>
                   <Label>Company Name</Label>
                   <Input
-                    value={localConfig.branding?.companyName || ''}
-                    onChange={(e) => updateLocalConfig('branding', { companyName: e.target.value })}
+                    value={localConfig.branding?.companyName || ""}
+                    onChange={(e) =>
+                      updateLocalConfig("branding", {
+                        companyName: e.target.value,
+                      })
+                    }
                     placeholder="Your Agency Name"
                   />
                 </div>
@@ -158,8 +181,10 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
                 <div>
                   <Label>Tagline</Label>
                   <Input
-                    value={localConfig.branding?.tagline || ''}
-                    onChange={(e) => updateLocalConfig('branding', { tagline: e.target.value })}
+                    value={localConfig.branding?.tagline || ""}
+                    onChange={(e) =>
+                      updateLocalConfig("branding", { tagline: e.target.value })
+                    }
                     placeholder="Your agency's tagline"
                   />
                 </div>
@@ -186,7 +211,7 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
                     ref={logoUploadRef}
                     type="file"
                     accept="image/*"
-                    onChange={(e) => handleLogoUpload(e, 'logo')}
+                    onChange={(e) => handleLogoUpload(e, "logo")}
                     className="hidden"
                   />
                 </div>
@@ -213,7 +238,7 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
                     ref={faviconUploadRef}
                     type="file"
                     accept="image/*"
-                    onChange={(e) => handleLogoUpload(e, 'favicon')}
+                    onChange={(e) => handleLogoUpload(e, "favicon")}
                     className="hidden"
                   />
                 </div>
@@ -228,8 +253,12 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
                 <div>
                   <Label>Copyright Text</Label>
                   <Input
-                    value={localConfig.footer?.copyrightText || ''}
-                    onChange={(e) => updateLocalConfig('footer', { copyrightText: e.target.value })}
+                    value={localConfig.footer?.copyrightText || ""}
+                    onChange={(e) =>
+                      updateLocalConfig("footer", {
+                        copyrightText: e.target.value,
+                      })
+                    }
                     placeholder="© 2024 Your Agency. All rights reserved."
                   />
                 </div>
@@ -238,7 +267,9 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
                   <Label>Show "Powered by Aligned AI"</Label>
                   <Switch
                     checked={localConfig.footer?.showPoweredBy ?? true}
-                    onCheckedChange={(checked) => updateLocalConfig('footer', { showPoweredBy: checked })}
+                    onCheckedChange={(checked) =>
+                      updateLocalConfig("footer", { showPoweredBy: checked })
+                    }
                   />
                 </div>
 
@@ -246,8 +277,12 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
                   <Label>Support Email</Label>
                   <Input
                     type="email"
-                    value={localConfig.footer?.supportEmail || ''}
-                    onChange={(e) => updateLocalConfig('footer', { supportEmail: e.target.value })}
+                    value={localConfig.footer?.supportEmail || ""}
+                    onChange={(e) =>
+                      updateLocalConfig("footer", {
+                        supportEmail: e.target.value,
+                      })
+                    }
                     placeholder="support@youragency.com"
                   />
                 </div>
@@ -278,7 +313,9 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
                         style={{ background: theme.preview }}
                       />
                       <h4 className="font-medium">{theme.name}</h4>
-                      <p className="text-sm text-gray-600">{theme.description}</p>
+                      <p className="text-sm text-gray-600">
+                        {theme.description}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -292,14 +329,17 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
-                    { key: 'primary', label: 'Primary' },
-                    { key: 'secondary', label: 'Secondary' },
-                    { key: 'accent', label: 'Accent' },
-                    { key: 'success', label: 'Success' },
-                    { key: 'warning', label: 'Warning' },
-                    { key: 'error', label: 'Error' },
+                    { key: "primary", label: "Primary" },
+                    { key: "secondary", label: "Secondary" },
+                    { key: "accent", label: "Accent" },
+                    { key: "success", label: "Success" },
+                    { key: "warning", label: "Warning" },
+                    { key: "error", label: "Error" },
                   ].map(({ key, label }) => {
-                    const colorValue = (localConfig.colors?.[key as keyof Omit<typeof localConfig.colors, 'text'>] as string | undefined) || '#000000';
+                    const colorValue =
+                      (localConfig.colors?.[
+                        key as keyof Omit<typeof localConfig.colors, "text">
+                      ] as string | undefined) || "#000000";
                     return (
                       <div key={key}>
                         <Label className="text-sm">{label}</Label>
@@ -307,12 +347,20 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
                           <input
                             type="color"
                             value={colorValue}
-                            onChange={(e) => updateLocalConfig('colors', { [key]: e.target.value })}
+                            onChange={(e) =>
+                              updateLocalConfig("colors", {
+                                [key]: e.target.value,
+                              })
+                            }
                             className="w-12 h-8 rounded border"
                           />
                           <Input
                             value={colorValue}
-                            onChange={(e) => updateLocalConfig('colors', { [key]: e.target.value })}
+                            onChange={(e) =>
+                              updateLocalConfig("colors", {
+                                [key]: e.target.value,
+                              })
+                            }
                             placeholder="#000000"
                             className="font-mono text-sm"
                           />
@@ -338,8 +386,10 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
               <div>
                 <Label>Custom Domain</Label>
                 <Input
-                  value={localConfig.domain?.custom || ''}
-                  onChange={(e) => updateLocalConfig('domain', { custom: e.target.value })}
+                  value={localConfig.domain?.custom || ""}
+                  onChange={(e) =>
+                    updateLocalConfig("domain", { custom: e.target.value })
+                  }
                   placeholder="clients.youragency.com"
                 />
                 <p className="text-sm text-gray-600 mt-1">
@@ -350,8 +400,10 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
               <div>
                 <Label>Subdomain Pattern</Label>
                 <Input
-                  value={localConfig.domain?.subdomain || ''}
-                  onChange={(e) => updateLocalConfig('domain', { subdomain: e.target.value })}
+                  value={localConfig.domain?.subdomain || ""}
+                  onChange={(e) =>
+                    updateLocalConfig("domain", { subdomain: e.target.value })
+                  }
                   placeholder="[client].youragency.com"
                 />
                 <p className="text-sm text-gray-600 mt-1">
@@ -371,41 +423,61 @@ export function WhiteLabelSettings({ userRole, className }: WhiteLabelSettingsPr
               <div className="flex items-center justify-between">
                 <div>
                   <Label>Hide Aligned AI Branding</Label>
-                  <p className="text-sm text-gray-600">Remove all Aligned AI references from the platform</p>
+                  <p className="text-sm text-gray-600">
+                    Remove all Aligned AI references from the platform
+                  </p>
                 </div>
                 <Switch
                   checked={localConfig.features?.hideAlignedAIBranding ?? false}
-                  onCheckedChange={(checked) => updateLocalConfig('features', { hideAlignedAIBranding: checked })}
+                  onCheckedChange={(checked) =>
+                    updateLocalConfig("features", {
+                      hideAlignedAIBranding: checked,
+                    })
+                  }
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
                   <Label>Custom Login Page</Label>
-                  <p className="text-sm text-gray-600">Use your branding on the login page</p>
+                  <p className="text-sm text-gray-600">
+                    Use your branding on the login page
+                  </p>
                 </div>
                 <Switch
                   checked={localConfig.features?.customLoginPage ?? false}
-                  onCheckedChange={(checked) => updateLocalConfig('features', { customLoginPage: checked })}
+                  onCheckedChange={(checked) =>
+                    updateLocalConfig("features", { customLoginPage: checked })
+                  }
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
                   <Label>Allow Client Branding</Label>
-                  <p className="text-sm text-gray-600">Let clients see their own brand colors in the interface</p>
+                  <p className="text-sm text-gray-600">
+                    Let clients see their own brand colors in the interface
+                  </p>
                 </div>
                 <Switch
                   checked={localConfig.features?.allowClientBranding ?? true}
-                  onCheckedChange={(checked) => updateLocalConfig('features', { allowClientBranding: checked })}
+                  onCheckedChange={(checked) =>
+                    updateLocalConfig("features", {
+                      allowClientBranding: checked,
+                    })
+                  }
                 />
               </div>
 
               <div>
                 <Label>Custom Dashboard Title</Label>
                 <Input
-                  value={localConfig.features?.customDashboardTitle || ''}
-                  onChange={(e) => updateLocalConfig('features', { customDashboardTitle: e.target.value })}
+                  value={localConfig.features?.customDashboardTitle || ""}
+                  onChange={(e) =>
+                    updateLocalConfig("features", {
+                      customDashboardTitle: e.target.value,
+                    })
+                  }
                   placeholder="Client Dashboard"
                 />
               </div>

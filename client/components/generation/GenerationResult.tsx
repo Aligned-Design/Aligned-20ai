@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge as _Badge } from '@/components/ui/badge';
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   AlertTriangle,
   CheckCircle,
@@ -13,10 +13,10 @@ import {
   AlertCircle,
   FileText,
   Eye,
-  EyeOff
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { BrandFidelityScore, LinterResult } from '@/types/agent-config';
+  EyeOff,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { BrandFidelityScore, LinterResult } from "@/types/agent-config";
 
 interface GenerationResultProps {
   content: string;
@@ -39,7 +39,7 @@ export function GenerationResult({
   onRegenerate,
   onEdit,
   isLoading = false,
-  className
+  className,
 }: GenerationResultProps) {
   const [copied, setCopied] = useState(false);
   const [expandedIssue, setExpandedIssue] = useState<string | null>(null);
@@ -52,17 +52,17 @@ export function GenerationResult({
   };
 
   const getBFSColor = (score: number | undefined) => {
-    if (!score) return 'text-gray-600';
-    if (score >= 0.9) return 'text-green-600';
-    if (score >= 0.8) return 'text-yellow-600';
-    return 'text-red-600';
+    if (!score) return "text-gray-600";
+    if (score >= 0.9) return "text-green-600";
+    if (score >= 0.8) return "text-yellow-600";
+    return "text-red-600";
   };
 
   const getBFSBgColor = (score: number | undefined) => {
-    if (!score) return 'bg-gray-100';
-    if (score >= 0.9) return 'bg-green-50';
-    if (score >= 0.8) return 'bg-yellow-50';
-    return 'bg-red-50';
+    if (!score) return "bg-gray-100";
+    if (score >= 0.9) return "bg-green-50";
+    if (score >= 0.8) return "bg-yellow-50";
+    return "bg-red-50";
   };
 
   const __hasComplianceIssues =
@@ -76,7 +76,7 @@ export function GenerationResult({
   const __hasBFSIssues = bfsScore && !bfsScore.passed;
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn("space-y-4", className)}>
       {/* Content Preview Card */}
       <Card>
         <CardHeader>
@@ -95,13 +95,9 @@ export function GenerationResult({
           <div className="flex items-center justify-between text-sm text-gray-600">
             <span>{content.length} characters</span>
             <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={copyToClipboard}
-              >
+              <Button size="sm" variant="outline" onClick={copyToClipboard}>
                 <Copy className="h-4 w-4 mr-1" />
-                {copied ? 'Copied!' : 'Copy'}
+                {copied ? "Copied!" : "Copy"}
               </Button>
               <Button
                 size="sm"
@@ -147,7 +143,12 @@ export function GenerationResult({
                 ) : (
                   <AlertTriangle className="h-5 w-5 text-red-600" />
                 )}
-                <span className={cn('text-3xl font-bold', getBFSColor(bfsScore.overall))}>
+                <span
+                  className={cn(
+                    "text-3xl font-bold",
+                    getBFSColor(bfsScore.overall),
+                  )}
+                >
                   {(bfsScore.overall * 100).toFixed(0)}%
                 </span>
               </div>
@@ -157,11 +158,27 @@ export function GenerationResult({
             {/* Component Scores */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               {[
-                { label: 'Tone Alignment', score: bfsScore.tone_alignment, weight: '30%' },
-                { label: 'Terminology', score: bfsScore.terminology_match, weight: '20%' },
-                { label: 'Compliance', score: bfsScore.compliance, weight: '20%' },
-                { label: 'CTA Fit', score: bfsScore.cta_fit, weight: '15%' },
-                { label: 'Platform Fit', score: bfsScore.platform_fit, weight: '15%' }
+                {
+                  label: "Tone Alignment",
+                  score: bfsScore.tone_alignment,
+                  weight: "30%",
+                },
+                {
+                  label: "Terminology",
+                  score: bfsScore.terminology_match,
+                  weight: "20%",
+                },
+                {
+                  label: "Compliance",
+                  score: bfsScore.compliance,
+                  weight: "20%",
+                },
+                { label: "CTA Fit", score: bfsScore.cta_fit, weight: "15%" },
+                {
+                  label: "Platform Fit",
+                  score: bfsScore.platform_fit,
+                  weight: "15%",
+                },
               ].map((component) => (
                 <div key={component.label} className="text-center">
                   <div className="relative w-16 h-16 mx-auto mb-2">
@@ -184,7 +201,9 @@ export function GenerationResult({
                         strokeWidth="2"
                         strokeDasharray={`${component.score * 176} 176`}
                         className={cn(
-                          component.score >= 0.8 ? 'text-green-600' : 'text-yellow-600'
+                          component.score >= 0.8
+                            ? "text-green-600"
+                            : "text-yellow-600",
                         )}
                       />
                     </svg>
@@ -203,15 +222,15 @@ export function GenerationResult({
             {/* Status Message */}
             <div
               className={cn(
-                'p-3 rounded-lg text-sm font-medium',
+                "p-3 rounded-lg text-sm font-medium",
                 bfsScore.passed
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-red-100 text-red-800'
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800",
               )}
             >
               {bfsScore.passed
-                ? '✓ Content meets brand fidelity requirements (≥80%)'
-                : '✗ Content falls short of brand fidelity requirements'}
+                ? "✓ Content meets brand fidelity requirements (≥80%)"
+                : "✗ Content falls short of brand fidelity requirements"}
             </div>
 
             {/* Issues */}
@@ -232,7 +251,8 @@ export function GenerationResult({
             {/* Regeneration Count */}
             {bfsScore.regeneration_count > 0 && (
               <div className="text-xs text-gray-600">
-                Regenerated {bfsScore.regeneration_count} time{bfsScore.regeneration_count > 1 ? 's' : ''}
+                Regenerated {bfsScore.regeneration_count} time
+                {bfsScore.regeneration_count > 1 ? "s" : ""}
               </div>
             )}
           </CardContent>
@@ -260,17 +280,28 @@ export function GenerationResult({
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <p className="text-xs text-gray-600">Toxicity Score</p>
-                <p className={cn('text-lg font-bold', linterResult.toxicity_score > 0.5 ? 'text-red-600' : 'text-green-600')}>
+                <p
+                  className={cn(
+                    "text-lg font-bold",
+                    linterResult.toxicity_score > 0.5
+                      ? "text-red-600"
+                      : "text-green-600",
+                  )}
+                >
                   {(linterResult.toxicity_score * 100).toFixed(0)}%
                 </p>
               </div>
               <div>
                 <p className="text-xs text-gray-600">Profanity Detected</p>
-                <p className="text-lg font-bold">{linterResult.profanity_detected ? '⚠️' : '✓'}</p>
+                <p className="text-lg font-bold">
+                  {linterResult.profanity_detected ? "⚠️" : "✓"}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-gray-600">Needs Human Review</p>
-                <p className="text-lg font-bold">{linterResult.needs_human_review ? '✓' : 'No'}</p>
+                <p className="text-lg font-bold">
+                  {linterResult.needs_human_review ? "✓" : "No"}
+                </p>
               </div>
             </div>
 
@@ -282,28 +313,31 @@ export function GenerationResult({
                   <button
                     onClick={() =>
                       setExpandedIssue(
-                        expandedIssue === 'phrases' ? null : 'phrases'
+                        expandedIssue === "phrases" ? null : "phrases",
                       )
                     }
                     className="flex items-center gap-2 w-full text-left hover:bg-gray-100 p-2 rounded"
                   >
-                    {expandedIssue === 'phrases' ? (
+                    {expandedIssue === "phrases" ? (
                       <ChevronUp className="h-4 w-4" />
                     ) : (
                       <ChevronDown className="h-4 w-4" />
                     )}
                     <AlertTriangle className="h-4 w-4 text-red-600" />
                     <span className="font-medium">
-                      Banned phrases detected ({linterResult.banned_phrases_found.length})
+                      Banned phrases detected (
+                      {linterResult.banned_phrases_found.length})
                     </span>
                   </button>
-                  {expandedIssue === 'phrases' && (
+                  {expandedIssue === "phrases" && (
                     <ul className="ml-6 space-y-1 mt-2">
-                      {linterResult.banned_phrases_found.map((phrase: string, idx: number) => (
-                        <li key={idx} className="text-sm text-red-700">
-                          "{phrase}"
-                        </li>
-                      ))}
+                      {linterResult.banned_phrases_found.map(
+                        (phrase: string, idx: number) => (
+                          <li key={idx} className="text-sm text-red-700">
+                            "{phrase}"
+                          </li>
+                        ),
+                      )}
                     </ul>
                   )}
                 </div>
@@ -315,28 +349,31 @@ export function GenerationResult({
                   <button
                     onClick={() =>
                       setExpandedIssue(
-                        expandedIssue === 'claims' ? null : 'claims'
+                        expandedIssue === "claims" ? null : "claims",
                       )
                     }
                     className="flex items-center gap-2 w-full text-left hover:bg-gray-100 p-2 rounded"
                   >
-                    {expandedIssue === 'claims' ? (
+                    {expandedIssue === "claims" ? (
                       <ChevronUp className="h-4 w-4" />
                     ) : (
                       <ChevronDown className="h-4 w-4" />
                     )}
                     <AlertTriangle className="h-4 w-4 text-red-600" />
                     <span className="font-medium">
-                      Banned claims detected ({linterResult.banned_claims_found.length})
+                      Banned claims detected (
+                      {linterResult.banned_claims_found.length})
                     </span>
                   </button>
-                  {expandedIssue === 'claims' && (
+                  {expandedIssue === "claims" && (
                     <ul className="ml-6 space-y-1 mt-2">
-                      {linterResult.banned_claims_found.map((claim: string, idx: number) => (
-                        <li key={idx} className="text-sm text-red-700">
-                          {claim}
-                        </li>
-                      ))}
+                      {linterResult.banned_claims_found.map(
+                        (claim: string, idx: number) => (
+                          <li key={idx} className="text-sm text-red-700">
+                            {claim}
+                          </li>
+                        ),
+                      )}
                     </ul>
                   )}
                 </div>
@@ -348,28 +385,31 @@ export function GenerationResult({
                   <button
                     onClick={() =>
                       setExpandedIssue(
-                        expandedIssue === 'disclaimers' ? null : 'disclaimers'
+                        expandedIssue === "disclaimers" ? null : "disclaimers",
                       )
                     }
                     className="flex items-center gap-2 w-full text-left hover:bg-gray-100 p-2 rounded"
                   >
-                    {expandedIssue === 'disclaimers' ? (
+                    {expandedIssue === "disclaimers" ? (
                       <ChevronUp className="h-4 w-4" />
                     ) : (
                       <ChevronDown className="h-4 w-4" />
                     )}
                     <AlertCircle className="h-4 w-4 text-yellow-600" />
                     <span className="font-medium">
-                      Missing disclaimers ({linterResult.missing_disclaimers.length})
+                      Missing disclaimers (
+                      {linterResult.missing_disclaimers.length})
                     </span>
                   </button>
-                  {expandedIssue === 'disclaimers' && (
+                  {expandedIssue === "disclaimers" && (
                     <ul className="ml-6 space-y-1 mt-2">
-                      {linterResult.missing_disclaimers.map((disclaimer: string, idx: number) => (
-                        <li key={idx} className="text-sm text-yellow-700">
-                          {disclaimer}
-                        </li>
-                      ))}
+                      {linterResult.missing_disclaimers.map(
+                        (disclaimer: string, idx: number) => (
+                          <li key={idx} className="text-sm text-yellow-700">
+                            {disclaimer}
+                          </li>
+                        ),
+                      )}
                     </ul>
                   )}
                 </div>
@@ -381,32 +421,40 @@ export function GenerationResult({
                   <button
                     onClick={() =>
                       setExpandedIssue(
-                        expandedIssue === 'platform' ? null : 'platform'
+                        expandedIssue === "platform" ? null : "platform",
                       )
                     }
                     className="flex items-center gap-2 w-full text-left hover:bg-gray-100 p-2 rounded"
                   >
-                    {expandedIssue === 'platform' ? (
+                    {expandedIssue === "platform" ? (
                       <ChevronUp className="h-4 w-4" />
                     ) : (
                       <ChevronDown className="h-4 w-4" />
                     )}
                     <AlertTriangle className="h-4 w-4 text-orange-600" />
                     <span className="font-medium">
-                      Platform violations ({linterResult.platform_violations.length})
+                      Platform violations (
+                      {linterResult.platform_violations.length})
                     </span>
                   </button>
-                  {expandedIssue === 'platform' && (
+                  {expandedIssue === "platform" && (
                     <ul className="ml-6 space-y-2 mt-2">
-                      {linterResult.platform_violations.map((violation: unknown, idx: number) => (
-                        <li key={idx} className="text-sm text-orange-700">
-                          <p className="font-medium">{violation.platform}: {violation.issue}</p>
-                          <p className="text-xs">
-                            Current: {violation.current} | Limit: {violation.limit}
-                          </p>
-                          <p className="text-xs italic">{violation.suggestion}</p>
-                        </li>
-                      ))}
+                      {linterResult.platform_violations.map(
+                        (violation: any, idx: number) => (
+                          <li key={idx} className="text-sm text-orange-700">
+                            <p className="font-medium">
+                              {violation.platform}: {violation.issue}
+                            </p>
+                            <p className="text-xs">
+                              Current: {violation.current} | Limit:{" "}
+                              {violation.limit}
+                            </p>
+                            <p className="text-xs italic">
+                              {violation.suggestion}
+                            </p>
+                          </li>
+                        ),
+                      )}
                     </ul>
                   )}
                 </div>
@@ -418,28 +466,31 @@ export function GenerationResult({
                   <button
                     onClick={() =>
                       setExpandedIssue(
-                        expandedIssue === 'competitors' ? null : 'competitors'
+                        expandedIssue === "competitors" ? null : "competitors",
                       )
                     }
                     className="flex items-center gap-2 w-full text-left hover:bg-gray-100 p-2 rounded"
                   >
-                    {expandedIssue === 'competitors' ? (
+                    {expandedIssue === "competitors" ? (
                       <ChevronUp className="h-4 w-4" />
                     ) : (
                       <ChevronDown className="h-4 w-4" />
                     )}
                     <AlertCircle className="h-4 w-4 text-blue-600" />
                     <span className="font-medium">
-                      Competitor mentions ({linterResult.competitor_mentions.length})
+                      Competitor mentions (
+                      {linterResult.competitor_mentions.length})
                     </span>
                   </button>
-                  {expandedIssue === 'competitors' && (
+                  {expandedIssue === "competitors" && (
                     <ul className="ml-6 space-y-1 mt-2">
-                      {linterResult.competitor_mentions.map((mention: string, idx: number) => (
-                        <li key={idx} className="text-sm text-blue-700">
-                          "{mention}"
-                        </li>
-                      ))}
+                      {linterResult.competitor_mentions.map(
+                        (mention: string, idx: number) => (
+                          <li key={idx} className="text-sm text-blue-700">
+                            "{mention}"
+                          </li>
+                        ),
+                      )}
                     </ul>
                   )}
                 </div>
@@ -453,11 +504,13 @@ export function GenerationResult({
                   Auto-fixes applied:
                 </p>
                 <ul className="space-y-1">
-                  {linterResult.fixes_applied.map((fix: string, idx: number) => (
-                    <li key={idx} className="text-sm text-green-800">
-                      ✓ {fix}
-                    </li>
-                  ))}
+                  {linterResult.fixes_applied.map(
+                    (fix: string, idx: number) => (
+                      <li key={idx} className="text-sm text-green-800">
+                        ✓ {fix}
+                      </li>
+                    ),
+                  )}
                 </ul>
               </div>
             )}
@@ -473,7 +526,7 @@ export function GenerationResult({
           className="flex-1"
         >
           <CheckCircle className="h-4 w-4 mr-2" />
-          {isLoading ? 'Processing...' : 'Approve & Publish'}
+          {isLoading ? "Processing..." : "Approve & Publish"}
         </Button>
         <Button
           onClick={onEdit}

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import type { BrandIntakeRequest } from "@shared/api";
 
 interface BrandIntakeFormProps {
   onSubmit: (data: BrandIntakeRequest) => Promise<void>;
@@ -9,16 +10,22 @@ interface BrandIntakeFormProps {
 }
 
 const FORM_STEPS = [
-  { id: 'basic', title: 'Basic Info', fields: 4 },
-  { id: 'voice', title: 'Brand Voice', fields: 6 },
-  { id: 'visual', title: 'Visual Identity', fields: 5 },
-  { id: 'content', title: 'Content Guidelines', fields: 4 },
-  { id: 'compliance', title: 'Guidelines', fields: 3 }
+  { id: "basic", title: "Basic Info", fields: 4 },
+  { id: "voice", title: "Brand Voice", fields: 6 },
+  { id: "visual", title: "Visual Identity", fields: 5 },
+  { id: "content", title: "Content Guidelines", fields: 4 },
+  { id: "compliance", title: "Guidelines", fields: 3 },
 ];
 
-export function BrandIntakeForm({ onSubmit, onSave, initialData }: BrandIntakeFormProps) {
+export function BrandIntakeForm({
+  onSubmit,
+  onSave,
+  initialData,
+}: BrandIntakeFormProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<Partial<BrandIntakeRequest>>(initialData || {});
+  const [formData, setFormData] = useState<Partial<BrandIntakeRequest>>(
+    initialData || {},
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
@@ -39,24 +46,24 @@ export function BrandIntakeForm({ onSubmit, onSave, initialData }: BrandIntakeFo
   const progress = Math.round((completedFields / totalFields) * 100);
 
   const updateField = (field: keyof BrandIntakeRequest, value: unknown) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleNext = () => {
     if (currentStep < FORM_STEPS.length - 1) {
-      setCurrentStep(prev => prev + 1);
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
   const handlePrevious = () => {
     if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
+      setCurrentStep((prev) => prev - 1);
     }
   };
 
   const handleSubmit = async () => {
     if (!isFormValid()) return;
-    
+
     setIsLoading(true);
     try {
       await onSubmit(formData as BrandIntakeRequest);
@@ -66,35 +73,46 @@ export function BrandIntakeForm({ onSubmit, onSave, initialData }: BrandIntakeFo
   };
 
   const isFormValid = () => {
-    const required = ['brandName', 'industry', 'missionStatement', 'targetAudience'];
-    return required.every(field => formData[field as keyof BrandIntakeRequest]);
+    const required = [
+      "brandName",
+      "industry",
+      "missionStatement",
+      "targetAudience",
+    ];
+    return required.every(
+      (field) => formData[field as keyof BrandIntakeRequest],
+    );
   };
 
   const renderStep = () => {
     const step = FORM_STEPS[currentStep];
-    
+
     switch (step.id) {
-      case 'basic':
+      case "basic":
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold">Basic Information</h2>
-            
+
             <div>
-              <label className="block text-sm font-medium mb-2">Brand Name *</label>
+              <label className="block text-sm font-medium mb-2">
+                Brand Name *
+              </label>
               <input
                 type="text"
-                value={formData.brandName || ''}
-                onChange={(e) => updateField('brandName', e.target.value)}
+                value={formData.brandName || ""}
+                onChange={(e) => updateField("brandName", e.target.value)}
                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary"
                 placeholder="Enter your brand name"
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium mb-2">Industry *</label>
+              <label className="block text-sm font-medium mb-2">
+                Industry *
+              </label>
               <select
-                value={formData.industry || ''}
-                onChange={(e) => updateField('industry', e.target.value)}
+                value={formData.industry || ""}
+                onChange={(e) => updateField("industry", e.target.value)}
                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary"
               >
                 <option value="">Select industry</option>
@@ -106,12 +124,14 @@ export function BrandIntakeForm({ onSubmit, onSave, initialData }: BrandIntakeFo
                 <option value="other">Other</option>
               </select>
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium mb-2">Company Size</label>
+              <label className="block text-sm font-medium mb-2">
+                Company Size
+              </label>
               <select
-                value={formData.companySize || ''}
-                onChange={(e) => updateField('companySize', e.target.value)}
+                value={formData.companySize || ""}
+                onChange={(e) => updateField("companySize", e.target.value)}
                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary"
               >
                 <option value="">Select size</option>
@@ -122,57 +142,67 @@ export function BrandIntakeForm({ onSubmit, onSave, initialData }: BrandIntakeFo
                 <option value="enterprise">Enterprise (1000+)</option>
               </select>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium mb-2">Website</label>
               <input
                 type="url"
-                value={formData.website || ''}
-                onChange={(e) => updateField('website', e.target.value)}
+                value={formData.website || ""}
+                onChange={(e) => updateField("website", e.target.value)}
                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary"
                 placeholder="https://yourwebsite.com"
               />
             </div>
           </div>
         );
-        
-      case 'voice':
+
+      case "voice":
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold">Brand Voice & Messaging</h2>
-            
+
             <div>
-              <label className="block text-sm font-medium mb-2">Mission Statement *</label>
+              <label className="block text-sm font-medium mb-2">
+                Mission Statement *
+              </label>
               <textarea
-                value={formData.missionStatement || ''}
-                onChange={(e) => updateField('missionStatement', e.target.value)}
+                value={formData.missionStatement || ""}
+                onChange={(e) =>
+                  updateField("missionStatement", e.target.value)
+                }
                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary h-24"
                 placeholder="What is your brand's mission?"
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium mb-2">Value Proposition</label>
+              <label className="block text-sm font-medium mb-2">
+                Value Proposition
+              </label>
               <textarea
-                value={formData.valueProposition || ''}
-                onChange={(e) => updateField('valueProposition', e.target.value)}
+                value={formData.valueProposition || ""}
+                onChange={(e) =>
+                  updateField("valueProposition", e.target.value)
+                }
                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary h-24"
                 placeholder="What unique value do you provide?"
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium mb-2">Target Audience *</label>
+              <label className="block text-sm font-medium mb-2">
+                Target Audience *
+              </label>
               <textarea
-                value={formData.targetAudience || ''}
-                onChange={(e) => updateField('targetAudience', e.target.value)}
+                value={formData.targetAudience || ""}
+                onChange={(e) => updateField("targetAudience", e.target.value)}
                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary h-24"
                 placeholder="Describe your ideal customer"
               />
             </div>
           </div>
         );
-        
+
       // Add other steps...
       default:
         return <div>Step {currentStep + 1} content</div>;
@@ -190,7 +220,7 @@ export function BrandIntakeForm({ onSubmit, onSave, initialData }: BrandIntakeFo
           )}
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
+          <div
             className="bg-primary h-2 rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
@@ -205,9 +235,9 @@ export function BrandIntakeForm({ onSubmit, onSave, initialData }: BrandIntakeFo
             onClick={() => setCurrentStep(index)}
             className={cn(
               "flex-1 p-2 text-sm font-medium border-b-2 transition-colors",
-              index === currentStep 
-                ? "border-primary text-primary" 
-                : "border-gray-200 text-gray-500 hover:text-gray-700"
+              index === currentStep
+                ? "border-primary text-primary"
+                : "border-gray-200 text-gray-500 hover:text-gray-700",
             )}
           >
             {step.title}
@@ -216,9 +246,7 @@ export function BrandIntakeForm({ onSubmit, onSave, initialData }: BrandIntakeFo
       </div>
 
       {/* Form Content */}
-      <div className="mb-8">
-        {renderStep()}
-      </div>
+      <div className="mb-8">{renderStep()}</div>
 
       {/* Navigation Buttons */}
       <div className="flex justify-between">
@@ -229,19 +257,17 @@ export function BrandIntakeForm({ onSubmit, onSave, initialData }: BrandIntakeFo
         >
           Previous
         </Button>
-        
+
         <div className="flex gap-4">
           {currentStep === FORM_STEPS.length - 1 ? (
             <Button
               onClick={handleSubmit}
               disabled={!isFormValid() || isLoading}
             >
-              {isLoading ? 'Creating Brand Kit...' : 'Create Brand Kit'}
+              {isLoading ? "Creating Brand Kit..." : "Create Brand Kit"}
             </Button>
           ) : (
-            <Button onClick={handleNext}>
-              Next
-            </Button>
+            <Button onClick={handleNext}>Next</Button>
           )}
         </div>
       </div>

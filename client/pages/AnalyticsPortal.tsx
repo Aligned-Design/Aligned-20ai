@@ -1,18 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge as _Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { 
-  TrendingUp, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import {
+  TrendingUp,
   TrendingDown,
-  Eye, 
-  Heart, 
+  Eye,
+  Heart,
   MousePointer,
   Share2,
   Download,
@@ -27,23 +33,38 @@ import {
   Plus,
   Settings,
   Mail,
-  Clock
-} from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { cn } from '@/lib/utils';
-import { AnalyticsPortalData, CustomReport } from '@shared/analytics-portal';
+  Clock,
+} from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from "recharts";
+import { cn } from "@/lib/utils";
+import { AnalyticsPortalData, CustomReport } from "@shared/analytics-portal";
 
 interface AnalyticsPortalProps {
   brandId: string;
   isSharedView?: boolean;
 }
 
-export default function AnalyticsPortal({ brandId, isSharedView = false }: AnalyticsPortalProps) {
+export default function AnalyticsPortal({
+  brandId,
+  isSharedView = false,
+}: AnalyticsPortalProps) {
   const [data, setData] = useState<AnalyticsPortalData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedPeriod, setSelectedPeriod] = useState('month');
-  const [feedbackText, setFeedbackText] = useState('');
-  const [feedbackType, setFeedbackType] = useState<'general' | 'revision'>('general');
+  const [selectedPeriod, setSelectedPeriod] = useState("month");
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackType, setFeedbackType] = useState<"general" | "revision">(
+    "general",
+  );
   const [showReportBuilder, setShowReportBuilder] = useState(false);
   const [customReports, setCustomReports] = useState<CustomReport[]>([]);
 
@@ -55,13 +76,15 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
   const loadAnalyticsData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/analytics-portal/${brandId}?period=${selectedPeriod}`);
+      const response = await fetch(
+        `/api/analytics-portal/${brandId}?period=${selectedPeriod}`,
+      );
       if (response.ok) {
         const analyticsData = await response.json();
         setData(analyticsData);
       }
     } catch (error) {
-      console.error('Failed to load analytics:', error);
+      console.error("Failed to load analytics:", error);
     } finally {
       setLoading(false);
     }
@@ -75,7 +98,7 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
         setCustomReports(reports);
       }
     } catch (error) {
-      console.error('Failed to load custom reports:', error);
+      console.error("Failed to load custom reports:", error);
     }
   };
 
@@ -83,37 +106,39 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
     if (!feedbackText.trim()) return;
 
     try {
-      await fetch('/api/analytics-portal/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/analytics-portal/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contentId,
           type: feedbackType,
           message: feedbackText,
-          priority: 'medium'
-        })
+          priority: "medium",
+        }),
       });
-      
-      setFeedbackText('');
+
+      setFeedbackText("");
       // Show success message
     } catch (error) {
-      console.error('Failed to submit feedback:', error);
+      console.error("Failed to submit feedback:", error);
     }
   };
 
   const handleCreateShareLink = async () => {
     try {
-      const response = await fetch('/api/analytics-portal/share-link', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/analytics-portal/share-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           brandId,
           name: `${data?.brandInfo.name} Analytics - ${new Date().toLocaleDateString()}`,
-          includeMetrics: ['reach', 'engagement', 'conversions'],
+          includeMetrics: ["reach", "engagement", "conversions"],
           dateRange: data?.timeRange,
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          passwordProtected: false
-        })
+          expiresAt: new Date(
+            Date.now() + 30 * 24 * 60 * 60 * 1000,
+          ).toISOString(),
+          passwordProtected: false,
+        }),
       });
 
       if (response.ok) {
@@ -122,7 +147,7 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
         // Show success message
       }
     } catch (error) {
-      console.error('Failed to create share link:', error);
+      console.error("Failed to create share link:", error);
     }
   };
 
@@ -152,7 +177,10 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
                 <div className="text-4xl">{data.brandInfo.logo}</div>
               )}
               <div>
-                <h1 className="text-3xl font-bold" style={{ color: data?.brandInfo.colors.primary }}>
+                <h1
+                  className="text-3xl font-bold"
+                  style={{ color: data?.brandInfo.colors.primary }}
+                >
                   {data?.brandInfo.name} Analytics
                 </h1>
                 <p className="text-gray-600">
@@ -160,7 +188,7 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
                 <SelectTrigger className="w-32">
@@ -173,10 +201,13 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
                   <SelectItem value="year">Year</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               {!isSharedView && (
                 <>
-                  <Button variant="outline" onClick={() => setShowReportBuilder(true)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowReportBuilder(true)}
+                  >
                     <Settings className="h-4 w-4 mr-2" />
                     Custom Reports
                   </Button>
@@ -190,7 +221,7 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
                   </Button>
                 </>
               )}
-              
+
               <Button variant="outline" onClick={loadAnalyticsData}>
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh
@@ -215,82 +246,118 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
 
           <TabsContent value="overview" className="space-y-6">
             {/* Key Metrics */}
-            {data && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <MetricCard
-                  title="Total Reach"
-                  current={data.metrics.reach.current}
-                  previous={data.metrics.reach.previous}
-                  change={data.metrics.reach.change}
-                  icon={<Eye className="h-6 w-6" />}
-                  color="blue"
-                />
-                <MetricCard
-                  title="Engagement"
-                  current={data.metrics.engagement.current}
-                  previous={data.metrics.engagement.previous}
-                  change={data.metrics.engagement.change}
-                  icon={<Heart className="h-6 w-6" />}
-                  color="red"
-                />
-                <MetricCard
-                  title="Conversions"
-                  current={data.metrics.conversions.current}
-                  previous={data.metrics.conversions.previous}
-                  change={data.metrics.conversions.change}
-                  icon={<MousePointer className="h-6 w-6" />}
-                  color="green"
-                />
-                <MetricCard
-                  title="Engagement Rate"
-                  current={data.metrics.engagementRate.current}
-                  previous={data.metrics.engagementRate.previous}
-                  change={data.metrics.engagementRate.change}
-                  icon={<BarChart3 className="h-6 w-6" />}
-                  color="purple"
-                  isPercentage
-                />
-              </div>
-            )}
+            {data &&
+              (() => {
+                const reach = data.metrics?.reach ?? {
+                  current: 0,
+                  previous: 0,
+                  change: 0,
+                };
+                const engagement = data.metrics?.engagement ?? {
+                  current: 0,
+                  previous: 0,
+                  change: 0,
+                };
+                const conversions = data.metrics?.conversions ?? {
+                  current: 0,
+                  previous: 0,
+                  change: 0,
+                };
+                const engagementRate = data.metrics?.engagementRate ?? {
+                  current: 0,
+                  previous: 0,
+                  change: 0,
+                };
+
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <MetricCard
+                      title="Total Reach"
+                      current={reach.current}
+                      previous={reach.previous}
+                      change={reach.change}
+                      icon={<Eye className="h-6 w-6" />}
+                      color="blue"
+                    />
+                    <MetricCard
+                      title="Engagement"
+                      current={engagement.current}
+                      previous={engagement.previous}
+                      change={engagement.change}
+                      icon={<Heart className="h-6 w-6" />}
+                      color="red"
+                    />
+                    <MetricCard
+                      title="Conversions"
+                      current={conversions.current}
+                      previous={conversions.previous}
+                      change={conversions.change}
+                      icon={<MousePointer className="h-6 w-6" />}
+                      color="green"
+                    />
+                    <MetricCard
+                      title="Engagement Rate"
+                      current={engagementRate.current}
+                      previous={engagementRate.previous}
+                      change={engagementRate.change}
+                      icon={<BarChart3 className="h-6 w-6" />}
+                      color="purple"
+                      isPercentage
+                    />
+                  </div>
+                );
+              })()}
 
             {/* Charts */}
-            {data && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Reach Over Time</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={data.charts.reachOverTime}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
+            {data &&
+              (() => {
+                const reachOverTime = data.charts?.reachOverTime ?? [];
+                const engagementByPlatform =
+                  data.charts?.engagementByPlatform ?? [];
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Engagement by Platform</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={data.charts.engagementByPlatform}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="platform" />
-                        <YAxis />
-                        <Tooltip />
-                        <Bar dataKey="value" fill="#10b981" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+                return (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Reach Over Time</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <LineChart data={reachOverTime}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="date" />
+                            <YAxis />
+                            <Tooltip />
+                            <Line
+                              type="monotone"
+                              dataKey="value"
+                              stroke="#3b82f6"
+                              strokeWidth={2}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Engagement by Platform</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={engagementByPlatform}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="platform" />
+                            <YAxis />
+                            <Tooltip />
+                            <Bar dataKey="value" fill="#10b981" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+                  </div>
+                );
+              })()}
 
             {/* Top Content */}
             <Card>
@@ -299,32 +366,42 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {data.charts.topContent.map((content, index) => (
-                    <div key={content.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold">
-                          {index + 1}
-                        </div>
-                        <div>
-                          <h4 className="font-medium">{content.title}</h4>
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
-                            <span>{formatNumber(content.reach)} reach</span>
-                            <span>{formatNumber(content.engagement)} engagement</span>
+                  {(data.charts?.topContent ?? []).map(
+                    (content: any, index: number) => (
+                      <div
+                        key={content.id || index}
+                        className="flex items-center justify-between p-4 border rounded-lg"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold">
+                            {index + 1}
+                          </div>
+                          <div>
+                            <h4 className="font-medium">{content.title}</h4>
+                            <div className="flex items-center gap-4 text-sm text-gray-600">
+                              <span>{formatNumber(content.reach)} reach</span>
+                              <span>
+                                {formatNumber(content.engagement)} engagement
+                              </span>
+                            </div>
                           </div>
                         </div>
+                        <Button variant="ghost" size="sm">
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <Button variant="ghost" size="sm">
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="content" className="space-y-6">
-            <ContentPerformanceView data={data} onFeedback={handleFeedbackSubmit} />
+            <ContentPerformanceView
+              data={data}
+              onFeedback={handleFeedbackSubmit}
+            />
           </TabsContent>
 
           <TabsContent value="audience" className="space-y-6">
@@ -364,7 +441,15 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
 }
 
 // Component implementations for MetricCard, ContentPerformanceView, etc.
-function MetricCard({ title, current, _previous, change, icon, color, isPercentage = false }: {
+function MetricCard({
+  title,
+  current,
+  previous,
+  change,
+  icon,
+  color,
+  isPercentage = false,
+}: {
   title: string;
   current: number;
   previous: number;
@@ -373,8 +458,15 @@ function MetricCard({ title, current, _previous, change, icon, color, isPercenta
   color: string;
   isPercentage?: boolean;
 }) {
-  const isPositive = change > 0;
-  const displayValue = isPercentage ? `${current}%` : formatNumber(current);
+  const isPositive =
+    typeof change === "number" && !Number.isNaN(change) ? change > 0 : false;
+  const safeCurrent =
+    typeof current === "number" && !Number.isNaN(current) ? current : 0;
+  const safeChange =
+    typeof change === "number" && !Number.isNaN(change) ? change : 0;
+  const displayValue = isPercentage
+    ? `${safeCurrent}%`
+    : formatNumber(safeCurrent);
 
   return (
     <Card className="transition-all hover:shadow-lg">
@@ -389,11 +481,14 @@ function MetricCard({ title, current, _previous, change, icon, color, isPercenta
             ) : (
               <TrendingDown className="h-4 w-4 text-red-500" />
             )}
-            <span className={cn(
-              "text-sm font-medium",
-              isPositive ? "text-green-600" : "text-red-600"
-            )}>
-              {isPositive ? '+' : ''}{change.toFixed(1)}%
+            <span
+              className={cn(
+                "text-sm font-medium",
+                isPositive ? "text-green-600" : "text-red-600",
+              )}
+            >
+              {isPositive ? "+" : ""}
+              {safeChange.toFixed(1)}%
             </span>
           </div>
         </div>
@@ -407,9 +502,12 @@ function MetricCard({ title, current, _previous, change, icon, color, isPercenta
   );
 }
 
-function ContentPerformanceView({ data, _onFeedback }: { 
-  data: AnalyticsPortalData; 
-  onFeedback: (contentId?: string) => void; 
+function ContentPerformanceView({
+  data,
+  onFeedback,
+}: {
+  data: AnalyticsPortalData;
+  onFeedback: (contentId?: string) => void;
 }) {
   return (
     <div className="space-y-4">
@@ -425,27 +523,35 @@ function ContentPerformanceView({ data, _onFeedback }: {
                 <p className="text-sm text-gray-600 mb-4">
                   Published {new Date(content.publishedAt).toLocaleDateString()}
                 </p>
-                
+
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
                     <p className="text-sm text-gray-600">Reach</p>
-                    <p className="text-lg font-semibold">{formatNumber(content.metrics.reach)}</p>
+                    <p className="text-lg font-semibold">
+                      {formatNumber(content.metrics.reach)}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Engagement</p>
-                    <p className="text-lg font-semibold">{formatNumber(content.metrics.engagement)}</p>
+                    <p className="text-lg font-semibold">
+                      {formatNumber(content.metrics.engagement)}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Clicks</p>
-                    <p className="text-lg font-semibold">{formatNumber(content.metrics.clicks)}</p>
+                    <p className="text-lg font-semibold">
+                      {formatNumber(content.metrics.clicks)}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Saves</p>
-                    <p className="text-lg font-semibold">{formatNumber(content.metrics.saves)}</p>
+                    <p className="text-lg font-semibold">
+                      {formatNumber(content.metrics.saves)}
+                    </p>
                   </div>
                 </div>
               </div>
-              
+
               {content.canProvideFeedback && (
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline">
@@ -479,7 +585,12 @@ function AudienceGrowthView({ data }: { data: AnalyticsPortalData }) {
             <XAxis dataKey="date" />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="followers" stroke="#8b5cf6" strokeWidth={2} />
+            <Line
+              type="monotone"
+              dataKey="followers"
+              stroke="#8b5cf6"
+              strokeWidth={2}
+            />
           </LineChart>
         </ResponsiveContainer>
       </CardContent>
@@ -487,18 +598,18 @@ function AudienceGrowthView({ data }: { data: AnalyticsPortalData }) {
   );
 }
 
-function FeedbackPanel({ 
-  onSubmit, 
-  feedbackText, 
-  setFeedbackText, 
-  feedbackType, 
-  setFeedbackType 
+function FeedbackPanel({
+  onSubmit,
+  feedbackText,
+  setFeedbackText,
+  feedbackType,
+  setFeedbackType,
 }: {
   onSubmit: () => void;
   feedbackText: string;
   setFeedbackText: (text: string) => void;
-  feedbackType: 'general' | 'revision';
-  setFeedbackType: (type: 'general' | 'revision') => void;
+  feedbackType: "general" | "revision";
+  setFeedbackType: (type: "general" | "revision") => void;
 }) {
   return (
     <Card>
@@ -508,7 +619,12 @@ function FeedbackPanel({
       <CardContent className="space-y-4">
         <div>
           <label className="text-sm font-medium">Feedback Type</label>
-          <Select value={feedbackType} onValueChange={(value: 'general' | 'revision') => setFeedbackType(value)}>
+          <Select
+            value={feedbackType}
+            onValueChange={(value: "general" | "revision") =>
+              setFeedbackType(value)
+            }
+          >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -518,7 +634,7 @@ function FeedbackPanel({
             </SelectContent>
           </Select>
         </div>
-        
+
         <div>
           <label className="text-sm font-medium">Message</label>
           <Textarea
@@ -528,7 +644,7 @@ function FeedbackPanel({
             className="min-h-32"
           />
         </div>
-        
+
         <Button onClick={onSubmit} disabled={!feedbackText.trim()}>
           Submit Feedback
         </Button>
@@ -537,7 +653,11 @@ function FeedbackPanel({
   );
 }
 
-function CustomReportsManager({ brandId, reports, onUpdate }: {
+function CustomReportsManager({
+  brandId,
+  reports,
+  onUpdate,
+}: {
   brandId: string;
   reports: CustomReport[];
   onUpdate: () => void;
@@ -547,24 +667,24 @@ function CustomReportsManager({ brandId, reports, onUpdate }: {
   const handleToggleReport = async (reportId: string, isActive: boolean) => {
     try {
       await fetch(`/api/analytics-portal/${brandId}/reports/${reportId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isActive })
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive }),
       });
       onUpdate();
     } catch (error) {
-      console.error('Failed to toggle report:', error);
+      console.error("Failed to toggle report:", error);
     }
   };
 
   const handleSendNow = async (reportId: string) => {
     try {
       await fetch(`/api/analytics-portal/${brandId}/reports/${reportId}/send`, {
-        method: 'POST'
+        method: "POST",
       });
       // Show success message
     } catch (error) {
-      console.error('Failed to send report:', error);
+      console.error("Failed to send report:", error);
     }
   };
 
@@ -573,7 +693,9 @@ function CustomReportsManager({ brandId, reports, onUpdate }: {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Custom Reports</h2>
-          <p className="text-gray-600">Automated analytics reports delivered to your inbox</p>
+          <p className="text-gray-600">
+            Automated analytics reports delivered to your inbox
+          </p>
         </div>
         <Button onClick={() => setShowBuilder(true)} className="gap-2">
           <Plus className="h-4 w-4" />
@@ -590,17 +712,21 @@ function CustomReportsManager({ brandId, reports, onUpdate }: {
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={report.isActive}
-                    onCheckedChange={(checked) => handleToggleReport(report.id, checked)}
+                    onCheckedChange={(checked) =>
+                      handleToggleReport(report.id, checked)
+                    }
                   />
-                  <Badge variant={report.isActive ? 'default' : 'secondary'}>
-                    {report.isActive ? 'Active' : 'Paused'}
+                  <Badge variant={report.isActive ? "default" : "secondary"}>
+                    {report.isActive ? "Active" : "Paused"}
                   </Badge>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-sm text-gray-600 mb-2">{report.description}</p>
+                <p className="text-sm text-gray-600 mb-2">
+                  {report.description}
+                </p>
                 <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4 text-gray-400" />
@@ -608,7 +734,10 @@ function CustomReportsManager({ brandId, reports, onUpdate }: {
                   </div>
                   <div className="flex items-center gap-1">
                     <Mail className="h-4 w-4 text-gray-400" />
-                    <span>{report.delivery.recipients.length} recipient{report.delivery.recipients.length > 1 ? 's' : ''}</span>
+                    <span>
+                      {report.delivery.recipients.length} recipient
+                      {report.delivery.recipients.length > 1 ? "s" : ""}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -622,8 +751,8 @@ function CustomReportsManager({ brandId, reports, onUpdate }: {
               </div>
 
               <div className="flex gap-2">
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   variant="outline"
                   onClick={() => handleSendNow(report.id)}
                   className="gap-1"
@@ -661,33 +790,46 @@ function CustomReportsManager({ brandId, reports, onUpdate }: {
 interface ReportFormData {
   name: string;
   description: string;
-  frequency: 'daily' | 'weekly' | 'monthly' | 'quarterly';
+  frequency: "daily" | "weekly" | "monthly" | "quarterly";
   dayOfWeek: number;
   time: string;
   recipients: string;
   subject: string;
   includeMetrics: string[];
   includePlatforms: string[];
-  format: 'html' | 'pdf' | 'csv';
+  format: "html" | "pdf" | "csv";
 }
 
-function ReportBuilderModal({ brandId, onClose, onSave, report }: {
+function ReportBuilderModal({
+  brandId,
+  onClose,
+  onSave,
+  report,
+}: {
   brandId: string;
   onClose: () => void;
   onSave: () => void;
   report?: CustomReport;
 }) {
   const [formData, setFormData] = useState<ReportFormData>({
-    name: report?.name || '',
-    description: report?.description || '',
-    frequency: (report?.schedule.frequency as 'daily' | 'weekly' | 'monthly' | 'quarterly') || 'weekly',
+    name: report?.name || "",
+    description: report?.description || "",
+    frequency:
+      (report?.schedule.frequency as
+        | "daily"
+        | "weekly"
+        | "monthly"
+        | "quarterly") || "weekly",
     dayOfWeek: report?.schedule.dayOfWeek || 1,
-    time: report?.schedule.time || '09:00',
-    recipients: report?.delivery.recipients.join(', ') || '',
-    subject: report?.delivery.subject || '',
-    includeMetrics: report?.content.includeMetrics || ['reach', 'engagement'],
-    includePlatforms: report?.content.includePlatforms || ['instagram', 'facebook'],
-    format: (report?.delivery.format as 'html' | 'pdf' | 'csv') || 'pdf'
+    time: report?.schedule.time || "09:00",
+    recipients: report?.delivery.recipients.join(", ") || "",
+    subject: report?.delivery.subject || "",
+    includeMetrics: report?.content.includeMetrics || ["reach", "engagement"],
+    includePlatforms: report?.content.includePlatforms || [
+      "instagram",
+      "facebook",
+    ],
+    format: (report?.delivery.format as "html" | "pdf" | "csv") || "pdf",
   });
 
   const handleSave = async () => {
@@ -700,42 +842,44 @@ function ReportBuilderModal({ brandId, onClose, onSave, report }: {
           frequency: formData.frequency,
           dayOfWeek: formData.dayOfWeek,
           time: formData.time,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         },
         content: {
           includeMetrics: formData.includeMetrics,
           includePlatforms: formData.includePlatforms,
-          includeCharts: ['reachOverTime', 'engagementByPlatform']
+          includeCharts: ["reachOverTime", "engagementByPlatform"],
         },
         delivery: {
           format: formData.format,
-          recipients: formData.recipients.split(',').map(email => email.trim()),
+          recipients: formData.recipients
+            .split(",")
+            .map((email) => email.trim()),
           subject: formData.subject,
-          attachAnalytics: true
+          attachAnalytics: true,
         },
         dateRange: {
-          type: 'relative',
-          relativePeriod: 'last_30_days'
+          type: "relative",
+          relativePeriod: "last_30_days",
         },
-        isActive: true
+        isActive: true,
       };
 
-      const url = report 
+      const url = report
         ? `/api/analytics-portal/${brandId}/reports/${report.id}`
         : `/api/analytics-portal/${brandId}/reports`;
-      
-      const method = report ? 'PUT' : 'POST';
+
+      const method = report ? "PUT" : "POST";
 
       await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(reportData)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reportData),
       });
 
       onSave();
       onClose();
     } catch (error) {
-      console.error('Failed to save report:', error);
+      console.error("Failed to save report:", error);
     }
   };
 
@@ -751,7 +895,9 @@ function ReportBuilderModal({ brandId, onClose, onSave, report }: {
               <Label>Report Name</Label>
               <Input
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 placeholder="Monthly Performance Report"
               />
             </div>
@@ -759,7 +905,16 @@ function ReportBuilderModal({ brandId, onClose, onSave, report }: {
               <Label>Frequency</Label>
               <Select
                 value={formData.frequency}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, frequency: value as 'daily' | 'weekly' | 'monthly' | 'quarterly' }))}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    frequency: value as
+                      | "daily"
+                      | "weekly"
+                      | "monthly"
+                      | "quarterly",
+                  }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -778,7 +933,12 @@ function ReportBuilderModal({ brandId, onClose, onSave, report }: {
             <Label>Description</Label>
             <Textarea
               value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               placeholder="Describe what this report includes..."
             />
           </div>
@@ -789,14 +949,21 @@ function ReportBuilderModal({ brandId, onClose, onSave, report }: {
               <Input
                 type="time"
                 value={formData.time}
-                onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, time: e.target.value }))
+                }
               />
             </div>
             <div>
               <Label>Format</Label>
               <Select
                 value={formData.format}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, format: value as 'html' | 'pdf' | 'csv' }))}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    format: value as "html" | "pdf" | "csv",
+                  }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -814,17 +981,23 @@ function ReportBuilderModal({ brandId, onClose, onSave, report }: {
             <Label>Email Recipients</Label>
             <Input
               value={formData.recipients}
-              onChange={(e) => setFormData(prev => ({ ...prev, recipients: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, recipients: e.target.value }))
+              }
               placeholder="email1@example.com, email2@example.com"
             />
-            <p className="text-xs text-gray-500 mt-1">Separate multiple emails with commas</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Separate multiple emails with commas
+            </p>
           </div>
 
           <div>
             <Label>Email Subject</Label>
             <Input
               value={formData.subject}
-              onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, subject: e.target.value }))
+              }
               placeholder="Your Monthly Analytics Report"
             />
           </div>
@@ -832,28 +1005,32 @@ function ReportBuilderModal({ brandId, onClose, onSave, report }: {
           <div>
             <Label>Include Metrics</Label>
             <div className="grid grid-cols-2 gap-2 mt-2">
-              {['reach', 'engagement', 'conversions', 'followers'].map((metric) => (
-                <label key={metric} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.includeMetrics.includes(metric)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setFormData(prev => ({ 
-                          ...prev, 
-                          includeMetrics: [...prev.includeMetrics, metric] 
-                        }));
-                      } else {
-                        setFormData(prev => ({ 
-                          ...prev, 
-                          includeMetrics: prev.includeMetrics.filter(m => m !== metric) 
-                        }));
-                      }
-                    }}
-                  />
-                  <span className="text-sm capitalize">{metric}</span>
-                </label>
-              ))}
+              {["reach", "engagement", "conversions", "followers"].map(
+                (metric) => (
+                  <label key={metric} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.includeMetrics.includes(metric)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData((prev) => ({
+                            ...prev,
+                            includeMetrics: [...prev.includeMetrics, metric],
+                          }));
+                        } else {
+                          setFormData((prev) => ({
+                            ...prev,
+                            includeMetrics: prev.includeMetrics.filter(
+                              (m) => m !== metric,
+                            ),
+                          }));
+                        }
+                      }}
+                    />
+                    <span className="text-sm capitalize">{metric}</span>
+                  </label>
+                ),
+              )}
             </div>
           </div>
 
@@ -862,7 +1039,7 @@ function ReportBuilderModal({ brandId, onClose, onSave, report }: {
               Cancel
             </Button>
             <Button onClick={handleSave}>
-              {report ? 'Update Report' : 'Create Report'}
+              {report ? "Update Report" : "Create Report"}
             </Button>
           </div>
         </CardContent>
@@ -871,8 +1048,11 @@ function ReportBuilderModal({ brandId, onClose, onSave, report }: {
   );
 }
 
-function formatNumber(num: number): string {
-  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-  return num.toString();
+function formatNumber(num?: number | null): string {
+  if (num === null || num === undefined || Number.isNaN(Number(num)))
+    return "0";
+  const n = Number(num);
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+  return n.toString();
 }

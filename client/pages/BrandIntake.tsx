@@ -112,7 +112,10 @@ export default function BrandIntake() {
     }
   }, [brandId, navigate, toast]);
 
-  const handleFieldChange = (field: keyof BrandIntakeFormData, value: unknown) => {
+  const handleFieldChange = (
+    field: keyof BrandIntakeFormData,
+    value: unknown,
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
@@ -215,10 +218,11 @@ export default function BrandIntake() {
         description:
           "Website data has been imported. Review and adjust as needed.",
       });
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Import failed",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -243,7 +247,8 @@ export default function BrandIntake() {
           for (const brand of allBrands) {
             if (brand.brand_kit?.website_url) {
               try {
-                const existingUrl = new URL(brand.brand_kit.website_url).hostname;
+                const existingUrl = new URL(brand.brand_kit.website_url)
+                  .hostname;
                 if (existingUrl === normalizedUrl) {
                   toast({
                     title: "Duplicate Brand",
@@ -280,13 +285,17 @@ export default function BrandIntake() {
 
       const handleUploadProgress = (
         categoryName: string,
-        progress: { currentFile: number; totalFiles: number; progress: number }
+        progress: { currentFile: number; totalFiles: number; progress: number },
       ) => {
         setUploadStatus(
-          `Uploading ${categoryName}: ${progress.currentFile}/${progress.totalFiles} (${progress.progress}%)`
+          `Uploading ${categoryName}: ${progress.currentFile}/${progress.totalFiles} (${progress.progress}%)`,
         );
         setUploadProgress(
-          Math.round(((completedUploadItems + progress.progress / 100) / totalUploadItems) * 100)
+          Math.round(
+            ((completedUploadItems + progress.progress / 100) /
+              totalUploadItems) *
+              100,
+          ),
         );
       };
 
@@ -395,10 +404,11 @@ export default function BrandIntake() {
       });
 
       navigate(`/brand-snapshot?brandId=${brandId}`);
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error saving brand intake",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -410,13 +420,15 @@ export default function BrandIntake() {
   const progress = (currentStep / SECTIONS.length) * 100;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="border-b bg-card sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
+    <div className="min-h-screen bg-gray-50">
+      <div className="border-b bg-white sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold">Brand Intake Form</h1>
-              <p className="text-sm text-muted-foreground">
+              <h1 className="text-2xl font-bold text-slate-900">
+                Brand Intake Form
+              </h1>
+              <p className="text-sm text-slate-600">
                 Step {currentStep} of {SECTIONS.length}:{" "}
                 {SECTIONS[currentStep - 1].title}
               </p>
@@ -433,13 +445,15 @@ export default function BrandIntake() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {currentStep === 1 && formData.websiteUrl && (
-          <div className="mb-6 rounded-xl border border-border/50 bg-card p-6 shadow-soft">
+          <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-md">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="font-semibold mb-1">Import from Website</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-semibold mb-1 text-slate-900">
+                  Import from Website
+                </h3>
+                <p className="text-sm text-slate-600">
                   Automatically extract brand colors, voice, and keywords from
                   your website.
                 </p>
@@ -533,7 +547,8 @@ export default function BrandIntake() {
             <Button
               onClick={handleSubmit}
               disabled={submitting}
-              className="min-h-[44px] bg-gradient-to-r from-primary to-fuchsia-500"
+              className="min-h-[44px]"
+              variant="default"
             >
               {submitting ? "Processing..." : "Complete Brand Intake"}
             </Button>

@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Sparkles } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Sparkles } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
 
 export default function Signup() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
@@ -27,31 +27,33 @@ export default function Signup() {
 
       if (userId) {
         const brandIds = [
-          '11111111-1111-1111-1111-111111111111',
-          '22222222-2222-2222-2222-222222222222',
-          '33333333-3333-3333-3333-333333333333',
+          "11111111-1111-1111-1111-111111111111",
+          "22222222-2222-2222-2222-222222222222",
+          "33333333-3333-3333-3333-333333333333",
         ];
 
         const memberships = brandIds.map((brandId) => ({
           brand_id: brandId,
           user_id: userId,
-          role: 'admin',
+          role: "admin",
         }));
 
-        await supabase.from('brand_members').insert(memberships);
+        await supabase.from("brand_members").insert(memberships);
       }
 
       toast({
-        title: 'Account created!',
-        description: 'Welcome to Aligned AI. Demo brands have been added to your account.',
+        title: "Account created!",
+        description:
+          "Welcome to Aligned AI. Demo brands have been added to your account.",
       });
 
-      navigate('/dashboard');
-    } catch (error: unknown) {
+      navigate("/dashboard");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
-        title: 'Signup failed',
-        description: error.message || 'Could not create account',
-        variant: 'destructive',
+        title: "Signup failed",
+        description: message || "Could not create account",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -69,7 +71,9 @@ export default function Signup() {
             <span className="text-2xl font-semibold">Aligned AI</span>
           </div>
           <h1 className="text-2xl font-bold">Create your account</h1>
-          <p className="text-muted-foreground mt-2">Start managing your brand content intelligently</p>
+          <p className="text-muted-foreground mt-2">
+            Start managing your brand content intelligently
+          </p>
         </div>
 
         <div className="rounded-xl border bg-card p-8 shadow-sm">
@@ -96,15 +100,17 @@ export default function Signup() {
                 required
                 minLength={6}
               />
-              <p className="text-xs text-muted-foreground">At least 6 characters</p>
+              <p className="text-xs text-muted-foreground">
+                At least 6 characters
+              </p>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Creating account...' : 'Sign up'}
+              {loading ? "Creating account..." : "Sign up"}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Link to="/login" className="text-primary hover:underline">
               Sign in
             </Link>

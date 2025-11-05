@@ -1,7 +1,7 @@
-import React from 'react';
-import { AlertTriangle as _AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import { Button } from './button';
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from './card';
+import React from "react";
+import { AlertTriangle, RefreshCw, Home } from "lucide-react";
+import { Button } from "./button";
+import { Card, CardContent, CardHeader, CardTitle } from "./card";
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -11,10 +11,17 @@ interface ErrorBoundaryState {
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
-  fallback?: React.ComponentType<{ error: Error; reset: () => void; goHome: () => void }>;
+  fallback?: React.ComponentType<{
+    error: Error;
+    reset: () => void;
+    goHome: () => void;
+  }>;
 }
 
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
@@ -26,17 +33,23 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     this.setState({ errorInfo });
-    console.error('Error boundary caught an error:', error, errorInfo);
+    console.error("Error boundary caught an error:", error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
       const Fallback = this.props.fallback || DefaultErrorFallback;
       return (
-        <Fallback 
-          error={this.state.error!} 
-          reset={() => this.setState({ hasError: false, error: undefined, errorInfo: undefined })}
-          goHome={() => window.location.href = '/'}
+        <Fallback
+          error={this.state.error!}
+          reset={() =>
+            this.setState({
+              hasError: false,
+              error: undefined,
+              errorInfo: undefined,
+            })
+          }
+          goHome={() => (window.location.href = "/")}
         />
       );
     }
@@ -45,9 +58,13 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 }
 
-function DefaultErrorFallback({ error, reset, goHome }: { 
-  error: Error; 
-  reset: () => void; 
+function DefaultErrorFallback({
+  error,
+  reset,
+  goHome,
+}: {
+  error: Error;
+  reset: () => void;
   goHome: () => void;
 }) {
   return (
@@ -63,7 +80,7 @@ function DefaultErrorFallback({ error, reset, goHome }: {
           <div className="bg-gray-50 p-3 rounded-lg">
             <p className="text-sm text-gray-600 font-mono">{error.message}</p>
           </div>
-          
+
           <div className="flex gap-3">
             <Button onClick={reset} className="flex-1 gap-2">
               <RefreshCw className="h-4 w-4" />

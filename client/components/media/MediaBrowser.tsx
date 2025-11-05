@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge as _Badge } from '@/components/ui/badge';
-import { Card as _Card } from '@/components/ui/card';
-import { Search, Grid, List} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { MediaAsset, MediaListRequest, MediaListResponse } from '@shared/media';
+import React, { useState, useEffect, useCallback } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Search, Grid, List } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { MediaAsset, MediaListRequest, MediaListResponse } from "@shared/media";
 
 interface MediaBrowserProps {
   brandId: string;
@@ -15,51 +15,54 @@ interface MediaBrowserProps {
   className?: string;
 }
 
-export function MediaBrowser({ 
-  brandId, 
-  onSelectAsset, 
-  selectedAssets = [], 
+export function MediaBrowser({
+  brandId,
+  onSelectAsset,
+  selectedAssets = [],
   multiSelect = false,
-  className 
+  className,
 }: MediaBrowserProps) {
   const [assets, setAssets] = useState<MediaAsset[]>([]);
   const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [hasMore, setHasMore] = useState(true);
 
-  const loadAssets = useCallback(async (reset = false) => {
-    setLoading(true);
-    try {
-      const params: MediaListRequest = {
-        brandId,
-        search: search || undefined,
-        tags: selectedTags.length > 0 ? selectedTags : undefined,
-        limit: 20,
-        offset: reset ? 0 : assets.length
-      };
+  const loadAssets = useCallback(
+    async (reset = false) => {
+      setLoading(true);
+      try {
+        const params: MediaListRequest = {
+          brandId,
+          search: search || undefined,
+          tags: selectedTags.length > 0 ? selectedTags : undefined,
+          limit: 20,
+          offset: reset ? 0 : assets.length,
+        };
 
-      const queryString = new URLSearchParams(
-        Object.entries(params).filter(([__, value]) => value !== undefined)
-      ).toString();
+        const queryString = new URLSearchParams(
+          Object.entries(params).filter(([__, value]) => value !== undefined),
+        ).toString();
 
-      const response = await fetch(`/api/media/list?${queryString}`);
-      const data: MediaListResponse = await response.json();
+        const response = await fetch(`/api/media/list?${queryString}`);
+        const data: MediaListResponse = await response.json();
 
-      if (reset) {
-        setAssets(data.assets);
-      } else {
-        setAssets(prev => [...prev, ...data.assets]);
+        if (reset) {
+          setAssets(data.assets);
+        } else {
+          setAssets((prev) => [...prev, ...data.assets]);
+        }
+
+        setHasMore(data.hasMore);
+      } catch (error) {
+        console.error("Failed to load assets:", error);
+      } finally {
+        setLoading(false);
       }
-      
-      setHasMore(data.hasMore);
-    } catch (error) {
-      console.error('Failed to load assets:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [brandId, search, selectedTags, assets.length]);
+    },
+    [brandId, search, selectedTags, assets.length],
+  );
 
   useEffect(() => {
     loadAssets(true);
@@ -70,7 +73,9 @@ export function MediaBrowser({
   };
 
   const getAssetUrl = async (asset: MediaAsset): Promise<string> => {
-    const response = await fetch(`/api/media/url/${asset.brandId}/${encodeURIComponent(asset.bucketPath)}`);
+    const response = await fetch(
+      `/api/media/url/${asset.brandId}/${encodeURIComponent(asset.bucketPath)}`,
+    );
     const data = await response.json();
     return data.url;
   };
@@ -83,15 +88,15 @@ export function MediaBrowser({
       if (!assetUrls[asset.id]) {
         try {
           const url = await getAssetUrl(asset);
-          setAssetUrls(prev => ({ ...prev, [asset.id]: url }));
+          setAssetUrls((prev) => ({ ...prev, [asset.id]: url }));
         } catch (error) {
-          console.error('Failed to get asset URL:', error);
+          console.error("Failed to get asset URL:", error);
         }
       }
     });
   }, [assets]);
 
-  const allTags = [...new Set(assets.flatMap(asset => asset.tags))];
+  const allTags = [...new Set(assets.flatMap((asset) => asset.tags))];
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -106,19 +111,19 @@ export function MediaBrowser({
             className="pl-10"
           />
         </div>
-        
+
         <div className="flex gap-2">
           <Button
-            variant={viewMode === 'grid' ? 'default' : 'outline'}
+            variant={viewMode === "grid" ? "default" : "outline"}
             size="sm"
-            onClick={() => setViewMode('grid')}
+            onClick={() => setViewMode("grid")}
           >
             <Grid className="h-4 w-4" />
           </Button>
           <Button
-            variant={viewMode === 'list' ? 'default' : 'outline'}
+            variant={viewMode === "list" ? "default" : "outline"}
             size="sm"
-            onClick={() => setViewMode('list')}
+            onClick={() => setViewMode("list")}
           >
             <List className="h-4 w-4" />
           </Button>
@@ -128,16 +133,16 @@ export function MediaBrowser({
       {/* Tag Filters */}
       {allTags.length > 0 && (
         <div className="flex flex-wrap gap-2">
-          {allTags.map(tag => (
+          {allTags.map((tag) => (
             <Badge
               key={tag}
-              variant={selectedTags.includes(tag) ? 'default' : 'outline'}
+              variant={selectedTags.includes(tag) ? "default" : "outline"}
               className="cursor-pointer"
               onClick={() => {
-                setSelectedTags(prev => 
-                  prev.includes(tag) 
-                    ? prev.filter(t => t !== tag)
-                    : [...prev, tag]
+                setSelectedTags((prev) =>
+                  prev.includes(tag)
+                    ? prev.filter((t) => t !== tag)
+                    : [...prev, tag],
                 );
               }}
             >
@@ -148,11 +153,13 @@ export function MediaBrowser({
       )}
 
       {/* Assets Grid/List */}
-      <div className={cn(
-        viewMode === 'grid' 
-          ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
-          : "space-y-2"
-      )}>
+      <div
+        className={cn(
+          viewMode === "grid"
+            ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
+            : "space-y-2",
+        )}
+      >
         {assets.map((asset) => (
           <AssetCard
             key={asset.id}
@@ -173,7 +180,7 @@ export function MediaBrowser({
             onClick={() => loadAssets()}
             disabled={loading}
           >
-            {loading ? 'Loading...' : 'Load More'}
+            {loading ? "Loading..." : "Load More"}
           </Button>
         </div>
       )}
@@ -190,18 +197,24 @@ export function MediaBrowser({
 interface AssetCardProps {
   asset: MediaAsset;
   imageUrl?: string;
-  viewMode: 'grid' | 'list';
+  viewMode: "grid" | "list";
   selected: boolean;
   onClick: () => void;
 }
 
-function AssetCard({ asset, imageUrl, viewMode, selected, onClick }: AssetCardProps) {
-  if (viewMode === 'list') {
+function AssetCard({
+  asset,
+  imageUrl,
+  viewMode,
+  selected,
+  onClick,
+}: AssetCardProps) {
+  if (viewMode === "list") {
     return (
       <Card
         className={cn(
           "p-4 cursor-pointer transition-colors hover:bg-gray-50",
-          selected && "ring-2 ring-primary"
+          selected && "ring-2 ring-primary",
         )}
         onClick={onClick}
       >
@@ -221,7 +234,7 @@ function AssetCard({ asset, imageUrl, viewMode, selected, onClick }: AssetCardPr
             </p>
             {asset.tags.length > 0 && (
               <div className="flex gap-1 mt-1">
-                {asset.tags.slice(0, 3).map(tag => (
+                {asset.tags.slice(0, 3).map((tag) => (
                   <Badge key={tag} variant="secondary" className="text-xs">
                     {tag}
                   </Badge>
@@ -238,7 +251,7 @@ function AssetCard({ asset, imageUrl, viewMode, selected, onClick }: AssetCardPr
     <Card
       className={cn(
         "group cursor-pointer transition-all hover:shadow-md",
-        selected && "ring-2 ring-primary"
+        selected && "ring-2 ring-primary",
       )}
       onClick={onClick}
     >

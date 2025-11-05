@@ -1,40 +1,40 @@
 import { useState, useEffect } from "react";
 import { useBrand } from "@/contexts/BrandContext";
 import { Button } from "@/components/ui/button";
-import { Badge as _Badge } from "@/components/ui/badge";
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DashboardSkeleton } from "@/components/ui/skeletons";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { 
-  CheckCircle2, 
-  XCircle, 
-  AlertTriangle, 
-  Clock, 
+import {
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  Clock,
   MessageSquare,
   Shield,
   PenSquare,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { 
-  ReviewQueueResponse, 
-  ReviewActionRequest, 
-  ReviewActionResponse 
+import {
+  ReviewQueueResponse,
+  ReviewActionRequest,
+  ReviewActionResponse,
 } from "@shared/api";
-import { 
-  BrandFidelityScore, 
+import {
+  BrandFidelityScore,
   LinterResult,
-  DocOutput 
+  DocOutput,
 } from "@/types/agent-config";
 
 interface ReviewItem {
@@ -42,7 +42,7 @@ interface ReviewItem {
   brand_id: string;
   agent: string;
   input: unknown;
-  output: unknown;
+  output: DocOutput | unknown;
   bfs?: BrandFidelityScore;
   linter_results?: LinterResult;
   timestamp: string;
@@ -69,9 +69,11 @@ export default function ReviewQueue() {
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/agents/review/queue/${currentBrand.id}`);
+      const response = await fetch(
+        `/api/agents/review/queue/${currentBrand.id}`,
+      );
       const data: ReviewQueueResponse = await response.json();
-      
+
       if (response.ok) {
         setReviewItems(data.queue);
       } else {
@@ -82,7 +84,7 @@ export default function ReviewQueue() {
       toast({
         title: "Error",
         description: "Failed to load review queue",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -96,8 +98,8 @@ export default function ReviewQueue() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          reviewer_notes: reviewNotes
-        } as ReviewActionRequest)
+          reviewer_notes: reviewNotes,
+        } as ReviewActionRequest),
       });
 
       const result: ReviewActionResponse = await response.json();
@@ -105,11 +107,12 @@ export default function ReviewQueue() {
       if (result.success) {
         toast({
           title: "Content Approved",
-          description: "The content has been approved and can now be scheduled."
+          description:
+            "The content has been approved and can now be scheduled.",
         });
-        
+
         // Remove from queue
-        setReviewItems(prev => prev.filter(item => item.id !== itemId));
+        setReviewItems((prev) => prev.filter((item) => item.id !== itemId));
         setSelectedItem(null);
         setReviewNotes("");
       } else {
@@ -119,8 +122,9 @@ export default function ReviewQueue() {
       console.error("Error approving content:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to approve content",
-        variant: "destructive"
+        description:
+          error instanceof Error ? error.message : "Failed to approve content",
+        variant: "destructive",
       });
     } finally {
       setActionLoading(false);
@@ -134,8 +138,8 @@ export default function ReviewQueue() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          reviewer_notes: reviewNotes
-        } as ReviewActionRequest)
+          reviewer_notes: reviewNotes,
+        } as ReviewActionRequest),
       });
 
       const result: ReviewActionResponse = await response.json();
@@ -143,11 +147,12 @@ export default function ReviewQueue() {
       if (result.success) {
         toast({
           title: "Content Rejected",
-          description: "The content has been rejected and will need to be regenerated."
+          description:
+            "The content has been rejected and will need to be regenerated.",
         });
-        
+
         // Remove from queue
-        setReviewItems(prev => prev.filter(item => item.id !== itemId));
+        setReviewItems((prev) => prev.filter((item) => item.id !== itemId));
         setSelectedItem(null);
         setReviewNotes("");
       } else {
@@ -157,8 +162,9 @@ export default function ReviewQueue() {
       console.error("Error rejecting content:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to reject content",
-        variant: "destructive"
+        description:
+          error instanceof Error ? error.message : "Failed to reject content",
+        variant: "destructive",
       });
     } finally {
       setActionLoading(false);
@@ -167,19 +173,27 @@ export default function ReviewQueue() {
 
   const getAgentIcon = (agent: string) => {
     switch (agent) {
-      case "doc": return <PenSquare className="h-4 w-4 text-violet" />;
-      case "design": return <Sparkles className="h-4 w-4 text-coral" />;
-      case "advisor": return <MessageSquare className="h-4 w-4 text-azure" />;
-      default: return <Shield className="h-4 w-4" />;
+      case "doc":
+        return <PenSquare className="h-4 w-4 text-violet" />;
+      case "design":
+        return <Sparkles className="h-4 w-4 text-coral" />;
+      case "advisor":
+        return <MessageSquare className="h-4 w-4 text-azure" />;
+      default:
+        return <Shield className="h-4 w-4" />;
     }
   };
 
   const getAgentName = (agent: string) => {
     switch (agent) {
-      case "doc": return "Doc Agent";
-      case "design": return "Design Agent";
-      case "advisor": return "Advisor Agent";
-      default: return "AI Agent";
+      case "doc":
+        return "Doc Agent";
+      case "design":
+        return "Design Agent";
+      case "advisor":
+        return "Advisor Agent";
+      default:
+        return "AI Agent";
     }
   };
 
@@ -193,7 +207,7 @@ export default function ReviewQueue() {
 
   if (!currentBrand) {
     return (
-            <EmptyState 
+      <EmptyState
         icon={Shield}
         title="No Brand Selected"
         description="Select a brand to view its review queue."
@@ -207,7 +221,8 @@ export default function ReviewQueue() {
         <div>
           <h1 className="text-3xl font-bold">Content Review Queue</h1>
           <p className="text-muted-foreground mt-2">
-            Review AI-generated content that requires human approval before publishing.
+            Review AI-generated content that requires human approval before
+            publishing.
           </p>
         </div>
 
@@ -237,18 +252,23 @@ export default function ReviewQueue() {
         )}
 
         {/* Review Dialog */}
-        <Dialog open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
+        <Dialog
+          open={!!selectedItem}
+          onOpenChange={() => setSelectedItem(null)}
+        >
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 {selectedItem && getAgentIcon(selectedItem.agent)}
-                Review {selectedItem && getAgentName(selectedItem.agent)} Content
+                Review {selectedItem && getAgentName(selectedItem.agent)}{" "}
+                Content
               </DialogTitle>
               <DialogDescription>
-                Review the generated content and quality scores before approving or rejecting.
+                Review the generated content and quality scores before approving
+                or rejecting.
               </DialogDescription>
             </DialogHeader>
-            
+
             {selectedItem && (
               <div className="space-y-6">
                 {/* Quality Scores */}
@@ -258,12 +278,12 @@ export default function ReviewQueue() {
                     <LinterResultCard result={selectedItem.linter_results} />
                   </div>
                 )}
-                
+
                 {/* Generated Content */}
                 {selectedItem.agent === "doc" && selectedItem.output && (
                   <DocOutputCard output={selectedItem.output as DocOutput} />
                 )}
-                
+
                 {/* Review Notes */}
                 <div className="space-y-2">
                   <Label htmlFor="review-notes">Review Notes (Optional)</Label>
@@ -275,10 +295,10 @@ export default function ReviewQueue() {
                     rows={3}
                   />
                 </div>
-                
+
                 {/* Actions */}
                 <div className="flex gap-3">
-                  <Button 
+                  <Button
                     onClick={() => handleApprove(selectedItem.id)}
                     disabled={actionLoading}
                     className="flex-1"
@@ -286,7 +306,7 @@ export default function ReviewQueue() {
                     <CheckCircle2 className="mr-2 h-4 w-4" />
                     Approve & Publish
                   </Button>
-                  <Button 
+                  <Button
                     variant="outline"
                     onClick={() => handleReject(selectedItem.id)}
                     disabled={actionLoading}
@@ -305,12 +325,12 @@ export default function ReviewQueue() {
   );
 }
 
-function ReviewItemCard({ 
-  item, 
-  onSelect, 
-  onApprove, 
-  onReject, 
-  loading 
+function ReviewItemCard({
+  item,
+  onSelect,
+  onApprove,
+  onReject,
+  loading,
 }: {
   item: ReviewItem;
   onSelect: () => void;
@@ -320,36 +340,52 @@ function ReviewItemCard({
 }) {
   const getStatusColor = () => {
     if (item.linter_results?.blocked) return "border-red-200 bg-red-50/50";
-    if (item.linter_results?.needs_human_review) return "border-yellow-200 bg-yellow-50/50";
-    if (item.bfs && item.bfs.overall < 0.8) return "border-orange-200 bg-orange-50/50";
+    if (item.linter_results?.needs_human_review)
+      return "border-yellow-200 bg-yellow-50/50";
+    if (item.bfs && item.bfs.overall < 0.8)
+      return "border-orange-200 bg-orange-50/50";
     return "border-blue-200 bg-blue-50/50";
   };
 
   const getStatusIcon = () => {
-    if (item.linter_results?.blocked) return <XCircle className="h-4 w-4 text-red-600" />;
-    if (item.linter_results?.needs_human_review) return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
+    if (item.linter_results?.blocked)
+      return <XCircle className="h-4 w-4 text-red-600" />;
+    if (item.linter_results?.needs_human_review)
+      return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
     return <Clock className="h-4 w-4 text-blue-600" />;
   };
 
   const getAgentIcon = (agent: string) => {
     switch (agent) {
-      case "doc": return <PenSquare className="h-4 w-4 text-violet" />;
-      case "design": return <Sparkles className="h-4 w-4 text-coral" />;
-      case "advisor": return <MessageSquare className="h-4 w-4 text-azure" />;
-      default: return <Shield className="h-4 w-4" />;
+      case "doc":
+        return <PenSquare className="h-4 w-4 text-violet" />;
+      case "design":
+        return <Sparkles className="h-4 w-4 text-coral" />;
+      case "advisor":
+        return <MessageSquare className="h-4 w-4 text-azure" />;
+      default:
+        return <Shield className="h-4 w-4" />;
     }
   };
 
   return (
-    <Card className={cn("border-2 cursor-pointer transition-all hover:shadow-md", getStatusColor())} onClick={onSelect}>
+    <Card
+      className={cn(
+        "border-2 cursor-pointer transition-all hover:shadow-md",
+        getStatusColor(),
+      )}
+      onClick={onSelect}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {getAgentIcon(item.agent)}
             <CardTitle className="text-lg">
-              {item.agent === "doc" ? "Content Generation" : 
-               item.agent === "design" ? "Design Creation" : 
-               "Advisor Analysis"}
+              {item.agent === "doc"
+                ? "Content Generation"
+                : item.agent === "design"
+                  ? "Design Creation"
+                  : "Advisor Analysis"}
             </CardTitle>
             {getStatusIcon()}
           </div>
@@ -363,34 +399,47 @@ function ReviewItemCard({
         {item.agent === "doc" && item.output && (
           <div className="bg-muted rounded-lg p-3">
             <p className="text-sm line-clamp-3">
-              {item.output.body || "No content available"}
+              {(item.output as DocOutput)?.body || "No content available"}
             </p>
           </div>
         )}
-        
+
         {/* Quality indicators */}
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-4">
             {item.bfs && (
-              <span className={cn(
-                "font-medium",
-                item.bfs.overall >= 0.8 ? "text-green-600" : "text-yellow-600"
-              )}>
+              <span
+                className={cn(
+                  "font-medium",
+                  item.bfs.overall >= 0.8
+                    ? "text-green-600"
+                    : "text-yellow-600",
+                )}
+              >
                 BFS: {(item.bfs.overall * 100).toFixed(0)}%
               </span>
             )}
             {item.linter_results && (
-              <span className={cn(
-                "font-medium",
-                item.linter_results.passed ? "text-green-600" : 
-                item.linter_results.blocked ? "text-red-600" : "text-yellow-600"
-              )}>
-                Safety: {item.linter_results.passed ? "Passed" : 
-                        item.linter_results.blocked ? "Blocked" : "Review Needed"}
+              <span
+                className={cn(
+                  "font-medium",
+                  item.linter_results.passed
+                    ? "text-green-600"
+                    : item.linter_results.blocked
+                      ? "text-red-600"
+                      : "text-yellow-600",
+                )}
+              >
+                Safety:{" "}
+                {item.linter_results.passed
+                  ? "Passed"
+                  : item.linter_results.blocked
+                    ? "Blocked"
+                    : "Review Needed"}
               </span>
             )}
           </div>
-          
+
           <div className="flex gap-2">
             <Button
               size="sm"
@@ -430,10 +479,14 @@ function BrandFidelityScoreCard({ score }: { score: BrandFidelityScore }) {
   };
 
   return (
-    <Card className={cn(
-      "border-2",
-      score.passed ? "border-green-200 bg-green-50/50" : "border-red-200 bg-red-50/50"
-    )}>
+    <Card
+      className={cn(
+        "border-2",
+        score.passed
+          ? "border-green-200 bg-green-50/50"
+          : "border-red-200 bg-red-50/50",
+      )}
+    >
       <CardHeader className="pb-3">
         <CardTitle className="text-sm flex items-center gap-2">
           <Shield className="h-4 w-4" />
@@ -478,18 +531,26 @@ function BrandFidelityScoreCard({ score }: { score: BrandFidelityScore }) {
 
 function LinterResultCard({ result }: { result: LinterResult }) {
   return (
-    <Card className={cn(
-      "border-2",
-      result.blocked ? "border-red-200 bg-red-50/50" :
-      result.needs_human_review ? "border-yellow-200 bg-yellow-50/50" :
-      result.passed ? "border-green-200 bg-green-50/50" : "border-blue-200 bg-blue-50/50"
-    )}>
+    <Card
+      className={cn(
+        "border-2",
+        result.blocked
+          ? "border-red-200 bg-red-50/50"
+          : result.needs_human_review
+            ? "border-yellow-200 bg-yellow-50/50"
+            : result.passed
+              ? "border-green-200 bg-green-50/50"
+              : "border-blue-200 bg-blue-50/50",
+      )}
+    >
       <CardHeader className="pb-3">
         <CardTitle className="text-sm flex items-center gap-2">
           <Shield className="h-4 w-4" />
           Content Safety Check
           {result.blocked && <XCircle className="h-4 w-4 text-red-600" />}
-          {result.needs_human_review && <AlertTriangle className="h-4 w-4 text-yellow-600" />}
+          {result.needs_human_review && (
+            <AlertTriangle className="h-4 w-4 text-yellow-600" />
+          )}
           {result.passed && <CheckCircle2 className="h-4 w-4 text-green-600" />}
         </CardTitle>
       </CardHeader>
@@ -499,16 +560,20 @@ function LinterResultCard({ result }: { result: LinterResult }) {
           {result.needs_human_review && "Needs Review"}
           {result.passed && "Passed"}
         </div>
-        
+
         <div className="text-xs text-muted-foreground">
           Toxicity Score: {(result.toxicity_score * 100).toFixed(0)}%
         </div>
-        
+
         {result.fixes_applied.length > 0 && (
           <div className="space-y-1">
-            <p className="text-xs font-medium text-muted-foreground">Auto-fixes Applied:</p>
+            <p className="text-xs font-medium text-muted-foreground">
+              Auto-fixes Applied:
+            </p>
             {result.fixes_applied.slice(0, 2).map((fix, index) => (
-              <p key={index} className="text-xs text-green-600">• {fix}</p>
+              <p key={index} className="text-xs text-green-600">
+                • {fix}
+              </p>
             ))}
           </div>
         )}
@@ -530,21 +595,21 @@ function DocOutputCard({ output }: { output: DocOutput }) {
             <p className="mt-1 p-3 bg-muted rounded-lg">{output.headline}</p>
           </div>
         )}
-        
+
         <div>
           <Label className="text-sm font-medium">Caption</Label>
-          <Textarea 
-            value={output.body} 
-            readOnly 
+          <Textarea
+            value={output.body}
+            readOnly
             className="mt-1 min-h-[120px]"
           />
         </div>
-        
+
         <div>
           <Label className="text-sm font-medium">Call to Action</Label>
           <p className="mt-1 p-3 bg-muted rounded-lg">{output.cta}</p>
         </div>
-        
+
         <div>
           <Label className="text-sm font-medium">Hashtags</Label>
           <div className="mt-1 flex flex-wrap gap-1">

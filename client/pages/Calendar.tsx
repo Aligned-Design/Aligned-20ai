@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge as _Badge } from '@/components/ui/badge';
-import { HelpTooltip } from '@/components/ui/help-tooltip';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 import {
   ChevronLeft,
   ChevronRight,
   Plus,
   Filter,
-  Calendar as CalendarIcon
-} from 'lucide-react';
+  Calendar as CalendarIcon,
+} from "lucide-react";
 
 interface CalendarEvent {
   id: string;
   title: string;
   brand: string;
   platform: string;
-  type: 'scheduled' | 'draft' | 'published';
+  type: "scheduled" | "draft" | "published";
   time: string;
   date: string;
 }
@@ -35,27 +35,27 @@ export default function Calendar() {
       // Mock data - replace with actual API call
       const mockEvents: CalendarEvent[] = [
         {
-          id: '1',
-          title: 'Summer Collection Launch',
-          brand: 'Nike',
-          platform: 'Instagram',
-          type: 'scheduled',
-          time: '09:00',
-          date: new Date().toISOString().split('T')[0]
+          id: "1",
+          title: "Summer Collection Launch",
+          brand: "Nike",
+          platform: "Instagram",
+          type: "scheduled",
+          time: "09:00",
+          date: new Date().toISOString().split("T")[0],
         },
         {
-          id: '2',
-          title: 'Product Announcement',
-          brand: 'Apple',
-          platform: 'Twitter',
-          type: 'draft',
-          time: '14:00',
-          date: new Date(Date.now() + 86400000).toISOString().split('T')[0]
-        }
+          id: "2",
+          title: "Product Announcement",
+          brand: "Apple",
+          platform: "Twitter",
+          type: "draft",
+          time: "14:00",
+          date: new Date(Date.now() + 86400000).toISOString().split("T")[0],
+        },
       ];
       setEvents(mockEvents);
     } catch (error) {
-      console.error('Failed to load calendar events:', error);
+      console.error("Failed to load calendar events:", error);
     } finally {
       setLoading(false);
     }
@@ -70,30 +70,30 @@ export default function Calendar() {
     const startingDayOfWeek = firstDay.getDay();
 
     const days = [];
-    
+
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDayOfWeek; i++) {
       days.push(null);
     }
-    
+
     // Add days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(new Date(year, month, day));
     }
-    
+
     return days;
   };
 
   const getEventsForDate = (date: Date | null) => {
     if (!date) return [];
-    const dateString = date.toISOString().split('T')[0];
-    return events.filter(event => event.date === dateString);
+    const dateString = date.toISOString().split("T")[0];
+    return events.filter((event) => event.date === dateString);
   };
 
-  const navigateMonth = (direction: 'prev' | 'next') => {
-    setCurrentDate(prev => {
+  const navigateMonth = (direction: "prev" | "next") => {
+    setCurrentDate((prev) => {
       const newDate = new Date(prev);
-      if (direction === 'prev') {
+      if (direction === "prev") {
         newDate.setMonth(prev.getMonth() - 1);
       } else {
         newDate.setMonth(prev.getMonth() + 1);
@@ -112,9 +112,9 @@ export default function Calendar() {
   }
 
   const days = getDaysInMonth(currentDate);
-  const monthYear = currentDate.toLocaleDateString('en-US', { 
-    month: 'long', 
-    year: 'numeric' 
+  const monthYear = currentDate.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
   });
 
   return (
@@ -122,10 +122,17 @@ export default function Calendar() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-3xl font-bold text-gray-900">Content Calendar</h1>
-            <HelpTooltip content="View all your scheduled posts in one place. See what's planned across all your brands and platforms." side="bottom" />
+            <h1 className="text-3xl font-bold text-gray-900">
+              Content Calendar
+            </h1>
+            <HelpTooltip
+              content="View all your scheduled posts in one place. See what's planned across all your brands and platforms."
+              side="bottom"
+            />
           </div>
-          <p className="text-gray-600">Schedule and manage your content across all platforms</p>
+          <p className="text-gray-600">
+            Schedule and manage your content across all platforms
+          </p>
         </div>
         <div className="flex gap-3">
           <div className="flex items-center gap-2">
@@ -133,14 +140,20 @@ export default function Calendar() {
               <Filter className="h-4 w-4" />
               Filter
             </Button>
-            <HelpTooltip content="Filter by brand, platform, or status to find specific posts quickly." side="bottom" />
+            <HelpTooltip
+              content="Filter by brand, platform, or status to find specific posts quickly."
+              side="bottom"
+            />
           </div>
           <div className="flex items-center gap-2">
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
               Schedule Content
             </Button>
-            <HelpTooltip content="Create and schedule a new post. Choose your brand, platform, and timing." side="bottom" />
+            <HelpTooltip
+              content="Create and schedule a new post. Choose your brand, platform, and timing."
+              side="bottom"
+            />
           </div>
         </div>
       </div>
@@ -153,20 +166,23 @@ export default function Calendar() {
                 <CalendarIcon className="h-5 w-5" />
                 {monthYear}
               </CardTitle>
-              <HelpTooltip content="Each cell shows scheduled posts for that day. Blue boxes indicate scheduled content. Click a day to view or edit posts." side="right" />
+              <HelpTooltip
+                content="Each cell shows scheduled posts for that day. Blue boxes indicate scheduled content. Click a day to view or edit posts."
+                side="right"
+              />
             </div>
             <div className="flex gap-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
-                onClick={() => navigateMonth('prev')}
+                onClick={() => navigateMonth("prev")}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
-                onClick={() => navigateMonth('next')}
+                onClick={() => navigateMonth("next")}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -175,24 +191,28 @@ export default function Calendar() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-7 gap-1 mb-4">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="p-2 text-center text-sm font-medium text-gray-600">
+            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+              <div
+                key={day}
+                className="p-2 text-center text-sm font-medium text-gray-600"
+              >
                 {day}
               </div>
             ))}
           </div>
-          
+
           <div className="grid grid-cols-7 gap-1">
             {days.map((day, index) => {
               const dayEvents = getEventsForDate(day);
-              const isToday = day && day.toDateString() === new Date().toDateString();
-              
+              const isToday =
+                day && day.toDateString() === new Date().toDateString();
+
               return (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className={`min-h-24 p-2 border rounded-lg ${
-                    day ? 'bg-white hover:bg-gray-50' : 'bg-gray-50'
-                  } ${isToday ? 'ring-2 ring-blue-500' : ''}`}
+                    day ? "bg-white hover:bg-gray-50" : "bg-gray-50"
+                  } ${isToday ? "ring-2 ring-blue-500" : ""}`}
                 >
                   {day && (
                     <>
@@ -200,8 +220,8 @@ export default function Calendar() {
                         {day.getDate()}
                       </div>
                       <div className="space-y-1">
-                        {dayEvents.map(event => (
-                          <div 
+                        {dayEvents.map((event) => (
+                          <div
                             key={event.id}
                             className="text-xs p-1 rounded bg-blue-100 text-blue-800 truncate"
                           >
@@ -223,13 +243,19 @@ export default function Calendar() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <CardTitle>Upcoming Events</CardTitle>
-            <HelpTooltip content="A list of your next scheduled posts. Shows the time, brand, platform, and current status (draft, scheduled, or published)." side="right" />
+            <HelpTooltip
+              content="A list of your next scheduled posts. Shows the time, brand, platform, and current status (draft, scheduled, or published)."
+              side="right"
+            />
           </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {events.slice(0, 5).map(event => (
-              <div key={event.id} className="flex items-center justify-between p-3 border rounded-lg">
+            {events.slice(0, 5).map((event) => (
+              <div
+                key={event.id}
+                className="flex items-center justify-between p-3 border rounded-lg"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-blue-500 rounded-full" />
                   <div>

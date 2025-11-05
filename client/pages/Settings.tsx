@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge as _Badge } from '@/components/ui/badge';
-import { Slider } from '@/components/ui/slider';
-import { 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import {
   Settings as SettingsIcon,
   User,
   Bot,
@@ -21,17 +27,19 @@ import {
   RotateCcw,
   HelpCircle,
   ChevronRight,
-  AlertTriangle
-} from 'lucide-react';
-import { UserPreferences, PreferenceValidation } from '@shared/preferences';
+  AlertTriangle,
+} from "lucide-react";
+import { UserPreferences, PreferenceValidation } from "@shared/preferences";
 
 export default function Settings() {
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useState("general");
   const [unsavedChanges, setUnsavedChanges] = useState(false);
-  const [validation, setValidation] = useState<PreferenceValidation | null>(null);
+  const [validation, setValidation] = useState<PreferenceValidation | null>(
+    null,
+  );
 
   useEffect(() => {
     loadPreferences();
@@ -40,27 +48,31 @@ export default function Settings() {
   const loadPreferences = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/preferences');
+      const response = await fetch("/api/preferences");
       if (response.ok) {
         const data = await response.json();
         setPreferences(data);
       }
     } catch (error) {
-      console.error('Failed to load preferences:', error);
+      console.error("Failed to load preferences:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const updatePreference = async (section: keyof UserPreferences, updates: Record<string, unknown>) => {
+  const updatePreference = async (
+    section: keyof UserPreferences,
+    updates: Record<string, unknown>,
+  ) => {
     if (!preferences) return;
 
     const currentValue = preferences[section];
     const newPreferences = {
       ...preferences,
-      [section]: typeof currentValue === 'object' && currentValue !== null
-        ? { ...(currentValue as any), ...updates }
-        : updates
+      [section]:
+        typeof currentValue === "object" && currentValue !== null
+          ? { ...(currentValue as any), ...updates }
+          : updates,
     };
 
     setPreferences(newPreferences);
@@ -71,15 +83,18 @@ export default function Settings() {
       const validation = await validatePreferences(section, updates);
       setValidation(validation);
     } catch (error) {
-      console.error('Validation failed:', error);
+      console.error("Validation failed:", error);
     }
   };
 
-  const validatePreferences = async (section: string, updates: Record<string, unknown>): Promise<PreferenceValidation> => {
-    const response = await fetch('/api/preferences/validate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ section, updates })
+  const validatePreferences = async (
+    section: string,
+    updates: Record<string, unknown>,
+  ): Promise<PreferenceValidation> => {
+    const response = await fetch("/api/preferences/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ section, updates }),
     });
     return response.json();
   };
@@ -89,10 +104,10 @@ export default function Settings() {
 
     try {
       setSaving(true);
-      const response = await fetch('/api/preferences', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(preferences)
+      const response = await fetch("/api/preferences", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(preferences),
       });
 
       if (response.ok) {
@@ -101,7 +116,7 @@ export default function Settings() {
         // Show success message
       }
     } catch (error) {
-      console.error('Failed to save preferences:', error);
+      console.error("Failed to save preferences:", error);
     } finally {
       setSaving(false);
     }
@@ -109,13 +124,15 @@ export default function Settings() {
 
   const resetToDefaults = async () => {
     try {
-      const response = await fetch('/api/preferences/reset', { method: 'POST' });
+      const response = await fetch("/api/preferences/reset", {
+        method: "POST",
+      });
       if (response.ok) {
         await loadPreferences();
         setUnsavedChanges(false);
       }
     } catch (error) {
-      console.error('Failed to reset preferences:', error);
+      console.error("Failed to reset preferences:", error);
     }
   };
 
@@ -137,28 +154,33 @@ export default function Settings() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-gray-600">Customize your experience and AI behavior</p>
+          <p className="text-gray-600">
+            Customize your experience and AI behavior
+          </p>
         </div>
-        
+
         <div className="flex items-center gap-3">
           {unsavedChanges && (
-            <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+            <Badge
+              variant="secondary"
+              className="bg-yellow-100 text-yellow-800"
+            >
               Unsaved changes
             </Badge>
           )}
-          
+
           <Button variant="outline" onClick={resetToDefaults}>
             <RotateCcw className="h-4 w-4 mr-2" />
             Reset to Defaults
           </Button>
-          
-          <Button 
-            onClick={savePreferences} 
+
+          <Button
+            onClick={savePreferences}
             disabled={!unsavedChanges || saving}
             className="gap-2"
           >
             <Save className="h-4 w-4" />
-            {saving ? 'Saving...' : 'Save Changes'}
+            {saving ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </div>
@@ -170,7 +192,9 @@ export default function Settings() {
             <div className="flex items-start gap-3">
               <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
               <div>
-                <h4 className="font-medium text-red-900 mb-2">Please fix the following issues:</h4>
+                <h4 className="font-medium text-red-900 mb-2">
+                  Please fix the following issues:
+                </h4>
                 <ul className="space-y-1">
                   {validation.errors.map((error, index) => (
                     <li key={index} className="text-sm text-red-800">
@@ -185,7 +209,11 @@ export default function Settings() {
       )}
 
       {/* Settings Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="general" className="gap-2">
             <User className="h-4 w-4" />
@@ -214,44 +242,44 @@ export default function Settings() {
         </TabsList>
 
         <TabsContent value="general" className="space-y-6">
-          <GeneralSettings 
-            preferences={preferences} 
-            onUpdate={(updates) => updatePreference('interface', updates)} 
+          <GeneralSettings
+            preferences={preferences}
+            onUpdate={(updates) => updatePreference("interface", updates)}
           />
         </TabsContent>
 
         <TabsContent value="ai" className="space-y-6">
-          <AIContentSettings 
-            preferences={preferences} 
-            onUpdate={(updates) => updatePreference('aiSettings', updates)} 
+          <AIContentSettings
+            preferences={preferences}
+            onUpdate={(updates) => updatePreference("aiSettings", updates)}
           />
         </TabsContent>
 
         <TabsContent value="publishing" className="space-y-6">
-          <PublishingSettings 
-            preferences={preferences} 
-            onUpdate={(updates) => updatePreference('publishing', updates)} 
+          <PublishingSettings
+            preferences={preferences}
+            onUpdate={(updates) => updatePreference("publishing", updates)}
           />
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-6">
-          <NotificationSettings 
-            preferences={preferences} 
-            onUpdate={(updates) => updatePreference('notifications', updates)} 
+          <NotificationSettings
+            preferences={preferences}
+            onUpdate={(updates) => updatePreference("notifications", updates)}
           />
         </TabsContent>
 
         <TabsContent value="team" className="space-y-6">
-          <TeamSettings 
-            preferences={preferences} 
-            onUpdate={(updates) => updatePreference('teamSettings', updates)} 
+          <TeamSettings
+            preferences={preferences}
+            onUpdate={(updates) => updatePreference("teamSettings", updates)}
           />
         </TabsContent>
 
         <TabsContent value="advanced" className="space-y-6">
-          <AdvancedSettings 
-            preferences={preferences} 
-            onUpdate={(updates) => updatePreference('advanced', updates)} 
+          <AdvancedSettings
+            preferences={preferences}
+            onUpdate={(updates) => updatePreference("advanced", updates)}
           />
         </TabsContent>
       </Tabs>
@@ -259,7 +287,10 @@ export default function Settings() {
   );
 }
 
-function GeneralSettings({ preferences, onUpdate }: {
+function GeneralSettings({
+  preferences,
+  onUpdate,
+}: {
   preferences: UserPreferences;
   onUpdate: (updates: Record<string, unknown>) => void;
 }) {
@@ -276,8 +307,8 @@ function GeneralSettings({ preferences, onUpdate }: {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label>Theme</Label>
-              <Select 
-                value={preferences.interface.theme} 
+              <Select
+                value={preferences.interface.theme}
                 onValueChange={(value) => onUpdate({ theme: value })}
               >
                 <SelectTrigger>
@@ -290,11 +321,11 @@ function GeneralSettings({ preferences, onUpdate }: {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label>Language</Label>
-              <Select 
-                value={preferences.interface.language} 
+              <Select
+                value={preferences.interface.language}
                 onValueChange={(value) => onUpdate({ language: value })}
               >
                 <SelectTrigger>
@@ -312,7 +343,9 @@ function GeneralSettings({ preferences, onUpdate }: {
           <div className="flex items-center justify-between">
             <div>
               <Label>Compact Mode</Label>
-              <p className="text-sm text-gray-600">Show more content in less space</p>
+              <p className="text-sm text-gray-600">
+                Show more content in less space
+              </p>
             </div>
             <Switch
               checked={preferences.interface.compactMode}
@@ -323,11 +356,15 @@ function GeneralSettings({ preferences, onUpdate }: {
           <div className="flex items-center justify-between">
             <div>
               <Label>Show Advanced Options</Label>
-              <p className="text-sm text-gray-600">Display power-user features</p>
+              <p className="text-sm text-gray-600">
+                Display power-user features
+              </p>
             </div>
             <Switch
               checked={preferences.interface.showAdvancedOptions}
-              onCheckedChange={(checked) => onUpdate({ showAdvancedOptions: checked })}
+              onCheckedChange={(checked) =>
+                onUpdate({ showAdvancedOptions: checked })
+              }
             />
           </div>
         </CardContent>
@@ -336,7 +373,10 @@ function GeneralSettings({ preferences, onUpdate }: {
   );
 }
 
-function AIContentSettings({ preferences, onUpdate }: {
+function AIContentSettings({
+  preferences,
+  onUpdate,
+}: {
   preferences: UserPreferences;
   onUpdate: (updates: Record<string, unknown>) => void;
 }) {
@@ -352,8 +392,8 @@ function AIContentSettings({ preferences, onUpdate }: {
         <CardContent className="space-y-6">
           <div>
             <Label>Default Tone</Label>
-            <Select 
-              value={preferences.aiSettings.defaultTone} 
+            <Select
+              value={preferences.aiSettings.defaultTone}
               onValueChange={(value) => onUpdate({ defaultTone: value })}
             >
               <SelectTrigger>
@@ -371,11 +411,17 @@ function AIContentSettings({ preferences, onUpdate }: {
 
           <div>
             <Label>Creativity Level</Label>
-            <p className="text-sm text-gray-600 mb-3">How creative should AI be with content generation?</p>
+            <p className="text-sm text-gray-600 mb-3">
+              How creative should AI be with content generation?
+            </p>
             <div className="space-y-3">
               <Slider
-                value={[getCreativityValue(preferences.aiSettings.creativityLevel)]}
-                onValueChange={(value) => onUpdate({ creativityLevel: getCreativityLevel(value[0]) })}
+                value={[
+                  getCreativityValue(preferences.aiSettings.creativityLevel),
+                ]}
+                onValueChange={(value) =>
+                  onUpdate({ creativityLevel: getCreativityLevel(value[0]) })
+                }
                 max={3}
                 step={1}
                 className="w-full"
@@ -392,24 +438,30 @@ function AIContentSettings({ preferences, onUpdate }: {
           <div className="flex items-center justify-between">
             <div>
               <Label>Strict Brand Mode</Label>
-              <p className="text-sm text-gray-600">Enforce strict adherence to brand guidelines</p>
+              <p className="text-sm text-gray-600">
+                Enforce strict adherence to brand guidelines
+              </p>
             </div>
             <Switch
               checked={preferences.aiSettings.strictBrandMode}
-              onCheckedChange={(checked) => onUpdate({ strictBrandMode: checked })}
+              onCheckedChange={(checked) =>
+                onUpdate({ strictBrandMode: checked })
+              }
             />
           </div>
 
           <div>
             <Label>Brand Voice Personality</Label>
             <Textarea
-              value={preferences.aiSettings.brandVoice.personality.join(', ')}
-              onChange={(e) => onUpdate({ 
-                brandVoice: { 
-                  ...preferences.aiSettings.brandVoice,
-                  personality: e.target.value.split(',').map(s => s.trim()) 
-                }
-              })}
+              value={preferences.aiSettings.brandVoice.personality.join(", ")}
+              onChange={(e) =>
+                onUpdate({
+                  brandVoice: {
+                    ...preferences.aiSettings.brandVoice,
+                    personality: e.target.value.split(",").map((s) => s.trim()),
+                  },
+                })
+              }
               placeholder="e.g., energetic, trustworthy, innovative"
             />
           </div>
@@ -417,13 +469,15 @@ function AIContentSettings({ preferences, onUpdate }: {
           <div>
             <Label>Words to Avoid</Label>
             <Textarea
-              value={preferences.aiSettings.brandVoice.avoidWords.join(', ')}
-              onChange={(e) => onUpdate({ 
-                brandVoice: { 
-                  ...preferences.aiSettings.brandVoice,
-                  avoidWords: e.target.value.split(',').map(s => s.trim()) 
-                }
-              })}
+              value={preferences.aiSettings.brandVoice.avoidWords.join(", ")}
+              onChange={(e) =>
+                onUpdate({
+                  brandVoice: {
+                    ...preferences.aiSettings.brandVoice,
+                    avoidWords: e.target.value.split(",").map((s) => s.trim()),
+                  },
+                })
+              }
               placeholder="e.g., cheap, discount, basic"
             />
           </div>
@@ -433,7 +487,10 @@ function AIContentSettings({ preferences, onUpdate }: {
   );
 }
 
-function PublishingSettings({ preferences, onUpdate }: {
+function PublishingSettings({
+  preferences,
+  onUpdate,
+}: {
   preferences: UserPreferences;
   onUpdate: (updates: Record<string, unknown>) => void;
 }) {
@@ -447,13 +504,20 @@ function PublishingSettings({ preferences, onUpdate }: {
           <div className="flex items-center justify-between">
             <div>
               <Label>Enable Auto-Approval</Label>
-              <p className="text-sm text-gray-600">Automatically approve content that meets criteria</p>
+              <p className="text-sm text-gray-600">
+                Automatically approve content that meets criteria
+              </p>
             </div>
             <Switch
               checked={preferences.publishing.autoApproval.enabled}
-              onCheckedChange={(checked) => onUpdate({ 
-                autoApproval: { ...preferences.publishing.autoApproval, enabled: checked }
-              })}
+              onCheckedChange={(checked) =>
+                onUpdate({
+                  autoApproval: {
+                    ...preferences.publishing.autoApproval,
+                    enabled: checked,
+                  },
+                })
+              }
             />
           </div>
 
@@ -462,38 +526,54 @@ function PublishingSettings({ preferences, onUpdate }: {
               <div>
                 <Label>Minimum Brand Fit Score (%)</Label>
                 <Slider
-                  value={[preferences.publishing.autoApproval.rules.minBrandFitScore]}
-                  onValueChange={(value) => onUpdate({ 
-                    autoApproval: { 
-                      ...preferences.publishing.autoApproval, 
-                      rules: { ...preferences.publishing.autoApproval.rules, minBrandFitScore: value[0] }
-                    }
-                  })}
+                  value={[
+                    preferences.publishing.autoApproval.rules.minBrandFitScore,
+                  ]}
+                  onValueChange={(value) =>
+                    onUpdate({
+                      autoApproval: {
+                        ...preferences.publishing.autoApproval,
+                        rules: {
+                          ...preferences.publishing.autoApproval.rules,
+                          minBrandFitScore: value[0],
+                        },
+                      },
+                    })
+                  }
                   max={100}
                   step={5}
                   className="w-full"
                 />
                 <p className="text-sm text-gray-600 mt-1">
-                  Current: {preferences.publishing.autoApproval.rules.minBrandFitScore}%
+                  Current:{" "}
+                  {preferences.publishing.autoApproval.rules.minBrandFitScore}%
                 </p>
               </div>
 
               <div>
                 <Label>Auto-Publish Score (%)</Label>
                 <Slider
-                  value={[preferences.publishing.autoApproval.rules.autoPublishScore]}
-                  onValueChange={(value) => onUpdate({ 
-                    autoApproval: { 
-                      ...preferences.publishing.autoApproval, 
-                      rules: { ...preferences.publishing.autoApproval.rules, autoPublishScore: value[0] }
-                    }
-                  })}
+                  value={[
+                    preferences.publishing.autoApproval.rules.autoPublishScore,
+                  ]}
+                  onValueChange={(value) =>
+                    onUpdate({
+                      autoApproval: {
+                        ...preferences.publishing.autoApproval,
+                        rules: {
+                          ...preferences.publishing.autoApproval.rules,
+                          autoPublishScore: value[0],
+                        },
+                      },
+                    })
+                  }
                   max={100}
                   step={5}
                   className="w-full"
                 />
                 <p className="text-sm text-gray-600 mt-1">
-                  Current: {preferences.publishing.autoApproval.rules.autoPublishScore}%
+                  Current:{" "}
+                  {preferences.publishing.autoApproval.rules.autoPublishScore}%
                 </p>
               </div>
             </>
@@ -504,7 +584,10 @@ function PublishingSettings({ preferences, onUpdate }: {
   );
 }
 
-function NotificationSettings({ preferences, onUpdate }: {
+function NotificationSettings({
+  preferences,
+  onUpdate,
+}: {
   preferences: UserPreferences;
   onUpdate: (updates: Record<string, unknown>) => void;
 }) {
@@ -519,9 +602,14 @@ function NotificationSettings({ preferences, onUpdate }: {
             <Label>Enable Email Notifications</Label>
             <Switch
               checked={preferences.notifications.email.enabled}
-              onCheckedChange={(checked) => onUpdate({ 
-                email: { ...preferences.notifications.email, enabled: checked }
-              })}
+              onCheckedChange={(checked) =>
+                onUpdate({
+                  email: {
+                    ...preferences.notifications.email,
+                    enabled: checked,
+                  },
+                })
+              }
             />
           </div>
 
@@ -529,11 +617,16 @@ function NotificationSettings({ preferences, onUpdate }: {
             <>
               <div>
                 <Label>Frequency</Label>
-                <Select 
-                  value={preferences.notifications.email.frequency} 
-                  onValueChange={(value) => onUpdate({ 
-                    email: { ...preferences.notifications.email, frequency: value }
-                  })}
+                <Select
+                  value={preferences.notifications.email.frequency}
+                  onValueChange={(value) =>
+                    onUpdate({
+                      email: {
+                        ...preferences.notifications.email,
+                        frequency: value,
+                      },
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -549,20 +642,32 @@ function NotificationSettings({ preferences, onUpdate }: {
 
               <div className="space-y-3">
                 <Label>Notification Types</Label>
-                {Object.entries(preferences.notifications.email.types).map(([type, enabled]) => (
-                  <div key={type} className="flex items-center justify-between">
-                    <span className="text-sm capitalize">{type.replace(/([A-Z])/g, ' $1')}</span>
-                    <Switch
-                      checked={enabled}
-                      onCheckedChange={(checked) => onUpdate({ 
-                        email: { 
-                          ...preferences.notifications.email, 
-                          types: { ...preferences.notifications.email.types, [type]: checked }
+                {Object.entries(preferences.notifications.email.types).map(
+                  ([type, enabled]) => (
+                    <div
+                      key={type}
+                      className="flex items-center justify-between"
+                    >
+                      <span className="text-sm capitalize">
+                        {type.replace(/([A-Z])/g, " $1")}
+                      </span>
+                      <Switch
+                        checked={enabled}
+                        onCheckedChange={(checked) =>
+                          onUpdate({
+                            email: {
+                              ...preferences.notifications.email,
+                              types: {
+                                ...preferences.notifications.email.types,
+                                [type]: checked,
+                              },
+                            },
+                          })
                         }
-                      })}
-                    />
-                  </div>
-                ))}
+                      />
+                    </div>
+                  ),
+                )}
               </div>
             </>
           )}
@@ -572,7 +677,10 @@ function NotificationSettings({ preferences, onUpdate }: {
   );
 }
 
-function TeamSettings({ preferences, onUpdate }: {
+function TeamSettings({
+  preferences,
+  onUpdate,
+}: {
   preferences: UserPreferences;
   onUpdate: (updates: Record<string, unknown>) => void;
 }) {
@@ -585,8 +693,8 @@ function TeamSettings({ preferences, onUpdate }: {
         <CardContent className="space-y-4">
           <div>
             <Label>Role</Label>
-            <Select 
-              value={preferences.teamSettings.role} 
+            <Select
+              value={preferences.teamSettings.role}
               onValueChange={(value) => onUpdate({ role: value })}
             >
               <SelectTrigger>
@@ -603,17 +711,29 @@ function TeamSettings({ preferences, onUpdate }: {
 
           <div className="space-y-3">
             <Label>Permissions</Label>
-            {Object.entries(preferences.teamSettings.permissions).map(([permission, enabled]) => (
-              <div key={permission} className="flex items-center justify-between">
-                <span className="text-sm">{formatPermissionName(permission)}</span>
-                <Switch
-                  checked={enabled}
-                  onCheckedChange={(checked) => onUpdate({ 
-                    permissions: { ...preferences.teamSettings.permissions, [permission]: checked }
-                  })}
-                />
-              </div>
-            ))}
+            {Object.entries(preferences.teamSettings.permissions).map(
+              ([permission, enabled]) => (
+                <div
+                  key={permission}
+                  className="flex items-center justify-between"
+                >
+                  <span className="text-sm">
+                    {formatPermissionName(permission)}
+                  </span>
+                  <Switch
+                    checked={enabled}
+                    onCheckedChange={(checked) =>
+                      onUpdate({
+                        permissions: {
+                          ...preferences.teamSettings.permissions,
+                          [permission]: checked,
+                        },
+                      })
+                    }
+                  />
+                </div>
+              ),
+            )}
           </div>
         </CardContent>
       </Card>
@@ -621,7 +741,10 @@ function TeamSettings({ preferences, onUpdate }: {
   );
 }
 
-function AdvancedSettings({ preferences, onUpdate }: {
+function AdvancedSettings({
+  preferences,
+  onUpdate,
+}: {
   preferences: UserPreferences;
   onUpdate: (updates: Record<string, unknown>) => void;
 }) {
@@ -636,24 +759,38 @@ function AdvancedSettings({ preferences, onUpdate }: {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3">
-            {preferences.advanced?.experimental?.betaFeatures?.map((feature: string) => (
-              <div key={feature} className="flex items-center justify-between">
-                <div>
-                  <span className="text-sm font-medium">{feature}</span>
-                  <Badge variant="secondary" className="ml-2">Beta</Badge>
+            {preferences.advanced?.experimental?.betaFeatures?.map(
+              (feature: string) => (
+                <div
+                  key={feature}
+                  className="flex items-center justify-between"
+                >
+                  <div>
+                    <span className="text-sm font-medium">{feature}</span>
+                    <Badge variant="secondary" className="ml-2">
+                      Beta
+                    </Badge>
+                  </div>
+                  <Switch defaultChecked />
                 </div>
-                <Switch defaultChecked />
-              </div>
-            ))}
+              ),
+            )}
           </div>
 
           <div>
             <Label>AI Model Version</Label>
             <Select
-              value={preferences.advanced?.experimental?.aiModelVersion || 'stable'}
-              onValueChange={(value) => onUpdate({
-                experimental: { ...(preferences.advanced?.experimental || {}), aiModelVersion: value }
-              })}
+              value={
+                preferences.advanced?.experimental?.aiModelVersion || "stable"
+              }
+              onValueChange={(value) =>
+                onUpdate({
+                  experimental: {
+                    ...(preferences.advanced?.experimental || {}),
+                    aiModelVersion: value,
+                  },
+                })
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -678,13 +815,13 @@ function getCreativityValue(level: string): number {
 }
 
 function getCreativityLevel(value: number): string {
-  const levels = ['conservative', 'balanced', 'creative', 'experimental'];
-  return levels[value] || 'balanced';
+  const levels = ["conservative", "balanced", "creative", "experimental"];
+  return levels[value] || "balanced";
 }
 
 function formatPermissionName(permission: string): string {
   return permission
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/^./, str => str.toUpperCase())
-    .replace('Can ', '');
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (str) => str.toUpperCase())
+    .replace("Can ", "");
 }

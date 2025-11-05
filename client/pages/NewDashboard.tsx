@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useBrand } from "@/contexts/BrandContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
@@ -103,11 +103,12 @@ export default function NewDashboard() {
           });
         }
       }
-    } catch (error: unknown) {
-      console.error("Error loading dashboard:", error);
+    } catch (err: unknown) {
+      console.error("Error loading dashboard:", err);
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error loading dashboard",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -140,10 +141,11 @@ export default function NewDashboard() {
         description: "The post has been approved successfully",
       });
       loadDashboardData();
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     }
@@ -249,7 +251,7 @@ export default function NewDashboard() {
     },
   ];
 
-  const insights: unknown[] = [
+  const insights: any[] = [
     {
       id: "1",
       title: "Try Reels Thu 3–5 PM",

@@ -33,4 +33,6 @@ function _Badge({ className, variant, ...props }: BadgeProps) {
   );
 }
 
-export { Badge as _Badge, badgeVariants };
+// Export a named Badge for imports like: import { Badge } from '@/components/ui/badge'
+export const Badge = _Badge;
+export { _Badge as BadgeComponent, badgeVariants };

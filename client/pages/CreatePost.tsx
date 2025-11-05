@@ -26,7 +26,7 @@ import {
   ContentType,
   CreatePostFormData,
 } from "@/types/integrations";
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
@@ -51,12 +51,12 @@ export default function CreatePost() {
     hashtags: string[];
     cta_text?: string;
   }) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       title: content.title || prev.title,
       caption: content.caption,
       hashtags: content.hashtags,
-      cta_text: content.cta_text || prev.cta_text
+      cta_text: content.cta_text || prev.cta_text,
     }));
   };
 
@@ -79,10 +79,11 @@ export default function CreatePost() {
 
       if (error) throw error;
       setConnections(data || []);
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error loading connections",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -132,10 +133,11 @@ export default function CreatePost() {
         title: "Draft Saved",
         description: "Your post has been saved as a draft",
       });
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     }

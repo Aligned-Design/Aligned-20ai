@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { useToast } from './use-toast';
+import { useEffect, useRef, useState } from "react";
+import { useToast } from "./use-toast";
 
 interface UseAutosaveOptions<T> {
   data: T;
@@ -35,12 +35,15 @@ export function useAutosave<T>({
         await onSave(dataRef.current);
         setLastSaved(new Date());
       } catch (err: unknown) {
-        const errorMessage = err.message || 'Failed to autosave';
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : String(err) || "Failed to autosave";
         setError(errorMessage);
         toast({
-          title: 'Autosave failed',
+          title: "Autosave failed",
           description: errorMessage,
-          variant: 'destructive',
+          variant: "destructive",
         });
       } finally {
         setSaving(false);

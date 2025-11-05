@@ -1,124 +1,171 @@
-import React, { useState, useEffect } from 'react';
-import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge as _Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Users, 
-  Eye, 
-  Heart, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import {
+  TrendingUp,
+  TrendingDown,
+  Users,
+  Eye,
+  Heart,
   MousePointer,
   Calendar,
   BarChart3,
   Zap,
   CheckCircle,
   Clock,
-  AlertCircle
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  AlertCircle,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // Sample data for Nike brand
-const DEMO_DATA = {
+interface DemoPost {
+  id: string;
+  platform: string;
+  content: string;
+  status: string;
+  publishedAt?: string;
+  scheduledFor?: string;
+  metrics?: {
+    reach?: number;
+    engagement?: number;
+    likes?: number;
+    comments?: number;
+    shares?: number;
+  };
+  image?: string;
+}
+interface DemoInsight {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  impact: string;
+  suggestions: string[];
+}
+interface DemoData {
   brand: {
-    name: 'Nike',
-    logo: '👟',
-    tagline: 'Just Do It',
+    name: string;
+    logo: string;
+    tagline: string;
+    colors: { primary: string; accent: string };
+  };
+  metrics: {
+    totalReach: number;
+    totalEngagement: number;
+    followers: number;
+    avgEngagementRate: number;
+    monthlyGrowth: number;
+  };
+  posts: DemoPost[];
+  insights: DemoInsight[];
+  calendar: { date: string; posts: number; status: string }[];
+}
+const DEMO_DATA: DemoData = {
+  brand: {
+    name: "Nike",
+    logo: "👟",
+    tagline: "Just Do It",
     colors: {
-      primary: '#000000',
-      accent: '#FF6B35'
-    }
+      primary: "#000000",
+      accent: "#FF6B35",
+    },
   },
   metrics: {
     totalReach: 2847293,
     totalEngagement: 142847,
     followers: 89472,
     avgEngagementRate: 8.7,
-    monthlyGrowth: 12.4
+    monthlyGrowth: 12.4,
   },
   posts: [
     {
-      id: '1',
-      platform: 'instagram',
-      content: 'New Air Max collection drops tomorrow! Get ready to step into the future of comfort and style. 👟✨',
-      status: 'published',
-      publishedAt: '2024-01-15T09:00:00Z',
+      id: "1",
+      platform: "instagram",
+      content:
+        "New Air Max collection drops tomorrow! Get ready to step into the future of comfort and style. 👟✨",
+      status: "published",
+      publishedAt: "2024-01-15T09:00:00Z",
       metrics: {
         reach: 45230,
         engagement: 3420,
         likes: 2890,
         comments: 430,
-        shares: 100
+        shares: 100,
       },
-      image: '🏃‍♂️'
+      image: "🏃‍♂️",
     },
     {
-      id: '2',
-      platform: 'twitter',
-      content: 'Athletes don\'t just wear Nike. They embody the spirit of pushing limits. What\'s your limit today?',
-      status: 'scheduled',
-      scheduledFor: '2024-01-16T14:00:00Z',
-      image: '🏆'
+      id: "2",
+      platform: "twitter",
+      content:
+        "Athletes don't just wear Nike. They embody the spirit of pushing limits. What's your limit today?",
+      status: "scheduled",
+      scheduledFor: "2024-01-16T14:00:00Z",
+      image: "🏆",
     },
     {
-      id: '3',
-      platform: 'linkedin',
-      content: 'Behind every great athlete is years of dedication, training, and the right gear. Here\'s how Nike supports champions at every level.',
-      status: 'in_review',
+      id: "3",
+      platform: "linkedin",
+      content:
+        "Behind every great athlete is years of dedication, training, and the right gear. Here's how Nike supports champions at every level.",
+      status: "in_review",
       metrics: {
         reach: 12890,
         engagement: 890,
         likes: 650,
         comments: 180,
-        shares: 60
+        shares: 60,
       },
-      image: '💪'
-    }
+      image: "💪",
+    },
   ],
   insights: [
     {
-      id: '1',
-      type: 'recommendation',
-      title: 'Video Content Driving 45% Higher Engagement',
-      description: 'Your video posts significantly outperform static images, with an average engagement rate of 12.4% vs 8.7%.',
-      impact: 'high',
+      id: "1",
+      type: "recommendation",
+      title: "Video Content Driving 45% Higher Engagement",
+      description:
+        "Your video posts significantly outperform static images, with an average engagement rate of 12.4% vs 8.7%.",
+      impact: "high",
       suggestions: [
-        'Increase video content frequency to 3-4 posts per week',
-        'Focus on workout tutorials and athlete spotlights',
-        'Create behind-the-scenes content from product development'
-      ]
+        "Increase video content frequency to 3-4 posts per week",
+        "Focus on workout tutorials and athlete spotlights",
+        "Create behind-the-scenes content from product development",
+      ],
     },
     {
-      id: '2',
-      type: 'observation',
-      title: 'Peak Engagement During Morning Hours',
-      description: 'Your audience shows 28% higher engagement between 7-9 AM, particularly on fitness-related content.',
-      impact: 'medium',
+      id: "2",
+      type: "observation",
+      title: "Peak Engagement During Morning Hours",
+      description:
+        "Your audience shows 28% higher engagement between 7-9 AM, particularly on fitness-related content.",
+      impact: "medium",
       suggestions: [
-        'Schedule workout motivation posts for 7:30 AM',
-        'Share daily fitness tips during commute hours',
-        'Post athlete training sessions in the morning'
-      ]
-    }
+        "Schedule workout motivation posts for 7:30 AM",
+        "Share daily fitness tips during commute hours",
+        "Post athlete training sessions in the morning",
+      ],
+    },
   ],
   calendar: [
-    { date: '2024-01-16', posts: 2, status: 'scheduled' },
-    { date: '2024-01-17', posts: 1, status: 'draft' },
-    { date: '2024-01-18', posts: 3, status: 'scheduled' },
-    { date: '2024-01-19', posts: 1, status: 'in_review' },
-    { date: '2024-01-20', posts: 2, status: 'scheduled' }
-  ]
+    { date: "2024-01-16", posts: 2, status: "scheduled" },
+    { date: "2024-01-17", posts: 1, status: "draft" },
+    { date: "2024-01-18", posts: 3, status: "scheduled" },
+    { date: "2024-01-19", posts: 1, status: "in_review" },
+    { date: "2024-01-20", posts: 2, status: "scheduled" },
+  ],
 };
 
 export default function Demo() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [animatedMetrics, setAnimatedMetrics] = useState({
     reach: 0,
     engagement: 0,
     followers: 0,
-    rate: 0
+    rate: 0,
   });
 
   // Animate metrics on page load
@@ -137,7 +184,9 @@ export default function Demo() {
         reach: Math.floor(DEMO_DATA.metrics.totalReach * easeOut),
         engagement: Math.floor(DEMO_DATA.metrics.totalEngagement * easeOut),
         followers: Math.floor(DEMO_DATA.metrics.followers * easeOut),
-        rate: parseFloat((DEMO_DATA.metrics.avgEngagementRate * easeOut).toFixed(1))
+        rate: parseFloat(
+          (DEMO_DATA.metrics.avgEngagementRate * easeOut).toFixed(1),
+        ),
       });
 
       if (currentStep >= steps) {
@@ -156,51 +205,72 @@ export default function Demo() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'published': return 'bg-green-100 text-green-800 border-green-200';
-      case 'scheduled': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'in_review': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'draft': return 'bg-gray-100 text-gray-800 border-gray-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case "published":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "scheduled":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "in_review":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "draft":
+        return "bg-gray-100 text-gray-800 border-gray-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'published': return <CheckCircle className="h-4 w-4" />;
-      case 'scheduled': return <Clock className="h-4 w-4" />;
-      case 'in_review': return <AlertCircle className="h-4 w-4" />;
-      default: return <Clock className="h-4 w-4" />;
+      case "published":
+        return <CheckCircle className="h-4 w-4" />;
+      case "scheduled":
+        return <Clock className="h-4 w-4" />;
+      case "in_review":
+        return <AlertCircle className="h-4 w-4" />;
+      default:
+        return <Clock className="h-4 w-4" />;
     }
   };
 
   const getPlatformColor = (platform: string) => {
     switch (platform) {
-      case 'instagram': return 'bg-gradient-to-r from-purple-500 to-pink-500';
-      case 'twitter': return 'bg-blue-500';
-      case 'linkedin': return 'bg-blue-700';
-      case 'facebook': return 'bg-blue-600';
-      default: return 'bg-gray-500';
+      case "instagram":
+        return "bg-gradient-to-r from-purple-500 to-pink-500";
+      case "twitter":
+        return "bg-blue-500";
+      case "linkedin":
+        return "bg-blue-700";
+      case "facebook":
+        return "bg-blue-600";
+      default:
+        return "bg-gray-500";
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Demo Header */}
-      <div className="bg-gradient-to-r from-gray-900 to-gray-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="text-center">
             <div className="flex items-center justify-center mb-6">
               <span className="text-6xl mr-4">{DEMO_DATA.brand.logo}</span>
               <div>
-                <h1 className="text-4xl font-bold">{DEMO_DATA.brand.name}</h1>
-                <p className="text-xl text-gray-300">{DEMO_DATA.brand.tagline}</p>
+                <h1 className="text-4xl font-bold text-slate-900">
+                  {DEMO_DATA.brand.name}
+                </h1>
+                <p className="text-xl text-slate-600">
+                  {DEMO_DATA.brand.tagline}
+                </p>
               </div>
             </div>
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl font-semibold mb-4">A Peek Inside the Dashboard</h2>
-              <p className="text-lg text-gray-300">
-                Experience how Nike's social media strategy comes to life with Aligned AI. 
-                Explore real-time analytics, content planning, and AI-powered insights.
+              <h2 className="text-2xl font-semibold mb-4 text-slate-900">
+                A Peek Inside the Dashboard
+              </h2>
+              <p className="text-lg text-slate-600">
+                Experience how Nike's social media strategy comes to life with
+                Aligned AI. Explore real-time analytics, content planning, and
+                AI-powered insights.
               </p>
             </div>
           </div>
@@ -208,8 +278,12 @@ export default function Demo() {
       </div>
 
       {/* Demo Dashboard */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="dashboard">📊 Dashboard</TabsTrigger>
             <TabsTrigger value="content">📝 Content Pipeline</TabsTrigger>
@@ -261,23 +335,42 @@ export default function Demo() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {DEMO_DATA.posts.slice(0, 3).map((post) => (
-                    <div key={post.id} className="flex items-start gap-3 p-3 rounded-lg border">
-                      <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white text-sm", getPlatformColor(post.platform))}>
+                    <div
+                      key={post.id}
+                      className="flex items-start gap-3 p-3 rounded-lg border"
+                    >
+                      <div
+                        className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center text-white text-sm",
+                          getPlatformColor(post.platform),
+                        )}
+                      >
                         {post.image}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <Badge className={getStatusColor(post.status)}>
                             {getStatusIcon(post.status)}
-                            <span className="ml-1 capitalize">{post.status.replace('_', ' ')}</span>
+                            <span className="ml-1 capitalize">
+                              {post.status.replace("_", " ")}
+                            </span>
                           </Badge>
-                          <span className="text-sm text-gray-500 capitalize">{post.platform}</span>
+                          <span className="text-sm text-gray-500 capitalize">
+                            {post.platform}
+                          </span>
                         </div>
-                        <p className="text-sm text-gray-700 mb-2 line-clamp-2">{post.content}</p>
+                        <p className="text-sm text-gray-700 mb-2 line-clamp-2">
+                          {post.content}
+                        </p>
                         {post.metrics && (
                           <div className="flex items-center gap-4 text-xs text-gray-500">
-                            <span>{formatNumber(post.metrics.reach)} reach</span>
-                            <span>{formatNumber(post.metrics.engagement)} engagement</span>
+                            <span>
+                              {formatNumber(post.metrics.reach ?? 0)} reach
+                            </span>
+                            <span>
+                              {formatNumber(post.metrics.engagement ?? 0)}{" "}
+                              engagement
+                            </span>
                           </div>
                         )}
                       </div>
@@ -295,28 +388,48 @@ export default function Demo() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {DEMO_DATA.insights.map((insight) => (
-                    <div key={insight.id} className="p-4 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
+                    <div
+                      key={insight.id}
+                      className="p-4 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200"
+                    >
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                        <Badge
+                          variant="secondary"
+                          className="bg-blue-100 text-blue-800"
+                        >
                           {insight.type}
                         </Badge>
-                        <Badge variant="outline" className={
-                          insight.impact === 'high' ? 'border-red-300 text-red-700' :
-                          insight.impact === 'medium' ? 'border-yellow-300 text-yellow-700' :
-                          'border-green-300 text-green-700'
-                        }>
+                        <Badge
+                          variant="outline"
+                          className={
+                            insight.impact === "high"
+                              ? "border-red-300 text-red-700"
+                              : insight.impact === "medium"
+                                ? "border-yellow-300 text-yellow-700"
+                                : "border-green-300 text-green-700"
+                          }
+                        >
                           {insight.impact} impact
                         </Badge>
                       </div>
-                      <h4 className="font-medium text-gray-900 mb-1">{insight.title}</h4>
-                      <p className="text-sm text-gray-600 mb-3">{insight.description}</p>
+                      <h4 className="font-medium text-gray-900 mb-1">
+                        {insight.title}
+                      </h4>
+                      <p className="text-sm text-gray-600 mb-3">
+                        {insight.description}
+                      </p>
                       <div className="space-y-1">
-                        {insight.suggestions.slice(0, 2).map((suggestion, index) => (
-                          <p key={index} className="text-xs text-gray-500 flex items-center gap-2">
-                            <span className="w-1 h-1 bg-blue-500 rounded-full"></span>
-                            {suggestion}
-                          </p>
-                        ))}
+                        {insight.suggestions
+                          .slice(0, 2)
+                          .map((suggestion, index) => (
+                            <p
+                              key={index}
+                              className="text-xs text-gray-500 flex items-center gap-2"
+                            >
+                              <span className="w-1 h-1 bg-blue-500 rounded-full"></span>
+                              {suggestion}
+                            </p>
+                          ))}
                       </div>
                     </div>
                   ))}
@@ -340,15 +453,25 @@ export default function Demo() {
 
         {/* CTA Section */}
         <div className="mt-12 text-center bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white">
-          <h3 className="text-2xl font-bold mb-4">Ready to Transform Your Social Media Strategy?</h3>
+          <h3 className="text-2xl font-bold mb-4">
+            Ready to Transform Your Social Media Strategy?
+          </h3>
           <p className="text-lg mb-6 text-blue-100">
-            Join Nike and hundreds of other brands using Aligned AI to create, schedule, and optimize their social media presence.
+            Join Nike and hundreds of other brands using Aligned AI to create,
+            schedule, and optimize their social media presence.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
+            <Button
+              size="lg"
+              className="bg-white text-blue-600 hover:bg-gray-100"
+            >
               Start Free Trial
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600">
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white text-white hover:bg-white hover:text-blue-600"
+            >
               Schedule Demo
             </Button>
           </div>
@@ -363,15 +486,15 @@ interface MetricCardProps {
   value: string;
   growth: number;
   icon: React.ReactNode;
-  color: 'blue' | 'red' | 'green' | 'purple';
+  color: "blue" | "red" | "green" | "purple";
 }
 
 function MetricCard({ title, value, growth, icon, color }: MetricCardProps) {
   const colorClasses = {
-    blue: 'text-blue-600 bg-blue-100',
-    red: 'text-red-600 bg-red-100',
-    green: 'text-green-600 bg-green-100',
-    purple: 'text-purple-600 bg-purple-100'
+    blue: "text-blue-600 bg-blue-100",
+    red: "text-red-600 bg-red-100",
+    green: "text-green-600 bg-green-100",
+    purple: "text-purple-600 bg-purple-100",
   };
 
   return (
@@ -392,8 +515,14 @@ function MetricCard({ title, value, growth, icon, color }: MetricCardProps) {
           ) : (
             <TrendingDown className="h-4 w-4 text-red-500 mr-1" />
           )}
-          <span className={cn("text-sm font-medium", growth > 0 ? "text-green-600" : "text-red-600")}>
-            {growth > 0 ? '+' : ''}{growth}%
+          <span
+            className={cn(
+              "text-sm font-medium",
+              growth > 0 ? "text-green-600" : "text-red-600",
+            )}
+          >
+            {growth > 0 ? "+" : ""}
+            {growth}%
           </span>
           <span className="text-sm text-gray-500 ml-1">vs last month</span>
         </div>
@@ -402,49 +531,65 @@ function MetricCard({ title, value, growth, icon, color }: MetricCardProps) {
   );
 }
 
-function ContentPipelineView({ posts }: { posts: unknown[] }) {
-  const statusGroups = posts.reduce((groups: Record<string, unknown[]>, post: unknown) => {
-    const status = post.status;
-    if (!groups[status]) groups[status] = [];
-    groups[status].push(post);
-    return groups;
-  }, {} as Record<string, unknown[]>);
+function ContentPipelineView({ posts }: { posts: DemoPost[] }) {
+  const statusGroups = posts.reduce(
+    (groups: Record<string, DemoPost[]>, post: DemoPost) => {
+      const status = post.status;
+      if (!groups[status]) groups[status] = [];
+      groups[status].push(post);
+      return groups;
+    },
+    {} as Record<string, DemoPost[]>,
+  );
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {Object.entries(statusGroups).map(([status, statusPosts]: [string, unknown[]]) => (
-        <Card key={status}>
-          <CardHeader>
-            <CardTitle className="capitalize flex items-center gap-2">
-              {status === 'published' && <CheckCircle className="h-5 w-5 text-green-500" />}
-              {status === 'scheduled' && <Clock className="h-5 w-5 text-blue-500" />}
-              {status === 'in_review' && <AlertCircle className="h-5 w-5 text-yellow-500" />}
-              {status.replace('_', ' ')} ({statusPosts.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {statusPosts.map((post: unknown) => (
-              <div key={post.id} className="p-3 border rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-2xl">{post.image}</span>
-                  <span className="text-sm font-medium capitalize">{post.platform}</span>
-                </div>
-                <p className="text-sm text-gray-700 mb-2 line-clamp-3">{post.content}</p>
-                {post.metrics && (
-                  <div className="text-xs text-gray-500">
-                    {formatNumber(post.metrics.likes)} likes • {formatNumber(post.metrics.comments)} comments
-                  </div>
+      {Object.entries(statusGroups).map(
+        ([status, statusPosts]: [string, DemoPost[]]) => (
+          <Card key={status}>
+            <CardHeader>
+              <CardTitle className="capitalize flex items-center gap-2">
+                {status === "published" && (
+                  <CheckCircle className="h-5 w-5 text-green-500" />
                 )}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      ))}
+                {status === "scheduled" && (
+                  <Clock className="h-5 w-5 text-blue-500" />
+                )}
+                {status === "in_review" && (
+                  <AlertCircle className="h-5 w-5 text-yellow-500" />
+                )}
+                {status.replace("_", " ")} ({statusPosts.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {statusPosts.map((post: DemoPost) => (
+                <div key={post.id} className="p-3 border rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-2xl">{post.image}</span>
+                    <span className="text-sm font-medium capitalize">
+                      {post.platform}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-700 mb-2 line-clamp-3">
+                    {post.content}
+                  </p>
+                  {post.metrics && (
+                    <div className="text-xs text-gray-500">
+                      {formatNumber(post.metrics.likes ?? 0)} likes •{" "}
+                      {formatNumber(post.metrics.comments ?? 0)} comments
+                    </div>
+                  )}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        ),
+      )}
     </div>
   );
 }
 
-function AnalyticsView({ _metrics }: { metrics: any }) {
+function AnalyticsView({ metrics }: { metrics: any }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -455,8 +600,15 @@ function AnalyticsView({ _metrics }: { metrics: any }) {
           <CardContent>
             <div className="h-64 flex items-end justify-between gap-2">
               {[65, 78, 82, 71, 89, 95, 87].map((value, index) => (
-                <div key={index} className="flex-1 bg-blue-100 rounded-t flex items-end justify-center" style={{ height: `${value}%` }}>
-                  <div className="w-full bg-blue-500 rounded-t" style={{ height: '20px' }}></div>
+                <div
+                  key={index}
+                  className="flex-1 bg-blue-100 rounded-t flex items-end justify-center"
+                  style={{ height: `${value}%` }}
+                >
+                  <div
+                    className="w-full bg-blue-500 rounded-t"
+                    style={{ height: "20px" }}
+                  ></div>
                 </div>
               ))}
             </div>
@@ -478,9 +630,13 @@ function AnalyticsView({ _metrics }: { metrics: any }) {
           </CardHeader>
           <CardContent className="space-y-4">
             {[
-              { platform: 'Instagram', percentage: 45, color: 'bg-gradient-to-r from-purple-500 to-pink-500' },
-              { platform: 'Twitter', percentage: 30, color: 'bg-blue-500' },
-              { platform: 'LinkedIn', percentage: 25, color: 'bg-blue-700' }
+              {
+                platform: "Instagram",
+                percentage: 45,
+                color: "bg-gradient-to-r from-purple-500 to-pink-500",
+              },
+              { platform: "Twitter", percentage: 30, color: "bg-blue-500" },
+              { platform: "LinkedIn", percentage: 25, color: "bg-blue-700" },
             ].map((item) => (
               <div key={item.platform}>
                 <div className="flex justify-between text-sm mb-1">
@@ -497,7 +653,11 @@ function AnalyticsView({ _metrics }: { metrics: any }) {
   );
 }
 
-function CalendarView({ calendar }: { calendar: unknown[] }) {
+function CalendarView({
+  calendar,
+}: {
+  calendar: { date: string; posts: number; status: string }[];
+}) {
   return (
     <Card>
       <CardHeader>
@@ -508,19 +668,22 @@ function CalendarView({ calendar }: { calendar: unknown[] }) {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-7 gap-4">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-            <div key={day} className="text-center font-medium text-gray-600 py-2">
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+            <div
+              key={day}
+              className="text-center font-medium text-gray-600 py-2"
+            >
               {day}
             </div>
           ))}
-          
+
           {/* Calendar grid with posts */}
           {Array.from({ length: 35 }, (_, i) => {
             const date = new Date(2024, 0, i - 7); // Start from a week before
             const dayOfMonth = date.getDate();
             const isCurrentMonth = date.getMonth() === 0;
-            const calendarEntry = calendar.find(entry => 
-              new Date(entry.date).getDate() === dayOfMonth
+            const calendarEntry = calendar.find(
+              (entry) => new Date(entry.date).getDate() === dayOfMonth,
             );
 
             return (
@@ -529,14 +692,15 @@ function CalendarView({ calendar }: { calendar: unknown[] }) {
                 className={cn(
                   "min-h-[80px] p-2 border rounded-lg",
                   isCurrentMonth ? "bg-white" : "bg-gray-50 text-gray-400",
-                  calendarEntry && "border-blue-200 bg-blue-50"
+                  calendarEntry && "border-blue-200 bg-blue-50",
                 )}
               >
                 <div className="text-sm font-medium">{dayOfMonth}</div>
                 {calendarEntry && (
                   <div className="mt-1">
                     <div className="text-xs bg-blue-100 text-blue-800 rounded px-1 py-0.5">
-                      {calendarEntry.posts} post{calendarEntry.posts !== 1 ? 's' : ''}
+                      {calendarEntry.posts} post
+                      {calendarEntry.posts !== 1 ? "s" : ""}
                     </div>
                   </div>
                 )}
