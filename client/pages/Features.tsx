@@ -17,7 +17,7 @@ export default function Features() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-6 py-20">
+      <main className="max-w-7xl mx-auto px-6 py-20 space-y-12">
         <Reveal>
           <div className="grid md:grid-cols-3 gap-8">
             <Card>
@@ -46,6 +46,25 @@ export default function Features() {
                 <p className="text-slate-600">Data-driven recommendations for timing, format, and content that moves the needle.</p>
               </CardContent>
             </Card>
+          </div>
+        </Reveal>
+
+        <Reveal>
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold text-slate-900">Integrations Showcase</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto mt-2">Connect publishing, analytics, and design tools for a seamless workflow.</p>
+
+            <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 max-w-4xl mx-auto">
+              {['Instagram','Facebook','X','Google Analytics','Canva','Zapier'].map((n) => (
+                <div key={n} className="bg-white border border-gray-100 rounded-lg p-4 flex items-center justify-center text-sm text-slate-800 shadow-sm hover:shadow-md transition-shadow duration-180">{n}</div>
+              ))}
+            </div>
+
+            <div className="mt-8">
+              <Button asChild variant="default">
+                <Link to="/integrations-marketing">See all integrations</Link>
+              </Button>
+            </div>
           </div>
         </Reveal>
 
