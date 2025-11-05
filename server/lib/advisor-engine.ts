@@ -670,11 +670,11 @@ export class AdvisorEngine {
     };
   }
 
-  private calculateOptimalPostCount(trends: unknown, daysAhead: number): number {
+  private calculateOptimalPostCount(trends: any, daysAhead: number): number {
     return Math.ceil(daysAhead / 3); // Every 3 days
   }
 
-  private async generateForecastRecommendations(_metrics: AnalyticsMetric[], _trends: unknown) {
+  private async generateForecastRecommendations(_metrics: AnalyticsMetric[], _trends: any) {
     return {
       bestDays: ['Tuesday', 'Wednesday', 'Thursday'],
       bestTimes: ['9:00 AM', '1:00 PM', '7:00 PM'],
@@ -689,31 +689,40 @@ export class AdvisorEngine {
     };
   }
 
-  private generateScenario(reach: unknown, engagement: unknown, followers: unknown, multiplier: number, days: number) {
+  private generateScenario(reach: any, engagement: any, followers: any, multiplier: number, days: number) {
+    const rVal = (reach && typeof reach.value === 'number') ? reach.value : (typeof reach === 'number' ? reach : 0);
+    const eVal = (engagement && typeof engagement.value === 'number') ? engagement.value : (typeof engagement === 'number' ? engagement : 0);
+    const fVal = (followers && typeof followers.value === 'number') ? followers.value : (typeof followers === 'number' ? followers : 0);
+
     return {
-      reach: reach.value * multiplier,
-      engagement: engagement.value * multiplier,
-      followers: followers.value * multiplier,
-      requiredPosts: Math.ceil(days / (4 - multiplier)),
+      reach: rVal * multiplier,
+      engagement: eVal * multiplier,
+      followers: fVal * multiplier,
+      requiredPosts: Math.ceil(days / Math.max(1, (4 - multiplier))),
       description: multiplier === 0.8 ? 'Conservative estimate with current strategy' :
                    multiplier === 1.0 ? 'Expected outcome with recommended optimizations' :
                    'Optimistic projection with full implementation of recommendations'
     };
   }
 
-  private async generateInsightDescription(type: string, data: unknown): Promise<string> {
+  private async generateInsightDescription(type: string, data: any): Promise<string> {
     // AI-generated descriptions would go here
     // For now, return template-based descriptions
-    
+
+    const isPositive = !!data?.isPositive;
+    const change = typeof data?.change === 'number' ? data.change : 0;
+    const topType = data?.topType || 'content';
+    const improvement = typeof data?.improvement === 'number' ? data.improvement : 0;
+
     switch (type) {
       case 'engagement_trend':
-        return data.isPositive 
-          ? `Your engagement has surged by ${Math.abs(data.change).toFixed(1)}%, indicating strong audience resonance with your recent content strategy.`
-          : `Your engagement has declined by ${Math.abs(data.change).toFixed(1)}%, suggesting a need to refresh your content approach.`;
-      
+        return isPositive
+          ? `Your engagement has surged by ${Math.abs(change).toFixed(1)}%, indicating strong audience resonance with your recent content strategy.`
+          : `Your engagement has declined by ${Math.abs(change).toFixed(1)}%, suggesting a need to refresh your content approach.`;
+
       case 'content_performance':
-        return `Your ${data.topType} content is driving exceptional results, outperforming other formats by ${data.improvement.toFixed(0)}%.`;
-      
+        return `Your ${topType} content is driving exceptional results, outperforming other formats by ${improvement.toFixed(0)}%.`;
+
       default:
         return 'AI-generated insight description would appear here.';
     }
