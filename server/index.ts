@@ -1,4 +1,4 @@
-import "dotenv/config";
+// dotenv not required in this dev environment; environment variables are injected by the runtime/DevServerControl.
 import express from "express";
 import cors from "cors";
 import path from "path";
