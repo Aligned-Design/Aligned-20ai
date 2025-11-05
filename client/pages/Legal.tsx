@@ -1,5 +1,6 @@
 import React from 'react';
 import FooterNew from '@/components/FooterNew';
+import Reveal from '@/components/Reveal';
 
 export default function Legal() {
   return (
@@ -12,6 +13,7 @@ export default function Legal() {
       </div>
 
       <main className="max-w-7xl mx-auto px-6 py-20">
+        <Reveal>
         <section className="prose prose-slate max-w-none">
           <h2>Terms of Service</h2>
           <p>This is a placeholder for Terms of Service. Replace with actual legal copy.</p>
@@ -19,6 +21,7 @@ export default function Legal() {
           <h2>Privacy Policy</h2>
           <p>This is a placeholder for the privacy policy. Replace with actual legal copy.</p>
         </section>
+        </Reveal>
       </main>
 
       <FooterNew />
