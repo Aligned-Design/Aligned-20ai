@@ -22,38 +22,78 @@ interface ApiErrorResponse {
  * @param response Fetch response object
  * @returns Parsed JSON data or throws descriptive error
  */
-async function safeJsonParse(response: Response): Promise<unknown> {
-  const contentType = response.headers.get('content-type') || '';
-
-  // If content-type does not claim JSON, attempt to read a preview and return a helpful error
-  if (!contentType.includes('application/json')) {
-    // clone response to safely read the body without consuming the original stream
-    const clone = response.clone();
-    const bodyText = await clone.text();
-    const preview = bodyText.slice(0, 300).replace(/\s+/g, ' ');
-    throw new Error(
-      `Invalid response format: expected JSON but got ${contentType || 'no content-type header'}. ` +
-      `Response preview: ${preview}`
-    );
-  }
-
-  // If content-type claims JSON, try parsing but still capture the raw body if parsing fails
-  try {
-    return await response.json();
-  } catch (parseError) {
-    // clone again to read raw text for debugging (json() may have consumed stream)
-    let bodyText = '';
+async function safeJsonParse(response: any): Promise<unknown> {
+  // Helper to read content-type from Headers-like or plain object
+  const getContentType = () => {
     try {
-      bodyText = await response.clone().text();
+      if (response && response.headers) {
+        if (typeof response.headers.get === 'function') {
+          return response.headers.get('content-type') || '';
+        }
+        if (typeof response.headers['content-type'] === 'string') {
+          return response.headers['content-type'];
+        }
+      }
     } catch (e) {
       // ignore
     }
-    const preview = (bodyText || '').slice(0, 500).replace(/\s+/g, ' ');
-    throw new Error(
-      `Failed to parse JSON: ${parseError instanceof Error ? parseError.message : 'unknown error'}. ` +
-      `Body preview: ${preview}`
-    );
+    return '';
+  };
+
+  const contentType = getContentType();
+
+  // If content-type explicitly not JSON, prefer to read text and throw
+  if (contentType && !contentType.includes('application/json')) {
+    if (typeof response.text === 'function') {
+      const bodyText = await response.text();
+      const preview = bodyText.slice(0, 300).replace(/\s+/g, ' ');
+      throw new Error(
+        `Invalid response format: expected JSON but got ${contentType || 'no content-type header'}. Response preview: ${preview}`
+      );
+    }
+    throw new Error(`Invalid response format: expected JSON but got ${contentType || 'no content-type header'}.`);
   }
+
+  // If response.json exists, try it first (covers native Response and many mocks)
+  if (response && typeof response.json === 'function') {
+    try {
+      return await response.json();
+    } catch (jsonErr) {
+      // If json() fails, try to fallback to text and parse
+      if (typeof response.text === 'function') {
+        const bodyText = await response.text();
+        const preview = bodyText.slice(0, 500).replace(/\s+/g, ' ');
+        try {
+          return JSON.parse(bodyText);
+        } catch (parseErr) {
+          throw new Error(
+            `Failed to parse JSON: ${parseErr instanceof Error ? parseErr.message : 'unknown error'}. Body preview: ${preview}`
+          );
+        }
+      }
+      throw new Error(`Failed to parse JSON: ${jsonErr instanceof Error ? jsonErr.message : String(jsonErr)}`);
+    }
+  }
+
+  // If only text() is available, attempt to parse it
+  if (response && typeof response.text === 'function') {
+    const bodyText = await response.text();
+    const preview = bodyText.slice(0, 500).replace(/\s+/g, ' ');
+    try {
+      return JSON.parse(bodyText);
+    } catch (parseErr) {
+      throw new Error(
+        `Failed to parse JSON from text response: ${parseErr instanceof Error ? parseErr.message : 'unknown error'}. Body preview: ${preview}`
+      );
+    }
+  }
+
+  // Last resort: return response as-is if it appears to be a plain object
+  if (response && typeof response === 'object') {
+    return response;
+  }
+
+  throw new Error('Response does not support json() or text() parsing');
 }
 
 /**
