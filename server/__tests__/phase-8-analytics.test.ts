@@ -4,7 +4,7 @@
  * Total: 40+ tests
  */
 
-import { describe, it, expect} from 'test';
+import { describe, it, expect } from 'vitest';
 
 // ==================== Analytics Sync Tests (15 tests) ====================
 
