@@ -20,7 +20,7 @@ import crypto from 'crypto';
 /**
  * Helper function to convert database record to API response format
  */
-function dbRecordToClientSettings(record: any): ClientSettings {
+function dbRecordToClientSettings(record: unknown): ClientSettings {
   return {
     id: record.id,
     clientId: record.client_id,
@@ -40,7 +40,7 @@ function dbRecordToClientSettings(record: any): ClientSettings {
 /**
  * Helper function to convert API input to database format
  */
-function clientSettingsToDbRecord(settings: Partial<ClientSettings>): any {
+function clientSettingsToDbRecord(settings: Partial<ClientSettings>): unknown {
   return {
     client_id: settings.clientId,
     brand_id: settings.brandId,
@@ -275,7 +275,7 @@ export const generateUnsubscribeLink: RequestHandler = async (req, res) => {
     const unsubscribeToken = crypto.randomBytes(32).toString('hex');
 
     // Update in database
-    const updatedSettings = await dbClientSettings.update(clientId, brandId, {
+    const __updatedSettings = await dbClientSettings.update(clientId, brandId, {
       unsubscribe_token: unsubscribeToken,
     });
 
@@ -318,7 +318,7 @@ export const unsubscribeFromEmails: RequestHandler = async (req, res) => {
       });
     }
 
-    let updatePayload: any;
+    let updatePayload: unknown;
 
     if (fromType) {
       // Unsubscribe from specific notification type

@@ -26,8 +26,8 @@
 │    │  └─ Security & OAuth
 │    │
 │    ├─ 💰 Pricing (/pricing)                             📋 PLANNED
-│    │  ├─ Solo Plan ($49/mo)
-│    │  ├─ Agency Plan ($199/mo)
+│    │  ├─ Solo Plan ($199/mo)
+│    │  ├─ Agency Plan ($299/mo)
 │    │  ├─ Enterprise Plan (Custom)
 │    │  └─ Feature Comparison
 │    │

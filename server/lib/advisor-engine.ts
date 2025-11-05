@@ -11,7 +11,7 @@ interface InsightContext {
   brandId: string;
   currentMetrics: AnalyticsMetric[];
   historicalMetrics: AnalyticsMetric[];
-  goals: any[];
+  goals: unknown[];
   userFeedback: Array<{ insightId: string; feedback: string; timestamp: string }>;
 }
 
@@ -535,7 +535,7 @@ export class AdvisorEngine {
     const avgPerformance = metrics.reduce((sum, m) => sum + m.metrics.engagementRate, 0) / metrics.length;
     
     const topHashtags = Array.from(hashtagPerformance.entries())
-      .filter(([_, data]) => data.count >= 3) // At least 3 uses
+      .filter(([__, data]) => data.count >= 3) // At least 3 uses
       .map(([hashtag, data]) => ({
         hashtag,
         avgEngagement: data.total / data.count
@@ -551,7 +551,7 @@ export class AdvisorEngine {
     };
   }
 
-  private analyzePostingTimes(metrics: AnalyticsMetric[]) {
+  private analyzePostingTimes(_metrics: AnalyticsMetric[]) {
     // Simplified timing analysis
     return {
       optimalTimes: ['9:00 AM Tuesday', '1:00 PM Wednesday', '7:00 PM Thursday'],
@@ -639,7 +639,7 @@ export class AdvisorEngine {
     };
   }
 
-  private calculateTrends(timeSeries: any) {
+  private calculateTrends(_timeSeries: unknown) {
     // Simple linear regression for trends
     return {
       reach: { slope: 10, confidence: 0.8 },
@@ -648,7 +648,7 @@ export class AdvisorEngine {
     };
   }
 
-  private detectSeasonality(timeSeries: any) {
+  private detectSeasonality(_timeSeries: unknown) {
     // Simplified seasonality detection
     return {
       reach: 1.0,
@@ -670,11 +670,11 @@ export class AdvisorEngine {
     };
   }
 
-  private calculateOptimalPostCount(trends: any, daysAhead: number): number {
+  private calculateOptimalPostCount(trends: unknown, daysAhead: number): number {
     return Math.ceil(daysAhead / 3); // Every 3 days
   }
 
-  private async generateForecastRecommendations(metrics: AnalyticsMetric[], trends: any) {
+  private async generateForecastRecommendations(_metrics: AnalyticsMetric[], _trends: unknown) {
     return {
       bestDays: ['Tuesday', 'Wednesday', 'Thursday'],
       bestTimes: ['9:00 AM', '1:00 PM', '7:00 PM'],
@@ -689,7 +689,7 @@ export class AdvisorEngine {
     };
   }
 
-  private generateScenario(reach: any, engagement: any, followers: any, multiplier: number, days: number) {
+  private generateScenario(reach: unknown, engagement: unknown, followers: unknown, multiplier: number, days: number) {
     return {
       reach: reach.value * multiplier,
       engagement: engagement.value * multiplier,
@@ -701,7 +701,7 @@ export class AdvisorEngine {
     };
   }
 
-  private async generateInsightDescription(type: string, data: any): Promise<string> {
+  private async generateInsightDescription(type: string, data: unknown): Promise<string> {
     // AI-generated descriptions would go here
     // For now, return template-based descriptions
     

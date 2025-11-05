@@ -103,7 +103,7 @@ export default function NewDashboard() {
           });
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error loading dashboard:", error);
       toast({
         title: "Error loading dashboard",
@@ -140,7 +140,7 @@ export default function NewDashboard() {
         description: "The post has been approved successfully",
       });
       loadDashboardData();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: error.message,
@@ -149,7 +149,7 @@ export default function NewDashboard() {
     }
   };
 
-  const handleRequestEdits = (postId: string) => {
+  const handleRequestEdits = (__postId: string) => {
     toast({
       title: "Request Edits",
       description: "Opening edit request dialog...",
@@ -249,7 +249,7 @@ export default function NewDashboard() {
     },
   ];
 
-  const insights: any[] = [
+  const insights: unknown[] = [
     {
       id: "1",
       title: "Try Reels Thu 3–5 PM",

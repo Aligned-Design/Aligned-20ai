@@ -26,7 +26,7 @@ const AuditLogQuerySchema = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
-const AuditExportQuerySchema = z.object({
+const __AuditExportQuerySchema = z.object({
   brandId: z.string(),
   startDate: z.string(),
   endDate: z.string(),

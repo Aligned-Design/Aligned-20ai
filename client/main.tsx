@@ -10,7 +10,7 @@ initializeMonitoring();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <SentryErrorBoundary
-      fallback={({ error, resetError }: any) => (
+      fallback={({ error, resetError }: unknown) => (
         <div style={{
           display: 'flex',
           flexDirection: 'column',

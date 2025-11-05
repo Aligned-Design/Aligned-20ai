@@ -20,7 +20,6 @@ import {
   getCategoryById,
   getArticleById,
 } from '@shared/tooltip-library';
-import type { HelpArticle, HelpCategory } from '@shared/tooltip-library';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'getting-started': '🚀',

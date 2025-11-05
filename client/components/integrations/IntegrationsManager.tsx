@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Badge as _Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -110,7 +110,7 @@ export function IntegrationsManager({ brandId, className }: IntegrationsManagerP
     }
   };
 
-  const getStatusIcon = (status: Integration['status']) => {
+  const _getStatusIcon = (status: Integration['status']) => {
     switch (status) {
       case 'connected':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
@@ -123,7 +123,7 @@ export function IntegrationsManager({ brandId, className }: IntegrationsManagerP
     }
   };
 
-  const getStatusColor = (status: Integration['status']) => {
+  const _getStatusColor = (status: Integration['status']) => {
     switch (status) {
       case 'connected':
         return 'bg-green-100 text-green-800';

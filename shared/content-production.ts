@@ -50,5 +50,5 @@ export interface ProductionDashboardData {
 export interface BatchOperation {
   action: 'retry' | 'approve' | 'delete' | 'reschedule';
   contentIds: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }

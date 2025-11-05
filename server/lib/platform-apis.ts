@@ -11,7 +11,7 @@ interface PublishResult {
   platformUrl?: string;
   error?: string;
   errorCode?: string;
-  errorDetails?: any;
+  errorDetails?: unknown;
 }
 
 /**
@@ -113,7 +113,7 @@ export class FacebookAPI {
 
   async publishPost(content: PostContent): Promise<PublishResult> {
     try {
-      const body: any = {
+      const body: unknown = {
         message: content.text,
         access_token: this.accessToken
       };
@@ -175,7 +175,7 @@ export class LinkedInAPI {
 
   async publishPost(content: PostContent): Promise<PublishResult> {
     try {
-      const body: any = {
+      const body: unknown = {
         author: `urn:li:person:${this.actorId}`,
         commentary: content.text,
         visibility: 'PUBLIC',
@@ -249,7 +249,7 @@ export class TwitterAPI {
 
   async publishPost(content: PostContent): Promise<PublishResult> {
     try {
-      const body: any = {
+      const body: unknown = {
         text: content.text
       };
 
@@ -316,7 +316,7 @@ export class GoogleBusinessAPI {
 
   async publishPost(content: PostContent): Promise<PublishResult> {
     try {
-      const postData: any = {
+      const postData: unknown = {
         summary: content.text,
         callToAction: {
           actionType: 'LEARN_MORE'

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
+import { Badge as _Badge } from '@/components/ui/badge';
 import { 
   ArrowRight, 
   ArrowLeft, 
@@ -18,7 +18,6 @@ import {
   Share2,
   X
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { OnboardingStep, OnboardingProgress } from '@shared/onboarding';
 
 interface OnboardingWizardProps {

@@ -362,7 +362,7 @@ router.post('/bulk-delete', async (req: Request, res: Response) => {
     const results = {
       deleted: 0,
       failed: 0,
-      errors: [] as any[]
+      errors: [] as unknown[]
     };
 
     for (const assetId of assetIds) {

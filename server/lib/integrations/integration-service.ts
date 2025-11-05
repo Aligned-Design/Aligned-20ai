@@ -39,7 +39,7 @@ export class IntegrationService {
     provider: PlatformProvider,
     credentials: Record<string, string>,
     post: PublishPostRequest
-  ): Promise<any> {
+  ): Promise<unknown> {
     switch (provider) {
       case 'wordpress': {
         const client = new WordPressClient(
@@ -116,7 +116,7 @@ export class IntegrationService {
     provider: PlatformProvider,
     credentials: Record<string, string>,
     campaign: PublishEmailCampaignRequest
-  ): Promise<any> {
+  ): Promise<unknown> {
     switch (provider) {
       case 'mailchimp': {
         const client = new MailchimpClient(credentials.apiKey);
@@ -200,7 +200,7 @@ export class IntegrationService {
   static async getPlatformInfo(
     provider: PlatformProvider,
     credentials: Record<string, string>
-  ): Promise<any> {
+  ): Promise<unknown> {
     switch (provider) {
       case 'mailchimp': {
         const client = new MailchimpClient(credentials.apiKey);

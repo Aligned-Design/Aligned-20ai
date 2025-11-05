@@ -123,7 +123,7 @@ export interface ClientMessage {
   message_type: "update" | "comment" | "notification";
   title?: string;
   content: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   from_user_id?: string;
   to_user_id?: string;
   read_at?: string;

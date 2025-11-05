@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 /**
  * Regression Tests - 70+ tests for critical functionality and bug prevention
@@ -94,7 +94,7 @@ describe('Data Persistence Regression Tests', () => {
 
     it('should not lose unsaved changes on navigation', () => {
       const draftContent = 'Unsaved content';
-      const confirmed = window.confirm('You have unsaved changes. Leave anyway?');
+      const __confirmed = window.confirm('You have unsaved changes. Leave anyway?');
 
       expect(draftContent).toBeTruthy();
     });
@@ -326,7 +326,7 @@ describe('API and Network Regression Tests', () => {
     });
 
     it('should handle null responses', () => {
-      const response: any = null;
+      const response: unknown = null;
       const data = response?.data || [];
 
       expect(Array.isArray(data)).toBe(true);
@@ -344,7 +344,7 @@ describe('API and Network Regression Tests', () => {
       let parsed;
       try {
         parsed = JSON.parse(json);
-      } catch (e) {
+      } catch (_e) {
         parsed = null;
       }
 
@@ -476,7 +476,7 @@ describe('Analytics Data Regression Tests', () => {
 
   describe('Chart Rendering', () => {
     it('should render with empty data set', () => {
-      const data: any[] = [];
+      const data: unknown[] = [];
       const hasData = data.length > 0;
 
       expect(hasData).toBe(false);

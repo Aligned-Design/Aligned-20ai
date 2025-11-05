@@ -138,7 +138,7 @@ describe('Number Utilities', () => {
 });
 
 describe('Array Utilities', () => {
-  const chunk = (arr: any[], size: number) => {
+  const chunk = (arr: unknown[], size: number) => {
     const result = [];
     for (let i = 0; i < arr.length; i += size) {
       result.push(arr.slice(i, i + size));
@@ -146,8 +146,8 @@ describe('Array Utilities', () => {
     return result;
   };
 
-  const unique = (arr: any[]) => [...new Set(arr)];
-  const flatten = (arr: any[]): any[] => arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flatten(val) : val), []);
+  const unique = (arr: unknown[]) => [...new Set(arr)];
+  const flatten = (arr: unknown[]): unknown[] => arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flatten(val) : val), []);
 
   describe('chunk', () => {
     it('should chunk array into specified size', () => {
@@ -205,21 +205,21 @@ describe('Array Utilities', () => {
 });
 
 describe('Object Utilities', () => {
-  const pick = (obj: any, keys: string[]) => {
-    const result: any = {};
+  const pick = (obj: unknown, keys: string[]) => {
+    const result: unknown = {};
     keys.forEach(key => {
       if (key in obj) result[key] = obj[key];
     });
     return result;
   };
 
-  const omit = (obj: any, keys: string[]) => {
+  const omit = (obj: unknown, keys: string[]) => {
     const result = { ...obj };
     keys.forEach(key => delete result[key]);
     return result;
   };
 
-  const merge = (obj1: any, obj2: any) => ({ ...obj1, ...obj2 });
+  const merge = (obj1: unknown, obj2: unknown) => ({ ...obj1, ...obj2 });
 
   describe('pick', () => {
     it('should pick specified keys from object', () => {
@@ -273,7 +273,7 @@ describe('Object Utilities', () => {
 describe('Validation Utilities', () => {
   const isEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPhone = (phone: string) => /^\d{3}-\d{3}-\d{4}$/.test(phone);
-  const isEmpty = (value: any) => value === null || value === undefined || value === '';
+  const isEmpty = (value: unknown) => value === null || value === undefined || value === '';
 
   describe('isEmail', () => {
     it('should validate correct email', () => {

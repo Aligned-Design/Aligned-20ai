@@ -23,7 +23,7 @@ export const WebhookEventSchema = z.object({
   brand_id: z.string().min(1),
   provider: WebhookProvider,
   event_type: z.string().min(1),
-  payload: z.record(z.any()),
+  payload: z.record(z.unknown()),
   idempotency_key: z.string().min(1),
   status: WebhookStatus,
   attempt_count: z.number().int().min(0),
@@ -59,7 +59,7 @@ export type WebhookAttempt = z.infer<typeof WebhookAttemptSchema>;
  */
 export const ZapierWebhookSchema = z.object({
   action: z.string(),
-  data: z.record(z.any()).optional(),
+  data: z.record(z.unknown()).optional(),
   timestamp: z.string().datetime().optional(),
 });
 
@@ -69,7 +69,7 @@ export const ZapierWebhookSchema = z.object({
  */
 export const MakeWebhookSchema = z.object({
   event: z.string(),
-  data: z.record(z.any()).optional(),
+  data: z.record(z.unknown()).optional(),
   webhook_id: z.string().optional(),
 });
 
@@ -83,7 +83,7 @@ export const SlackWebhookSchema = z.object({
   token: z.string().optional(),
   team_id: z.string().optional(),
   api_app_id: z.string().optional(),
-  event: z.record(z.any()).optional(),
+  event: z.record(z.unknown()).optional(),
   authed_users: z.array(z.string()).optional(),
 });
 
@@ -99,7 +99,7 @@ export const HubSpotWebhookSchema = z.object({
   objectId: z.number(),
   changeSource: z.string().optional(),
   timestamp: z.number(),
-  changes: z.array(z.record(z.any())).optional(),
+  changes: z.array(z.record(z.unknown())).optional(),
 });
 
 // ==================== WEBHOOK HANDLER SCHEMAS ====================
@@ -112,7 +112,7 @@ export const WebhookHandlerRequestSchema = z.object({
   provider: WebhookProvider,
   brandId: z.string().uuid(),
   eventType: z.string(),
-  payload: z.record(z.any()),
+  payload: z.record(z.unknown()),
   idempotencyKey: z.string(),
   signature: z.string().optional(),
   timestamp: z.number().optional(),
@@ -222,7 +222,7 @@ export const SIGNATURE_CONFIGS: Record<WebhookProvider, SignatureVerificationCon
  */
 export function calculateBackoffDelay(
   attemptNumber: number,
-  config: WebhookRetryConfig = DEFAULT_WEBHOOK_RETRY_CONFIG
+  config: WebhookRetryConfig = DEFAULT_WEBHOOK_RETRY_CONFIG,
 ): number {
   const exponentialDelay = config.baseDelayMs * Math.pow(config.backoffMultiplier, attemptNumber - 1);
   return Math.min(exponentialDelay, config.maxDelayMs);
@@ -233,7 +233,6 @@ export function calculateBackoffDelay(
  */
 export function shouldRetryWebhook(
   event: WebhookEvent,
-  config: WebhookRetryConfig = DEFAULT_WEBHOOK_RETRY_CONFIG
 ): boolean {
   if (event.status === 'delivered') return false;
   if (event.status === 'dead_letter') return false;

@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
+import { Badge as _Badge } from "@/components/ui/badge";
 import { HelpTooltip } from "@/components/ui/help-tooltip";
 import {
   BrandIntakeFormData,
@@ -21,14 +21,14 @@ import { useState } from "react";
 
 interface Section4Props {
   data: Partial<BrandIntakeFormData>;
-  onChange: (field: keyof BrandIntakeFormData, value: any) => void;
+  onChange: (field: keyof BrandIntakeFormData, value: unknown) => void;
   errors: Record<string, string>;
 }
 
 export default function Section4ContentPreferences({
   data,
   onChange,
-  errors,
+  errors: _errors,
 }: Section4Props) {
   const [newHashtag, setNewHashtag] = useState("");
   const [newCompetitor, setNewCompetitor] = useState("");

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
+import { Badge as _Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { 
   Settings as SettingsIcon,
@@ -24,8 +23,7 @@ import {
   ChevronRight,
   AlertTriangle
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { UserPreferences, PreferenceUpdate, PreferenceValidation } from '@shared/preferences';
+import { UserPreferences, PreferenceValidation } from '@shared/preferences';
 
 export default function Settings() {
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
@@ -54,7 +52,7 @@ export default function Settings() {
     }
   };
 
-  const updatePreference = async (section: keyof UserPreferences, updates: Record<string, any>) => {
+  const updatePreference = async (section: keyof UserPreferences, updates: Record<string, unknown>) => {
     if (!preferences) return;
 
     const currentValue = preferences[section];
@@ -77,7 +75,7 @@ export default function Settings() {
     }
   };
 
-  const validatePreferences = async (section: string, updates: Record<string, any>): Promise<PreferenceValidation> => {
+  const validatePreferences = async (section: string, updates: Record<string, unknown>): Promise<PreferenceValidation> => {
     const response = await fetch('/api/preferences/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -263,7 +261,7 @@ export default function Settings() {
 
 function GeneralSettings({ preferences, onUpdate }: {
   preferences: UserPreferences;
-  onUpdate: (updates: Record<string, any>) => void;
+  onUpdate: (updates: Record<string, unknown>) => void;
 }) {
   return (
     <div className="space-y-6">
@@ -340,7 +338,7 @@ function GeneralSettings({ preferences, onUpdate }: {
 
 function AIContentSettings({ preferences, onUpdate }: {
   preferences: UserPreferences;
-  onUpdate: (updates: Record<string, any>) => void;
+  onUpdate: (updates: Record<string, unknown>) => void;
 }) {
   return (
     <div className="space-y-6">
@@ -437,7 +435,7 @@ function AIContentSettings({ preferences, onUpdate }: {
 
 function PublishingSettings({ preferences, onUpdate }: {
   preferences: UserPreferences;
-  onUpdate: (updates: Record<string, any>) => void;
+  onUpdate: (updates: Record<string, unknown>) => void;
 }) {
   return (
     <div className="space-y-6">
@@ -508,7 +506,7 @@ function PublishingSettings({ preferences, onUpdate }: {
 
 function NotificationSettings({ preferences, onUpdate }: {
   preferences: UserPreferences;
-  onUpdate: (updates: Record<string, any>) => void;
+  onUpdate: (updates: Record<string, unknown>) => void;
 }) {
   return (
     <div className="space-y-6">
@@ -576,7 +574,7 @@ function NotificationSettings({ preferences, onUpdate }: {
 
 function TeamSettings({ preferences, onUpdate }: {
   preferences: UserPreferences;
-  onUpdate: (updates: Record<string, any>) => void;
+  onUpdate: (updates: Record<string, unknown>) => void;
 }) {
   return (
     <div className="space-y-6">
@@ -625,7 +623,7 @@ function TeamSettings({ preferences, onUpdate }: {
 
 function AdvancedSettings({ preferences, onUpdate }: {
   preferences: UserPreferences;
-  onUpdate: (updates: Record<string, any>) => void;
+  onUpdate: (updates: Record<string, unknown>) => void;
 }) {
   return (
     <div className="space-y-6">

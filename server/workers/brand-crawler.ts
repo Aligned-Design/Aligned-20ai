@@ -95,7 +95,7 @@ async function retryWithBackoff<T>(
 export async function processBrandIntake(
   brandId: string,
   websiteUrl: string,
-  supabase: any,
+  supabase: unknown,
 ): Promise<BrandKitData> {
   console.log(`[Brand Crawler] Starting intake for brand ${brandId}`);
 
@@ -530,7 +530,7 @@ async function createEmbeddings(
   brandId: string,
   brandKit: BrandKitData,
   crawlResults: CrawlResult[],
-  supabase: any,
+  supabase: unknown,
 ): Promise<void> {
   if (!OPENAI_API_KEY) {
     console.warn("[Embeddings] OPENAI_API_KEY not set, skipping");

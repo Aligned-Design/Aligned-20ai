@@ -30,7 +30,7 @@ export class DatabaseError extends Error {
   }
 }
 
-function handleError(error: any, operation: string): DatabaseError {
+function handleError(error: unknown, operation: string): DatabaseError {
   console.error(`[Database] ${operation} failed:`, error);
 
   const message = error?.message || error?.error_description || 'Unknown database error';
@@ -45,7 +45,7 @@ export interface ClientSettingsRecord {
   id: string;
   client_id: string;
   brand_id: string;
-  email_preferences: Record<string, any>;
+  email_preferences: Record<string, unknown>;
   timezone: string;
   language: string;
   unsubscribe_token?: string;
@@ -274,7 +274,7 @@ export interface AuditLogRecord {
   actor_id: string;
   actor_email: string;
   action: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   ip_address?: string;
   user_agent?: string;
   created_at: string;
@@ -387,7 +387,7 @@ interface WebhookEventRecord {
   brand_id: string;
   provider: string;
   event_type: string;
-  payload: Record<string, any>;
+  payload: Record<string, unknown>;
   idempotency_key: string;
   status: string;
   attempt_count: number;

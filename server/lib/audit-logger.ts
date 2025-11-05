@@ -6,12 +6,12 @@
  */
 
 import { AuditLog, AuditAction, AuditLogQuery } from '@shared/approvals';
-import { auditLogs as dbAuditLogs, DatabaseError } from './dbClient';
+import { auditLogs as dbAuditLogs} from './dbClient';
 
 /**
  * Helper to convert database record to AuditLog format
  */
-function dbRecordToAuditLog(record: any): AuditLog {
+function dbRecordToAuditLog(record: unknown): AuditLog {
   return {
     id: record.id,
     brandId: record.brand_id,
@@ -36,7 +36,7 @@ export async function logAuditAction(
   actorId: string,
   actorEmail: string,
   action: AuditAction,
-  metadata: Record<string, any> = {},
+  metadata: Record<string, unknown> = {},
   ipAddress?: string,
   userAgent?: string
 ): Promise<AuditLog> {
@@ -198,7 +198,7 @@ export async function getAuditStatistics(
 /**
  * Verify audit log integrity (check for tampering)
  */
-export async function verifyAuditLogIntegrity(logId: string): Promise<{
+export async function verifyAuditLogIntegrity(_logId: string): Promise<{
   valid: boolean;
   message: string;
 }> {

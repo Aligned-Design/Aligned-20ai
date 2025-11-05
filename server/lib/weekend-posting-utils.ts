@@ -72,7 +72,7 @@ export function getNextPostingDate(
   }
 
   // Find next weekday
-  let nextDate = new Date(currentDate);
+  const nextDate = new Date(currentDate);
   let attempts = 0;
   const maxAttempts = 7; // Max 7 days to find a weekday
 
@@ -179,7 +179,7 @@ export function getWeekendPostingStatus(enabled: boolean, timezone: string = 'UT
  * @param postingConfig - Brand's posting configuration (JSONB object)
  * @returns Whether weekend posting is enabled (default: true)
  */
-export function getWeekendPostingFromConfig(postingConfig: any): boolean {
+export function getWeekendPostingFromConfig(postingConfig: unknown): boolean {
   // Default to true if not specified
   if (!postingConfig) {
     return true;

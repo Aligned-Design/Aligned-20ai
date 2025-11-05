@@ -157,7 +157,7 @@ export class EscalationScheduler {
   /**
    * Process a single escalation event
    */
-  private async processEscalation(escalation: any): Promise<void> {
+  private async processEscalation(escalation: unknown): Promise<void> {
     // Get approval details
     const approval = await postApprovals.getById(escalation.approval_id);
     if (!approval) {
@@ -201,9 +201,9 @@ export class EscalationScheduler {
    * Send email notification
    */
   private async sendEmailNotification(
-    escalation: any,
-    approval: any,
-    rule: any,
+    escalation: unknown,
+    approval: unknown,
+    rule: unknown,
     clientSettingsData: any
   ): Promise<void> {
     const recipient = escalation.escalated_to_user_id;
@@ -242,7 +242,7 @@ Please review and take action at your earliest convenience.
   /**
    * Send Slack notification
    */
-  private async sendSlackNotification(escalation: any, approval: any, rule: any): Promise<void> {
+  private async sendSlackNotification(escalation: unknown, _approval: unknown, _rule: unknown): Promise<void> {
     // This would integrate with Slack service (not implemented in this phase)
     // Placeholder for future Slack integration
     console.log(
@@ -253,7 +253,7 @@ Please review and take action at your earliest convenience.
   /**
    * Check if notification should be sent based on user preferences
    */
-  private shouldSendNotification(escalationLevel: string, clientSettings: any): boolean {
+  private shouldSendNotification(escalationLevel: string, clientSettings: unknown): boolean {
     if (!clientSettings) {
       // Default: send if no preferences found
       return true;

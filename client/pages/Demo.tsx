@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Badge as _Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { 
@@ -402,17 +402,17 @@ function MetricCard({ title, value, growth, icon, color }: MetricCardProps) {
   );
 }
 
-function ContentPipelineView({ posts }: { posts: any[] }) {
-  const statusGroups = posts.reduce((groups: Record<string, any[]>, post: any) => {
+function ContentPipelineView({ posts }: { posts: unknown[] }) {
+  const statusGroups = posts.reduce((groups: Record<string, unknown[]>, post: unknown) => {
     const status = post.status;
     if (!groups[status]) groups[status] = [];
     groups[status].push(post);
     return groups;
-  }, {} as Record<string, any[]>);
+  }, {} as Record<string, unknown[]>);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {Object.entries(statusGroups).map(([status, statusPosts]: [string, any[]]) => (
+      {Object.entries(statusGroups).map(([status, statusPosts]: [string, unknown[]]) => (
         <Card key={status}>
           <CardHeader>
             <CardTitle className="capitalize flex items-center gap-2">
@@ -423,7 +423,7 @@ function ContentPipelineView({ posts }: { posts: any[] }) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {statusPosts.map((post: any) => (
+            {statusPosts.map((post: unknown) => (
               <div key={post.id} className="p-3 border rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-2xl">{post.image}</span>
@@ -444,7 +444,7 @@ function ContentPipelineView({ posts }: { posts: any[] }) {
   );
 }
 
-function AnalyticsView({ metrics }: { metrics: any }) {
+function AnalyticsView({ _metrics }: { metrics: any }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -497,7 +497,7 @@ function AnalyticsView({ metrics }: { metrics: any }) {
   );
 }
 
-function CalendarView({ calendar }: { calendar: any[] }) {
+function CalendarView({ calendar }: { calendar: unknown[] }) {
   return (
     <Card>
       <CardHeader>

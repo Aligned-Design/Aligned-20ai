@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { ClientDashboardData, ContentItem, ContentComment } from '@shared/client-portal';
+import { ClientDashboardData, ContentComment } from '@shared/client-portal';
 
 // Mock data for client dashboard
 const mockDashboardData: ClientDashboardData = {

@@ -55,7 +55,7 @@ export class MailchimpClient {
   private async request<T>(
     endpoint: string,
     method: string = 'GET',
-    body?: Record<string, any>
+    body?: Record<string, unknown>
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
@@ -76,38 +76,38 @@ export class MailchimpClient {
     return response.json() as Promise<T>;
   }
 
-  async getLists(): Promise<any> {
+  async getLists(): Promise<unknown> {
     return this.request('/lists');
   }
 
   async getListSegments(listId: string): Promise<MailchimpListSegment[]> {
-    const response = await this.request<any>(`/lists/${listId}/segments`);
+    const response = await this.request<unknown>(`/lists/${listId}/segments`);
     return response.segments;
   }
 
-  async createCampaign(campaign: MailchimpCampaign): Promise<any> {
+  async createCampaign(campaign: MailchimpCampaign): Promise<unknown> {
     return this.request('/campaigns', 'POST', campaign);
   }
 
-  async updateCampaign(campaignId: string, updates: Partial<MailchimpCampaign>): Promise<any> {
+  async updateCampaign(campaignId: string, updates: Partial<MailchimpCampaign>): Promise<unknown> {
     return this.request(`/campaigns/${campaignId}`, 'PATCH', updates);
   }
 
-  async setCampaignContent(campaignId: string, content: any): Promise<any> {
+  async setCampaignContent(campaignId: string, content: unknown): Promise<unknown> {
     return this.request(`/campaigns/${campaignId}/content`, 'PUT', content);
   }
 
-  async sendCampaign(campaignId: string): Promise<any> {
+  async sendCampaign(campaignId: string): Promise<unknown> {
     return this.request(`/campaigns/${campaignId}/actions/send`, 'POST', {});
   }
 
-  async scheduleCampaign(campaignId: string, scheduleTime: string): Promise<any> {
+  async scheduleCampaign(campaignId: string, scheduleTime: string): Promise<unknown> {
     return this.request(`/campaigns/${campaignId}/actions/schedule`, 'POST', {
       schedule_time: scheduleTime,
     });
   }
 
-  async getCampaignStatus(campaignId: string): Promise<any> {
+  async getCampaignStatus(campaignId: string): Promise<unknown> {
     return this.request(`/campaigns/${campaignId}`);
   }
 

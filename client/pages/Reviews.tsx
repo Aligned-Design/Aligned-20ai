@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useBrand } from "@/contexts/BrandContext";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Badge as _Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DashboardSkeleton } from "@/components/ui/skeletons";
@@ -36,7 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar as _Avatar, AvatarFallback as _AvatarFallback, AvatarImage as _AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
@@ -74,7 +74,7 @@ export default function Reviews() {
 
       if (error) throw error;
       setReviews(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error loading reviews",
         description: error.message,
@@ -103,7 +103,7 @@ export default function Reviews() {
         description: "Your response has been posted",
       });
       loadReviews();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: error.message,

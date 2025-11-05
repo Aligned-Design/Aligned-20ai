@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge as _Badge } from "@/components/ui/badge";
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from "@/components/ui/card";
 import {
   Sparkles,
   CheckCircle2,
@@ -14,7 +14,7 @@ import {
   Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { MetricCard } from "./AnalyticsCharts";
+import { AnalyticsCharts as _AnalyticsCharts } from "./AnalyticsCharts";
 import { useNavigate } from "react-router-dom";
 
 // Welcome & AI Summary Widget

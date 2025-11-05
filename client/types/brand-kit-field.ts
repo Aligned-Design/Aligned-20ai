@@ -65,9 +65,9 @@ export interface BrandKitWithSources {
 export interface CrawlerSuggestion {
   field: string;
   label: string;
-  currentValue: any;
+  currentValue: unknown;
   currentSource: FieldSource;
-  suggestedValue: any;
+  suggestedValue: unknown;
   confidence: number;
   category: "colors" | "fonts" | "tone" | "keywords" | "about" | "other";
 }
@@ -85,7 +85,7 @@ export interface CrawlResult {
 
 export interface FieldChange {
   field: string;
-  value: any;
+  value: unknown;
   source: FieldSource;
   force_user_override?: boolean; // admin only
 }
@@ -93,8 +93,8 @@ export interface FieldChange {
 export interface FieldHistoryEntry {
   timestamp: string;
   field: string;
-  old_value: any;
-  new_value: any;
+  old_value: unknown;
+  new_value: unknown;
   old_source: FieldSource;
   new_source: FieldSource;
   changed_by: "user" | "crawler" | "system";
@@ -125,7 +125,7 @@ export function createTrackedField<T>(
  * Helper to check if field can be updated by crawler
  */
 export function canCrawlerUpdate(
-  field: TrackedField<any> | undefined,
+  field: TrackedField<unknown> | undefined,
 ): boolean {
   if (!field) return true; // No existing value, crawler can set it
   return field.source !== "user"; // Only update if not user-edited

@@ -9,7 +9,7 @@ export interface WixBlogPost {
   content: string;
   excerpt?: string;
   richContent?: {
-    nodes: any[];
+    nodes: unknown[];
   };
   authors?: string[];
   featured_image?: string;
@@ -54,7 +54,7 @@ export class WixClient {
   private async request<T>(
     endpoint: string,
     method: string = 'GET',
-    body?: Record<string, any>
+    body?: Record<string, unknown>
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
@@ -76,12 +76,12 @@ export class WixClient {
     return response.json() as Promise<T>;
   }
 
-  async getSiteInfo(): Promise<any> {
+  async getSiteInfo(): Promise<unknown> {
     return this.request('/contacts/sites');
   }
 
   async getBlogPosts(limit: number = 20): Promise<WixBlogPost[]> {
-    const response = await this.request<any>(
+    const response = await this.request<unknown>(
       `/blogs/posts?limit=${limit}&sort=PUBLISHED_DATE_DESC`
     );
     return response.posts || [];
@@ -117,13 +117,13 @@ export class WixClient {
     });
   }
 
-  async getContactLists(): Promise<any[]> {
-    const response = await this.request<any>('/contacts/lists');
+  async getContactLists(): Promise<unknown[]> {
+    const response = await this.request<unknown>('/contacts/lists');
     return response.lists || [];
   }
 
-  async getContacts(limit: number = 20): Promise<any[]> {
-    const response = await this.request<any>(
+  async getContacts(limit: number = 20): Promise<unknown[]> {
+    const response = await this.request<unknown>(
       `/contacts/contacts?limit=${limit}`
     );
     return response.contacts || [];
@@ -140,11 +140,11 @@ export class WixClient {
     return this.request(`/email/campaigns/${campaignId}`, 'PATCH', updates);
   }
 
-  async sendEmailCampaign(campaignId: string): Promise<any> {
+  async sendEmailCampaign(campaignId: string): Promise<unknown> {
     return this.request(`/email/campaigns/${campaignId}/send`, 'POST', {});
   }
 
-  async scheduleEmailCampaign(campaignId: string, sendAt: string): Promise<any> {
+  async scheduleEmailCampaign(campaignId: string, sendAt: string): Promise<unknown> {
     return this.request(`/email/campaigns/${campaignId}`, 'PATCH', {
       schedule: { sendAt },
       status: 'scheduled',
@@ -152,20 +152,20 @@ export class WixClient {
   }
 
   async getEmailCampaigns(limit: number = 20): Promise<WixEmailCampaign[]> {
-    const response = await this.request<any>(
+    const response = await this.request<unknown>(
       `/email/campaigns?limit=${limit}&sort=CREATED_DATE_DESC`
     );
     return response.campaigns || [];
   }
 
-  async getMediaItems(limit: number = 20): Promise<any[]> {
-    const response = await this.request<any>(
+  async getMediaItems(limit: number = 20): Promise<unknown[]> {
+    const response = await this.request<unknown>(
       `/media/items?limit=${limit}&sort=CREATED_DATE_DESC`
     );
     return response.items || [];
   }
 
-  async uploadMedia(filename: string, fileData: Buffer, mimeType: string): Promise<any> {
+  async uploadMedia(filename: string, fileData: Buffer, mimeType: string): Promise<unknown> {
     // Wix uses a different media upload flow - requires multipart form data
     const url = `${this.baseUrl}/media/items`;
 

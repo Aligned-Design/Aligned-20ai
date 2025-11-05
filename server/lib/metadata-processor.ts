@@ -2,9 +2,9 @@ import sharp from 'sharp';
 import { MediaMetadata, MediaCategory, MediaAsset } from '@shared/media';
 
 interface RawMetadata {
-  exif?: any;
-  iptc?: any;
-  xmp?: any;
+  exif?: unknown;
+  iptc?: unknown;
+  xmp?: unknown;
 }
 
 export async function extractMetadata(
@@ -166,7 +166,7 @@ function extractDominantColors(stats: sharp.Stats): string[] {
   return colors;
 }
 
-async function detectTextInImage(fileBuffer: Buffer): Promise<boolean> {
+async function detectTextInImage(_fileBuffer: Buffer): Promise<boolean> {
   // TODO: Integrate with OCR service (Tesseract, Google Vision, etc.)
   // For now, return false as placeholder
   return false;

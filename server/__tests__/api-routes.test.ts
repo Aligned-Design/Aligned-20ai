@@ -157,7 +157,7 @@ describe('API Routes', () => {
       });
 
       it('should validate required fields', () => {
-        const goal: Record<string, any> = { target: 10, deadline: '2024-12-31' };
+        const goal: Record<string, unknown> = { target: 10, deadline: '2024-12-31' };
 
         expect(() => {
           if (!goal.metric) throw new Error('Metric required');
@@ -364,7 +364,7 @@ describe('API Routes', () => {
       it('should return immediately without waiting', () => {
         const startTime = Date.now();
         // Simulating async operation that doesn't wait
-        const response = { status: 'pending' };
+        const __response = { status: 'pending' };
         const elapsed = Date.now() - startTime;
 
         expect(elapsed).toBeLessThan(100); // Should be instant
@@ -413,7 +413,7 @@ describe('API Routes', () => {
     });
 
     it('should handle missing required fields', () => {
-      const data: Record<string, any> = { name: 'Test' };
+      const data: Record<string, unknown> = { name: 'Test' };
       expect(() => {
         if (!data.email) throw new Error('Email required');
       }).toThrow('Email required');

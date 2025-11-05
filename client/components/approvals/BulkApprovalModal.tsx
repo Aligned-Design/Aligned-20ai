@@ -14,11 +14,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CheckCircle, AlertCircle, XCircle, Loader } from 'lucide-react';
+import { CheckCircle as _CheckCircle, AlertCircle as _AlertCircle, XCircle, Loader } from 'lucide-react';
 
 export interface BulkApprovalModalProps {
   isOpen: boolean;
@@ -30,11 +29,6 @@ export interface BulkApprovalModalProps {
   error?: string | null;
 }
 
-interface PostPreview {
-  id: string;
-  title: string;
-  platforms: string[];
-}
 
 export function BulkApprovalModal({
   isOpen,

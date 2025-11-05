@@ -2,8 +2,8 @@ import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Upload, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { Badge as _Badge } from '@/components/ui/badge';
+import { Upload, X, CheckCircle as _CheckCircle, AlertCircle as _AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MediaUploadProgress {
@@ -16,7 +16,7 @@ interface MediaUploadProgress {
 
 interface MediaUploaderProps {
   brandId: string;
-  onUploadComplete?: (assets: any[]) => void;
+  onUploadComplete?: (assets: unknown[]) => void;
   maxFiles?: number;
   acceptedTypes?: string[];
   className?: string;
@@ -32,7 +32,7 @@ export function MediaUploader({
   const [uploads, setUploads] = useState<MediaUploadProgress[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  const uploadFile = async (file: File): Promise<any> => {
+  const uploadFile = async (file: File): Promise<unknown> => {
     const uploadId = Math.random().toString(36).substr(2, 9);
     
     setUploads(prev => [...prev, {
@@ -113,7 +113,7 @@ export function MediaUploader({
     if (acceptedFiles.length === 0) return;
 
     setIsUploading(true);
-    const results: any[] = [];
+    const results: unknown[] = [];
 
     try {
       const uploadPromises = acceptedFiles.slice(0, maxFiles).map(uploadFile);

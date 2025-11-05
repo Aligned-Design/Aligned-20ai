@@ -1,21 +1,17 @@
 import { RequestHandler } from 'express';
-import crypto from 'crypto';
+
 import {
   Platform,
-  PublishRequest,
   PublishResponse,
   PublishingJob,
-  PlatformConnection,
   ConnectionStatus,
-  OAuthFlow,
   PostContent
 } from '@shared/publishing';
 import { validatePostContent, validateScheduleTime } from '../lib/platform-validators';
 import {
   generateOAuthUrl,
   exchangeCodeForToken,
-  refreshAccessToken,
-  isTokenExpired
+  refreshAccessToken
 } from '../lib/oauth-manager';
 import { publishingQueue } from '../lib/publishing-queue';
 import { connectionsDB } from '../lib/connections-db-service';
@@ -69,7 +65,7 @@ export const handleOAuthCallback: RequestHandler = async (req, res) => {
       state as string
     );
 
-    const [stateToken, brandId] = (state as string).split(':');
+    const [_stateToken, brandId] = (state as string).split(':');
 
     // Get tenantId and userId from auth context (in production, from req.user or session)
     const tenantId = (req as any).user?.tenantId || 'tenant-123';
@@ -238,7 +234,7 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
   try {
     const { brandId } = req.params;
     // ✅ VALIDATED: Query parameters validated against GetJobsQuerySchema
-    const { status, platform, limit, offset } = validateQuery(GetJobsQuerySchema, req.query);
+    const { __status, platform, limit, offset } = validateQuery(GetJobsQuerySchema, req.query);
 
     // Fetch from database for persistence across server restarts
     const { jobs, total } = await publishingDBService.getJobHistory(
@@ -380,7 +376,7 @@ export const verifyConnection: RequestHandler = async (req, res) => {
 
     // Try a simple API call to verify the token still works
     try {
-      const platformAPI = getPlatformAPI(platform as Platform, connection.access_token, connection.account_id);
+      const __platformAPI = getPlatformAPI(platform as Platform, connection.access_token, connection.account_id);
 
       // For now, just verify the connection object is valid
       // In production, you might make a simple test API call

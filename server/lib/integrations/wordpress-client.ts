@@ -53,7 +53,7 @@ export class WordPressClient {
   private async request<T>(
     endpoint: string,
     method: string = 'GET',
-    body?: Record<string, any>
+    body?: Record<string, unknown>
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
@@ -76,11 +76,11 @@ export class WordPressClient {
     return response.json() as Promise<T>;
   }
 
-  async getSiteInfo(): Promise<any> {
+  async getSiteInfo(): Promise<unknown> {
     return fetch(`${this.siteUrl}/wp-json`).then((r: Response) => r.json());
   }
 
-  async getPosts(params?: Record<string, any>): Promise<WordPressPost[]> {
+  async getPosts(params?: Record<string, unknown>): Promise<WordPressPost[]> {
     const queryString = new URLSearchParams(
       params || { per_page: 20, order: 'desc', orderby: 'date' }
     );
@@ -99,7 +99,7 @@ export class WordPressClient {
     return this.request(`/posts/${postId}`, 'POST', updates);
   }
 
-  async deletePost(postId: number, force: boolean = false): Promise<any> {
+  async deletePost(postId: number, force: boolean = false): Promise<unknown> {
     const queryString = force ? '?force=true' : '';
     return this.request(`/posts/${postId}${queryString}`, 'DELETE');
   }
@@ -139,7 +139,7 @@ export class WordPressClient {
     });
   }
 
-  async uploadMedia(filename: string, fileData: Buffer, mimeType: string): Promise<any> {
+  async uploadMedia(filename: string, fileData: Buffer, mimeType: string): Promise<unknown> {
     const url = `${this.baseUrl}/media`;
     const auth = Buffer.from(`${this.username}:${this.appPassword}`).toString('base64');
 
@@ -161,7 +161,7 @@ export class WordPressClient {
     return response.json();
   }
 
-  async getMediaItems(limit: number = 20): Promise<any[]> {
+  async getMediaItems(limit: number = 20): Promise<unknown[]> {
     return this.request(`/media?per_page=${limit}&order=desc&orderby=date`);
   }
 }

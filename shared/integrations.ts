@@ -39,7 +39,7 @@ export interface SyncEvent {
   action: 'create' | 'update' | 'delete' | 'sync';
   sourceId: string;
   targetId?: string;
-  data: any;
+  data: unknown;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   error?: string;
   attempts: number;
@@ -52,7 +52,7 @@ export interface WebhookEvent {
   integrationId: string;
   source: IntegrationType;
   eventType: string;
-  payload: any;
+  payload: unknown;
   signature?: string;
   receivedAt: string;
   processedAt?: string;

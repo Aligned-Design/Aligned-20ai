@@ -15,7 +15,6 @@ import {
   resubscribeToEmails,
   verifyUnsubscribeToken,
 } from '../routes/client-settings';
-import type { ClientSettings } from '@shared/client-settings';
 
 // Create test app
 const app = express();

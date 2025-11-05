@@ -7,11 +7,8 @@ import { Router, Request, RequestHandler } from 'express';
 import { z } from 'zod';
 import { escalationRules, escalationEvents, postApprovals, auditLogs } from '../lib/dbClient';
 import {
-  EscalationRuleSchema,
   CreateEscalationRuleSchema,
   UpdateEscalationRuleSchema,
-  EscalationEventSchema,
-  EscalationQuerySchema,
   CreateEscalationRequestSchema,
   UpdateEscalationEventSchema,
   calculateEscalationTime,
@@ -22,6 +19,7 @@ const router = Router();
 // ==================== REQUEST VALIDATION ====================
 
 interface AuthRequest extends Request {
+  brandId?: string;
   headers: {
     'x-brand-id'?: string;
     'x-user-id'?: string;
@@ -30,7 +28,7 @@ interface AuthRequest extends Request {
 }
 
 // Middleware: Extract brand ID from headers
-const requireBrandId: RequestHandler = (req: any, res: any, next: any) => {
+const requireBrandId: RequestHandler = (req: unknown, res: unknown, next: unknown) => {
   const brandId = req.headers['x-brand-id'];
   if (!brandId) {
     return res.status(400).json({ error: 'Missing x-brand-id header' });
@@ -47,9 +45,9 @@ router.use(requireBrandId);
  * GET /api/escalations/rules
  * Get all escalation rules for a brand
  */
-router.get('/rules', async (req: AuthRequest, res: any) => {
+router.get('/rules', async (req: AuthRequest, res: unknown) => {
   try {
-    const brandId = (req as any).brandId;
+    const brandId = req.brandId as string;
 
     const rules = await escalationRules.getByBrand(brandId, true);
 
@@ -71,7 +69,7 @@ router.get('/rules', async (req: AuthRequest, res: any) => {
  * GET /api/escalations/rules/:ruleId
  * Get a specific escalation rule
  */
-router.get('/rules/:ruleId', async (req: AuthRequest, res: any) => {
+router.get('/rules/:ruleId', async (req: AuthRequest, res: unknown) => {
   try {
     const { ruleId } = req.params;
 
@@ -97,9 +95,9 @@ router.get('/rules/:ruleId', async (req: AuthRequest, res: any) => {
  * POST /api/escalations/rules
  * Create a new escalation rule
  */
-router.post('/rules', async (req: AuthRequest, res: any) => {
+router.post('/rules', async (req: AuthRequest, res: unknown) => {
   try {
-    const brandId = (req as any).brandId;
+    const brandId = req.brandId as string;
     const userId = req.headers['x-user-id'] as string;
     const userEmail = req.headers['x-user-email'] as string;
 
@@ -114,7 +112,7 @@ router.post('/rules', async (req: AuthRequest, res: any) => {
       ...payload,
       brand_id: brandId,
       created_by: userId,
-    } as any);
+    });
 
     // Audit log
     await auditLogs.create({
@@ -153,10 +151,10 @@ router.post('/rules', async (req: AuthRequest, res: any) => {
  * PUT /api/escalations/rules/:ruleId
  * Update an escalation rule
  */
-router.put('/rules/:ruleId', async (req: AuthRequest, res: any) => {
+router.put('/rules/:ruleId', async (req: AuthRequest, res: unknown) => {
   try {
     const { ruleId } = req.params;
-    const brandId = (req as any).brandId;
+    const brandId = req.brandId as string;
     const userId = req.headers['x-user-id'] as string;
     const userEmail = req.headers['x-user-email'] as string;
 
@@ -170,7 +168,7 @@ router.put('/rules/:ruleId', async (req: AuthRequest, res: any) => {
     const updates = UpdateEscalationRuleSchema.parse(req.body);
 
     // Update rule
-    const updatedRule = await escalationRules.update(ruleId, updates as any);
+    const updatedRule = await escalationRules.update(ruleId, updates as Partial<typeof updates>);
 
     // Audit log
     await auditLogs.create({
@@ -208,10 +206,10 @@ router.put('/rules/:ruleId', async (req: AuthRequest, res: any) => {
  * DELETE /api/escalations/rules/:ruleId
  * Delete an escalation rule
  */
-router.delete('/rules/:ruleId', async (req: AuthRequest, res: any) => {
+router.delete('/rules/:ruleId', async (req: AuthRequest, res: unknown) => {
   try {
     const { ruleId } = req.params;
-    const brandId = (req as any).brandId;
+    const brandId = req.brandId as string;
     const userId = req.headers['x-user-id'] as string;
     const userEmail = req.headers['x-user-email'] as string;
 
@@ -255,9 +253,9 @@ router.delete('/rules/:ruleId', async (req: AuthRequest, res: any) => {
  * GET /api/escalations/events
  * Get escalation events for a brand
  */
-router.get('/events', async (req: AuthRequest, res: any) => {
+router.get('/events', async (req: AuthRequest, res: unknown) => {
   try {
-    const brandId = (req as any).brandId;
+    const brandId = req.brandId as string;
     const { status, level, limit = 50, offset = 0 } = req.query;
 
     const { events, total } = await escalationEvents.query({
@@ -291,7 +289,7 @@ router.get('/events', async (req: AuthRequest, res: any) => {
  * GET /api/escalations/events/:eventId
  * Get a specific escalation event
  */
-router.get('/events/:eventId', async (req: AuthRequest, res: any) => {
+router.get('/events/:eventId', async (req: AuthRequest, res: unknown) => {
   try {
     const { eventId } = req.params;
 
@@ -317,9 +315,9 @@ router.get('/events/:eventId', async (req: AuthRequest, res: any) => {
  * POST /api/escalations/events
  * Create a new escalation event
  */
-router.post('/events', async (req: AuthRequest, res: any) => {
+router.post('/events', async (req: AuthRequest, res: unknown) => {
   try {
-    const brandId = (req as any).brandId;
+    const brandId = req.brandId as string;
     const userId = req.headers['x-user-id'] as string;
     const userEmail = req.headers['x-user-email'] as string;
 
@@ -351,12 +349,12 @@ router.post('/events', async (req: AuthRequest, res: any) => {
       escalation_level: payload.escalation_level,
       escalated_to_role: rule.escalate_to_role,
       escalated_to_user_id: rule.escalate_to_user_id,
-      notification_type: (rule.notify_via[0] as any) || 'email',
+      notification_type: (rule.notify_via[0] as string) || 'email',
       triggered_at: new Date().toISOString(),
       scheduled_send_at: scheduledSendAt.toISOString(),
       status: 'pending',
       delivery_attempt_count: 0,
-    } as any);
+    });
 
     // Audit log
     await auditLogs.create({
@@ -395,10 +393,10 @@ router.post('/events', async (req: AuthRequest, res: any) => {
  * PUT /api/escalations/events/:eventId
  * Update an escalation event status
  */
-router.put('/events/:eventId', async (req: AuthRequest, res: any) => {
+router.put('/events/:eventId', async (req: AuthRequest, res: unknown) => {
   try {
     const { eventId } = req.params;
-    const brandId = (req as any).brandId;
+    const brandId = req.brandId as string;
     const userId = req.headers['x-user-id'] as string;
     const userEmail = req.headers['x-user-email'] as string;
 

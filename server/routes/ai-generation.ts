@@ -5,7 +5,6 @@ import {
   validateAIProviders,
   getAvailableProviders
 } from "../workers/ai-generation";
-import type { AIGenerationRequest, AIGenerationResponse } from "@shared/api";
 
 export const generateContent: RequestHandler = async (req, res) => {
   try {

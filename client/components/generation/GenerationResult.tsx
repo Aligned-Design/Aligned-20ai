@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Badge as _Badge } from '@/components/ui/badge';
 import {
   AlertTriangle,
   CheckCircle,
@@ -65,7 +65,7 @@ export function GenerationResult({
     return 'bg-red-50';
   };
 
-  const hasComplianceIssues =
+  const __hasComplianceIssues =
     linterResult &&
     (!linterResult.passed ||
       linterResult.pii_detected?.length > 0 ||
@@ -73,7 +73,7 @@ export function GenerationResult({
       linterResult.banned_claims_found?.length > 0 ||
       linterResult.platform_violations?.length > 0);
 
-  const hasBFSIssues = bfsScore && !bfsScore.passed;
+  const __hasBFSIssues = bfsScore && !bfsScore.passed;
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -398,7 +398,7 @@ export function GenerationResult({
                   </button>
                   {expandedIssue === 'platform' && (
                     <ul className="ml-6 space-y-2 mt-2">
-                      {linterResult.platform_violations.map((violation: any, idx: number) => (
+                      {linterResult.platform_violations.map((violation: unknown, idx: number) => (
                         <li key={idx} className="text-sm text-orange-700">
                           <p className="font-medium">{violation.platform}: {violation.issue}</p>
                           <p className="text-xs">

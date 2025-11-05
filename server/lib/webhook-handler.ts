@@ -116,7 +116,7 @@ export class WebhookHandler {
    * Deliver/process a webhook event
    * Simulates actual delivery. In production, this would invoke the real handler
    */
-  private async deliverEvent(eventId: string, event: any): Promise<boolean> {
+  private async deliverEvent(eventId: string, event: unknown): Promise<boolean> {
     try {
       // Log the attempt
       const attemptNumber = event.attempt_count + 1;
@@ -228,7 +228,7 @@ export class WebhookHandler {
   /**
    * Get event status
    */
-  public async getEventStatus(eventId: string): Promise<any> {
+  public async getEventStatus(eventId: string): Promise<unknown> {
     const event = await webhookEvents.getById(eventId);
     if (!event) {
       return null;

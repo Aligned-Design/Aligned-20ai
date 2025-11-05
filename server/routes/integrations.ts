@@ -166,7 +166,7 @@ router.post("/oauth/start", (async (req, res) => {
 // Complete OAuth flow
 router.post("/oauth/callback", (async (req, res) => {
   try {
-    const { type, code, state, brandId } = req.body;
+    const { type, code, __state, brandId } = req.body;
 
     if (!type || !code || !brandId) {
       return res.status(400).json({ error: 'type, code, and brandId required' });
@@ -278,8 +278,8 @@ router.delete("/:integrationId", (async (req, res) => {
 // Get sync events
 router.get("/:integrationId/sync-events", (async (req, res) => {
   try {
-    const { integrationId } = req.params;
-    const { limit = '50', offset = '0' } = req.query;
+    const { __integrationId } = req.params;
+    const { __limit = '50', __offset = '0' } = req.query;
 
     // TODO: Fetch from database
     const syncEvents: SyncEvent[] = [];
@@ -366,7 +366,7 @@ function generateOAuthUrl(type: IntegrationType, brandId: string, redirectUrl?: 
   return `${baseUrls[type]}?${params.toString()}`;
 }
 
-async function exchangeCodeForTokens(type: IntegrationType, code: string) {
+async function exchangeCodeForTokens(type: IntegrationType, _code: string) {
   // Mock token exchange - in production, make actual API calls
   return {
     accessToken: `${type}_access_token_${Date.now()}`,
@@ -394,7 +394,7 @@ async function triggerSync(integration: Integration, syncType: string): Promise<
   };
 }
 
-function verifyWebhookSignature(type: IntegrationType, payload: any, signature: string): boolean {
+function verifyWebhookSignature(_type: IntegrationType, _payload: unknown, _signature: string): boolean {
   // TODO: Implement proper signature verification for each platform
   return true;
 }

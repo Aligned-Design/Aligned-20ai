@@ -1,4 +1,4 @@
-import { PublishingJob, Platform, PostContent, JobStatusUpdate } from '@shared/publishing';
+import { PublishingJob, JobStatusUpdate } from '@shared/publishing';
 import { validatePostContent } from './platform-validators';
 import { connectionsDB } from './connections-db-service';
 import { publishingDBService } from './publishing-db-service';
@@ -15,7 +15,7 @@ interface PublishResult {
   platformPostId?: string;
   platformUrl?: string;
   error?: string;
-  errorDetails?: any;
+  errorDetails?: unknown;
 }
 
 export class PublishingQueue {
@@ -434,7 +434,7 @@ export class PublishingQueue {
     }
   }
 
-  private async handleJobFailure(jobId: string, error: string, errorDetails?: any): Promise<void> {
+  private async handleJobFailure(jobId: string, error: string, errorDetails?: unknown): Promise<void> {
     const job = this.jobs.get(jobId);
     if (!job) return;
 
@@ -513,7 +513,7 @@ export class PublishingQueue {
     return true;
   }
 
-  private async getBrandPostingConfig(brandId: string): Promise<any> {
+  private async getBrandPostingConfig(brandId: string): Promise<unknown> {
     try {
       // Fetch brand posting config from database
       // This integrates with the brands table posting_config JSONB field

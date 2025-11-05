@@ -170,8 +170,8 @@ export interface GenerationLog {
   approved: boolean;
   revision: number;
   timestamp: string;
-  input: any;
-  output: any;
+  input: unknown;
+  output: unknown;
   duration_ms: number;
   error?: string;
 }
@@ -182,7 +182,7 @@ export interface GenerationLog {
 export interface GenerationRequest {
   brand_id: string;
   agent: AgentType;
-  input: DocInput | DesignInput | Record<string, any>;
+  input: DocInput | DesignInput | Record<string, unknown>;
   safety_mode?: SafetyMode;
   idempotency_key?: string;
 }

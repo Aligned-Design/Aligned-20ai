@@ -52,8 +52,8 @@ export interface ReviewQueueResponse {
     id: string;
     brand_id: string;
     agent: string;
-    input: any;
-    output: any;
+    input: unknown;
+    output: unknown;
     bfs?: BrandFidelityScore;
     linter_results?: LinterResult;
     timestamp: string;
@@ -337,7 +337,7 @@ export interface AssetUploadResponse {
     filename: string;
     category: string;
     size: number;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
   };
   error?: string;
 }
@@ -442,8 +442,8 @@ export interface PostHistory {
   timestamp: string;
   changes?: {
     field: string;
-    oldValue: any;
-    newValue: any;
+    oldValue: unknown;
+    newValue: unknown;
   }[];
   comment?: string;
 }

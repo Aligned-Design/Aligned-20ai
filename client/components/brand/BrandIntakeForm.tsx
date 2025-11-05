@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { BrandIntakeRequest, BrandKitResponse } from '@shared/api';
 
 interface BrandIntakeFormProps {
   onSubmit: (data: BrandIntakeRequest) => Promise<void>;
@@ -39,7 +38,7 @@ export function BrandIntakeForm({ onSubmit, onSave, initialData }: BrandIntakeFo
   const completedFields = Object.keys(formData).length;
   const progress = Math.round((completedFields / totalFields) * 100);
 
-  const updateField = (field: keyof BrandIntakeRequest, value: any) => {
+  const updateField = (field: keyof BrandIntakeRequest, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrandIntakeForm } from '@/components/brand/BrandIntakeForm';
-import { AssetUploader } from '@/components/brand/AssetUploader';
+
 import type { BrandIntakeRequest, BrandKitResponse } from '@shared/api';
 
 export default function BrandKitBuilder() {

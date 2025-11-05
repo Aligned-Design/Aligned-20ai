@@ -23,7 +23,7 @@ interface AuditLogEntry {
   ip: string;
   userAgent: string;
   requestId: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 class MonitoringService {
@@ -109,7 +109,7 @@ export const performanceMonitor = (req: Request, res: Response, next: NextFuncti
   monitoringService.performanceEntries.set(requestId, entry);
   
   const originalEnd = res.end;
-  res.end = function(chunk?: any, encoding?: any) {
+  res.end = function(chunk?: unknown, encoding?: unknown) {
     const endTime = Date.now();
     const duration = endTime - startTime;
     
@@ -153,7 +153,7 @@ export const auditLogger = (req: Request, res: Response, next: NextFunction) => 
   next();
 };
 
-export const errorHandler = (error: Error, req: Request, res: Response, next: NextFunction) => {
+export const errorHandler = (error: Error, req: Request, res: Response, __next: NextFunction) => {
   console.error('Error:', {
     message: error.message,
     stack: error.stack,

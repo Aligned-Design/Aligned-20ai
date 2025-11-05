@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Badge as _Badge } from "@/components/ui/badge";
 import { supabase, Brand } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { Loading } from "@/components/ui/loading";
@@ -46,7 +46,7 @@ export default function BrandSnapshot() {
 
       if (fetchError) throw fetchError;
       setBrand(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message);
       toast({
         title: "Error loading brand",
@@ -71,8 +71,8 @@ export default function BrandSnapshot() {
   }
 
   const brandKit = (brand.brand_kit as any) || {};
-  const voiceSummary = (brand.voice_summary as any) || {};
-  const visualSummary = (brand.visual_summary as any) || {};
+  const __voiceSummary = (brand.voice_summary as any) || {};
+  const __visualSummary = (brand.visual_summary as any) || {};
 
   return (
     <div className="min-h-screen bg-background">

@@ -100,7 +100,7 @@ export async function recoverPublishingJobs(): Promise<void> {
 /**
  * Convert database job record to publishing queue format
  */
-function dbJobToQueueJob(dbJob: any): PublishingJob {
+function dbJobToQueueJob(dbJob: unknown): PublishingJob {
   return {
     id: dbJob.id,
     brandId: dbJob.brand_id,
@@ -145,7 +145,7 @@ export async function verifyJobSync(brandId: string): Promise<{
       queueJobs: queueJobs.length,
       syncStatus: status
     };
-  } catch (error) {
+  } catch (_error) {
     return {
       dbJobs: 0,
       queueJobs: 0,

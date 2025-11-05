@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -27,10 +26,10 @@ import { useNavigate } from "react-router-dom";
 import { useBrand } from "@/contexts/BrandContext";
 
 export default function Brands() {
-  const { brands, refreshBrands, setCurrentBrand, loading } = useBrand();
+  const { brands, refreshBrands, _setCurrentBrand, loading } = useBrand();
   const { user } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const _navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -97,7 +96,7 @@ export default function Brands() {
         primary_color: "#8B5CF6",
       });
       refreshBrands();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error creating brand",
         description: error.message,

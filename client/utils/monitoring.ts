@@ -51,25 +51,25 @@ export function trackWebVitals() {
   const vitals: Record<string, number> = {};
 
   // Collect Cumulative Layout Shift
-  onCLS((metric: any) => {
+  onCLS((metric: unknown) => {
     vitals['CLS'] = metric.value;
     captureMetric('web-vital', metric.name, metric.value, metric.rating);
   });
 
   // Collect First Contentful Paint
-  onFCP((metric: any) => {
+  onFCP((metric: unknown) => {
     vitals['FCP'] = metric.value;
     captureMetric('web-vital', metric.name, metric.value, metric.rating);
   });
 
   // Collect Largest Contentful Paint
-  onLCP((metric: any) => {
+  onLCP((metric: unknown) => {
     vitals['LCP'] = metric.value;
     captureMetric('web-vital', metric.name, metric.value, metric.rating);
   });
 
   // Collect Time to First Byte
-  onTTFB((metric: any) => {
+  onTTFB((metric: unknown) => {
     vitals['TTFB'] = metric.value;
     captureMetric('web-vital', metric.name, metric.value, metric.rating);
   });
@@ -124,7 +124,7 @@ export function captureMetric(
 // Capture user interaction metrics
 export function captureUserInteraction(
   action: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ) {
   Sentry.captureMessage(`User Interaction: ${action}`, {
     level: 'debug',
@@ -139,7 +139,7 @@ export function captureUserInteraction(
 }
 
 // Set user context for error tracking
-export function setUserContext(userId: string, email?: string, metadata?: Record<string, any>) {
+export function setUserContext(userId: string, email?: string, metadata?: Record<string, unknown>) {
   Sentry.setUser({
     id: userId,
     email,
@@ -153,7 +153,7 @@ export function clearUserContext() {
 }
 
 // Capture errors with context
-export function captureError(error: Error | unknown, context?: Record<string, any>) {
+export function captureError(error: Error | unknown, context?: Record<string, unknown>) {
   Sentry.captureException(error, {
     contexts: {
       custom: context,

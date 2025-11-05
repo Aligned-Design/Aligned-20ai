@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { BrandIntelligence, CompetitorProfile, StrategicRecommendation } from '@shared/brand-intelligence';
+import { BrandIntelligence} from '@shared/brand-intelligence';
 
 export const getBrandIntelligence: RequestHandler = async (req, res) => {
   try {
@@ -219,7 +219,7 @@ export const getBrandIntelligence: RequestHandler = async (req, res) => {
 
 export const submitRecommendationFeedback: RequestHandler = async (req, res) => {
   try {
-    const { recommendationId, action } = req.body;
+    const { __recommendationId, __action } = req.body;
     
     // TODO: Store feedback in database
     // TODO: Use feedback to improve future recommendations

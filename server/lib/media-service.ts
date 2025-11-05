@@ -124,7 +124,7 @@ class MediaService {
 
     if (error || !data) return 0;
 
-    return data.reduce((sum: number, row: any) => sum + (row.file_size || 0), 0);
+    return data.reduce((sum: number, row: unknown) => sum + (row.file_size || 0), 0);
   }
 
   /**
@@ -186,7 +186,7 @@ class MediaService {
         status: 'uploading'
       });
 
-      const { error: uploadError, data } = await supabase.storage
+      const { error: uploadError, __data } = await supabase.storage
         .from(bucketName)
         .upload(assetPath, file, {
           contentType: mimeType,
@@ -198,7 +198,7 @@ class MediaService {
         throw new Error(`Upload failed: ${uploadError.message}`);
       }
 
-      const uploadTime = Date.now() - uploadStartTime;
+      const __uploadTime = Date.now() - uploadStartTime;
       const processingStartTime = Date.now();
 
       // 3. Generate variants for images
@@ -242,7 +242,7 @@ class MediaService {
       const aiTags = await this.generateAITags(file, mimeType, filename);
       const aiTaggingTime = Date.now() - aiTaggingStartTime;
 
-      const processingTime = Date.now() - processingStartTime;
+      const __processingTime = Date.now() - processingStartTime;
 
       // 6. Create asset record
       const asset: MediaAsset = {
@@ -336,7 +336,7 @@ class MediaService {
     };
 
     const image = sharp(file);
-    const imageMetadata = await image.metadata();
+    const __imageMetadata = await image.metadata();
 
     for (const [sizeName, dimensions] of Object.entries(sizes)) {
       try {
@@ -383,7 +383,7 @@ class MediaService {
     mimeType: string,
     filename: string,
     brandId: string
-  ): Promise<any> {
+  ): Promise<unknown> {
     try {
       if (mimeType.startsWith('image/')) {
         const metadata = await sharp(file).metadata();
@@ -772,7 +772,7 @@ class MediaService {
   /**
    * Map database row to MediaAsset
    */
-  private mapAssetRow(row: any): MediaAsset {
+  private mapAssetRow(row: unknown): MediaAsset {
     return {
       id: row.id,
       brandId: row.brand_id,

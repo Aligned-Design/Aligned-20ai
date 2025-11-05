@@ -7,7 +7,7 @@
 import { RequestHandler } from 'express';
 import { z } from 'zod';
 import { logAuditAction } from '../lib/audit-logger';
-import { postApprovals as dbPostApprovals, DatabaseError } from '../lib/dbClient';
+import { postApprovals as dbPostApprovals} from '../lib/dbClient';
 
 // ==================== TYPES & VALIDATION ====================
 
@@ -71,7 +71,7 @@ export const bulkApproveOrReject: RequestHandler = async (req, res) => {
     for (const postId of postIds) {
       try {
         // Upsert approval record in database
-        const approval = await dbPostApprovals.upsert({
+        const __approval = await dbPostApprovals.upsert({
           brand_id: brandId,
           post_id: postId,
           status: action === 'approve' ? 'approved' : 'rejected',

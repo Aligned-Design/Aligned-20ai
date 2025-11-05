@@ -8,8 +8,8 @@
 import React, { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, Calendar } from "lucide-react";
+import { Card as _Card, CardContent as _CardContent, CardDescription as _CardDescription, CardHeader as _CardHeader, CardTitle as _CardTitle } from "@/components/ui/card";
+import { AlertCircle as _AlertCircle, Calendar as _Calendar } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface WeekendPostingToggleProps {

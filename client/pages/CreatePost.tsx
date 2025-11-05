@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useBrand } from "@/contexts/BrandContext";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -27,8 +26,7 @@ import {
   ContentType,
   CreatePostFormData,
 } from "@/types/integrations";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
@@ -81,7 +79,7 @@ export default function CreatePost() {
 
       if (error) throw error;
       setConnections(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error loading connections",
         description: error.message,
@@ -134,7 +132,7 @@ export default function CreatePost() {
         title: "Draft Saved",
         description: "Your post has been saved as a draft",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: error.message,

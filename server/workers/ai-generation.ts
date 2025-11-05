@@ -253,7 +253,7 @@ Return as valid JSON with this structure:
         provider: provider || "openai",
         agentType: agentType
       };
-    } catch (parseError) {
+    } catch (_parseError) {
       // Fallback if not valid JSON
       return {
         content: result,
@@ -434,7 +434,7 @@ Return as valid JSON with this structure:
         provider: provider || "openai",
         agentType: "design"
       };
-    } catch (parseError) {
+    } catch (_parseError) {
       // Fallback if not valid JSON
       return {
         content: result,

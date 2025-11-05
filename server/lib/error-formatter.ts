@@ -47,7 +47,7 @@ class ErrorFormatter {
   /**
    * Format error to standard structure
    */
-  private formatError(error: Error | APIError | string, includeStack = false): APIError {
+  private formatError(error: Error | APIError | string, _includeStack = false): APIError {
     // If already formatted, return as-is
     if (this.isAPIError(error)) {
       return error;
@@ -220,7 +220,7 @@ class ErrorFormatter {
   /**
    * Check if error is already formatted
    */
-  private isAPIError(error: any): error is APIError {
+  private isAPIError(error: unknown): error is APIError {
     return (
       error &&
       typeof error === 'object' &&
@@ -233,7 +233,7 @@ class ErrorFormatter {
   /**
    * Log error for monitoring (Sentry, etc.)
    */
-  logError(error: Error, context?: Record<string, any>): void {
+  logError(error: Error, context?: Record<string, unknown>): void {
     // In production, send to Sentry or similar
     console.error('Error logged:', {
       message: error.message,
@@ -252,7 +252,7 @@ export const errorFormatter = new ErrorFormatter();
  */
 export function errorHandlingMiddleware(
   err: Error,
-  req: any,
+  req: unknown,
   res: Response,
   next: any
 ): void {

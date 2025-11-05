@@ -3,7 +3,7 @@
  * Tests the full flow: AI Generation → Brand Application → BFS Scoring → Scheduling
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach} from 'test';
 import {
   mockAIGeneratedContent,
   mockBrandGuide,
@@ -27,7 +27,7 @@ import {
  * Mock AI Service
  */
 class MockAIService {
-  async generateContent(prompt: string) {
+  async generateContent(_prompt: string) {
     return mockAIGeneratedContent.happy_path;
   }
 
@@ -46,7 +46,7 @@ class MockBFSScorer {
     this.strictMode = strict;
   }
 
-  async scoreContent(content: any, brandGuide: any) {
+  async scoreContent(content: unknown, brandGuide: unknown) {
     // Simulate scoring logic
     const toneScore = content.tone === 'professional' ? 95 : 30;
     const terminologyScore = content.body.includes('Solution') ? 90 : 40;
@@ -69,7 +69,7 @@ class MockBFSScorer {
     };
   }
 
-  private generateRecommendations(content: any, brandGuide: any): string[] {
+  private generateRecommendations(content: unknown, _brandGuide: unknown): string[] {
     const recommendations: string[] = [];
 
     if (content.tone !== 'professional') {
@@ -92,9 +92,9 @@ class MockBFSScorer {
  * Mock Scheduling Service
  */
 class MockSchedulingService {
-  private scheduledPosts = new Map<string, any>();
+  private scheduledPosts = new Map<string, unknown>();
 
-  async schedulePost(postId: string, content: any, scheduleTime: Date) {
+  async schedulePost(postId: string, content: unknown, scheduleTime: Date) {
     // Check for conflicts
     for (const [, scheduled] of this.scheduledPosts) {
       const timeDiff = Math.abs(scheduled.scheduleTime.getTime() - scheduleTime.getTime());
@@ -135,9 +135,9 @@ class MockSchedulingService {
  * Mock Audit Logger
  */
 class MockAuditLogger {
-  private logs: any[] = [];
+  private logs: unknown[] = [];
 
-  async logAction(action: string, metadata: any) {
+  async logAction(action: string, metadata: unknown) {
     this.logs.push({
       action,
       metadata,
@@ -179,7 +179,7 @@ class AutomationPipeline {
     scheduleHours: number;
     timezone: string;
     contentVariant?: 'happy_path' | 'brand_mismatch' | 'missing_cta' | 'compliance_violation';
-    brandGuide?: any;
+    brandGuide?: unknown;
   }) {
     const startTime = Date.now();
 
@@ -193,7 +193,7 @@ class AutomationPipeline {
       });
 
       // Step 2: Generate AI content
-      let content = request.contentVariant
+      const content = request.contentVariant
         ? await this.aiService.generateContentWithVariant(request.contentVariant)
         : await this.aiService.generateContent('');
 
@@ -228,7 +228,7 @@ class AutomationPipeline {
 
       // Step 5: Schedule the post
       const scheduleTime = calculateScheduleTime(request.timezone, request.scheduleHours);
-      const schedulingResult = await this.schedulingService.schedulePost(
+      const __schedulingResult = await this.schedulingService.schedulePost(
         request.postId,
         content,
         scheduleTime

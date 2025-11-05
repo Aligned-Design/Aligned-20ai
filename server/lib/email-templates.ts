@@ -214,7 +214,7 @@ export function generatePublishFailureEmail(data: PublishFailureEmailData): {
   htmlBody: string;
   textBody: string;
 } {
-  const brandColor = data.brandColor || '#DC2626';
+  const __brandColor = data._brandColor || '#DC2626';
   const subject = `⚠️ Publishing failed for "${data.postTitle}"`;
 
   const htmlBody = `

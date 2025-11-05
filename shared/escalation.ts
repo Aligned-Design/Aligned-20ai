@@ -126,7 +126,7 @@ export const EscalationEventSchema = z.object({
   resolved_by: z.string().uuid().optional(),
   delivery_attempt_count: z.number().int().min(0).default(0),
   last_delivery_error: z.string().optional(),
-  response_metadata: z.record(z.any()).optional(),
+  response_metadata: z.record(z.unknown()).optional(),
   created_at: z.string().datetime(),
   updated_at: z.string().datetime(),
 });
@@ -152,7 +152,7 @@ export const EscalationHistorySchema = z.object({
   action: z.enum(['created', 'scheduled', 'sent', 'failed', 'resolved', 'acknowledged']),
   actor: z.string().uuid().optional(),
   reason: z.string().optional(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.unknown()).optional(),
   created_at: z.string().datetime(),
 });
 
@@ -274,7 +274,7 @@ export const DEFAULT_ESCALATION_RULES: DefaultEscalationRuleSet = {
 export function calculateEscalationTime(
   createdAt: Date | string,
   triggerHours: number,
-  timezone?: string,
+  _timezone?: string,
 ): Date {
   const created = typeof createdAt === 'string' ? new Date(createdAt) : createdAt;
   const scheduled = new Date(created.getTime() + triggerHours * 60 * 60 * 1000);

@@ -131,7 +131,7 @@ export interface AnalyticsAlert {
 export interface ChartData {
   type: 'line' | 'bar' | 'donut' | 'bubble' | 'heatmap';
   title: string;
-  data: any[];
+  data: unknown[];
   config: {
     xAxis?: string;
     yAxis?: string;
@@ -215,7 +215,7 @@ export interface VoiceQuery {
 
 export interface VoiceResponse {
   answer: string;
-  data?: any;
+  data?: unknown;
   suggestions?: string[];
   chartRecommendation?: string;
 }

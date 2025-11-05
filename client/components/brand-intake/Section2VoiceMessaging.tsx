@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
+import { Badge as _Badge } from "@/components/ui/badge";
 import { HelpTooltip } from "@/components/ui/help-tooltip";
 import {
   BrandIntakeFormData,
@@ -21,17 +21,17 @@ import { useState } from "react";
 
 interface Section2Props {
   data: Partial<BrandIntakeFormData>;
-  onChange: (field: keyof BrandIntakeFormData, value: any) => void;
+  onChange: (field: keyof BrandIntakeFormData, value: unknown) => void;
   errors: Record<string, string>;
 }
 
 export default function Section2VoiceMessaging({
   data,
   onChange,
-  errors,
+  errors: _errors,
 }: Section2Props) {
   const [newToneKeyword, setNewToneKeyword] = useState("");
-  const [newPhrase, setNewPhrase] = useState("");
+  const [_newPhrase, _setNewPhrase] = useState("");
 
   const togglePersonality = (personality: string) => {
     const current = data.brandPersonality || [];

@@ -218,7 +218,7 @@ function calculateToneAlignmentMatch(
 /**
  * Fallback keyword-based tone alignment
  */
-function calculateKeywordToneAlignment(brandKit: any): number {
+function calculateKeywordToneAlignment(brandKit: unknown): number {
   const toneKeywords = brandKit.tone_keywords || [];
   const personality = brandKit.brandPersonality || [];
 
@@ -233,7 +233,7 @@ function calculateKeywordToneAlignment(brandKit: any): number {
 /**
  * Terminology match scoring
  */
-function calculateTerminologyMatch(content: any, brandKit: any): number {
+function calculateTerminologyMatch(content: unknown, brandKit: unknown): number {
   const preferredTerms = brandKit.commonPhrases?.split(',') || [];
   const contentLower = `${content.body} ${content.cta || ''}`.toLowerCase();
 
@@ -251,7 +251,7 @@ function calculateTerminologyMatch(content: any, brandKit: any): number {
 /**
  * Compliance scoring
  */
-function calculateCompliance(content: any, brandKit: any): number {
+function calculateCompliance(content: unknown, brandKit: unknown): number {
   const contentLower = content.body.toLowerCase();
   const bannedPhrases = brandKit.banned_phrases || [];
 
@@ -276,7 +276,7 @@ function calculateCompliance(content: any, brandKit: any): number {
 /**
  * CTA fit scoring
  */
-function calculateCTAFit(content: any): number {
+function calculateCTAFit(content: unknown): number {
   if (!content.cta || content.cta.length === 0) {
     return 0.2; // Poor score if no CTA
   }
@@ -303,7 +303,7 @@ function calculateCTAFit(content: any): number {
 /**
  * Platform fit scoring
  */
-function calculatePlatformFit(content: any): number {
+function calculatePlatformFit(content: unknown): number {
   const platform = content.platform?.toLowerCase() || '';
 
   // Platform-specific length checks

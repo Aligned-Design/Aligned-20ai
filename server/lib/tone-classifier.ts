@@ -130,7 +130,7 @@ export class ToneClassifier {
   /**
    * Classify tone of given text
    */
-  async classifyTone(text: string, targetTone?: string): Promise<ToneClassificationResult> {
+  async classifyTone(text: string, _targetTone?: string): Promise<ToneClassificationResult> {
     try {
       // Step 1: Get text embedding
       const textEmbedding = await this.getEmbedding(text);

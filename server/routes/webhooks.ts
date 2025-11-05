@@ -7,7 +7,6 @@ import { RequestHandler } from 'express';
 import { z } from 'zod';
 import {
   WebhookProvider,
-  WebhookHandlerRequestSchema,
   WebhookLogsQuerySchema,
   generateIdempotencyKey,
 } from '@shared/webhooks';
@@ -17,15 +16,36 @@ import { logAuditAction } from '../lib/audit-logger';
 
 // ==================== TYPES & VALIDATION ====================
 
+interface WebhookEventAttempt {
+  attempt_number: number;
+  status: string;
+  error: string | null;
+  response_code: number | null;
+  backoff_ms: number;
+  created_at: string;
+}
+
+interface WebhookEventStatus {
+  event_id: string;
+  status: string;
+  attempt_count: number;
+  max_attempts: number;
+  created_at: string;
+  updated_at: string;
+  delivered_at: string | null;
+  last_error: string | null;
+  attempts: WebhookEventAttempt[];
+}
+
 const ZapierWebhookBodySchema = z.object({
   id: z.string().optional(),
   action: z.string(),
-  data: z.record(z.any()).optional(),
+  data: z.record(z.unknown()).optional(),
 });
 
 const MakeWebhookBodySchema = z.object({
   event: z.string(),
-  data: z.record(z.any()).optional(),
+  data: z.record(z.unknown()).optional(),
   webhook_id: z.string().optional(),
 });
 
@@ -42,7 +62,7 @@ const HubSpotWebhookBodySchema = z.object({
 /**
  * Get webhook signature from request headers
  */
-function getSignatureFromRequest(provider: WebhookProvider, headers: Record<string, any>): string | null {
+function _getSignatureFromRequest(provider: WebhookProvider, headers: Record<string, unknown>): string | null {
   const headerMap: Record<WebhookProvider, string> = {
     zapier: 'x-zapier-signature',
     make: 'x-hook-secret-key',
@@ -57,7 +77,7 @@ function getSignatureFromRequest(provider: WebhookProvider, headers: Record<stri
 /**
  * Get webhook secret from environment
  */
-function getWebhookSecret(provider: WebhookProvider): string {
+function _getWebhookSecret(provider: WebhookProvider): string {
   const secrets: Record<WebhookProvider, string> = {
     zapier: process.env.WEBHOOK_SECRET_ZAPIER || 'zapier-secret',
     make: process.env.WEBHOOK_SECRET_MAKE || 'make-secret',
@@ -266,7 +286,7 @@ export const getWebhookStatus: RequestHandler = async (req, res) => {
         deliveredAt: eventStatus.delivered_at,
         lastError: eventStatus.last_error,
       },
-      attempts: eventStatus.attempts.map((a: any) => ({
+      attempts: eventStatus.attempts.map((a: unknown) => ({
         attemptNumber: a.attempt_number,
         status: a.status,
         error: a.error,

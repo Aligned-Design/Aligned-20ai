@@ -1,13 +1,13 @@
 import React, { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Upload, Eye, Save, RotateCcw, Palette, Globe, Mail } from 'lucide-react';
+import { Badge as _Badge } from '@/components/ui/badge';
+import { Upload, Eye, Save, RotateCcw, Palette, Globe} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWhiteLabel } from '@/hooks/useWhiteLabel';
 import { WhiteLabelConfig, BRANDING_THEMES } from '@shared/branding';

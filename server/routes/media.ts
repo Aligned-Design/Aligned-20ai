@@ -14,8 +14,8 @@ interface MediaAsset {
   updatedAt: string;
   hash?: string;
   tags?: string[];
-  variants?: any[];
-  metadata?: Record<string, any>;
+  variants?: unknown[];
+  metadata?: Record<string, unknown>;
 }
 
 interface MediaUploadResponse {
@@ -59,11 +59,11 @@ interface SEOMetadataResponse {
   title: string;
   description: string;
   keywords: string[];
-  optimizedMetadata: Record<string, any>;
+  optimizedMetadata: Record<string, unknown>;
 }
 
 // Helper function stubs
-async function getCategoryUsage(bucketName: string, brandId: string): Promise<Record<string, { count: number; size: number }>> {
+async function getCategoryUsage(_bucketName: string, _brandId: string): Promise<Record<string, { count: number; size: number }>> {
   return {
     graphics: { count: 0, size: 0 },
     images: { count: 0, size: 0 },
@@ -76,11 +76,11 @@ async function getSignedUrl(bucketName: string, assetPath: string, expirationSec
   return `https://storage.example.com/${bucketName}/${assetPath}?expires=${expirationSeconds}`;
 }
 
-async function checkDuplicate(bucketName: string, hash: string, brandId: string): Promise<MediaAsset | null> {
+async function checkDuplicate(_bucketName: string, _hash: string, _brandId: string): Promise<MediaAsset | null> {
   return null;
 }
 
-function generateSEOMetadata(asset: MediaAsset, context: string): { altText: string; title: string; description: string } {
+function generateSEOMetadata(asset: MediaAsset, _context: string): { altText: string; title: string; description: string } {
   return {
     altText: asset.originalName,
     title: `Image: ${asset.originalName}`,

@@ -432,7 +432,7 @@ export type GenerateContentRequest = z.infer<typeof GenerateContentSchema>;
  * Create a validation middleware function
  */
 export function createValidationMiddleware<T extends z.ZodSchema>(schema: T) {
-  return (req: any, res: any, next: any) => {
+  return (req: { body: unknown }, res: { status: (code: number) => { json: (data: unknown) => void } }, next: (error?: unknown) => void) => {
     try {
       // Validate request body
       if (Object.keys(req.body).length > 0) {
@@ -463,13 +463,13 @@ export function createValidationMiddleware<T extends z.ZodSchema>(schema: T) {
 /**
  * Validate query parameters
  */
-export function validateQuery<T extends z.ZodSchema>(schema: T, query: any) {
+export function validateQuery<T extends z.ZodSchema>(schema: T, query: unknown) {
   return schema.parse(query);
 }
 
 /**
  * Validate URL parameters
  */
-export function validateParams<T extends z.ZodSchema>(schema: T, params: any) {
+export function validateParams<T extends z.ZodSchema>(schema: T, params: unknown) {
   return schema.parse(params);
 }

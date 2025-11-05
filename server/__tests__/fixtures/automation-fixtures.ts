@@ -286,7 +286,7 @@ export function createMockAutomationRequest(
     scheduleHours: number;
     timezone: string;
     contentVariant: 'happy_path' | 'brand_mismatch' | 'missing_cta' | 'compliance_violation';
-    brandGuide: any;
+    brandGuide: unknown;
   }>
 ) {
   const defaults = {

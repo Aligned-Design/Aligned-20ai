@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase, Brand, BrandMember } from "@/lib/supabase";
+import { supabase, Brand} from "@/lib/supabase";
 import { useAuth } from "./AuthContext";
 
 type BrandContextType = {
