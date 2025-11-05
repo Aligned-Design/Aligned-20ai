@@ -322,11 +322,11 @@ function WorkflowStep({
 
   return (
     <div className="text-center">
-      <div className={`w-12 h-12 ${colorClasses[color]} rounded-full flex items-center justify-center mx-auto mb-4 border border-white/8 shadow-sm`}>
+      <div className={`w-12 h-12 ${colorClasses[color]} rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100 shadow-sm`}>
         <span className="font-semibold">{number}</span>
       </div>
-      <h3 className="font-semibold text-white mb-2">{title}</h3>
-      <p className="text-sm text-slate-200">{description}</p>
+      <h3 className="font-semibold text-slate-900 mb-2">{title}</h3>
+      <p className="text-sm text-slate-600">{description}</p>
     </div>
   );
 }
