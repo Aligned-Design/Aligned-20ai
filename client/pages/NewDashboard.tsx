@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import { useBrand } from "@/contexts/BrandContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
@@ -251,7 +252,7 @@ export default function NewDashboard() {
     },
   ];
 
-  const insights: unknown[] = [
+  const insights: any[] = [
     {
       id: "1",
       title: "Try Reels Thu 3–5 PM",
