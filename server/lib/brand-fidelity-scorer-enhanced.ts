@@ -218,9 +218,9 @@ function calculateToneAlignmentMatch(
 /**
  * Fallback keyword-based tone alignment
  */
-function calculateKeywordToneAlignment(brandKit: unknown): number {
-  const toneKeywords = brandKit.tone_keywords || [];
-  const personality = brandKit.brandPersonality || [];
+function calculateKeywordToneAlignment(brandKit: any): number {
+  const toneKeywords: string[] = (brandKit && brandKit.tone_keywords) || [];
+  const personality: string[] = (brandKit && brandKit.brandPersonality) || [];
 
   if (toneKeywords.length === 0 && personality.length === 0) {
     return 0.5; // Neutral if no tone guidelines
