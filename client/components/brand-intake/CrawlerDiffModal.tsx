@@ -8,7 +8,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Badge as _Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, X, Sparkles } from "lucide-react";
 import { CrawlerSuggestion, FieldChange } from "@/types/brand-kit-field";
