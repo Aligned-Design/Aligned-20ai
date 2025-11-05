@@ -1,5 +1,3 @@
-import { Suspense, lazy } from 'react';
-
 import React, { lazy, Suspense } from 'react';
 
 const Chart = lazy(() => import('recharts').then(module => ({
