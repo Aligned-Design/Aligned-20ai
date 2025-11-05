@@ -215,43 +215,50 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
 
           <TabsContent value="overview" className="space-y-6">
             {/* Key Metrics */}
-            {data && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <MetricCard
-                  title="Total Reach"
-                  current={data.metrics.reach.current}
-                  previous={data.metrics.reach.previous}
-                  change={data.metrics.reach.change}
-                  icon={<Eye className="h-6 w-6" />}
-                  color="blue"
-                />
-                <MetricCard
-                  title="Engagement"
-                  current={data.metrics.engagement.current}
-                  previous={data.metrics.engagement.previous}
-                  change={data.metrics.engagement.change}
-                  icon={<Heart className="h-6 w-6" />}
-                  color="red"
-                />
-                <MetricCard
-                  title="Conversions"
-                  current={data.metrics.conversions.current}
-                  previous={data.metrics.conversions.previous}
-                  change={data.metrics.conversions.change}
-                  icon={<MousePointer className="h-6 w-6" />}
-                  color="green"
-                />
-                <MetricCard
-                  title="Engagement Rate"
-                  current={data.metrics.engagementRate.current}
-                  previous={data.metrics.engagementRate.previous}
-                  change={data.metrics.engagementRate.change}
-                  icon={<BarChart3 className="h-6 w-6" />}
-                  color="purple"
-                  isPercentage
-                />
-              </div>
-            )}
+            {data && (() => {
+              const reach = data.metrics?.reach ?? { current: 0, previous: 0, change: 0 };
+              const engagement = data.metrics?.engagement ?? { current: 0, previous: 0, change: 0 };
+              const conversions = data.metrics?.conversions ?? { current: 0, previous: 0, change: 0 };
+              const engagementRate = data.metrics?.engagementRate ?? { current: 0, previous: 0, change: 0 };
+
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <MetricCard
+                    title="Total Reach"
+                    current={reach.current}
+                    previous={reach.previous}
+                    change={reach.change}
+                    icon={<Eye className="h-6 w-6" />}
+                    color="blue"
+                  />
+                  <MetricCard
+                    title="Engagement"
+                    current={engagement.current}
+                    previous={engagement.previous}
+                    change={engagement.change}
+                    icon={<Heart className="h-6 w-6" />}
+                    color="red"
+                  />
+                  <MetricCard
+                    title="Conversions"
+                    current={conversions.current}
+                    previous={conversions.previous}
+                    change={conversions.change}
+                    icon={<MousePointer className="h-6 w-6" />}
+                    color="green"
+                  />
+                  <MetricCard
+                    title="Engagement Rate"
+                    current={engagementRate.current}
+                    previous={engagementRate.previous}
+                    change={engagementRate.change}
+                    icon={<BarChart3 className="h-6 w-6" />}
+                    color="purple"
+                    isPercentage
+                  />
+                </div>
+              );
+            })()}
 
             {/* Charts */}
             {data && (
