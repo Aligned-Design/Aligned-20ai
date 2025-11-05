@@ -452,10 +452,11 @@ function CreateEventForm({
         description: "Your event has been saved as a draft",
       });
       onSuccess();
-    } catch (error: unknown) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: "Error",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     }
