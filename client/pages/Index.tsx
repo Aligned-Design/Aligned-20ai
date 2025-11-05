@@ -171,10 +171,10 @@ export default function Index() {
       {/* Features Grid */}
       <div className="max-w-7xl mx-auto px-6 py-16 relative z-10 bg-gray-50">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
             Everything You Need
           </h2>
-          <p className="text-lg text-slate-200">
+          <p className="text-lg text-slate-600">
             Professional-grade features for agencies and brands
           </p>
         </div>
