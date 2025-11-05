@@ -195,9 +195,9 @@ export function CrawlerDiffModal({
         <div className="flex items-center gap-2">
           <div
             className="h-8 w-8 rounded-lg border shadow-sm"
-            style={{ backgroundColor: value }}
+            style={{ backgroundColor: String(value) }}
           />
-          <span className="text-sm">{value}</span>
+          <span className="text-sm">{String(value)}</span>
         </div>
       );
     }
