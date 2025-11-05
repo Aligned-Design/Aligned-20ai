@@ -281,12 +281,12 @@ export default function Index() {
             on-brand content at scale.
           </p>
           <div className="flex gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="rounded-3xl px-6 py-3 bg-[#C9F06A] text-black font-semibold shadow-2xl hover:shadow-xl transition">
+            <Button size="lg" variant="default">
               <Link to="/signup">
                 Start Free Trial
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="rounded-3xl px-6 py-3 border border-white/30 text-white hover:bg-white/8">
+            <Button size="lg" variant="outline">
               <Link to="/demo">
                 Schedule Demo
               </Link>
