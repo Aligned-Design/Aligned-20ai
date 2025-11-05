@@ -279,8 +279,8 @@ export default function Demo() {
                         <p className="text-sm text-gray-700 mb-2 line-clamp-2">{post.content}</p>
                         {post.metrics && (
                           <div className="flex items-center gap-4 text-xs text-gray-500">
-                            <span>{formatNumber(post.metrics.reach)} reach</span>
-                            <span>{formatNumber(post.metrics.engagement)} engagement</span>
+                            <span>{formatNumber(post.metrics.reach ?? 0)} reach</span>
+                            <span>{formatNumber(post.metrics.engagement ?? 0)} engagement</span>
                           </div>
                         )}
                       </div>
