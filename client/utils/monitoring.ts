@@ -9,34 +9,42 @@ import { onCLS, onFCP, onLCP, onTTFB } from 'web-vitals';
 
 // Initialize Sentry for error tracking and performance monitoring
 export function initializeSentry() {
-  const isDevelopment = process.env.NODE_ENV === 'development';
-  const isProduction = process.env.NODE_ENV === 'production';
+  // Resolve environment in both browser (import.meta.env) and Node (process.env)
+  const env = (typeof window !== 'undefined' && (import.meta as any)?.env)
+    || (typeof process !== 'undefined' && process.env)
+    || {} as Record<string, any>;
+
+  const NODE_ENV = env.NODE_ENV || env.VITE_NODE_ENV || 'development';
+  const isDevelopment = NODE_ENV === 'development';
+  const isProduction = NODE_ENV === 'production';
 
   // Only initialize in production or when explicitly enabled
-  if (!isProduction && !process.env.VITE_ENABLE_SENTRY) {
-    console.log('ℹ️  Sentry disabled (use VITE_ENABLE_SENTRY=true to enable in development)');
+  const enableSentry = env.VITE_ENABLE_SENTRY ?? env.ENABLE_SENTRY ?? false;
+  if (!isProduction && !(enableSentry === true || String(enableSentry) === 'true')) {
+    console.log('ℹ️  Sentry disabled (set VITE_ENABLE_SENTRY=true to enable in development)');
     return;
   }
 
-  const dsn = process.env.VITE_SENTRY_DSN || 'https://your-sentry-dsn@sentry.io/project-id';
+  const dsn = env.VITE_SENTRY_DSN || env.SENTRY_DSN || 'https://your-sentry-dsn@sentry.io/project-id';
 
   Sentry.init({
     dsn,
-    environment: process.env.NODE_ENV,
+    environment: NODE_ENV,
     integrations: [
       new BrowserTracing({
         // @ts-ignore - reactRouterV6Instrumentation is available at runtime
         routingInstrumentation: Sentry.reactRouterV6Instrumentation(
-          window.history
+          // Use history if available
+          (typeof window !== 'undefined' && (window as any).history) || undefined
         ),
         tracingOrigins: ['localhost', /^\//],
         tracePropagationTargets: ['localhost', /^\//],
       }),
-      // @ts-ignore - Replay is available at runtime
-      new Sentry.Replay({
+      // @ts-ignore - Replay may not be available in all bundles
+      ...(typeof (Sentry as any).Replay !== 'undefined' ? [new (Sentry as any).Replay({
         maskAllText: true,
         blockAllMedia: true,
-      }),
+      })] : []),
     ],
     tracesSampleRate: isProduction ? 0.1 : 1.0,
     replaysSessionSampleRate: isProduction ? 0.1 : 1.0,
@@ -46,10 +54,11 @@ export function initializeSentry() {
     beforeSend(event, hint) {
       // Filter out certain errors
       if (event.exception) {
-        const error = hint.originalException;
+        const error = hint?.originalException as any;
         // Don't send network errors from third-party services
         if (
           error instanceof Error &&
+          typeof error.message === 'string' &&
           error.message.includes('NetworkError') &&
           error.message.includes('third-party')
         ) {
