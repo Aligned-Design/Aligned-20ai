@@ -363,7 +363,7 @@ function ReviewItemCard({
         {item.agent === "doc" && item.output && (
           <div className="bg-muted rounded-lg p-3">
             <p className="text-sm line-clamp-3">
-              {item.output.body || "No content available"}
+              {((item.output as DocOutput)?.body) || "No content available"}
             </p>
           </div>
         )}
