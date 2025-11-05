@@ -303,11 +303,11 @@ function calculateCTAFit(content: any): number {
 /**
  * Platform fit scoring
  */
-function calculatePlatformFit(content: unknown): number {
-  const platform = content.platform?.toLowerCase() || '';
+function calculatePlatformFit(content: any): number {
+  const platform = (content?.platform || '').toLowerCase();
 
   // Platform-specific length checks
-  const contentLength = content.body.length;
+  const contentLength = (content?.body || '').length;
 
   switch (platform) {
     case 'twitter':
