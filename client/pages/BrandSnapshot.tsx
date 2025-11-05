@@ -47,10 +47,11 @@ export default function BrandSnapshot() {
       if (fetchError) throw fetchError;
       setBrand(data);
     } catch (err: unknown) {
-      setError(err.message);
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
       toast({
         title: "Error loading brand",
-        description: err.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
