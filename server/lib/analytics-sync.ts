@@ -634,7 +634,7 @@ export class AnalyticsSync {
     }));
   }
 
-  private extractMetrics(platform: Platform, item: unknown): AnalyticsMetric['metrics'] {
+  private extractMetrics(platform: Platform, item: any): AnalyticsMetric['metrics'] {
     const base = {
       reach: 0,
       impressions: 0,
