@@ -15,7 +15,8 @@ export type AuditAction =
   | 'COMMENT_ADDED'
   | 'WORKFLOW_STARTED'
   | 'SETTINGS_UPDATED'
-  | 'EMAIL_PREFERENCES_UPDATED';
+  | 'EMAIL_PREFERENCES_UPDATED'
+  | 'WEBHOOK_RETRY_TRIGGERED';
 
 export interface AuditLog {
   id: string;

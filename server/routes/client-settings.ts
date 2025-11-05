@@ -1,6 +1,7 @@
 /**
  * Client Settings API routes
  * Manages email preferences, notification settings, and account preferences
+ * Now uses Supabase database for persistence
  */
 
 import { RequestHandler } from 'express';
@@ -13,10 +14,45 @@ import {
   EmailNotificationType,
 } from '@shared/client-settings';
 import { logAuditAction } from '../lib/audit-logger';
+import { clientSettings as dbClientSettings, DatabaseError } from '../lib/dbClient';
 import crypto from 'crypto';
 
-// Mock storage for client settings (replace with database)
-const clientSettingsStore: Map<string, ClientSettings> = new Map();
+/**
+ * Helper function to convert database record to API response format
+ */
+function dbRecordToClientSettings(record: any): ClientSettings {
+  return {
+    id: record.id,
+    clientId: record.client_id,
+    brandId: record.brand_id,
+    emailPreferences: record.email_preferences || DEFAULT_CLIENT_SETTINGS.emailPreferences,
+    timezone: record.timezone,
+    language: record.language,
+    unsubscribeToken: record.unsubscribe_token,
+    unsubscribedFromAll: record.unsubscribed_from_all,
+    unsubscribedTypes: record.unsubscribed_types || [],
+    createdAt: record.created_at,
+    updatedAt: record.updated_at,
+    lastModifiedBy: record.last_modified_by,
+  };
+}
+
+/**
+ * Helper function to convert API input to database format
+ */
+function clientSettingsToDbRecord(settings: Partial<ClientSettings>): any {
+  return {
+    client_id: settings.clientId,
+    brand_id: settings.brandId,
+    email_preferences: settings.emailPreferences,
+    timezone: settings.timezone,
+    language: settings.language,
+    unsubscribe_token: settings.unsubscribeToken,
+    unsubscribed_from_all: settings.unsubscribedFromAll,
+    unsubscribed_types: settings.unsubscribedTypes,
+    last_modified_by: settings.lastModifiedBy,
+  };
+}
 
 /**
  * GET /api/client/settings
@@ -33,29 +69,32 @@ export const getClientSettings: RequestHandler = async (req, res) => {
       });
     }
 
-    const key = `${clientId}:${brandId}`;
-    let settings = clientSettingsStore.get(key);
+    let settings = await dbClientSettings.get(clientId, brandId);
 
     if (!settings) {
       // Create default settings if not found
-      settings = {
-        id: `settings_${Date.now()}`,
-        clientId,
-        brandId,
-        ...DEFAULT_CLIENT_SETTINGS,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+      const defaultSettings = {
+        client_id: clientId,
+        brand_id: brandId,
+        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences,
+        timezone: DEFAULT_CLIENT_SETTINGS.timezone,
+        language: DEFAULT_CLIENT_SETTINGS.language,
+        unsubscribed_from_all: false,
+        unsubscribed_types: [],
       };
-      clientSettingsStore.set(key, settings);
+      settings = await dbClientSettings.create(defaultSettings);
     }
+
+    const apiSettings = dbRecordToClientSettings(settings);
 
     res.json({
       success: true,
-      settings,
+      settings: apiSettings,
     });
   } catch (error) {
     console.error('[Client Settings] Get error:', error);
-    res.status(500).json({
+    const statusCode = error instanceof DatabaseError ? 500 : 500;
+    res.status(statusCode).json({
       error: error instanceof Error ? error.message : 'Failed to retrieve settings',
     });
   }
@@ -87,35 +126,36 @@ export const updateClientSettings: RequestHandler = async (req, res) => {
       });
     }
 
-    const key = `${clientId}:${brandId}`;
-    let settings = clientSettingsStore.get(key);
-
-    if (!settings) {
-      settings = {
-        id: `settings_${Date.now()}`,
-        clientId,
-        brandId,
-        ...DEFAULT_CLIENT_SETTINGS,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+    // Get current settings or create defaults
+    let currentSettings = await dbClientSettings.get(clientId, brandId);
+    if (!currentSettings) {
+      currentSettings = await dbClientSettings.create({
+        client_id: clientId,
+        brand_id: brandId,
+        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences,
+        timezone: DEFAULT_CLIENT_SETTINGS.timezone,
+        language: DEFAULT_CLIENT_SETTINGS.language,
+        unsubscribed_from_all: false,
+        unsubscribed_types: [],
+      });
     }
 
     // Merge updates
     const updates = validationResult.data;
-    const updatedSettings: ClientSettings = {
-      ...settings,
-      ...updates,
-      emailPreferences: {
-        ...settings.emailPreferences,
+    const mergedUpdates = {
+      timezone: updates.timezone,
+      language: updates.language,
+      email_preferences: {
+        ...currentSettings.email_preferences,
         ...(updates.emailPreferences || {}),
       },
-      unsubscribedTypes: (updates.unsubscribedTypes || settings.unsubscribedTypes) as EmailNotificationType[],
-      updatedAt: new Date().toISOString(),
-      lastModifiedBy: userEmail,
+      unsubscribed_types: updates.unsubscribedTypes || currentSettings.unsubscribed_types,
+      last_modified_by: userEmail,
     };
 
-    clientSettingsStore.set(key, updatedSettings);
+    // Update in database
+    const updatedSettings = await dbClientSettings.update(clientId, brandId, mergedUpdates);
+    const apiSettings = dbRecordToClientSettings(updatedSettings);
 
     // Log the change
     await logAuditAction(
@@ -135,7 +175,7 @@ export const updateClientSettings: RequestHandler = async (req, res) => {
 
     res.json({
       success: true,
-      settings: updatedSettings,
+      settings: apiSettings,
       message: 'Settings updated successfully',
     });
   } catch (error) {
@@ -157,31 +197,32 @@ export const updateEmailPreferences: RequestHandler = async (req, res) => {
     const userId = req.headers['x-user-id'] as string;
     const userEmail = req.headers['x-user-email'] as string;
 
-    const key = `${clientId}:${brandId}`;
-    let settings = clientSettingsStore.get(key);
-
-    if (!settings) {
-      settings = {
-        id: `settings_${Date.now()}`,
-        clientId,
-        brandId,
-        ...DEFAULT_CLIENT_SETTINGS,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+    // Get current settings or create defaults
+    let currentSettings = await dbClientSettings.get(clientId, brandId);
+    if (!currentSettings) {
+      currentSettings = await dbClientSettings.create({
+        client_id: clientId,
+        brand_id: brandId,
+        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences,
+        timezone: DEFAULT_CLIENT_SETTINGS.timezone,
+        language: DEFAULT_CLIENT_SETTINGS.language,
+        unsubscribed_from_all: false,
+        unsubscribed_types: [],
+      });
     }
 
-    const updatedSettings = {
-      ...settings,
-      emailPreferences: {
-        ...settings.emailPreferences,
-        ...req.body,
-      },
-      updatedAt: new Date().toISOString(),
-      lastModifiedBy: userEmail,
+    // Merge email preferences
+    const updatedPreferences = {
+      ...currentSettings.email_preferences,
+      ...req.body,
     };
 
-    clientSettingsStore.set(key, updatedSettings);
+    // Update in database
+    const updatedSettings = await dbClientSettings.update(clientId, brandId, {
+      email_preferences: updatedPreferences,
+      last_modified_by: userEmail,
+    });
+    const apiSettings = dbRecordToClientSettings(updatedSettings);
 
     // Log the change
     await logAuditAction(
@@ -191,13 +232,13 @@ export const updateEmailPreferences: RequestHandler = async (req, res) => {
       userEmail || 'system',
       'EMAIL_PREFERENCES_UPDATED',
       {
-        preferences: updatedSettings.emailPreferences,
+        preferences: updatedPreferences,
       }
     );
 
     res.json({
       success: true,
-      settings: updatedSettings,
+      settings: apiSettings,
     });
   } catch (error) {
     console.error('[Client Settings] Email preferences error:', error);
@@ -216,29 +257,27 @@ export const generateUnsubscribeLink: RequestHandler = async (req, res) => {
     const clientId = req.headers['x-client-id'] as string;
     const brandId = req.headers['x-brand-id'] as string;
 
-    const key = `${clientId}:${brandId}`;
-    let settings = clientSettingsStore.get(key);
-
-    if (!settings) {
-      settings = {
-        id: `settings_${Date.now()}`,
-        clientId,
-        brandId,
-        ...DEFAULT_CLIENT_SETTINGS,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+    // Get current settings or create defaults
+    let currentSettings = await dbClientSettings.get(clientId, brandId);
+    if (!currentSettings) {
+      currentSettings = await dbClientSettings.create({
+        client_id: clientId,
+        brand_id: brandId,
+        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences,
+        timezone: DEFAULT_CLIENT_SETTINGS.timezone,
+        language: DEFAULT_CLIENT_SETTINGS.language,
+        unsubscribed_from_all: false,
+        unsubscribed_types: [],
+      });
     }
 
     // Generate secure unsubscribe token
     const unsubscribeToken = crypto.randomBytes(32).toString('hex');
-    const updatedSettings = {
-      ...settings,
-      unsubscribeToken,
-      updatedAt: new Date().toISOString(),
-    };
 
-    clientSettingsStore.set(key, updatedSettings);
+    // Update in database
+    const updatedSettings = await dbClientSettings.update(clientId, brandId, {
+      unsubscribe_token: unsubscribeToken,
+    });
 
     // In production, this would be a full URL with client domain
     const unsubscribeUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/unsubscribe?token=${unsubscribeToken}`;
@@ -271,58 +310,54 @@ export const unsubscribeFromEmails: RequestHandler = async (req, res) => {
     }
 
     // Find settings by token
-    let found = false;
-    let updatedSettings: ClientSettings | null = null;
+    const settings = await dbClientSettings.findByUnsubscribeToken(unsubscribeToken);
 
-    for (const [key, settings] of clientSettingsStore.entries()) {
-      if (settings.unsubscribeToken === unsubscribeToken) {
-        found = true;
-
-        if (fromType) {
-          // Unsubscribe from specific notification type
-          const unsubscribedTypes = new Set(settings.unsubscribedTypes || []);
-          unsubscribedTypes.add(fromType);
-
-          updatedSettings = {
-            ...settings,
-            unsubscribedTypes: Array.from(unsubscribedTypes) as EmailNotificationType[],
-            updatedAt: new Date().toISOString(),
-          };
-        } else {
-          // Unsubscribe from all
-          updatedSettings = {
-            ...settings,
-            unsubscribedFromAll: true,
-            unsubscribedTypes: [
-              'approvals_needed',
-              'approval_reminders',
-              'publish_failures',
-              'publish_success',
-              'weekly_digest',
-              'daily_digest',
-            ] as EmailNotificationType[],
-            updatedAt: new Date().toISOString(),
-          };
-        }
-
-        clientSettingsStore.set(key, updatedSettings);
-        break;
-      }
-    }
-
-    if (!found) {
+    if (!settings) {
       return res.status(404).json({
         error: 'Invalid or expired unsubscribe token',
       });
     }
+
+    let updatePayload: any;
+
+    if (fromType) {
+      // Unsubscribe from specific notification type
+      const unsubscribedTypes = new Set(settings.unsubscribed_types || []);
+      unsubscribedTypes.add(fromType);
+
+      updatePayload = {
+        unsubscribedTypes: Array.from(unsubscribedTypes) as EmailNotificationType[],
+      };
+    } else {
+      // Unsubscribe from all
+      updatePayload = {
+        unsubscribedFromAll: true,
+        unsubscribedTypes: [
+          'approvals_needed',
+          'approval_reminders',
+          'publish_failures',
+          'publish_success',
+          'weekly_digest',
+          'daily_digest',
+        ] as EmailNotificationType[],
+      };
+    }
+
+    // Update in database
+    const updatedSettings = await dbClientSettings.update(
+      settings.client_id,
+      settings.brand_id,
+      updatePayload
+    );
+    const apiSettings = dbRecordToClientSettings(updatedSettings);
 
     res.json({
       success: true,
       message: fromType
         ? `Unsubscribed from ${fromType}`
         : 'Unsubscribed from all email notifications',
-      unsubscribedFromAll: updatedSettings?.unsubscribedFromAll,
-      unsubscribedTypes: updatedSettings?.unsubscribedTypes,
+      unsubscribedFromAll: apiSettings.unsubscribedFromAll,
+      unsubscribedTypes: apiSettings.unsubscribedTypes,
     });
   } catch (error) {
     console.error('[Client Settings] Unsubscribe error:', error);
@@ -342,8 +377,8 @@ export const resubscribeToEmails: RequestHandler = async (req, res) => {
     const brandId = req.headers['x-brand-id'] as string;
     const { notificationType } = req.body;
 
-    const key = `${clientId}:${brandId}`;
-    let settings = clientSettingsStore.get(key);
+    // Get current settings
+    const settings = await dbClientSettings.get(clientId, brandId);
 
     if (!settings) {
       return res.status(404).json({
@@ -351,7 +386,7 @@ export const resubscribeToEmails: RequestHandler = async (req, res) => {
       });
     }
 
-    const unsubscribedTypes = new Set(settings.unsubscribedTypes || []);
+    const unsubscribedTypes = new Set(settings.unsubscribed_types || []);
     if (notificationType) {
       unsubscribedTypes.delete(notificationType);
     } else {
@@ -359,19 +394,17 @@ export const resubscribeToEmails: RequestHandler = async (req, res) => {
       unsubscribedTypes.clear();
     }
 
-    const updatedSettings = {
-      ...settings,
-      unsubscribedFromAll: unsubscribedTypes.size === 0 ? false : settings.unsubscribedFromAll,
-      unsubscribedTypes: Array.from(unsubscribedTypes) as EmailNotificationType[],
-      updatedAt: new Date().toISOString(),
-    };
-
-    clientSettingsStore.set(key, updatedSettings);
+    // Update in database
+    const updatedSettings = await dbClientSettings.update(clientId, brandId, {
+      unsubscribed_from_all: unsubscribedTypes.size === 0 ? false : settings.unsubscribed_from_all,
+      unsubscribed_types: Array.from(unsubscribedTypes) as EmailNotificationType[],
+    });
+    const apiSettings = dbRecordToClientSettings(updatedSettings);
 
     res.json({
       success: true,
       message: notificationType ? `Resubscribed to ${notificationType}` : 'Resubscribed to all notifications',
-      settings: updatedSettings,
+      settings: apiSettings,
     });
   } catch (error) {
     console.error('[Client Settings] Resubscribe error:', error);
@@ -396,15 +429,15 @@ export const verifyUnsubscribeToken: RequestHandler = async (req, res) => {
     }
 
     // Find settings by token
-    for (const settings of clientSettingsStore.values()) {
-      if (settings.unsubscribeToken === token) {
-        return res.json({
-          valid: true,
-          clientId: settings.clientId,
-          unsubscribedTypes: settings.unsubscribedTypes,
-          unsubscribedFromAll: settings.unsubscribedFromAll,
-        });
-      }
+    const settings = await dbClientSettings.findByUnsubscribeToken(token);
+
+    if (settings) {
+      return res.json({
+        valid: true,
+        clientId: settings.client_id,
+        unsubscribedTypes: settings.unsubscribed_types,
+        unsubscribedFromAll: settings.unsubscribed_from_all,
+      });
     }
 
     res.json({

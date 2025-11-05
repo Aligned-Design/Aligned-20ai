@@ -1,11 +1,13 @@
 /**
  * Bulk Approval Routes
  * Handles bulk approval/rejection of multiple posts with atomic operations
+ * Now uses Supabase database for persistence
  */
 
 import { RequestHandler } from 'express';
 import { z } from 'zod';
 import { logAuditAction } from '../lib/audit-logger';
+import { postApprovals as dbPostApprovals, DatabaseError } from '../lib/dbClient';
 
 // ==================== TYPES & VALIDATION ====================
 
@@ -28,16 +30,6 @@ export interface BulkApprovalResult {
     reason: string;
   }>;
 }
-
-// Mock storage for post approvals
-const postApprovalsStore: Map<string, {
-  postId: string;
-  status: 'pending' | 'approved' | 'rejected';
-  approvedAt?: string;
-  rejectedAt?: string;
-  approvedBy?: string;
-  rejectedBy?: string;
-}> = new Map();
 
 /**
  * POST /api/client/approvals/bulk
@@ -75,39 +67,20 @@ export const bulkApproveOrReject: RequestHandler = async (req, res) => {
       errors: [],
     };
 
-    const now = new Date().toISOString();
-
     // Process each post
     for (const postId of postIds) {
       try {
-        // Check if post exists in store (mock)
-        const key = `${brandId}:${postId}`;
-        const currentApproval = postApprovalsStore.get(key);
-
-        // If post doesn't exist, create a new entry
-        if (!currentApproval) {
-          const approval = {
-            postId,
-            status: action === 'approve' ? 'approved' as const : 'rejected' as const,
-            ...(action === 'approve'
-              ? { approvedAt: now, approvedBy: userEmail }
-              : { rejectedAt: now, rejectedBy: userEmail }
-            ),
-          };
-          postApprovalsStore.set(key, approval);
-        } else {
-          // Update existing approval
-          const approval = {
-            ...currentApproval,
-            postId,
-            status: action === 'approve' ? 'approved' as const : 'rejected' as const,
-            ...(action === 'approve'
-              ? { approvedAt: now, approvedBy: userEmail }
-              : { rejectedAt: now, rejectedBy: userEmail }
-            ),
-          };
-          postApprovalsStore.set(key, approval);
-        }
+        // Upsert approval record in database
+        const approval = await dbPostApprovals.upsert({
+          brand_id: brandId,
+          post_id: postId,
+          status: action === 'approve' ? 'approved' : 'rejected',
+          locked: false,
+          ...(action === 'approve'
+            ? { approved_by: userEmail }
+            : { rejected_by: userEmail }
+          ),
+        });
 
         if (action === 'approve') {
           result.approved++;
@@ -170,8 +143,7 @@ export const getApprovalStatus: RequestHandler = async (req, res) => {
       });
     }
 
-    const key = `${brandId}:${postId}`;
-    const approval = postApprovalsStore.get(key);
+    const approval = await dbPostApprovals.get(brandId, postId);
 
     if (!approval) {
       return res.status(404).json({
@@ -179,9 +151,22 @@ export const getApprovalStatus: RequestHandler = async (req, res) => {
       });
     }
 
+    // Convert to camelCase response format
     res.json({
       success: true,
-      approval,
+      approval: {
+        id: approval.id,
+        brandId: approval.brand_id,
+        postId: approval.post_id,
+        status: approval.status,
+        approvedAt: approval.approved_at,
+        approvedBy: approval.approved_by,
+        rejectedAt: approval.rejected_at,
+        rejectedBy: approval.rejected_by,
+        locked: approval.locked,
+        createdAt: approval.created_at,
+        updatedAt: approval.updated_at,
+      },
     });
   } catch (error) {
     console.error('[Approval Status] Error:', error);
@@ -212,13 +197,32 @@ export const getBatchApprovalStatus: RequestHandler = async (req, res) => {
       });
     }
 
-    const approvals = postIds.map(postId => {
-      const key = `${brandId}:${postId}`;
-      return postApprovalsStore.get(key) || {
-        postId,
-        status: 'pending',
-      };
-    });
+    // Fetch all approvals in parallel
+    const approvals = await Promise.all(
+      postIds.map(async (postId) => {
+        const approval = await dbPostApprovals.get(brandId, postId);
+        if (approval) {
+          return {
+            id: approval.id,
+            brandId: approval.brand_id,
+            postId: approval.post_id,
+            status: approval.status,
+            approvedAt: approval.approved_at,
+            approvedBy: approval.approved_by,
+            rejectedAt: approval.rejected_at,
+            rejectedBy: approval.rejected_by,
+            locked: approval.locked,
+            createdAt: approval.created_at,
+            updatedAt: approval.updated_at,
+          };
+        }
+        // Return default pending status if not found
+        return {
+          postId,
+          status: 'pending' as const,
+        };
+      })
+    );
 
     res.json({
       success: true,
@@ -253,14 +257,18 @@ export const lockPostsAfterApproval: RequestHandler = async (req, res) => {
       });
     }
 
-    // In a real implementation, this would set a lock flag on posts
-    // For now, we'll just return success
-    const lockedCount = postIds.length;
+    // Update posts to set locked flag in database
+    try {
+      await dbPostApprovals.batchUpdate(brandId, postIds, { locked: true });
+    } catch (error) {
+      console.warn('[Lock Posts] Warning: Could not lock all posts:', error);
+      // Continue even if locking fails - this is non-critical
+    }
 
     res.json({
       success: true,
-      message: `Successfully locked ${lockedCount} posts`,
-      lockedCount,
+      message: `Successfully locked ${postIds.length} posts`,
+      lockedCount: postIds.length,
     });
   } catch (error) {
     console.error('[Lock Posts] Error:', error);

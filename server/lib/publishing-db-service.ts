@@ -374,6 +374,25 @@ export class PublishingDBService {
       total: count || 0
     };
   }
+
+  /**
+   * Get brand posting configuration
+   * Fetches posting_config and timezone from brands table
+   */
+  async getBrandPostingConfig(
+    brandId: string
+  ): Promise<{ posting_config: any; timezone: string } | null> {
+    const { data, error } = await supabase
+      .from('brands')
+      .select('posting_config, timezone')
+      .eq('id', brandId)
+      .single();
+
+    if (error && error.code === 'PGRST116') return null; // Not found
+    if (error) throw new Error(`Failed to fetch brand config: ${error.message}`);
+
+    return data as { posting_config: any; timezone: string };
+  }
 }
 
 export const publishingDBService = new PublishingDBService();

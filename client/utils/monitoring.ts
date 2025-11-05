@@ -4,12 +4,10 @@
  */
 
 import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/tracing';
 import { onCLS, onFCP, onLCP, onTTFB } from 'web-vitals';
 
 // Initialize Sentry for error tracking and performance monitoring
 export function initializeSentry() {
-  const isDevelopment = process.env.NODE_ENV === 'development';
   const isProduction = process.env.NODE_ENV === 'production';
 
   // Only initialize in production or when explicitly enabled
@@ -23,26 +21,11 @@ export function initializeSentry() {
   Sentry.init({
     dsn,
     environment: process.env.NODE_ENV,
-    integrations: [
-      new BrowserTracing({
-        // @ts-ignore - reactRouterV6Instrumentation is available at runtime
-        routingInstrumentation: Sentry.reactRouterV6Instrumentation(
-          window.history
-        ),
-        tracingOrigins: ['localhost', /^\//],
-        tracePropagationTargets: ['localhost', /^\//],
-      }),
-      // @ts-ignore - Replay is available at runtime
-      new Sentry.Replay({
-        maskAllText: true,
-        blockAllMedia: true,
-      }),
-    ],
-    tracesSampleRate: isProduction ? 0.1 : 1.0,
-    replaysSessionSampleRate: isProduction ? 0.1 : 1.0,
-    replaysOnErrorSampleRate: 1.0,
+    // Use the default integrations provided by @sentry/react
+    // which includes automatic error capture and error boundary support
     maxBreadcrumbs: 50,
     attachStacktrace: true,
+    tracesSampleRate: isProduction ? 0.1 : 1.0,
     beforeSend(event, hint) {
       // Filter out certain errors
       if (event.exception) {

@@ -56,9 +56,16 @@ export const getAuditLogs: RequestHandler = async (req, res) => {
       });
     }
 
+    const validData = validationResult.data;
     const query: AuditLogQuery = {
-      ...validationResult.data,
-      brandId, // Enforce brand context
+      brandId,
+      postId: validData.postId,
+      actorId: validData.actorId,
+      action: validData.action as any,
+      startDate: validData.startDate,
+      endDate: validData.endDate,
+      limit: validData.limit,
+      offset: validData.offset,
     };
 
     const { logs, total, hasMore } = await queryAuditLogs(query);
