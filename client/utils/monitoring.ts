@@ -110,7 +110,11 @@ export function captureMetric(
   value: number,
   rating?: 'good' | 'needs-improvement' | 'poor'
 ) {
-  if (process.env.NODE_ENV !== 'production' && !process.env.VITE_ENABLE_SENTRY) {
+  const env = (typeof window !== 'undefined' && (import.meta as any)?.env) || (typeof process !== 'undefined' && process.env) || {} as Record<string, any>;
+  const NODE_ENV = env.NODE_ENV || env.VITE_NODE_ENV || 'development';
+  const enableSentry = env.VITE_ENABLE_SENTRY ?? env.ENABLE_SENTRY ?? false;
+
+  if (NODE_ENV !== 'production' && !(enableSentry === true || String(enableSentry) === 'true')) {
     console.debug(`📊 [${category}] ${name}: ${value}ms (${rating})`);
     return;
   }
