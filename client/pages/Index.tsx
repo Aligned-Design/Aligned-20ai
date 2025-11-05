@@ -71,6 +71,7 @@ export default function Index() {
 
       {/* Features Section */}
       <div className="max-w-7xl mx-auto px-6 py-20 relative z-10 bg-gray-50">
+        <Reveal>
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
             Three Specialized AI Agents
@@ -126,6 +127,7 @@ export default function Index() {
             </CardContent>
           </Card>
         </div>
+        </Reveal>
       </div>
 
       {/* Workflow Section */}
