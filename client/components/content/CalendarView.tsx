@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { CalendarEvent, CalendarFilter, PostModel } from '@shared/api';
@@ -45,7 +45,7 @@ export function CalendarView({ events, onEventMove, onEventClick, filter, onFilt
       });
     } else {
       // Month view logic
-      const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      const __startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
       const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
       
       const days = [];
@@ -78,7 +78,7 @@ export function CalendarView({ events, onEventMove, onEventClick, filter, onFilt
     setDraggedEvent(null);
   };
 
-  const filteredEvents = events.filter(event => {
+  const __filteredEvents = events.filter(event => {
     const matchesBrand = !filter.brands?.length || filter.brands.includes(event.brandId);
     const matchesPlatform = !filter.platforms?.length || filter.platforms.includes(event.platform);
     const matchesStatus = !filter.statuses?.length || filter.statuses.includes(event.status);

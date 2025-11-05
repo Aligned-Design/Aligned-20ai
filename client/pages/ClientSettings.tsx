@@ -4,9 +4,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle, CardDescription as _CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import {
@@ -16,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { AlertCircle, Check, Copy, Mail, Bell, Settings as SettingsIcon } from 'lucide-react';
+import { AlertCircle as _AlertCircle, Check, Copy, Mail, Bell, Settings as SettingsIcon } from 'lucide-react';
 import type { ClientSettings } from '@shared/client-settings';
 import { TIMEZONE_OPTIONS, LANGUAGE_OPTIONS } from '@shared/client-settings';
 

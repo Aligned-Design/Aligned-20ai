@@ -11,7 +11,6 @@ import { Builder } from '@builder.io/react';
 
 // Import existing components
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
 
 // Lazy load pages for performance
 const Demo = lazy(() => import("./pages/Demo"));
@@ -34,7 +33,7 @@ const ClientPortal = lazy(() => import("./pages/ClientPortal"));
 // Additional pages
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Brands = lazy(() => import("./pages/Brands"));
-const Calendar = lazy(() => import("./pages/Calendar"));
+const _Calendar = lazy(() => import("./pages/Calendar"));
 const Integrations = lazy(() => import("./pages/Integrations"));
 const MediaManager = lazy(() => import("./pages/MediaManager"));
 const TeamManagement = lazy(() => import("./pages/TeamManagement"));

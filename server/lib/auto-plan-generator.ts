@@ -5,7 +5,6 @@
 
 import { analyticsDB } from './analytics-db-service';
 import { advisorEngine } from './advisor-engine';
-import { AnalyticsMetric } from '@shared/analytics';
 
 export interface AutoPlanData {
   month: string;
@@ -120,7 +119,7 @@ export class AutoPlanGenerator {
   /**
    * Extract topics from advisor insights
    */
-  private extractTopicsFromInsights(insights: any[]): string[] {
+  private extractTopicsFromInsights(insights: unknown[]): string[] {
     const topicInsights = insights.filter(i => i.category === 'content');
     const topics = new Set<string>();
 

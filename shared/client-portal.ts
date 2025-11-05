@@ -57,7 +57,7 @@ export interface ContentItem {
   approvedAt?: string;
   requestedChanges?: string;
   version: number;
-  workflowInstance?: any; // WorkflowInstance - using any to avoid circular imports
+  workflowInstance?: unknown; // WorkflowInstance - using any to avoid circular imports
 }
 
 export interface ContentComment {

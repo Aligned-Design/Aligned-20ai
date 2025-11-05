@@ -158,7 +158,7 @@ export async function generateBrandMonthlyPlan(
   brandId: string,
   tenantId: string,
   month?: Date
-): Promise<any> {
+): Promise<unknown> {
   try {
     console.log(`📋 Generating monthly plan for brand ${brandId}...`);
 

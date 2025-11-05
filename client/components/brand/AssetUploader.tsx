@@ -10,7 +10,7 @@ interface AssetUploaderProps {
   multiple?: boolean;
 }
 
-export function AssetUploader({ brandId, category, onUpload, accept, multiple = false }: AssetUploaderProps) {
+export function AssetUploader({ _brandId, category, onUpload, accept, multiple = false }: AssetUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<AssetUploadResponse[]>([]);

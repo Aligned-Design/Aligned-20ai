@@ -2,7 +2,7 @@ import { RequestHandler } from 'express';
 import { UserPreferences } from '@shared/preferences';
 
 interface PreferencesUpdateRequest {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface PreferencesResponse {
@@ -12,7 +12,7 @@ interface PreferencesResponse {
 }
 
 // Mock user preferences - in production this would come from database
-const mockPreferences: any = {
+const mockPreferences: unknown = {
   userId: 'user-123',
   id: 'pref-123',
   basic: {
@@ -73,7 +73,7 @@ const mockPreferences: any = {
 export const getPreferences: RequestHandler = async (req, res) => {
   try {
     // TODO: Get userId from authentication middleware
-    const userId = 'user-123';
+    const __userId = 'user-123';
     
     // TODO: Fetch from database
     // const preferences = await db.preferences.findByUserId(userId);
@@ -95,7 +95,7 @@ export const getPreferences: RequestHandler = async (req, res) => {
 export const updatePreferences: RequestHandler = async (req, res) => {
   try {
     const { section, preferences }: PreferencesUpdateRequest = req.body;
-    const userId = 'user-123'; // TODO: Get from auth
+    const __userId = 'user-123'; // TODO: Get from auth
 
     if (!section || !preferences) {
       return res.status(400).json({
@@ -134,7 +134,7 @@ export const updatePreferences: RequestHandler = async (req, res) => {
 
 export const exportPreferences: RequestHandler = async (req, res) => {
   try {
-    const userId = 'user-123'; // TODO: Get from auth
+    const __userId = 'user-123'; // TODO: Get from auth
     
     // TODO: Fetch from database
     const preferences = mockPreferences;

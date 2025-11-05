@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import { MediaCategory, MediaAsset } from '@shared/media';
 
-export async function ensureBrandStorage(tenantId: string, brandId: string): Promise<string> {
+export async function ensureBrandStorage(tenantId: string, _brandId: string): Promise<string> {
   const bucketName = `tenant-${tenantId}`;
   
   // Check if bucket exists

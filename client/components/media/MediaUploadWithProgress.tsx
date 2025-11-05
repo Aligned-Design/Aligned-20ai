@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Badge as _Badge } from '@/components/ui/badge';
 import {
   Upload,
   X,
@@ -18,14 +18,14 @@ interface UploadFile {
   progress: number;
   status: 'pending' | 'uploading' | 'processing' | 'complete' | 'error';
   error?: string;
-  result?: any;
+  result?: unknown;
 }
 
 interface MediaUploadWithProgressProps {
   brandId: string;
   tenantId: string;
   category: 'graphics' | 'images' | 'logos' | 'videos' | 'ai_exports' | 'client_uploads';
-  onUploadComplete?: (assets: any[]) => void;
+  onUploadComplete?: (assets: unknown[]) => void;
   onError?: (error: string) => void;
   className?: string;
 }
@@ -114,7 +114,7 @@ export function MediaUploadWithProgress({
       setFiles(prev =>
         prev.map(uf => {
           const uploadedAsset = data.assets?.find(
-            (a: any) => a.filename === uf.file.name
+            (a: unknown) => a.filename === uf.file.name
           );
           if (uploadedAsset) {
             return {
@@ -126,7 +126,7 @@ export function MediaUploadWithProgress({
           }
 
           const error = data.errors?.find(
-            (e: any) => e.file === uf.file.name
+            (e: unknown) => e.file === uf.file.name
           );
           if (error) {
             return {

@@ -4,7 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { Platform, PlatformConnection } from '@shared/publishing';
+import { Platform} from '@shared/publishing';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -28,7 +28,7 @@ export interface PlatformConnectionRecord {
   token_expires_at?: string;
   status: 'connected' | 'expired' | 'revoked' | 'disconnected';
   permissions?: string[];
-  metadata?: any;
+  metadata?: unknown;
   created_by?: string;
   created_at: string;
   updated_at: string;
@@ -54,7 +54,7 @@ export class ConnectionsDBService {
     refreshToken?: string,
     tokenExpiresAt?: Date,
     permissions?: string[],
-    metadata?: any,
+    metadata?: unknown,
     userId?: string
   ): Promise<PlatformConnectionRecord> {
     const { data: existing } = await supabase
@@ -64,7 +64,7 @@ export class ConnectionsDBService {
       .eq('platform', platform)
       .limit(1);
 
-    const connectionData: any = {
+    const connectionData: unknown = {
       brand_id: brandId,
       tenant_id: tenantId,
       platform,
@@ -161,7 +161,7 @@ export class ConnectionsDBService {
       .eq('status', 'connected');
 
     if (error) throw new Error(`Failed to get connected platforms: ${error.message}`);
-    return data?.map((d: any) => d.platform) as Platform[];
+    return data?.map((d: unknown) => d.platform) as Platform[];
   }
 
   /**
@@ -191,7 +191,7 @@ export class ConnectionsDBService {
     refreshToken?: string,
     tokenExpiresAt?: Date
   ): Promise<PlatformConnectionRecord> {
-    const updateData: any = {
+    const updateData: unknown = {
       access_token: accessToken,
       last_verified_at: new Date().toISOString()
     };
@@ -312,10 +312,10 @@ export class ConnectionsDBService {
 
     const stats = {
       total: data?.length || 0,
-      connected: data?.filter((d: any) => d.status === 'connected').length || 0,
-      expired: data?.filter((d: any) => d.status === 'expired').length || 0,
-      revoked: data?.filter((d: any) => d.status === 'revoked').length || 0,
-      platforms: [...new Set(data?.map((d: any) => d.platform) || [])]
+      connected: data?.filter((d: unknown) => d.status === 'connected').length || 0,
+      expired: data?.filter((d: unknown) => d.status === 'expired').length || 0,
+      revoked: data?.filter((d: unknown) => d.status === 'revoked').length || 0,
+      platforms: [...new Set(data?.map((d: unknown) => d.platform) || [])]
     };
 
     return stats;

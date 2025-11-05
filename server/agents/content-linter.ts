@@ -35,7 +35,7 @@ export async function lintContent(
   content: ContentToLint,
   safetyConfig: BrandSafetyConfig,
 ): Promise<LinterResult> {
-  const issues: string[] = [];
+  const __issues: string[] = [];
   const fixes: string[] = [];
 
   // 1. Profanity & Toxicity Check
@@ -373,7 +373,7 @@ export function autoFixContent(
   linterResult: LinterResult,
   safetyConfig: BrandSafetyConfig,
 ): { content: ContentToLint; fixes: string[] } {
-  let fixedContent = { ...content };
+  const fixedContent = { ...content };
   const fixes: string[] = [];
 
   // Auto-insert missing disclaimers

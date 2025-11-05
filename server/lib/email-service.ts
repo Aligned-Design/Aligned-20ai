@@ -16,8 +16,8 @@ const USE_SENDGRID = process.env.EMAIL_PROVIDER === 'sendgrid' && SENDGRID_API_K
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Nodemailer test account (for development)
-let testAccount: any = null;
-let transporter: any = null;
+let testAccount: unknown = null;
+let transporter: unknown = null;
 
 /**
  * Initialize email service based on environment and provider
@@ -84,7 +84,7 @@ export async function sendEmail(options: SendEmailOptions, retryCount = 0): Prom
   const RETRY_DELAY_MS = 1000;
 
   try {
-    let result: any;
+    let result: unknown;
 
     if (USE_SENDGRID) {
       result = await sendViaSegndGrid(options);
@@ -127,7 +127,7 @@ export async function sendEmail(options: SendEmailOptions, retryCount = 0): Prom
 /**
  * Send via SendGrid
  */
-async function sendViaSegndGrid(options: SendEmailOptions): Promise<any> {
+async function sendViaSegndGrid(options: SendEmailOptions): Promise<unknown> {
   const msg = {
     to: options.to,
     from: EMAIL_FROM,
@@ -150,7 +150,7 @@ async function sendViaSegndGrid(options: SendEmailOptions): Promise<any> {
 /**
  * Send via Nodemailer
  */
-async function sendViaNodemailer(options: SendEmailOptions): Promise<any> {
+async function sendViaNodemailer(options: SendEmailOptions): Promise<unknown> {
   if (!transporter) {
     throw new Error('Nodemailer transporter not initialized');
   }

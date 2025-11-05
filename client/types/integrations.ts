@@ -10,6 +10,7 @@ export type PlatformProvider =
   | "squarespace"
   | "mailchimp"
   | "wordpress"
+  | "wix"
   | "shopify"
   | "woocommerce"
   | "faire"
@@ -55,7 +56,7 @@ export interface PlatformConnection {
   token_expires_at?: string;
   scopes?: string[];
   status: ConnectionStatus;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -71,12 +72,12 @@ export interface SocialPost {
   hashtags?: string[];
   cta_text?: string;
   cta_url?: string;
-  platform_specific_data: Record<string, any>;
+  platform_specific_data: Record<string, unknown>;
   schedule_for?: string;
   status: PostStatus;
   published_at?: string;
   published_urls: Record<string, string>;
-  performance_metrics: Record<string, any>;
+  performance_metrics: Record<string, unknown>;
   created_by?: string;
   created_at: string;
   updated_at: string;
@@ -99,7 +100,7 @@ export interface PlatformReview {
   sentiment?: ReviewSentiment;
   status: ReviewStatus;
   platform_url?: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -133,7 +134,7 @@ export interface ReviewResponseTemplate {
   template_name: string;
   rating_range?: string;
   template_text: string;
-  variables: Record<string, any>;
+  variables: Record<string, unknown>;
   usage_count: number;
   created_at: string;
   updated_at: string;
@@ -297,6 +298,17 @@ export const PLATFORM_CONFIGS: Record<PlatformProvider, PlatformConfig> = {
     icon: "📝",
     color: "#21759B",
     supportedContentTypes: ["blog"],
+    requiresAuth: true,
+    supportsScheduling: true,
+  },
+  wix: {
+    provider: "wix",
+    name: "Wix",
+    category: "web_blog",
+    tier: 1,
+    icon: "⚙️",
+    color: "#FFB700",
+    supportedContentTypes: ["blog", "email"],
     requiresAuth: true,
     supportsScheduling: true,
   },

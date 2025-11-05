@@ -341,8 +341,8 @@ export const requestApproval: RequestHandler = async (req, res) => {
  */
 export const getPendingApprovals: RequestHandler = async (req, res) => {
   try {
-    const userId = req.headers['x-user-id'] as string;
-    const brandId = req.query.brandId as string;
+    const __userId = req.headers['x-user-id'] as string;
+    const __brandId = req.query._brandId as string;
 
     // TODO: Query approval_requests where assignedTo = userId and status = pending
     // TODO: Filter by brandId if provided

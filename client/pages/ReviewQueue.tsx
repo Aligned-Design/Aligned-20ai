@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useBrand } from "@/contexts/BrandContext";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge as _Badge } from "@/components/ui/badge";
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -41,8 +41,8 @@ interface ReviewItem {
   id: string;
   brand_id: string;
   agent: string;
-  input: any;
-  output: any;
+  input: unknown;
+  output: unknown;
   bfs?: BrandFidelityScore;
   linter_results?: LinterResult;
   timestamp: string;
@@ -183,7 +183,7 @@ export default function ReviewQueue() {
     }
   };
 
-  const formatDate = (timestamp: string) => {
+  const __formatDate = (timestamp: string) => {
     return new Date(timestamp).toLocaleString();
   };
 

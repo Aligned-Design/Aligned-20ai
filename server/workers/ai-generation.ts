@@ -253,7 +253,7 @@ Return as valid JSON with this structure:
         provider: provider || "openai",
         agentType: agentType
       };
-    } catch (parseError) {
+    } catch (_parseError) {
       // Fallback if not valid JSON
       return {
         content: result,
@@ -327,11 +327,128 @@ function getMaxTokens(agentType: string): number {
     case "doc":
       return 1000; // Enough for social posts
     case "design":
-      return 500; // Structured output
+      return 2000; // Structured visual output
     case "advisor":
       return 1500; // Detailed analysis
     default:
       return 1000;
+  }
+}
+
+/**
+ * Generate visual design blocks for Builder.io
+ * Creates structured visual specifications with color, layout, and typography
+ */
+export async function generateDesignVisuals(
+  request: AIGenerationRequest
+): Promise<AIGenerationResponse> {
+  const { prompt, provider } = request;
+
+  const designPrompt = `${prompt}
+
+Generate visual design specifications for Builder.io with these requirements:
+- Return structured JSON optimized for visual blocks
+- Include color palette with exact hex codes
+- Provide layout and grid specifications
+- Include typography recommendations
+- Suggest component structure
+- Consider responsive design (mobile, tablet, desktop)
+- Include accessibility guidelines
+
+Return as valid JSON with this structure:
+{
+  "title": "Design name",
+  "description": "Design description",
+  "visualBlocks": [
+    {
+      "type": "hero|section|card|grid|carousel|button|text|image",
+      "id": "block-id",
+      "label": "Block label",
+      "config": {
+        "layout": "flex|grid|block",
+        "gridColumns": 12,
+        "gap": "1rem",
+        "padding": "2rem",
+        "alignment": "center|start|end|stretch"
+      },
+      "styling": {
+        "backgroundColor": "#ffffff",
+        "borderRadius": "8px",
+        "boxShadow": "0 2px 8px rgba(0,0,0,0.1)"
+      }
+    }
+  ],
+  "colorPalette": {
+    "primary": "#primary-hex",
+    "secondary": "#secondary-hex",
+    "accent": "#accent-hex",
+    "background": "#bg-hex",
+    "text": "#text-hex"
+  },
+  "typography": {
+    "heading": {
+      "fontFamily": "Font Name",
+      "fontSize": "32px",
+      "fontWeight": "700",
+      "lineHeight": "1.2"
+    },
+    "body": {
+      "fontFamily": "Font Name",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "lineHeight": "1.5"
+    }
+  },
+  "responsive": {
+    "mobile": {
+      "breakpoint": "640px",
+      "columns": 1,
+      "padding": "1rem"
+    },
+    "tablet": {
+      "breakpoint": "768px",
+      "columns": 2,
+      "padding": "1.5rem"
+    },
+    "desktop": {
+      "breakpoint": "1024px",
+      "columns": 12,
+      "padding": "2rem"
+    }
+  },
+  "accessibility": {
+    "contrastRatio": "WCAG AA",
+    "altText": "Descriptive alt text",
+    "focusable": true
+  }
+}`;
+
+  try {
+    const result = await generateWithAI(designPrompt, "design", provider);
+
+    // Try to parse as JSON first
+    try {
+      const parsed = JSON.parse(result);
+      return {
+        content: JSON.stringify(parsed, null, 2),
+        provider: provider || "openai",
+        agentType: "design"
+      };
+    } catch (_parseError) {
+      // Fallback if not valid JSON
+      return {
+        content: result,
+        provider: provider || "openai",
+        agentType: "design"
+      };
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Generation failed';
+    return {
+      content: `Error: ${errorMessage}`,
+      provider: provider || "openai",
+      agentType: "design"
+    };
   }
 }
 

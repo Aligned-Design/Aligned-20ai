@@ -4,7 +4,7 @@
  * Total: 50+ tests
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'test';
 import crypto from 'crypto';
 import { oauthStateCache } from '../lib/oauth-state-cache';
 
@@ -240,8 +240,8 @@ describe('PHASE 7: Publishing - Jobs', () => {
     });
 
     it('should track retry count with exponential backoff', () => {
-      let retryCount = 0;
-      const maxRetries = 3;
+      const __retryCount = 0;
+      const __maxRetries = 3;
       const baseDelay = 1000; // 1 second
 
       const getRetryDelay = (attempt: number) => baseDelay * Math.pow(2, attempt);
@@ -755,7 +755,7 @@ describe('PHASE 7: Publishing - Integration Tests', () => {
 
   it('should handle error, retry, and eventually succeed', () => {
     let retryCount = 0;
-    const maxRetries = 3;
+    const __maxRetries = 3;
 
     const simulatePublish = (attempt: number) => {
       if (attempt < 2) {
@@ -766,13 +766,13 @@ describe('PHASE 7: Publishing - Integration Tests', () => {
 
     try {
       simulatePublish(0);
-    } catch (e) {
+    } catch (_e) {
       retryCount++;
     }
 
     try {
       simulatePublish(1);
-    } catch (e) {
+    } catch (_e) {
       retryCount++;
     }
 

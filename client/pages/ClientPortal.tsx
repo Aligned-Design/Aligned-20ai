@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Badge as _Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   Home, 
   BarChart3,
@@ -45,7 +43,7 @@ import {
 import { cn } from '@/lib/utils';
 import { ClientDashboardData, ContentItem, ApprovalAction } from '@shared/client-portal';
 import { WorkflowTracker } from '@/components/workflow/WorkflowTracker';
-import { WorkflowInstance, WorkflowAction } from '@shared/workflow';
+import { WorkflowAction } from '@shared/workflow';
 
 export default function ClientPortal() {
   const [dashboardData, setDashboardData] = useState<ClientDashboardData | null>(null);
@@ -589,7 +587,7 @@ function ApprovalsSection({
 
 function UploadsSection() {
   const [uploads, setUploads] = useState<any[]>([]);
-  const [uploading, setUploading] = useState(false);
+  const [_uploading, setUploading] = useState(false);
 
   const handleFileUpload = async (files: FileList) => {
     setUploading(true);

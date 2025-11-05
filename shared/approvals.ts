@@ -15,7 +15,8 @@ export type AuditAction =
   | 'COMMENT_ADDED'
   | 'WORKFLOW_STARTED'
   | 'SETTINGS_UPDATED'
-  | 'EMAIL_PREFERENCES_UPDATED';
+  | 'EMAIL_PREFERENCES_UPDATED'
+  | 'WEBHOOK_RETRY_TRIGGERED';
 
 export interface AuditLog {
   id: string;
@@ -25,8 +26,8 @@ export interface AuditLog {
   actorEmail: string;
   action: AuditAction;
   metadata: {
-    before?: Record<string, any>;
-    after?: Record<string, any>;
+    before?: Record<string, unknown>;
+    after?: Record<string, unknown>;
     note?: string;
     emailAddress?: string;
     bulkCount?: number;
@@ -208,7 +209,7 @@ export interface SendEmailOptions {
   htmlBody: string;
   textBody?: string;
   templateId?: string;
-  variables?: Record<string, any>;
+  variables?: Record<string, unknown>;
   brandId?: string;
   userId?: string;
   notificationType?: string;
@@ -231,7 +232,7 @@ export interface WorkflowNotification {
   userId: string;
   read: boolean;
   sentAt: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export interface NotificationStats {

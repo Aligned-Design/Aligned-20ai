@@ -3,15 +3,14 @@
  * Tests for upload, processing, tagging, deduplication, search, and quota management
  */
 
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect} from 'vitest';
 import { mediaService } from '../lib/media-service';
 import sharp from 'sharp';
-import crypto from 'crypto';
 
 describe('PHASE 6: Media Management System', () => {
   const testBrandId = 'test-brand-' + Date.now();
   const testTenantId = 'test-tenant-' + Date.now();
-  const testAssets: any[] = [];
+  const testAssets: unknown[] = [];
 
   /**
    * Test 1: Basic image upload with processing
@@ -453,8 +452,8 @@ describe('PHASE 6: RLS & Security', () => {
     // In a real scenario, we'd verify that users can only see their own brand's assets
     // This is enforced at the database level through RLS policies
 
-    const differentBrandId = 'different-brand-' + Date.now();
-    const differentTenantId = 'different-tenant-' + Date.now();
+    const __differentBrandId = 'different-brand-' + Date.now();
+    const __differentTenantId = 'different-tenant-' + Date.now();
 
     const imageBuffer = await sharp({
       create: {

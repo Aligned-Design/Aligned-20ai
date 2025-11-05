@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { PostModel, PostUpdateRequest, UndoRedoState, ComplianceLinterResult } from '@shared/api';
 
 interface PostEditorProps {
   post: PostModel;
@@ -19,7 +18,7 @@ export function PostEditor({ post, onSave, onUndo, onRedo, canUndo, canRedo, rea
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [characterCount, setCharacterCount] = useState(0);
-  const [complianceScore, setComplianceScore] = useState(post.complianceScore);
+  const [complianceScore, _setComplianceScore] = useState(post.complianceScore);
 
   // Platform character limits
   const platformLimits = {

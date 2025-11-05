@@ -8,8 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge as _Badge } from "@/components/ui/badge";
 import { HelpTooltip } from "@/components/ui/help-tooltip";
 import {
   BrandIntakeFormData,
@@ -21,14 +20,14 @@ import { useState } from "react";
 
 interface Section3Props {
   data: Partial<BrandIntakeFormData>;
-  onChange: (field: keyof BrandIntakeFormData, value: any) => void;
+  onChange: (field: keyof BrandIntakeFormData, value: unknown) => void;
   errors: Record<string, string>;
 }
 
 export default function Section3VisualIdentity({
   data,
   onChange,
-  errors,
+  errors: _errors,
 }: Section3Props) {
   const [newReferenceLink, setNewReferenceLink] = useState("");
 

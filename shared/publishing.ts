@@ -17,7 +17,7 @@ export interface PlatformConnection {
   createdAt: string;
   updatedAt: string;
   permissions: string[];
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export interface PublishingJob {
@@ -37,7 +37,7 @@ export interface PublishingJob {
   retryCount: number;
   maxRetries: number;
   lastError?: string;
-  errorDetails?: any;
+  errorDetails?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
 }
@@ -50,7 +50,7 @@ export interface PostContent {
   hashtags?: string[];
   mentions?: string[];
   location?: PostLocation;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface PostLink {

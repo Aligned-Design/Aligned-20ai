@@ -28,14 +28,14 @@ export function useAuth(): UseAuthReturn {
     if (savedUser) {
       try {
         setUser(JSON.parse(savedUser));
-      } catch (error) {
+      } catch (_error) {
         localStorage.removeItem('auth-user');
       }
     }
     setLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, __password: string): Promise<boolean> => {
     try {
       // Mock authentication - replace with real API call
       const mockUser: User = {

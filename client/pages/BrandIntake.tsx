@@ -112,7 +112,7 @@ export default function BrandIntake() {
     }
   }, [brandId, navigate, toast]);
 
-  const handleFieldChange = (field: keyof BrandIntakeFormData, value: any) => {
+  const handleFieldChange = (field: keyof BrandIntakeFormData, value: unknown) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
@@ -215,7 +215,7 @@ export default function BrandIntake() {
         description:
           "Website data has been imported. Review and adjust as needed.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Import failed",
         description: error.message,
@@ -267,7 +267,7 @@ export default function BrandIntake() {
     setSubmitting(true);
     try {
       // Upload all files with progress tracking
-      const uploadPromises: Promise<any>[] = [];
+      const uploadPromises: Promise<unknown>[] = [];
       let totalUploadItems = 0;
       let completedUploadItems = 0;
 
@@ -395,7 +395,7 @@ export default function BrandIntake() {
       });
 
       navigate(`/brand-snapshot?brandId=${brandId}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error saving brand intake",
         description: error.message,

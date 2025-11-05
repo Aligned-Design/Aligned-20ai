@@ -52,7 +52,7 @@ export async function calculateBFS(
   };
 
   const issues: string[] = [];
-  let regeneration_count = 0;
+  const regeneration_count = 0;
 
   // 1. Tone Alignment (30% weight)
   scores.tone_alignment = await scoreToneAlignment(
@@ -137,7 +137,7 @@ async function scoreToneAlignment(
 
       // Map similarity (0-1) to score
       return similarity;
-    } catch (error) {
+    } catch (_error) {
       console.error(
         "Embedding similarity failed, falling back to keyword matching",
       );

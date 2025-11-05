@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Badge as _Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { BrandIntelligenceSkeleton } from '@/components/ui/skeleton';
@@ -49,6 +49,9 @@ export default function BrandIntelligencePage() {
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Unable to Load Brand Intelligence</h3>
             <p className="text-gray-600 mt-2">{error}</p>
+            {typeof error === 'string' && (error.includes('<!DOCTYPE') || error.includes('Invalid response format')) && (
+              <p className="text-sm text-gray-500 mt-2">It looks like the server returned HTML instead of JSON — ensure the API server is running and /api/brand-intelligence/:id returns JSON. Check network tab for more details.</p>
+            )}
           </div>
           <Button onClick={refresh} className="gap-2">
             <RefreshCw className="h-4 w-4" />

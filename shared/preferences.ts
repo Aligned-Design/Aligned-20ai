@@ -227,7 +227,7 @@ export interface UserPreferences {
 
 export interface PreferenceUpdate {
   section: keyof UserPreferences;
-  updates: Record<string, any>;
+  updates: Record<string, unknown>;
   validateOnly?: boolean;
 }
 
@@ -252,8 +252,8 @@ export interface PreferenceAuditLog {
   section: string;
   changes: {
     field: string;
-    oldValue: any;
-    newValue: any;
+    oldValue: unknown;
+    newValue: unknown;
   }[];
   timestamp: string;
   userAgent?: string;

@@ -4,13 +4,12 @@
  */
 
 import { supabase } from './supabase';
-import { PublishingJob, PublishResponse } from '@shared/publishing';
 
 export interface PublishingJobRecord {
   id: string;
   brand_id: string;
   tenant_id: string;
-  content: any;
+  content: Record<string, unknown>;
   platforms: string[];
   scheduled_at?: string;
   status: 'pending' | 'processing' | 'published' | 'failed' | 'scheduled';
@@ -18,8 +17,8 @@ export interface PublishingJobRecord {
   max_retries: number;
   published_at?: string;
   last_error?: string;
-  last_error_details?: any;
-  validation_results?: any[];
+  last_error_details?: Record<string, unknown>;
+  validation_results?: unknown[];
   created_by?: string;
   created_at: string;
   updated_at: string;
@@ -36,10 +35,10 @@ export interface PublishingLogRecord {
   platform_post_url?: string;
   error_code?: string;
   error_message?: string;
-  error_details?: any;
-  content_snapshot?: any;
-  request_metadata?: any;
-  response_metadata?: any;
+  error_details?: Record<string, unknown>;
+  content_snapshot?: Record<string, unknown>;
+  request_metadata?: Record<string, unknown>;
+  response_metadata?: Record<string, unknown>;
   created_at: string;
 }
 
@@ -50,7 +49,7 @@ export class PublishingDBService {
   async createPublishingJob(
     brandId: string,
     tenantId: string,
-    content: any,
+    content: Record<string, unknown>,
     platforms: string[],
     scheduledAt?: Date,
     userId?: string
@@ -179,7 +178,7 @@ export class PublishingDBService {
   /**
    * Mark job as failed
    */
-  async markJobFailed(jobId: string, error: string, errorDetails?: any): Promise<PublishingJobRecord> {
+  async markJobFailed(jobId: string, error: string, errorDetails?: Record<string, unknown>): Promise<PublishingJobRecord> {
     const { data, error: dbError } = await supabase
       .from('publishing_jobs')
       .update({
@@ -309,7 +308,7 @@ export class PublishingDBService {
   /**
    * Get platform statistics for a brand
    */
-  async getPlatformStats(brandId: string, days: number = 30): Promise<Record<string, any>> {
+  async getPlatformStats(brandId: string, days: number = 30): Promise<Record<string, unknown>> {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
@@ -322,7 +321,7 @@ export class PublishingDBService {
     if (error) throw new Error(`Failed to fetch platform stats: ${error.message}`);
 
     // Aggregate stats by platform and status
-    const stats: Record<string, any> = {};
+    const stats: Record<string, unknown> = {};
     (data as any[]).forEach(log => {
       if (!stats[log.platform]) {
         stats[log.platform] = {
@@ -373,6 +372,25 @@ export class PublishingDBService {
       jobs: data as PublishingJobRecord[],
       total: count || 0
     };
+  }
+
+  /**
+   * Get brand posting configuration
+   * Fetches posting_config and timezone from brands table
+   */
+  async getBrandPostingConfig(
+    brandId: string
+  ): Promise<{ posting_config: Record<string, unknown>; timezone: string } | null> {
+    const { data, error } = await supabase
+      .from('brands')
+      .select('posting_config, timezone')
+      .eq('id', brandId)
+      .single();
+
+    if (error && error.code === 'PGRST116') return null; // Not found
+    if (error) throw new Error(`Failed to fetch brand config: ${error.message}`);
+
+    return data as { posting_config: Record<string, unknown>; timezone: string };
   }
 }
 

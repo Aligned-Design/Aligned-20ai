@@ -82,17 +82,14 @@ import {
 } from "./routes/workflow";
 import { initializeEmailService } from "./lib/email-service";
 import { generateContent, getProviderStatus } from "./routes/ai";
-import { serverEnv } from '@shared/env';
-import { builderWebhook } from "./routes/builder";
-import { validateAIProviders } from "./workers/ai-generation";
-import { generateContent as generateContentWorker, getProviders } from "./routes/ai-generation";
+import { generateContent as generateAIContent } from "./routes/ai-generation";
 import { recoverPublishingJobs } from "./lib/job-recovery";
 import publishingRouter from "./routes/publishing-router";
 import { scheduleAnalyticsSyncJobs, syncBrandAnalytics, generateBrandMonthlyPlan, getSyncStatus } from "./lib/analytics-scheduler";
 import { autoPlanGenerator } from "./lib/auto-plan-generator";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const ___dirname = path.dirname(__filename);
 
 // Helper functions for demo/mock data
 function getTierFeatures(tier: string): string[] {
@@ -176,8 +173,8 @@ function calculateNextScheduled(schedule: any): string {
 
 export function createServer() {
   const app = express();
-  const PORT = process.env.PORT || 8080;
-  const isDev = process.env.NODE_ENV !== 'production';
+  const _PORT = process.env.PORT || 8080;
+  const _isDev = process.env.NODE_ENV !== 'production';
 
   // Middleware
   app.use(cors({
@@ -625,7 +622,7 @@ export function createServer() {
 
   // Trial and subscription routes
   app.post("/api/trial/start", (req, res) => {
-    const { email, brandCount = 1 } = req.body;
+    const { _email, brandCount = 1 } = req.body;
     
     // TODO: Create trial user and subscription
     res.json({ 
@@ -644,7 +641,7 @@ export function createServer() {
   });
 
   app.get("/api/trial/status", (req, res) => {
-    const { userId } = req.query;
+    const { _userId } = req.query;
     
     res.json({
       isActive: true,
@@ -848,7 +845,7 @@ export function createServer() {
   });
 
   app.post("/api/content/generate", (req, res) => {
-    const { brandId, platform, prompt, settings } = req.body;
+    const { _brandId, _platform, _prompt, _settings } = req.body;
     
     // TODO: Start content generation job
     res.json({
@@ -888,7 +885,7 @@ export function createServer() {
   });
 
   app.post("/api/analytics-portal/feedback", (req, res) => {
-    const { contentId, type, message, priority } = req.body;
+    const { _contentId, _type, _message, _priority } = req.body;
     
     // TODO: Save feedback to database
     res.json({ 
@@ -1038,15 +1035,15 @@ export function createServer() {
   });
 
   app.put("/api/analytics-portal/:brandId/reports/:reportId", (req, res) => {
-    const { brandId, reportId } = req.params;
-    const updates = req.body;
+    const { _brandId, _reportId } = req.params;
+    const _updates = req.body;
     
     // TODO: Update report in database
     res.json({ success: true, message: 'Report updated successfully' });
   });
 
   app.post("/api/analytics-portal/:brandId/reports/:reportId/send", (req, res) => {
-    const { brandId, reportId } = req.params;
+    const { _brandId, _reportId } = req.params;
     
     // TODO: Generate and send report immediately
     res.json({ 
@@ -1057,7 +1054,7 @@ export function createServer() {
   });
 
   app.delete("/api/analytics-portal/:brandId/reports/:reportId", (req, res) => {
-    const { brandId, reportId } = req.params;
+    const { _brandId, _reportId } = req.params;
     
     // TODO: Delete report from database
     res.json({ success: true, message: 'Report deleted successfully' });

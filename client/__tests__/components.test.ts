@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 /**
  * Component Tests - 80+ tests for critical UI components
- * Tests cover Dashboard, Calendar, Assets, Analytics, and Brand components
+ * Tests cover Dashboard, Calendar as _Calendar, Assets, Analytics, and Brand components
  */
 
 describe('Dashboard Component', () => {

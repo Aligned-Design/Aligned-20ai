@@ -2,7 +2,7 @@ import React from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar } from 'recharts';
 
 interface AccessibleChartProps {
-  data: any[];
+  data: unknown[];
   title: string;
   description?: string;
   type: 'line' | 'bar';

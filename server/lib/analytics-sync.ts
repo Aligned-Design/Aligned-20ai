@@ -95,7 +95,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchPlatformMetrics(config: SyncConfig, type: 'incremental' | 'full'): Promise<any[]> {
+  private async fetchPlatformMetrics(config: SyncConfig, type: 'incremental' | 'full'): Promise<unknown[]> {
     switch (config.platform) {
       case 'instagram':
         return this.fetchInstagramMetrics(config, type);
@@ -118,7 +118,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchPlatformMetricsDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+  private async fetchPlatformMetricsDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<unknown[]> {
     // Delegate to platform-specific handlers with date range support
     // Most platforms use incremental sync, so we create a temporary config with the date range
     const dateRangeConfig = {
@@ -149,7 +149,7 @@ export class AnalyticsSync {
   }
 
   // Date-range specific methods for each platform
-  private async fetchInstagramMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+  private async fetchInstagramMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<unknown[]> {
     const startStr = startDate.toISOString();
     const endStr = endDate.toISOString();
 
@@ -170,7 +170,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchFacebookMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+  private async fetchFacebookMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<unknown[]> {
     const startUnix = Math.floor(startDate.getTime() / 1000);
     const endUnix = Math.floor(endDate.getTime() / 1000);
 
@@ -191,7 +191,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchLinkedInMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+  private async fetchLinkedInMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<unknown[]> {
     const startMs = startDate.getTime();
     const endMs = endDate.getTime();
 
@@ -212,7 +212,7 @@ export class AnalyticsSync {
 
       const postsData = await postsResponse.json();
       // Filter posts by date range
-      return (postsData.elements || []).filter((post: any) => {
+      return (postsData.elements || []).filter((post: unknown) => {
         const postTime = post.createdTime || 0;
         return postTime >= startMs && postTime <= endMs;
       });
@@ -222,7 +222,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchTwitterMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+  private async fetchTwitterMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<unknown[]> {
     const startStr = startDate.toISOString();
     const endStr = endDate.toISOString();
 
@@ -248,7 +248,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchTikTokMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+  private async fetchTikTokMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<unknown[]> {
     try {
       const videosResponse = await fetch(
         'https://open.tiktokapis.com/v1/video/list/',
@@ -282,7 +282,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchGoogleBusinessMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+  private async fetchGoogleBusinessMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<unknown[]> {
     try {
       const insightsResponse = await fetch(
         `https://mybusiness.googleapis.com/v1/accounts/*/locations/${config.accountId}/insights:reportInsights?pageSize=100`,
@@ -322,7 +322,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchPinterestMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+  private async fetchPinterestMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<unknown[]> {
     try {
       const pinsResponse = await fetch(
         `https://api.pinterest.com/v1/user/${config.accountId}/pins?access_token=${config.accessToken}&fields=id,created_at,note,stats`
@@ -334,7 +334,7 @@ export class AnalyticsSync {
 
       const pinsData = await pinsResponse.json();
       // Filter by date range
-      return (pinsData.data || []).filter((pin: any) => {
+      return (pinsData.data || []).filter((pin: unknown) => {
         const pinTime = new Date(pin.created_at).getTime();
         return pinTime >= startDate.getTime() && pinTime <= endDate.getTime();
       });
@@ -344,7 +344,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchYouTubeMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<any[]> {
+  private async fetchYouTubeMetricsForDateRange(config: SyncConfig, startDate: Date, endDate: Date): Promise<unknown[]> {
     try {
       const videosResponse = await fetch(
         `https://www.googleapis.com/youtube/v3/search?part=snippet&forMine=true&type=video&maxResults=50&publishedAfter=${startDate.toISOString()}&publishedBefore=${endDate.toISOString()}&access_token=${config.accessToken}`
@@ -363,7 +363,7 @@ export class AnalyticsSync {
   }
 
   // Platform-specific implementations
-  private async fetchInstagramMetrics(config: SyncConfig, type: string): Promise<any[]> {
+  private async fetchInstagramMetrics(config: SyncConfig, type: string): Promise<unknown[]> {
     const sinceDate = type === 'incremental' && config.lastSyncAt 
       ? config.lastSyncAt 
       : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -394,7 +394,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchFacebookMetrics(config: SyncConfig, type: string): Promise<any[]> {
+  private async fetchFacebookMetrics(config: SyncConfig, type: string): Promise<unknown[]> {
     const sinceDate = type === 'incremental' && config.lastSyncAt
       ? Math.floor(new Date(config.lastSyncAt).getTime() / 1000)
       : Math.floor((Date.now() - 24 * 60 * 60 * 1000) / 1000);
@@ -425,7 +425,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchLinkedInMetrics(config: SyncConfig, type: string): Promise<any[]> {
+  private async fetchLinkedInMetrics(config: SyncConfig, type: string): Promise<unknown[]> {
     const sinceDate = type === 'incremental' && config.lastSyncAt
       ? new Date(config.lastSyncAt).toISOString()
       : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -468,7 +468,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchTwitterMetrics(config: SyncConfig, type: string): Promise<any[]> {
+  private async fetchTwitterMetrics(config: SyncConfig, type: string): Promise<unknown[]> {
     const sinceDate = type === 'incremental' && config.lastSyncAt
       ? new Date(config.lastSyncAt).toISOString()
       : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -496,7 +496,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchTikTokMetrics(config: SyncConfig, type: string): Promise<any[]> {
+  private async fetchTikTokMetrics(config: SyncConfig, _type: string): Promise<unknown[]> {
     try {
       // Fetch video statistics
       const videosResponse = await fetch(
@@ -525,7 +525,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchGoogleBusinessMetrics(config: SyncConfig, type: string): Promise<any[]> {
+  private async fetchGoogleBusinessMetrics(config: SyncConfig, _type: string): Promise<unknown[]> {
     try {
       // Fetch location insights
       const insightsResponse = await fetch(
@@ -574,7 +574,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchPinterestMetrics(config: SyncConfig, type: string): Promise<any[]> {
+  private async fetchPinterestMetrics(config: SyncConfig, _type: string): Promise<unknown[]> {
     try {
       // Fetch pin analytics
       const pinsResponse = await fetch(
@@ -593,7 +593,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async fetchYouTubeMetrics(config: SyncConfig, type: string): Promise<any[]> {
+  private async fetchYouTubeMetrics(config: SyncConfig, _type: string): Promise<unknown[]> {
     try {
       // Fetch channel and video statistics
       const videosResponse = await fetch(
@@ -620,7 +620,7 @@ export class AnalyticsSync {
     }
   }
 
-  private normalizeMetrics(brandId: string, platform: Platform, rawData: any[]): AnalyticsMetric[] {
+  private normalizeMetrics(brandId: string, platform: Platform, rawData: unknown[]): AnalyticsMetric[] {
     return rawData.map((item, index) => ({
       id: `${platform}_${brandId}_${Date.now()}_${index}`,
       brandId,
@@ -634,7 +634,7 @@ export class AnalyticsSync {
     }));
   }
 
-  private extractMetrics(platform: Platform, item: any): AnalyticsMetric['metrics'] {
+  private extractMetrics(platform: Platform, item: unknown): AnalyticsMetric['metrics'] {
     const base = {
       reach: 0,
       impressions: 0,
@@ -653,13 +653,13 @@ export class AnalyticsSync {
       case 'instagram':
         return {
           ...base,
-          reach: item.insights?.data?.find((i: any) => i.name === 'reach')?.values?.[0]?.value || 0,
-          impressions: item.insights?.data?.find((i: any) => i.name === 'impressions')?.values?.[0]?.value || 0,
-          engagement: item.insights?.data?.find((i: any) => i.name === 'engagement')?.values?.[0]?.value || 0,
+          reach: item.insights?.data?.find((i: unknown) => i.name === 'reach')?.values?.[0]?.value || 0,
+          impressions: item.insights?.data?.find((i: unknown) => i.name === 'impressions')?.values?.[0]?.value || 0,
+          engagement: item.insights?.data?.find((i: unknown) => i.name === 'engagement')?.values?.[0]?.value || 0,
           likes: item.like_count || 0,
           comments: item.comments_count || 0,
           engagementRate: item.like_count && item.insights ? 
-            ((item.like_count + item.comments_count) / (item.insights.data.find((i: any) => i.name === 'reach')?.values?.[0]?.value || 1)) * 100 : 0
+            ((item.like_count + item.comments_count) / (item.insights.data.find((i: unknown) => i.name === 'reach')?.values?.[0]?.value || 1)) * 100 : 0
         };
       // Add other platforms...
       default:
@@ -667,7 +667,7 @@ export class AnalyticsSync {
     }
   }
 
-  private extractMetadata(platform: Platform, item: any): AnalyticsMetric['metadata'] {
+  private extractMetadata(platform: Platform, item: unknown): AnalyticsMetric['metadata'] {
     return {
       postType: this.mapPostType(platform, item.media_type || item.type),
       hashtags: this.extractHashtags(item.caption || item.text || ''),
@@ -744,7 +744,7 @@ export class AnalyticsSync {
     }
   }
 
-  private async logSyncError(brandId: string, platform: Platform, error: any): Promise<void> {
+  private async logSyncError(brandId: string, platform: Platform, error: unknown): Promise<void> {
     try {
       const { supabase } = await import('./supabase');
 
@@ -788,7 +788,7 @@ export class AnalyticsSync {
    * Scrub PII from metadata before storing in database
    * Removes email addresses, phone numbers, usernames, and other sensitive data
    */
-  private scrubbePII(metadata: any): any {
+  private scrubbePII(metadata: unknown): unknown {
     if (!metadata) return metadata;
 
     const scrubbedData = { ...metadata };

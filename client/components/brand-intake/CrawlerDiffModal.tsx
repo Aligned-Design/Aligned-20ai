@@ -8,9 +8,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Badge as _Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, X, RotateCcw, Sparkles } from "lucide-react";
+import { Check, X, Sparkles } from "lucide-react";
 import { CrawlerSuggestion, FieldChange } from "@/types/brand-kit-field";
 import { cn } from "@/lib/utils";
 
@@ -170,7 +170,7 @@ export function CrawlerDiffModal({
     );
   };
 
-  const renderValue = (value: any, field: string) => {
+  const renderValue = (value: unknown, field: string) => {
     if (!value)
       return <span className="text-muted-foreground italic">Not set</span>;
 

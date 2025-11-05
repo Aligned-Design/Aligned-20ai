@@ -1,15 +1,21 @@
-import { PublishingJob, Platform, PostContent, JobStatusUpdate } from '@shared/publishing';
+import { PublishingJob, JobStatusUpdate } from '@shared/publishing';
 import { validatePostContent } from './platform-validators';
 import { connectionsDB } from './connections-db-service';
 import { publishingDBService } from './publishing-db-service';
 import { getPlatformAPI } from './platform-apis';
+import {
+  isWeekend,
+  canPostOnDate,
+  calculatePostingDelay,
+  getWeekendPostingFromConfig
+} from './weekend-posting-utils';
 
 interface PublishResult {
   success: boolean;
   platformPostId?: string;
   platformUrl?: string;
   error?: string;
-  errorDetails?: any;
+  errorDetails?: unknown;
 }
 
 export class PublishingQueue {
@@ -45,7 +51,7 @@ export class PublishingQueue {
     }
 
     this.processing.add(jobId);
-    
+
     try {
       // Update status to processing
       await this.updateJobStatus(jobId, { status: 'processing' });
@@ -59,9 +65,33 @@ export class PublishingQueue {
         return;
       }
 
+      // Check weekend posting restrictions
+      if (job.scheduledAt) {
+        const scheduledDate = new Date(job.scheduledAt);
+        const brandConfig = await this.getBrandPostingConfig(job.brandId);
+        const weekendPostingEnabled = getWeekendPostingFromConfig(brandConfig?.posting_config);
+        const brandTimezone = brandConfig?.timezone || 'UTC';
+
+        // If weekend posting is disabled and scheduled for weekend, reschedule
+        if (!canPostOnDate(scheduledDate, weekendPostingEnabled, brandTimezone)) {
+          const nextAvailable = calculatePostingDelay(scheduledDate, weekendPostingEnabled, brandTimezone);
+          console.log(
+            `[Publishing Queue] Weekend posting disabled for brand ${job.brandId}. ` +
+            `Rescheduling from ${scheduledDate.toISOString()} to ${nextAvailable.toISOString()}`
+          );
+
+          const delay = nextAvailable.getTime() - Date.now();
+          job.scheduledAt = nextAvailable.toISOString();
+
+          setTimeout(() => this.processJob(jobId), Math.max(delay, 0));
+          this.processing.delete(jobId);
+          return;
+        }
+      }
+
       // Publish to platform
       const result = await this.publishToPlatform(job);
-      
+
       if (result.success) {
         await this.updateJobStatus(jobId, {
           status: 'published',
@@ -404,7 +434,7 @@ export class PublishingQueue {
     }
   }
 
-  private async handleJobFailure(jobId: string, error: string, errorDetails?: any): Promise<void> {
+  private async handleJobFailure(jobId: string, error: string, errorDetails?: unknown): Promise<void> {
     const job = this.jobs.get(jobId);
     if (!job) return;
 
@@ -481,6 +511,22 @@ export class PublishingQueue {
     await this.updateJobStatus(jobId, { status: 'pending' });
     this.processJob(jobId);
     return true;
+  }
+
+  private async getBrandPostingConfig(brandId: string): Promise<unknown> {
+    try {
+      // Fetch brand posting config from database
+      // This integrates with the brands table posting_config JSONB field
+      const config = await publishingDBService.getBrandPostingConfig(brandId);
+      return config;
+    } catch (error) {
+      console.error(`Failed to get posting config for brand ${brandId}:`, error);
+      // Default config: allow weekend posting
+      return {
+        posting_config: { weekendPostingEnabled: true },
+        timezone: 'UTC'
+      };
+    }
   }
 }
 

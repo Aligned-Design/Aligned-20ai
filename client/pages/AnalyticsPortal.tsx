@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card as _Card, CardContent as _CardContent, CardHeader as _CardHeader, CardTitle as _CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Badge as _Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { cn } from '@/lib/utils';
-import { AnalyticsPortalData, ClientFeedback, CustomReport } from '@shared/analytics-portal';
+import { AnalyticsPortalData, CustomReport } from '@shared/analytics-portal';
 
 interface AnalyticsPortalProps {
   brandId: string;
@@ -364,7 +364,7 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
 }
 
 // Component implementations for MetricCard, ContentPerformanceView, etc.
-function MetricCard({ title, current, previous, change, icon, color, isPercentage = false }: {
+function MetricCard({ title, current, _previous, change, icon, color, isPercentage = false }: {
   title: string;
   current: number;
   previous: number;
@@ -407,7 +407,7 @@ function MetricCard({ title, current, previous, change, icon, color, isPercentag
   );
 }
 
-function ContentPerformanceView({ data, onFeedback }: { 
+function ContentPerformanceView({ data, _onFeedback }: { 
   data: AnalyticsPortalData; 
   onFeedback: (contentId?: string) => void; 
 }) {

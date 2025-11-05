@@ -26,7 +26,7 @@ const AuditLogQuerySchema = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
-const AuditExportQuerySchema = z.object({
+const __AuditExportQuerySchema = z.object({
   brandId: z.string(),
   startDate: z.string(),
   endDate: z.string(),
@@ -56,9 +56,16 @@ export const getAuditLogs: RequestHandler = async (req, res) => {
       });
     }
 
+    const validData = validationResult.data;
     const query: AuditLogQuery = {
-      ...validationResult.data,
-      brandId, // Enforce brand context
+      brandId,
+      postId: validData.postId,
+      actorId: validData.actorId,
+      action: validData.action as any,
+      startDate: validData.startDate,
+      endDate: validData.endDate,
+      limit: validData.limit,
+      offset: validData.offset,
     };
 
     const { logs, total, hasMore } = await queryAuditLogs(query);

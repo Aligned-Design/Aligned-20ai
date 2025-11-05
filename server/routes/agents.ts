@@ -25,7 +25,7 @@ import {
 } from "../../client/types/agent-config";
 import { calculateBFS } from "../agents/brand-fidelity-scorer";
 import { lintContent, autoFixContent } from "../agents/content-linter";
-import { generateWithAI, loadPromptTemplate, AIProvider } from "../workers/ai-generation";
+import { generateWithAI, loadPromptTemplate} from "../workers/ai-generation";
 
 const router = Router();
 
@@ -43,7 +43,7 @@ const MAX_REGENERATION_ATTEMPTS = 3;
  */
 router.post("/generate/doc", async (req, res) => {
   try {
-    const { brand_id, input, safety_mode = "safe", idempotency_key } = req.body as GenerationRequest;
+    const { brand_id, input, safety_mode = "safe", __idempotency_key } = req.body as GenerationRequest;
     const docInput = input as DocInput;
     
     if (!brand_id || !input) {
@@ -133,7 +133,7 @@ router.post("/generate/doc", async (req, res) => {
         );
 
         // Auto-fix if possible
-        let finalContent = {
+        const finalContent = {
           body: aiOutput.body,
           headline: aiOutput.headline || "",
           cta: aiOutput.cta,
@@ -391,7 +391,7 @@ router.post("/generate/advisor", async (req, res) => {
       duration_ms: 0
     };
 
-    const { data: logData, error: logError } = await supabase
+    const { data: logData, error: __logError } = await supabase
       .from("generation_logs")
       .insert(logEntry)
       .select()
@@ -551,7 +551,7 @@ router.get("/", (req, res) => {
 });
 
 // Helper functions for content generation
-async function generateDocContent(input: DocInput, brandKit: any, safetyConfig: BrandSafetyConfig): Promise<DocOutput> {
+async function generateDocContent(input: DocInput, brandKit: unknown, _safetyConfig: BrandSafetyConfig): Promise<DocOutput> {
   const template = await loadPromptTemplate("doc", "v1.0", "en");
   
   const prompt = template
@@ -597,7 +597,7 @@ async function generateDocContent(input: DocInput, brandKit: any, safetyConfig: 
   };
 }
 
-async function generateDesignContent(input: DesignInput, brandKit: any): Promise<DesignOutput> {
+async function generateDesignContent(input: DesignInput, brandKit: unknown): Promise<DesignOutput> {
   const template = await loadPromptTemplate("design", "v1.0", "en");
   
   const prompt = template

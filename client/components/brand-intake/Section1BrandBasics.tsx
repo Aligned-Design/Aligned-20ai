@@ -14,7 +14,7 @@ import { BrandIntakeFormData, INDUSTRIES } from "@/types/brand-intake";
 
 interface Section1Props {
   data: Partial<BrandIntakeFormData>;
-  onChange: (field: keyof BrandIntakeFormData, value: any) => void;
+  onChange: (field: keyof BrandIntakeFormData, value: unknown) => void;
   errors: Record<string, string>;
 }
 

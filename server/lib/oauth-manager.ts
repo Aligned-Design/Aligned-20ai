@@ -100,7 +100,7 @@ export async function exchangeCodeForToken(
   accessToken: string;
   refreshToken?: string;
   expiresIn?: number;
-  accountInfo: any;
+  accountInfo: unknown;
 }> {
   const config = OAUTH_CONFIGS[platform];
 
@@ -120,7 +120,7 @@ export async function exchangeCodeForToken(
     );
   }
 
-  const { brandId, codeVerifier } = stateData;
+  const { __brandId, codeVerifier } = stateData;
 
   const tokenParams = new URLSearchParams({
     client_id: config.clientId,
@@ -164,7 +164,7 @@ export async function exchangeCodeForToken(
   };
 }
 
-async function getAccountInfo(platform: Platform, accessToken: string): Promise<any> {
+async function getAccountInfo(platform: Platform, accessToken: string): Promise<unknown> {
   const endpoints = {
     instagram: 'https://graph.instagram.com/me?fields=id,username,account_type,media_count',
     facebook: 'https://graph.facebook.com/me?fields=id,name,picture',

@@ -1,21 +1,17 @@
 import { RequestHandler } from 'express';
-import crypto from 'crypto';
+
 import {
   Platform,
-  PublishRequest,
   PublishResponse,
   PublishingJob,
-  PlatformConnection,
   ConnectionStatus,
-  OAuthFlow,
   PostContent
 } from '@shared/publishing';
 import { validatePostContent, validateScheduleTime } from '../lib/platform-validators';
 import {
   generateOAuthUrl,
   exchangeCodeForToken,
-  refreshAccessToken,
-  isTokenExpired
+  refreshAccessToken
 } from '../lib/oauth-manager';
 import { publishingQueue } from '../lib/publishing-queue';
 import { connectionsDB } from '../lib/connections-db-service';
@@ -69,7 +65,7 @@ export const handleOAuthCallback: RequestHandler = async (req, res) => {
       state as string
     );
 
-    const [stateToken, brandId] = (state as string).split(':');
+    const [_stateToken, brandId] = (state as string).split(':');
 
     // Get tenantId and userId from auth context (in production, from req.user or session)
     const tenantId = (req as any).user?.tenantId || 'tenant-123';
@@ -238,7 +234,7 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
   try {
     const { brandId } = req.params;
     // ✅ VALIDATED: Query parameters validated against GetJobsQuerySchema
-    const { status, platform, limit, offset } = validateQuery(GetJobsQuerySchema, req.query);
+    const { __status, platform, limit, offset } = validateQuery(GetJobsQuerySchema, req.query);
 
     // Fetch from database for persistence across server restarts
     const { jobs, total } = await publishingDBService.getJobHistory(
@@ -380,7 +376,7 @@ export const verifyConnection: RequestHandler = async (req, res) => {
 
     // Try a simple API call to verify the token still works
     try {
-      const platformAPI = getPlatformAPI(platform as Platform, connection.access_token, connection.account_id);
+      const __platformAPI = getPlatformAPI(platform as Platform, connection.access_token, connection.account_id);
 
       // For now, just verify the connection object is valid
       // In production, you might make a simple test API call
@@ -446,6 +442,136 @@ export const refreshToken: RequestHandler = async (req, res) => {
     );
 
     res.json({ success: true });
+  } catch (error) {
+    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
+      path: req.path,
+      requestId: req.headers['x-request-id'] as string
+    });
+  }
+};
+
+// Publish blog post to WordPress, Squarespace, or Wix
+export const publishBlogPost: RequestHandler = async (req, res) => {
+  try {
+    const { brandId, platform } = req.params;
+    const {
+      title,
+      content,
+      excerpt,
+      mediaUrls,
+      tags,
+      categories,
+      scheduledFor
+    } = req.body;
+
+    if (!title || !content) {
+      return res.status(400).json({
+        error: 'Missing required fields: title, content'
+      });
+    }
+
+    const supportedPlatforms = ['wordpress', 'squarespace', 'wix'];
+    if (!supportedPlatforms.includes(platform)) {
+      return res.status(400).json({
+        error: `Blog publishing not supported for ${platform}`
+      });
+    }
+
+    // Get connection
+    const connection = await connectionsDB.getConnection(brandId, platform as Platform);
+    if (!connection || connection.status !== 'connected') {
+      return res.status(401).json({
+        error: 'Platform not connected or connection expired'
+      });
+    }
+
+    // Import the integration service dynamically to avoid circular dependencies
+    const { IntegrationService } = await import('../lib/integrations/integration-service');
+
+    const result = await IntegrationService.publishBlogPost(
+      platform as any,
+      connection.metadata || {},
+      {
+        title,
+        content,
+        excerpt,
+        mediaUrls,
+        tags,
+        categories,
+        scheduledFor
+      }
+    );
+
+    res.json({
+      success: true,
+      message: `Blog post published to ${platform}${scheduledFor ? ' (scheduled)' : ''}`,
+      result
+    });
+  } catch (error) {
+    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
+      path: req.path,
+      requestId: req.headers['x-request-id'] as string
+    });
+  }
+};
+
+// Publish email campaign to Mailchimp, Squarespace, or Wix
+export const publishEmailCampaign: RequestHandler = async (req, res) => {
+  try {
+    const { brandId, platform } = req.params;
+    const {
+      title,
+      subject,
+      content,
+      htmlContent,
+      listIds,
+      excerpt,
+      scheduledFor
+    } = req.body;
+
+    if (!title || !subject || !content) {
+      return res.status(400).json({
+        error: 'Missing required fields: title, subject, content'
+      });
+    }
+
+    const supportedPlatforms = ['mailchimp', 'squarespace', 'wix'];
+    if (!supportedPlatforms.includes(platform)) {
+      return res.status(400).json({
+        error: `Email publishing not supported for ${platform}`
+      });
+    }
+
+    // Get connection
+    const connection = await connectionsDB.getConnection(brandId, platform as Platform);
+    if (!connection || connection.status !== 'connected') {
+      return res.status(401).json({
+        error: 'Platform not connected or connection expired'
+      });
+    }
+
+    // Import the integration service dynamically
+    const { IntegrationService } = await import('../lib/integrations/integration-service');
+
+    const result = await IntegrationService.publishEmailCampaign(
+      platform as any,
+      connection.metadata || {},
+      {
+        title,
+        subject,
+        content,
+        htmlContent,
+        listIds,
+        excerpt,
+        scheduledFor
+      }
+    );
+
+    res.json({
+      success: true,
+      message: `Email campaign published to ${platform}${scheduledFor ? ' (scheduled)' : ''}`,
+      result
+    });
   } catch (error) {
     errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
       path: req.path,

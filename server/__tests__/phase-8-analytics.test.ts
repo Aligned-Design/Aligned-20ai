@@ -4,7 +4,7 @@
  * Total: 40+ tests
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect} from 'test';
 
 // ==================== Analytics Sync Tests (15 tests) ====================
 
@@ -176,7 +176,7 @@ describe('PHASE 8: Analytics - Data Sync', () => {
 describe('PHASE 8: Analytics - Advisor Engine', () => {
   describe('Insight Generation', () => {
     it('should generate content recommendations based on engagement', () => {
-      const topContent = [
+      const __topContent = [
         { title: 'Post 1', engagement: 500 },
         { title: 'Post 2', engagement: 300 },
         { title: 'Post 3', engagement: 150 },

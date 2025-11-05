@@ -148,9 +148,9 @@ export interface TimingRecommendation {
 
 export interface BrandIntelligenceUpdate {
   brandId: string;
-  competitorData?: any[];
-  performanceData?: any[];
-  audienceData?: any[];
+  competitorData?: unknown[];
+  performanceData?: unknown[];
+  audienceData?: unknown[];
   feedbackData?: {
     recommendationId: string;
     action: 'accepted' | 'rejected' | 'modified';
@@ -160,9 +160,9 @@ export interface BrandIntelligenceUpdate {
 
 export interface BrandIntelligenceUpdate {
   brandId: string;
-  competitorData?: any[];
-  performanceData?: any[];
-  audienceData?: any[];
+  competitorData?: unknown[];
+  performanceData?: unknown[];
+  audienceData?: unknown[];
   feedbackData?: {
     recommendationId: string;
     action: 'accepted' | 'rejected' | 'modified';

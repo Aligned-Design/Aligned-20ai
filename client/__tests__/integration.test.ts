@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 /**
  * Integration Tests - 60+ tests for complete user workflows
@@ -132,7 +132,7 @@ describe('Brand Creation Flow', () => {
     });
 
     it('should show industry selection dropdown', () => {
-      const select = document.createElement('select');
+      const _select = document.createElement('__select');
       const option = document.createElement('option');
       option.value = 'technology';
       option.textContent = 'Technology';

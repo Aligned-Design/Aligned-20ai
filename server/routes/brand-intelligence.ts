@@ -1,12 +1,51 @@
-import { RequestHandler } from 'express';
-import { BrandIntelligence, CompetitorProfile, StrategicRecommendation } from '@shared/brand-intelligence';
+import { RequestHandler, Response } from 'express';
+import { BrandIntelligence } from '@shared/brand-intelligence';
+
+/**
+ * Ensures all API responses are JSON with proper headers
+ * @param res Express response object
+ */
+function setJsonHeaders(res: Response): void {
+  res.set({
+    'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-cache, no-store, must-revalidate'
+  });
+}
+
+/**
+ * Sends a JSON error response with proper status code and headers
+ * @param res Express response object
+ * @param status HTTP status code
+ * @param error Error message or object
+ */
+function sendJsonError(
+  res: Response,
+  status: number,
+  error: string | { error?: string; message?: string; code?: string }
+): Response {
+  setJsonHeaders(res);
+
+  const errorObj = typeof error === 'string' ? { error } : error;
+
+  return res.status(status).json({
+    error: errorObj.error || errorObj.message || 'An error occurred',
+    code: (errorObj as any).code || 'UNKNOWN_ERROR',
+    timestamp: new Date().toISOString()
+  });
+}
 
 export const getBrandIntelligence: RequestHandler = async (req, res) => {
   try {
     const { brandId } = req.params;
-    
+
+    // Validate required parameter
     if (!brandId) {
-      return res.status(400).json({ error: 'brandId required' });
+      return sendJsonError(res, 400, { error: 'brandId parameter is required' });
+    }
+
+    // Validate brandId format (basic check)
+    if (typeof brandId !== 'string' || brandId.length === 0) {
+      return sendJsonError(res, 400, { error: 'Invalid brandId format' });
     }
 
     // Mock comprehensive brand intelligence data
@@ -208,11 +247,22 @@ export const getBrandIntelligence: RequestHandler = async (req, res) => {
       confidenceScore: 0.87
     };
 
-    res.json(intelligence);
+    // Always return JSON with proper headers
+    setJsonHeaders(res);
+    return res.status(200).json(intelligence);
   } catch (error) {
-    console.error('Brand intelligence error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to get brand intelligence'
+    // Log error for debugging
+    console.error('[Brand Intelligence API] Error:', {
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      brandId: req.params.brandId,
+      timestamp: new Date().toISOString()
+    });
+
+    // Return structured JSON error response
+    return sendJsonError(res, 500, {
+      error: error instanceof Error ? error.message : 'Failed to load brand intelligence',
+      code: 'BRAND_INTELLIGENCE_ERROR'
     });
   }
 };
@@ -220,17 +270,39 @@ export const getBrandIntelligence: RequestHandler = async (req, res) => {
 export const submitRecommendationFeedback: RequestHandler = async (req, res) => {
   try {
     const { recommendationId, action } = req.body;
-    
+
+    // Validate required fields
+    if (!recommendationId) {
+      return sendJsonError(res, 400, { error: 'recommendationId is required' });
+    }
+
+    if (!action || !['accepted', 'rejected'].includes(action)) {
+      return sendJsonError(res, 400, {
+        error: 'action must be either "accepted" or "rejected"'
+      });
+    }
+
     // TODO: Store feedback in database
     // TODO: Use feedback to improve future recommendations
-    
-    res.json({
+    // const feedbackId = await storeFeedback({ recommendationId, action, timestamp: new Date() });
+
+    setJsonHeaders(res);
+    return res.status(200).json({
       success: true,
-      message: 'Feedback recorded successfully'
+      message: 'Feedback recorded successfully',
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to record feedback'
+    console.error('[Brand Intelligence Feedback] Error:', {
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      recommendationId: (req.body as any)?.recommendationId,
+      timestamp: new Date().toISOString()
+    });
+
+    return sendJsonError(res, 500, {
+      error: error instanceof Error ? error.message : 'Failed to record feedback',
+      code: 'FEEDBACK_ERROR'
     });
   }
 };

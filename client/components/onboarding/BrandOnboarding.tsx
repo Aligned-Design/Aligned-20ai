@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Check, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Check, ChevronRight as _ChevronRight, ChevronLeft } from 'lucide-react';
 import { InlineError } from '@/components/ui/error-state';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -96,7 +96,7 @@ export default function BrandOnboarding({ open, onComplete }: BrandOnboardingPro
       });
 
       onComplete();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Error creating brand',
         description: error.message || 'Please try again.',

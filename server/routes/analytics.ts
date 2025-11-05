@@ -10,7 +10,7 @@ export const getAnalytics: RequestHandler = async (req, res) => {
     const summary = await analyticsDB.getMetricsSummary(brandId, days);
 
     // Get platform-specific stats
-    const platformStats: Record<string, any> = {};
+    const platformStats: Record<string, unknown> = {};
     const platforms = ['instagram', 'facebook', 'linkedin', 'twitter', 'tiktok', 'pinterest', 'youtube', 'google_business'];
 
     for (const platform of platforms) {
@@ -148,7 +148,7 @@ export const processVoiceQuery: RequestHandler = async (req, res) => {
       suggestions: ['Try asking about engagement rates', 'Check platform performance']
     };
     res.json(response);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Failed to process voice query' });
   }
 };

@@ -47,7 +47,7 @@ export default function Signup() {
       });
 
       navigate('/dashboard');
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Signup failed',
         description: error.message || 'Could not create account',

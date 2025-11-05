@@ -1,4 +1,4 @@
-import { expect, afterEach, beforeAll, afterAll, vi, beforeEach } from 'vitest';
+import { afterEach, beforeAll, afterAll, vi, beforeEach } from 'vitest';
 
 // Helper to create storage mock with actual data storage
 const createStorageMock = () => {
@@ -70,46 +70,46 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
-})) as any;
+})) as unknown as typeof IntersectionObserver;
 
 // Mock ResizeObserver
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
-})) as any;
+})) as unknown as typeof ResizeObserver;
 
 // Mock DragEvent if not available
 if (typeof DragEvent === 'undefined') {
-  (global as any).DragEvent = class DragEvent extends Event {
-    dataTransfer: any;
+  (global as Record<string, unknown>).DragEvent = class DragEvent extends Event {
+    dataTransfer: DataTransfer;
     constructor(type: string, eventInitDict?: EventInit) {
       super(type, eventInitDict);
       this.dataTransfer = {
         dropEffect: 'move',
         effectAllowed: 'move',
-        files: [],
-        items: [],
+        files: [] as unknown as FileList,
+        items: [] as unknown as DataTransferItemList,
         types: [],
         getData: vi.fn(),
         setData: vi.fn(),
         clearData: vi.fn(),
         setDragImage: vi.fn(),
-      };
+      } as unknown as DataTransfer;
     }
   };
 }
 
 // Mock StorageEvent if not available
 if (typeof StorageEvent === 'undefined') {
-  (global as any).StorageEvent = class StorageEvent extends Event {
+  (global as Record<string, unknown>).StorageEvent = class StorageEvent extends Event {
     key: string | null;
     newValue: string | null;
     oldValue: string | null;
     storageArea: Storage | null;
     url: string;
 
-    constructor(type: string, eventInitDict?: any) {
+    constructor(type: string, eventInitDict?: StorageEventInit) {
       super(type, eventInitDict);
       this.key = eventInitDict?.key ?? null;
       this.newValue = eventInitDict?.newValue ?? null;
@@ -122,11 +122,16 @@ if (typeof StorageEvent === 'undefined') {
 
 // Mock web-vitals module
 vi.mock('web-vitals', () => ({
-  onCLS: vi.fn((callback) => callback({ name: 'CLS', value: 0.1, rating: 'good' })),
-  onFID: vi.fn((callback) => callback({ name: 'FID', value: 100, rating: 'good' })),
-  onFCP: vi.fn((callback) => callback({ name: 'FCP', value: 500, rating: 'good' })),
-  onLCP: vi.fn((callback) => callback({ name: 'LCP', value: 1000, rating: 'good' })),
-  onTTFB: vi.fn((callback) => callback({ name: 'TTFB', value: 300, rating: 'good' })),
+  onCLS: vi.fn((callback: (metric: { name: string; value: number; rating: string }) => void) =>
+    callback({ name: 'CLS', value: 0.1, rating: 'good' })),
+  onFID: vi.fn((callback: (metric: { name: string; value: number; rating: string }) => void) =>
+    callback({ name: 'FID', value: 100, rating: 'good' })),
+  onFCP: vi.fn((callback: (metric: { name: string; value: number; rating: string }) => void) =>
+    callback({ name: 'FCP', value: 500, rating: 'good' })),
+  onLCP: vi.fn((callback: (metric: { name: string; value: number; rating: string }) => void) =>
+    callback({ name: 'LCP', value: 1000, rating: 'good' })),
+  onTTFB: vi.fn((callback: (metric: { name: string; value: number; rating: string }) => void) =>
+    callback({ name: 'TTFB', value: 300, rating: 'good' })),
 }));
 
 // Mock Sentry module
@@ -138,7 +143,7 @@ vi.mock('@sentry/react', async () => {
     captureException: vi.fn(),
     captureMessage: vi.fn(),
     setUser: vi.fn(),
-    ErrorBoundary: ({ children }: any) => children,
+    ErrorBoundary: ({ children }: { children: React.ReactNode }) => children,
     reactRouterV6Instrumentation: vi.fn(() => ({})),
     Replay: vi.fn(function() {
       return {};

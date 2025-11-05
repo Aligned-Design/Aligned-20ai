@@ -66,7 +66,7 @@ export async function runGenerationPipeline(request: PipelineRequest): Promise<P
       throw new Error(`Failed to load brand kit: ${brandError.message}`);
     }
 
-    const { data: safetyConfig, error: safetyError } = await supabase
+    const { data: safetyConfig, error: __safetyError } = await supabase
       .from("brand_safety_configs")
       .select("*")
       .eq("brand_id", request.brand_id)
@@ -240,7 +240,7 @@ async function runAdvisorStep(brand_id: string): Promise<AdvisorOutput> {
  */
 async function runDocStep(
   input: DocInput, 
-  brandKit: any, 
+  brandKit: unknown, 
   safetyConfig: BrandSafetyConfig
 ): Promise<DocOutput> {
   const MAX_ATTEMPTS = 3;
@@ -356,7 +356,7 @@ async function runDocStep(
 /**
  * Run Design step
  */
-async function runDesignStep(input: DesignInput, brandKit: any): Promise<DesignOutput> {
+async function runDesignStep(input: DesignInput, brandKit: unknown): Promise<DesignOutput> {
   const template = await loadPromptTemplate("design", "v1.0", "en");
   
   const prompt = template

@@ -78,7 +78,7 @@ export enum ErrorSeverity {
 export interface ValidationErrorDetail {
   field: string;
   message: string;
-  value?: any;
+  value?: unknown;
   code?: string;
 }
 
@@ -86,7 +86,7 @@ export interface APIError {
   code: ErrorCode | string;
   message: string;
   statusCode: number;
-  details?: any;
+  details?: unknown;
   validationErrors?: ValidationErrorDetail[];
   recoveryHints?: string[];
   severity?: ErrorSeverity;

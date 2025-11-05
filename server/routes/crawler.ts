@@ -31,7 +31,7 @@ const supabase = createClient(
 );
 
 // In-memory job store (use Redis in production)
-const crawlJobs = new Map<string, any>();
+const crawlJobs = new Map<string, unknown>();
 
 /**
  * POST /api/crawl/start
@@ -92,7 +92,7 @@ router.post("/crawl/start", async (req, res) => {
     });
 
     res.json({ job_id, status: "pending" });
-  } catch (error: any) {
+  } catch (error: unknown) {
     res.status(500).json({ error: error.message });
   }
 });
@@ -104,7 +104,7 @@ async function runCrawlJob(
   job_id: string,
   brand_id: string,
   url: string,
-  currentBrandKit: any,
+  currentBrandKit: unknown,
 ) {
   const job = crawlJobs.get(job_id);
   if (!job) return;
@@ -178,7 +178,7 @@ async function runCrawlJob(
     job.suggestions = suggestions;
     job.palette = [colors.primary, colors.secondary, colors.accent];
     job.keywords = keywords;
-  } catch (error: any) {
+  } catch (error: unknown) {
     job.status = "failed";
     job.error = error.message;
     job.completed_at = new Date().toISOString();
@@ -239,7 +239,7 @@ router.get("/crawl/result/:jobId", async (req, res) => {
     }
 
     res.json(job);
-  } catch (error: any) {
+  } catch (error: unknown) {
     res.status(500).json({ error: error.message });
   }
 });
@@ -315,7 +315,7 @@ router.post("/brand-kit/apply", async (req, res) => {
     await saveHistory(brand_id, history);
 
     res.json({ success: true, applied: changes.length });
-  } catch (error: any) {
+  } catch (error: unknown) {
     res.status(500).json({ error: error.message });
   }
 });
@@ -342,11 +342,11 @@ router.get("/brand-kit/history/:brandId", async (req, res) => {
 
     // Filter by field if specified
     const history = field
-      ? data.filter((entry: any) => entry.field === field)
+      ? data.filter((entry: unknown) => entry.field === field)
       : data;
 
     res.json({ history });
-  } catch (error: any) {
+  } catch (error: unknown) {
     res.status(500).json({ error: error.message });
   }
 });
@@ -406,7 +406,7 @@ router.post("/brand-kit/revert", async (req, res) => {
     }
 
     res.json({ success: true, field, value: historyEntry.old_value });
-  } catch (error: any) {
+  } catch (error: unknown) {
     res.status(500).json({ error: error.message });
   }
 });
@@ -440,7 +440,7 @@ async function saveHistory(brand_id: string, entries: FieldHistoryEntry[]) {
       .order("created_at", { ascending: false });
 
     if (allEntries && allEntries.length > 10) {
-      const toDelete = allEntries.slice(10).map((e: any) => e.id);
+      const toDelete = allEntries.slice(10).map((e: unknown) => e.id);
       await supabase.from("brand_kit_history").delete().in("id", toDelete);
     }
   }

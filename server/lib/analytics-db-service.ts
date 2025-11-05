@@ -4,7 +4,6 @@
  */
 
 import { supabase } from './supabase';
-import { AnalyticsMetric } from '@shared/analytics';
 
 export interface AnalyticsMetricRecord {
   id: string;
@@ -13,8 +12,8 @@ export interface AnalyticsMetricRecord {
   platform: string;
   post_id?: string;
   date: string;
-  metrics: any;
-  metadata: any;
+  metrics: Record<string, unknown>;
+  metadata: unknown;
   created_at: string;
   updated_at: string;
 }
@@ -107,7 +106,7 @@ export class AnalyticsDBService {
     averageEngagementRate: number;
     totalFollowers: number;
     topPlatform: string;
-    platformBreakdown: Record<string, any>;
+    platformBreakdown: Record<string, unknown>;
   }> {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
@@ -121,7 +120,7 @@ export class AnalyticsDBService {
       totalFollowers: 0,
       averageEngagementRate: 0,
       topPlatform: '',
-      platformBreakdown: {} as Record<string, any>
+      platformBreakdown: {} as Record<string, unknown>
     };
 
     let engagementRateSum = 0;

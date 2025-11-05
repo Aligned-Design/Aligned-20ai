@@ -1,6 +1,6 @@
 interface AIProvider {
-  generateContent(prompt: string, options?: any): Promise<string>
-  analyzeContent(content: string): Promise<any>
+  generateContent(prompt: string, options?: unknown): Promise<string>
+  analyzeContent(content: string): Promise<unknown>
 }
 
 class OpenAIProvider implements AIProvider {
@@ -13,7 +13,7 @@ class OpenAIProvider implements AIProvider {
     this.apiKey = apiKey
   }
 
-  async generateContent(prompt: string, options: any = {}): Promise<string> {
+  async generateContent(prompt: string, options: unknown = {}): Promise<string> {
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -50,7 +50,7 @@ class OpenAIProvider implements AIProvider {
     }
   }
 
-  async analyzeContent(content: string): Promise<any> {
+  async analyzeContent(content: string): Promise<unknown> {
     const prompt = `Analyze the following marketing content for sentiment, engagement potential, and provide actionable improvement suggestions:\n\n${content}`
     const analysis = await this.generateContent(prompt)
     
@@ -73,7 +73,7 @@ class AnthropicProvider implements AIProvider {
     this.apiKey = apiKey
   }
 
-  async generateContent(prompt: string, options: any = {}): Promise<string> {
+  async generateContent(prompt: string, options: unknown = {}): Promise<string> {
     try {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -106,7 +106,7 @@ class AnthropicProvider implements AIProvider {
     }
   }
 
-  async analyzeContent(content: string): Promise<any> {
+  async analyzeContent(content: string): Promise<unknown> {
     const prompt = `Analyze the following marketing content for sentiment, engagement potential, and provide actionable improvement suggestions:\n\n${content}`
     const analysis = await this.generateContent(prompt)
     

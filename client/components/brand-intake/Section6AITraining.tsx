@@ -1,21 +1,21 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+import { Badge as _Badge } from "@/components/ui/badge";
 import { HelpTooltip } from "@/components/ui/help-tooltip";
 import { BrandIntakeFormData } from "@/types/brand-intake";
-import { Upload, FileText, Image, FolderArchive } from "lucide-react";
+import { FileText, Image, FolderArchive } from "lucide-react";
 
 interface Section6Props {
   data: Partial<BrandIntakeFormData>;
-  onChange: (field: keyof BrandIntakeFormData, value: any) => void;
+  onChange: (field: keyof BrandIntakeFormData, value: unknown) => void;
   errors: Record<string, string>;
 }
 
 export default function Section6AITraining({
   data,
   onChange,
-  errors,
+  errors: _errors,
 }: Section6Props) {
   const handleFileChange = (
     field: keyof BrandIntakeFormData,

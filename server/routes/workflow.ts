@@ -133,7 +133,7 @@ export const startWorkflow: RequestHandler = async (req, res) => {
 
 export const processWorkflowAction: RequestHandler = async (req, res) => {
   try {
-    const action: WorkflowAction = req.body;
+    const __action: WorkflowAction = req.body;
     
     // TODO: Validate user permissions
     // TODO: Update workflow instance
@@ -150,7 +150,7 @@ export const processWorkflowAction: RequestHandler = async (req, res) => {
 
 export const getWorkflowNotifications: RequestHandler = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const { __userId } = req.query;
     
     // TODO: Fetch notifications for user
     const notifications: WorkflowNotification[] = [];
