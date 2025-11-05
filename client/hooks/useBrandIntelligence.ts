@@ -148,11 +148,11 @@ export function useBrandIntelligence(brandId: string): UseBrandIntelligenceRetur
         try {
           errorData = await safeJsonParse(response);
         } catch (parseErr) {
-          // If JSON parsing fails, include response preview in error
-          throw new Error(`HTTP ${response.status}: ${response.statusText}. Response not JSON.`);
+          // If JSON parsing fails, surface the HTTP status as the error (matches expected behavior in tests)
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
-        // Handle specific HTTP status codes
+        // Handle specific HTTP status codes with friendly messages for auth/permission/not found
         if (response.status === 401) {
           throw new Error('Authentication required. Please log in.');
         } else if (response.status === 403) {
@@ -160,7 +160,8 @@ export function useBrandIntelligence(brandId: string): UseBrandIntelligenceRetur
         } else if (response.status === 404) {
           throw new Error('Brand intelligence data not found.');
         } else if (response.status >= 500) {
-          throw new Error('Server error occurred. Please try again later.');
+          // For server errors prefer returning the HTTP status message to the caller
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
         // Try to extract error message from API response
