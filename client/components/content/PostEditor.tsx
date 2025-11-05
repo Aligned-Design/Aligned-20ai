@@ -1,6 +1,7 @@
-
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import type { PostModel, PostUpdateRequest } from '@shared/api';
 
 interface PostEditorProps {
   post: PostModel;
