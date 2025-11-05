@@ -21,22 +21,21 @@ const buttonVariants = (props?: {
   const { variant = "default", size = "default" } = props || {};
 
   const baseStyles =
-    "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background";
+    "inline-flex items-center justify-center rounded-3xl text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9F06A] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background shadow-sm";
 
   const variantStyles: Record<string, string> = {
-    default: "bg-primary text-primary-foreground hover:bg-primary/90",
-    destructive:
-      "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-    outline: "border border-input hover:bg-accent hover:text-accent-foreground",
-    secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-    ghost: "hover:bg-accent hover:text-accent-foreground",
-    link: "underline-offset-4 hover:underline text-primary",
+    default: "bg-[#C9F06A] text-black hover:shadow-lg",
+    destructive: "bg-red-600 text-white hover:shadow-lg",
+    outline: "border border-white/30 text-white hover:bg-white/8",
+    secondary: "bg-white/6 text-white hover:bg-white/10",
+    ghost: "bg-transparent hover:bg-white/6",
+    link: "underline-offset-4 hover:underline text-[#C9F06A]",
   };
 
   const sizeStyles: Record<string, string> = {
-    default: "h-10 py-2 px-4",
-    sm: "h-9 px-3 rounded-md",
-    lg: "h-11 px-8 rounded-md",
+    default: "h-12 px-6",
+    sm: "h-10 px-4",
+    lg: "h-14 px-8",
     icon: "h-10 w-10",
   };
 
