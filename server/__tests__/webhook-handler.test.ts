@@ -3,7 +3,7 @@
  * Tests for webhook handling, retry logic, and idempotency
  */
 
-import { describe, it, expect, beforeEach} from 'test';
+import { describe, it, expect, beforeEach } from 'vitest';
 import crypto from 'crypto';
 import { WebhookHandler } from '../lib/webhook-handler';
 import { calculateBackoffDelay, shouldRetryWebhook, DEFAULT_WEBHOOK_RETRY_CONFIG } from '@shared/webhooks';
