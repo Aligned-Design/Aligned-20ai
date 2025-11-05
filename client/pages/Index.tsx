@@ -131,10 +131,10 @@ export default function Index() {
       <div className="bg-white py-16 relative z-10">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
               Streamlined Workflow
             </h2>
-            <p className="text-lg text-slate-200">
+            <p className="text-lg text-slate-600">
               From brand input to published content in four simple steps
             </p>
           </div>
