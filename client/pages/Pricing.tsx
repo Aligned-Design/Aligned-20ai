@@ -117,7 +117,7 @@ export default function Pricing() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-16">
+      <div className="max-w-7xl mx-auto px-6 py-20">
         {/* Pricing Calculator */}
         <Card className="mb-12 shadow-lg">
           <CardHeader className="text-center">
