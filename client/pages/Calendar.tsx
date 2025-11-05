@@ -128,20 +128,20 @@ export default function Calendar() {
           <p className="text-gray-600">Schedule and manage your content across all platforms</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="gap-2 relative group">
-            <Filter className="h-4 w-4" />
-            Filter
-            <span className="absolute -right-1 -top-1">
-              <HelpTooltip content="Filter by brand, platform, or status to find specific posts quickly." side="bottom" />
-            </span>
-          </Button>
-          <Button className="gap-2 relative group">
-            <Plus className="h-4 w-4" />
-            Schedule Content
-            <span className="absolute -right-1 -top-1">
-              <HelpTooltip content="Create and schedule a new post. Choose your brand, platform, and timing." side="bottom" />
-            </span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" className="gap-2">
+              <Filter className="h-4 w-4" />
+              Filter
+            </Button>
+            <HelpTooltip content="Filter by brand, platform, or status to find specific posts quickly." side="bottom" />
+          </div>
+          <div className="flex items-center gap-2">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Schedule Content
+            </Button>
+            <HelpTooltip content="Create and schedule a new post. Choose your brand, platform, and timing." side="bottom" />
+          </div>
         </div>
       </div>
 
