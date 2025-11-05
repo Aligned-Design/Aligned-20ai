@@ -202,8 +202,7 @@ export function useBrandIntelligence(brandId: string): UseBrandIntelligenceRetur
       const response = await fetch('/api/brand-intelligence/feedback', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ recommendationId, action })
       });
