@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { AlertCircle as _AlertCircle, Check, Copy, Mail, Bell, Settings as SettingsIcon } from 'lucide-react';
+import { AlertCircle, Check, Copy, Mail, Bell, Settings as SettingsIcon } from 'lucide-react';
 import type { ClientSettings } from '@shared/client-settings';
 import { TIMEZONE_OPTIONS, LANGUAGE_OPTIONS } from '@shared/client-settings';
 
