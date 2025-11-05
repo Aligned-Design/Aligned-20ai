@@ -5,6 +5,15 @@
 
 import { supabase } from './supabase';
 
+export interface AnalyticsMetrics {
+  reach?: number;
+  engagement?: number;
+  followers?: number;
+  engagementRate?: number;
+  impressions?: number;
+  [key: string]: any;
+}
+
 export interface AnalyticsMetricRecord {
   id: string;
   brand_id: string;
@@ -12,8 +21,8 @@ export interface AnalyticsMetricRecord {
   platform: string;
   post_id?: string;
   date: string;
-  metrics: Record<string, unknown>;
-  metadata: unknown;
+  metrics: AnalyticsMetrics;
+  metadata: any;
   created_at: string;
   updated_at: string;
 }
@@ -120,19 +129,25 @@ export class AnalyticsDBService {
       totalFollowers: 0,
       averageEngagementRate: 0,
       topPlatform: '',
-      platformBreakdown: {} as Record<string, unknown>
+      platformBreakdown: {} as Record<string, { reach: number; engagement: number; posts: number }>
     };
 
     let engagementRateSum = 0;
     let engagementRateCount = 0;
 
-    metrics.forEach(metric => {
-      summary.totalReach += metric.metrics.reach || 0;
-      summary.totalEngagement += metric.metrics.engagement || 0;
-      summary.totalFollowers = Math.max(summary.totalFollowers, metric.metrics.followers || 0);
+    metrics.forEach((metric) => {
+      const m = metric.metrics || {};
+      const reach = typeof m.reach === 'number' ? m.reach : 0;
+      const engagement = typeof m.engagement === 'number' ? m.engagement : 0;
+      const followers = typeof m.followers === 'number' ? m.followers : 0;
+      const engagementRate = typeof m.engagementRate === 'number' ? m.engagementRate : undefined;
 
-      if (metric.metrics.engagementRate) {
-        engagementRateSum += metric.metrics.engagementRate;
+      summary.totalReach += reach;
+      summary.totalEngagement += engagement;
+      summary.totalFollowers = Math.max(summary.totalFollowers, followers);
+
+      if (engagementRate !== undefined) {
+        engagementRateSum += engagementRate;
         engagementRateCount++;
       }
 
@@ -145,8 +160,8 @@ export class AnalyticsDBService {
         };
       }
 
-      summary.platformBreakdown[metric.platform].reach += metric.metrics.reach || 0;
-      summary.platformBreakdown[metric.platform].engagement += metric.metrics.engagement || 0;
+      summary.platformBreakdown[metric.platform].reach += reach;
+      summary.platformBreakdown[metric.platform].engagement += engagement;
       summary.platformBreakdown[metric.platform].posts += 1;
     });
 
@@ -199,16 +214,21 @@ export class AnalyticsDBService {
 
     let engagementRateSum = 0;
 
-    metrics.forEach(metric => {
-      stats.totalReach += metric.metrics.reach || 0;
-      stats.totalEngagement += metric.metrics.engagement || 0;
+    metrics.forEach((metric) => {
+      const m = metric.metrics || {};
+      const reach = typeof m.reach === 'number' ? m.reach : 0;
+      const engagement = typeof m.engagement === 'number' ? m.engagement : 0;
+      const engagementRate = typeof m.engagementRate === 'number' ? m.engagementRate : undefined;
 
-      if (metric.metrics.engagementRate) {
-        engagementRateSum += metric.metrics.engagementRate;
+      stats.totalReach += reach;
+      stats.totalEngagement += engagement;
+
+      if (engagementRate !== undefined) {
+        engagementRateSum += engagementRate;
       }
 
-      if ((metric.metrics.engagement || 0) > maxEngagement) {
-        maxEngagement = metric.metrics.engagement || 0;
+      if (engagement > maxEngagement) {
+        maxEngagement = engagement;
         topPost = metric;
       }
     });
