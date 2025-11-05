@@ -121,14 +121,14 @@ export function AppLayout({
         </nav>
 
         {/* User Menu */}
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-800">
           <div className="flex items-center gap-3 p-2 mb-3">
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-xs font-semibold text-gray-600">JD</span>
+            <div className="w-8 h-8 bg-slate-600 rounded-full flex items-center justify-center">
+              <span className="text-xs font-semibold text-white">JD</span>
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900">John Doe</p>
-              <p className="text-xs text-gray-500">john@agency.com</p>
+              <p className="text-sm font-medium text-white">John Doe</p>
+              <p className="text-xs text-slate-400">john@agency.com</p>
             </div>
           </div>
           <Button
