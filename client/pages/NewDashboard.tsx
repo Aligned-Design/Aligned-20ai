@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import React, { useState, useEffect } from 'react';
 import { useBrand } from "@/contexts/BrandContext";
 import { useToast } from "@/hooks/use-toast";
