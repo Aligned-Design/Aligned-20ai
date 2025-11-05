@@ -119,8 +119,8 @@ export class AutoPlanGenerator {
   /**
    * Extract topics from advisor insights
    */
-  private extractTopicsFromInsights(insights: unknown[]): string[] {
-    const topicInsights = insights.filter(i => i.category === 'content');
+  private extractTopicsFromInsights(insights: any[]): string[] {
+    const topicInsights = insights.filter((i: any) => i.category === 'content');
     const topics = new Set<string>();
 
     topicInsights.forEach(insight => {
