@@ -7,7 +7,8 @@ import {
   PublishingJob,
   PlatformConnection,
   ConnectionStatus,
-  OAuthFlow
+  OAuthFlow,
+  PostContent
 } from '@shared/publishing';
 import { validatePostContent, validateScheduleTime } from '../lib/platform-validators';
 import {
@@ -20,23 +21,28 @@ import { publishingQueue } from '../lib/publishing-queue';
 import { connectionsDB } from '../lib/connections-db-service';
 import { publishingDBService } from '../lib/publishing-db-service';
 import { getPlatformAPI } from '../lib/platform-apis';
+import { errorFormatter } from '../lib/error-formatter';
+import {
+  InitiateOAuthSchema,
+  PublishContentSchema,
+  GetJobsQuerySchema,
+  validateQuery
+} from '@shared/validation-schemas';
 
 // OAuth initiation
 export const initiateOAuth: RequestHandler = async (req, res) => {
   try {
-    const { platform, brandId } = req.body;
+    // ✅ VALIDATED: Request body validated against InitiateOAuthSchema
+    const validated = InitiateOAuthSchema.parse(req.body);
+    const { platform, brandId } = validated;
 
-    if (!platform || !brandId) {
-      return res.status(400).json({ error: 'Platform and brandId required' });
-    }
-
-    const oauthFlow = generateOAuthUrl(platform as Platform, brandId);
+    const oauthFlow = generateOAuthUrl(platform, brandId);
 
     res.json(oauthFlow);
   } catch (error) {
-    console.error('OAuth initiation error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to initiate OAuth'
+    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
+      path: req.path,
+      requestId: req.headers['x-request-id'] as string
     });
   }
 };
@@ -52,9 +58,11 @@ export const handleOAuthCallback: RequestHandler = async (req, res) => {
     }
 
     if (!code || !state) {
-      return res.redirect('/integrations?error=Missing authorization code');
+      const errorMsg = 'Missing authorization code or state parameter';
+      return res.redirect(`/integrations?error=${encodeURIComponent(errorMsg)}`);
     }
 
+    // ✅ SECURE: exchangeCodeForToken validates state from cache
     const tokenData = await exchangeCodeForToken(
       platform as Platform,
       code as string,
@@ -86,7 +94,8 @@ export const handleOAuthCallback: RequestHandler = async (req, res) => {
     res.redirect('/integrations?success=Connected successfully');
   } catch (error) {
     console.error('OAuth callback error:', error);
-    res.redirect(`/integrations?error=${encodeURIComponent('Connection failed')}`);
+    const errorMsg = error instanceof Error ? error.message : 'Connection failed';
+    res.redirect(`/integrations?error=${encodeURIComponent(errorMsg)}`);
   }
 };
 
@@ -111,9 +120,9 @@ export const getConnections: RequestHandler = async (req, res) => {
 
     res.json(connectionStatuses);
   } catch (error) {
-    console.error('Get connections error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to get connections'
+    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
+      path: req.path,
+      requestId: req.headers['x-request-id'] as string
     });
   }
 };
@@ -128,9 +137,9 @@ export const disconnectPlatform: RequestHandler = async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    console.error('Disconnect error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to disconnect'
+    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
+      path: req.path,
+      requestId: req.headers['x-request-id'] as string
     });
   }
 };
@@ -138,14 +147,14 @@ export const disconnectPlatform: RequestHandler = async (req, res) => {
 // Publish content
 export const publishContent: RequestHandler = async (req, res) => {
   try {
-    const { brandId, platforms, content, scheduledAt, validateOnly }: PublishRequest = req.body;
-
-    if (!brandId || !platforms || !content) {
-      return res.status(400).json({ error: 'brandId, platforms, and content required' });
-    }
+    // ✅ VALIDATED: Request body validated against PublishContentSchema
+    const { brandId, platforms, content: contentText, scheduledAt, validateOnly } = PublishContentSchema.parse(req.body);
 
     const tenantId = (req as any).user?.tenantId || 'tenant-123';
     const userId = (req as any).user?.id;
+
+    // Convert content string to PostContent object
+    const content: PostContent = { text: contentText };
 
     const jobs: PublishingJob[] = [];
     const validationResults = [];
@@ -217,9 +226,9 @@ export const publishContent: RequestHandler = async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    console.error('Publish error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to publish content'
+    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
+      path: req.path,
+      requestId: req.headers['x-request-id'] as string
     });
   }
 };
@@ -228,13 +237,14 @@ export const publishContent: RequestHandler = async (req, res) => {
 export const getPublishingJobs: RequestHandler = async (req, res) => {
   try {
     const { brandId } = req.params;
-    const { status, platform, limit = '50', offset = '0' } = req.query;
+    // ✅ VALIDATED: Query parameters validated against GetJobsQuerySchema
+    const { status, platform, limit, offset } = validateQuery(GetJobsQuerySchema, req.query);
 
     // Fetch from database for persistence across server restarts
     const { jobs, total } = await publishingDBService.getJobHistory(
       brandId,
-      Number(limit),
-      Number(offset)
+      limit,
+      offset
     );
 
     // Filter by platform if specified
@@ -272,13 +282,13 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
     res.json({
       jobs: publishingJobs,
       total,
-      limit: Number(limit),
-      offset: Number(offset)
+      limit,
+      offset
     });
   } catch (error) {
-    console.error('Get jobs error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to get publishing jobs'
+    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
+      path: req.path,
+      requestId: req.headers['x-request-id'] as string
     });
   }
 };
@@ -293,12 +303,15 @@ export const retryJob: RequestHandler = async (req, res) => {
     if (success) {
       res.json({ success: true });
     } else {
-      res.status(400).json({ error: 'Job cannot be retried' });
+      errorFormatter.sendError(res, new Error('Job cannot be retried'), {
+        path: req.path,
+        requestId: req.headers['x-request-id'] as string
+      });
     }
   } catch (error) {
-    console.error('Retry job error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to retry job'
+    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
+      path: req.path,
+      requestId: req.headers['x-request-id'] as string
     });
   }
 };
@@ -313,12 +326,15 @@ export const cancelJob: RequestHandler = async (req, res) => {
     if (success) {
       res.json({ success: true });
     } else {
-      res.status(400).json({ error: 'Job cannot be cancelled' });
+      errorFormatter.sendError(res, new Error('Job cannot be cancelled'), {
+        path: req.path,
+        requestId: req.headers['x-request-id'] as string
+      });
     }
   } catch (error) {
-    console.error('Cancel job error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to cancel job'
+    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
+      path: req.path,
+      requestId: req.headers['x-request-id'] as string
     });
   }
 };
@@ -385,10 +401,9 @@ export const verifyConnection: RequestHandler = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Verify connection error:', error);
-    res.status(500).json({
-      verified: false,
-      error: error instanceof Error ? error.message : 'Failed to verify connection'
+    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
+      path: req.path,
+      requestId: req.headers['x-request-id'] as string
     });
   }
 };
@@ -432,9 +447,9 @@ export const refreshToken: RequestHandler = async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    console.error('Token refresh error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to refresh token'
+    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
+      path: req.path,
+      requestId: req.headers['x-request-id'] as string
     });
   }
 };
