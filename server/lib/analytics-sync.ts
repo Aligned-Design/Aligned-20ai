@@ -212,7 +212,7 @@ export class AnalyticsSync {
 
       const postsData: any = await postsResponse.json();
       // Filter posts by date range
-      return (postsData.elements || []).filter((post: unknown) => {
+      return (postsData.elements || []).filter((post: any) => {
         const postTime = post.createdTime || 0;
         return postTime >= startMs && postTime <= endMs;
       });
