@@ -75,25 +75,25 @@ export default function BrandSnapshot() {
   const visualSummary = (brand.visual_summary as any) || {};
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="bg-gradient-to-br from-primary/10 via-fuchsia-500/10 to-sky-500/10 py-16">
-        <div className="container mx-auto px-4 text-center">
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white border-b py-16">
+        <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="inline-flex items-center gap-2 mb-4">
-            <CheckCircle2 className="h-12 w-12 text-green-600" />
+            <CheckCircle2 className="h-12 w-12 text-[#C9F06A]" />
           </div>
-          <h1 className="text-4xl font-bold mb-4">
+          <h1 className="text-4xl font-bold mb-4 text-slate-900">
             Here's Your Brand Snapshot
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
             Your brand profile is complete! Our AI agents are now trained on
             your unique voice, style, and preferences.
           </p>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12 max-w-5xl">
+      <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid gap-8 md:grid-cols-2">
-          <div className="rounded-xl border bg-card p-6">
+          <div className="rounded-xl border bg-white p-6">
             <div className="flex items-center gap-2 mb-4">
               <div className="p-2 rounded-lg bg-primary/10">
                 <MessageSquare className="h-5 w-5 text-primary" />
