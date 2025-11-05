@@ -248,13 +248,31 @@ export function useBrandIntelligence(brandId: string): UseBrandIntelligenceRetur
       const errorMessage = getErrorMessage(err);
       setError(errorMessage);
 
-      console.error('[Brand Intelligence Feedback] Error:', {
-        error: err,
-        message: errorMessage,
-        recommendationId,
-        action,
-        timestamp: new Date().toISOString()
-      });
+      try {
+        const serializedError = (function stringifySafe(value: any) {
+          try {
+            return JSON.stringify(value, (_k, v) => {
+              if (v instanceof Error) {
+                return { message: v.message, stack: v.stack };
+              }
+              if (typeof v === 'function') return `[Function: ${v.name || 'anonymous'}]`;
+              return v;
+            });
+          } catch (e) {
+            return String(value);
+          }
+        })(err);
+
+        console.error(`[Brand Intelligence Feedback] Error: ${serializedError}`, {
+          message: errorMessage,
+          recommendationId,
+          action,
+          timestamp: new Date().toISOString()
+        });
+      } catch (logErr) {
+        console.error('[Brand Intelligence Feedback] Error (logging failed):', String(logErr));
+        console.error('[Brand Intelligence Feedback] Original error:', err);
+      }
 
       if (typeof window !== 'undefined' && (window as any).__telemetry?.error) {
         (window as any).__telemetry.error('brand_intelligence_feedback_failed', {
