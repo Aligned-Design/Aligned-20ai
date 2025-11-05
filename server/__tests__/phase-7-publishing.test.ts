@@ -269,7 +269,7 @@ describe('PHASE 7: Publishing - Jobs', () => {
         publishedAt: new Date().toISOString(),
       };
 
-      const canCancel = job.status === 'pending' || job.status === 'processing';
+      const canCancel = (job.status as string) === 'pending' || (job.status as string) === 'processing';
       expect(canCancel).toBe(false);
     });
 
@@ -450,7 +450,7 @@ describe('PHASE 7: Publishing - Platform Connections', () => {
         status: 'revoked' as const,
       };
 
-      const canPublish = connection.status === 'connected';
+      const canPublish = (connection.status as string) === 'connected';
       expect(canPublish).toBe(false);
     });
   });
