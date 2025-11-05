@@ -71,18 +71,18 @@ describe('PHASE 7: Publishing - OAuth Flow', () => {
       expect(stateData?.platform).not.toBe('facebook');
     });
 
-    it('should enforce state expiration after TTL', () => {
+    it('should enforce state expiration after TTL', async () => {
       const state = crypto.randomBytes(32).toString('hex');
       const brandId = '123e4567-e89b-12d3-a456-426614174000';
 
       // Store with 1ms TTL for testing
       oauthStateCache.store(state, brandId, 'linkedin', 'verifier', 0.001);
 
-      // Wait for expiration
-      setTimeout(() => {
-        const expired = oauthStateCache.retrieve(state);
-        expect(expired).toBeNull();
-      }, 10);
+      // Wait for expiration (ensure test waits for timeout)
+      await new Promise((resolve) => setTimeout(resolve, 20));
+
+      const expired = oauthStateCache.retrieve(state);
+      expect(expired).toBeNull();
     });
 
     it('should store code_verifier for PKCE verification', () => {
