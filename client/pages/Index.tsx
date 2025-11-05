@@ -277,10 +277,11 @@ export default function Index() {
       </div>
 
       {/* Reviews Section (new) */}
-      <ReviewsCarousel />
+      <Reveal><div><ReviewsCarousel /></div></Reveal>
 
       {/* CTA Section */}
       <div className="py-20 relative z-10" style={{ background: 'linear-gradient(90deg,#14223a 0%, #3a1466 100%)' }}>
+        <Reveal>
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
             Ready to Scale Your Content?
@@ -302,6 +303,7 @@ export default function Index() {
             </Button>
           </div>
         </div>
+        </Reveal>
       </div>
 
       {/* Footer */}
