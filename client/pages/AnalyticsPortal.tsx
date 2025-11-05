@@ -261,43 +261,48 @@ export default function AnalyticsPortal({ brandId, isSharedView = false }: Analy
             })()}
 
             {/* Charts */}
-            {data && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Reach Over Time</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={data.charts.reachOverTime}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
+            {data && (() => {
+              const reachOverTime = data.charts?.reachOverTime ?? [];
+              const engagementByPlatform = data.charts?.engagementByPlatform ?? [];
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Engagement by Platform</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={data.charts.engagementByPlatform}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="platform" />
-                        <YAxis />
-                        <Tooltip />
-                        <Bar dataKey="value" fill="#10b981" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+              return (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Reach Over Time</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={reachOverTime}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="date" />
+                          <YAxis />
+                          <Tooltip />
+                          <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Engagement by Platform</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={engagementByPlatform}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="platform" />
+                          <YAxis />
+                          <Tooltip />
+                          <Bar dataKey="value" fill="#10b981" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+                </div>
+              );
+            })()}
 
             {/* Top Content */}
             <Card>
