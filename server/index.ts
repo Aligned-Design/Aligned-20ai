@@ -1056,20 +1056,20 @@ export function createServer() {
   });
 
   app.post("/api/analytics-portal/:brandId/reports/:reportId/send", (req, res) => {
-    const { _brandId, _reportId } = req.params;
-    
-    // TODO: Generate and send report immediately
-    res.json({ 
-      success: true, 
+    const { brandId, reportId } = req.params;
+
+    // TODO: Generate and send report immediately for brandId/reportId
+    res.json({
+      success: true,
       message: 'Report sent successfully',
       executionId: `exec_${Date.now()}`
     });
   });
 
   app.delete("/api/analytics-portal/:brandId/reports/:reportId", (req, res) => {
-    const { _brandId, _reportId } = req.params;
-    
-    // TODO: Delete report from database
+    const { brandId, reportId } = req.params;
+
+    // TODO: Delete report from database for brandId/reportId
     res.json({ success: true, message: 'Report deleted successfully' });
   });
 
