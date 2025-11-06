@@ -113,7 +113,7 @@ export class FacebookAPI {
 
   async publishPost(content: PostContent): Promise<PublishResult> {
     try {
-      const body: unknown = {
+      const body: any = {
         message: content.text,
         access_token: this.accessToken
       };
