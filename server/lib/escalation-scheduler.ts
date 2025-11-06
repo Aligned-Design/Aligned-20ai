@@ -160,17 +160,22 @@ export class EscalationScheduler {
   // Define minimal escalation event shape used by scheduler
   private async processEscalation(escalation: {
     id: string;
-    approval_id: string;
+    approval_id?: string;
+    post_id?: string;
     rule_id: string;
     brand_id: string;
     escalation_level: string;
     notification_type?: string;
     escalated_to_user_id?: string;
   }): Promise<void> {
-    // Get approval details
-    const approval = await postApprovals.getById(escalation.approval_id);
-    if (!approval) {
-      throw new Error(`Approval not found: ${escalation.approval_id}`);
+    // Get approval details if present
+    let approval: any = null;
+    if (escalation.approval_id) {
+      approval = await postApprovals.getById(escalation.approval_id);
+      if (!approval) {
+        // If approval_id provided but missing, log and continue (some escalations may target posts instead)
+        console.warn(`Approval not found for escalation ${escalation.id}: ${escalation.approval_id}`);
+      }
     }
 
     // Get escalation rule for context
@@ -193,11 +198,11 @@ export class EscalationScheduler {
 
     // Send notification
     if (escalation.notification_type === 'email' || (rule && (rule as any).send_email)) {
-      await this.sendEmailNotification(escalation, approval, rule, clientSettingsData);
+      await this.sendEmailNotification(escalation as any, approval as any, rule as any, clientSettingsData);
     }
 
     if (escalation.notification_type === 'slack' || ((rule as any).send_slack && escalation.notification_type !== 'email')) {
-      await this.sendSlackNotification(escalation, approval, rule).catch((err: any) => {
+      await this.sendSlackNotification(escalation as any, approval as any, rule as any).catch((err: any) => {
         console.warn(`[Escalation Scheduler] Failed to send Slack notification: ${err?.message || err}`);
       });
     }
