@@ -68,7 +68,7 @@ export class PublishingQueue {
       // Check weekend posting restrictions
       if (job.scheduledAt) {
         const scheduledDate = new Date(job.scheduledAt);
-        const brandConfig = await this.getBrandPostingConfig(job.brandId);
+        const brandConfig = await publishingDBService.getBrandPostingConfig(job.brandId);
         const weekendPostingEnabled = getWeekendPostingFromConfig(brandConfig?.posting_config);
         const brandTimezone = brandConfig?.timezone || 'UTC';
 
