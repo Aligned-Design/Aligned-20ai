@@ -262,7 +262,7 @@ Please review and take action at your earliest convenience.
   /**
    * Check if notification should be sent based on user preferences
    */
-  private shouldSendNotification(escalationLevel: string, clientSettings: unknown): boolean {
+  private shouldSendNotification(escalationLevel: string, clientSettings: any): boolean {
     if (!clientSettings) {
       // Default: send if no preferences found
       return true;
