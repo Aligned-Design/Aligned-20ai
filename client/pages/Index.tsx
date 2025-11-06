@@ -383,7 +383,7 @@ function Feature({
   desc: string;
 }) {
   return (
-    <div className="p-6 rounded-2xl bg-white border border-gray-100 hover:shadow-lg transition-transform hover:-translate-y-1 h-full">
+    <div className="p-6 rounded-3xl bg-[var(--surface-0)] border border-gray-100 hover:shadow-lg transition-transform hover:scale-[1.02] h-full">
       <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center mb-4 text-[var(--accent-lime)]">
         {icon}
       </div>
