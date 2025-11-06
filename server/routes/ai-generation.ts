@@ -15,7 +15,7 @@ export const generateContent: RequestHandler = async (req, res) => {
       });
     }
 
-    const { prompt, agentType, provider } = req.body as AIGenerationRequest;
+    const { prompt, agentType, provider } = req.body as any;
 
     if (!prompt || !agentType) {
       return res.status(400).json({
