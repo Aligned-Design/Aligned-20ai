@@ -316,7 +316,7 @@ export class GoogleBusinessAPI {
 
   async publishPost(content: PostContent): Promise<PublishResult> {
     try {
-      const postData: unknown = {
+      const postData: any = {
         summary: content.text,
         callToAction: {
           actionType: 'LEARN_MORE'
