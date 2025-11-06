@@ -148,17 +148,13 @@ export class WixClient {
   }
 
   async getEmailCampaigns(limit: number = 20): Promise<WixEmailCampaign[]> {
-    const response = await this.request<unknown>(
-      `/email/campaigns?limit=${limit}&sort=CREATED_DATE_DESC`
-    );
-    return response.campaigns || [];
+    const response = await this.request(`/email/campaigns?limit=${limit}&sort=CREATED_DATE_DESC`);
+    return (response && response.campaigns) || [];
   }
 
-  async getMediaItems(limit: number = 20): Promise<unknown[]> {
-    const response = await this.request<unknown>(
-      `/media/items?limit=${limit}&sort=CREATED_DATE_DESC`
-    );
-    return response.items || [];
+  async getMediaItems(limit: number = 20): Promise<any[]> {
+    const response = await this.request(`/media/items?limit=${limit}&sort=CREATED_DATE_DESC`);
+    return (response && response.items) || [];
   }
 
   async uploadMedia(filename: string, fileData: Buffer, mimeType: string): Promise<unknown> {
