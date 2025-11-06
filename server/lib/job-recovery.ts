@@ -120,28 +120,29 @@ export async function recoverPublishingJobs(): Promise<void> {
 /**
  * Convert database job record to publishing queue format
  */
-function dbJobToQueueJob(dbJob: any): PublishingJob {
-  const platforms = Array.isArray(dbJob.platforms) ? dbJob.platforms : [];
+function dbJobToQueueJob(dbJob: unknown): PublishingJob {
+  const parsed = parsePublishingJobRow(dbJob);
+  const platforms = Array.isArray(parsed.platforms) ? parsed.platforms : [];
   return {
-    id: dbJob.id,
-    brandId: dbJob.brand_id,
-    tenantId: dbJob.tenant_id,
-    postId: dbJob.id, // Use same ID as job ID
-    platform: platforms[0] || "instagram", // Get first platform
-    connectionId: `${platforms[0] || 'unknown'}-${dbJob.brand_id}`,
-    status: dbJob.status as any,
-    scheduledAt: dbJob.scheduled_at,
-    publishedAt: dbJob.published_at,
+    id: parsed.id,
+    brandId: parsed.brand_id,
+    tenantId: parsed.tenant_id,
+    postId: parsed.id, // Use same ID as job ID
+    platform: platforms[0] || "instagram",
+    connectionId: `${platforms[0] || 'unknown'}-${parsed.brand_id}`,
+    status: parsed.status as any,
+    scheduledAt: parsed.scheduled_at,
+    publishedAt: parsed.published_at,
     platformPostId: undefined,
     platformUrl: undefined,
-    content: dbJob.content,
-    validationResults: dbJob.validation_results || [],
-    retryCount: dbJob.retry_count || 0,
-    maxRetries: dbJob.max_retries || 3,
-    lastError: dbJob.last_error,
-    errorDetails: dbJob.last_error_details,
-    createdAt: dbJob.created_at,
-    updatedAt: dbJob.updated_at,
+    content: parsed.content,
+    validationResults: parsed.validation_results || [],
+    retryCount: parsed.retry_count || 0,
+    maxRetries: parsed.max_retries || 3,
+    lastError: parsed.last_error,
+    errorDetails: parsed.last_error_details,
+    createdAt: parsed.created_at,
+    updatedAt: parsed.updated_at,
   };
 }
 
