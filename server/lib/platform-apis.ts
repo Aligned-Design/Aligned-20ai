@@ -175,7 +175,7 @@ export class LinkedInAPI {
 
   async publishPost(content: PostContent): Promise<PublishResult> {
     try {
-      const body: unknown = {
+      const body: any = {
         author: `urn:li:person:${this.actorId}`,
         commentary: content.text,
         visibility: 'PUBLIC',
