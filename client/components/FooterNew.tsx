@@ -12,10 +12,16 @@ export default function FooterNew() {
           </div>
 
           <nav className="flex gap-6 flex-wrap">
-            <Link to="/" className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]">
+            <Link
+              to="/"
+              className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]"
+            >
               Home
             </Link>
-            <Link to="/features" className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]">
+            <Link
+              to="/features"
+              className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]"
+            >
               Features
             </Link>
             <Link
@@ -24,19 +30,34 @@ export default function FooterNew() {
             >
               Integrations
             </Link>
-            <Link to="/pricing" className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]">
+            <Link
+              to="/pricing"
+              className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]"
+            >
               Pricing
             </Link>
-            <Link to="/about" className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]">
+            <Link
+              to="/about"
+              className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]"
+            >
               About
             </Link>
-            <Link to="/contact" className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]">
+            <Link
+              to="/contact"
+              className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]"
+            >
               Contact
             </Link>
-            <Link to="/terms" className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]">
+            <Link
+              to="/terms"
+              className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]"
+            >
               Terms
             </Link>
-            <Link to="/privacy" className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]">
+            <Link
+              to="/privacy"
+              className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]"
+            >
               Privacy
             </Link>
           </nav>

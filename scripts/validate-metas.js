@@ -1,8 +1,8 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { z } from 'zod';
+import { promises as fs } from "fs";
+import path from "path";
+import { z } from "zod";
 
-const META_DIR = path.resolve(process.cwd(), 'src', 'pages');
+const META_DIR = path.resolve(process.cwd(), "src", "pages");
 
 const metaSchema = z.object({
   title: z.string().min(1),
@@ -18,12 +18,12 @@ const metaSchema = z.object({
 async function findMetaFiles() {
   const entries = await fs.readdir(META_DIR, { withFileTypes: true });
   return entries
-    .filter((e) => e.isFile() && e.name.endsWith('.meta.json'))
+    .filter((e) => e.isFile() && e.name.endsWith(".meta.json"))
     .map((e) => path.join(META_DIR, e.name));
 }
 
 async function validateFile(filePath) {
-  const raw = await fs.readFile(filePath, 'utf-8');
+  const raw = await fs.readFile(filePath, "utf-8");
   let data;
   try {
     data = JSON.parse(raw);
@@ -42,7 +42,9 @@ async function main() {
   try {
     const files = await findMetaFiles();
     if (files.length === 0) {
-      console.warn('No *.meta.json files found under src/pages/. Nothing to validate.');
+      console.warn(
+        "No *.meta.json files found under src/pages/. Nothing to validate.",
+      );
       return;
     }
 
@@ -51,7 +53,7 @@ async function main() {
     if (failures.length > 0) {
       console.error(`\nMeta validation failed for ${failures.length} file(s):`);
       failures.forEach((f) => {
-        console.error('\n--- ' + f.filePath + '\n', f.error);
+        console.error("\n--- " + f.filePath + "\n", f.error);
       });
       process.exitCode = 1;
       return;
@@ -59,7 +61,7 @@ async function main() {
 
     console.log(`All ${results.length} meta files validated successfully.`);
   } catch (err) {
-    console.error('Error validating meta files:', err);
+    console.error("Error validating meta files:", err);
     process.exitCode = 2;
   }
 }

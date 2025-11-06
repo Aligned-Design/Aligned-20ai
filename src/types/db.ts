@@ -10,7 +10,7 @@ export interface PlatformConnectionRecordDB {
   access_token: string;
   refresh_token?: string | null;
   token_expires_at?: string | null;
-  status: 'connected' | 'expired' | 'revoked' | 'disconnected';
+  status: "connected" | "expired" | "revoked" | "disconnected";
   permissions?: string[] | null;
   metadata?: Record<string, unknown> | null;
   created_by?: string | null;

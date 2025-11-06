@@ -1,6 +1,10 @@
-import { z } from 'zod';
-import { z } from 'zod';
-import type { PlatformConnectionRecordDB, MediaAssetRowDB, PublishingJobDB } from './db';
+import { z } from "zod";
+import { z } from "zod";
+import type {
+  PlatformConnectionRecordDB,
+  MediaAssetRowDB,
+  PublishingJobDB,
+} from "./db";
 
 export const PlatformConnectionRecordSchema = z.object({
   id: z.string(),
@@ -13,7 +17,7 @@ export const PlatformConnectionRecordSchema = z.object({
   access_token: z.string(),
   refresh_token: z.string().nullable().optional(),
   token_expires_at: z.string().nullable().optional(),
-  status: z.enum(['connected', 'expired', 'revoked', 'disconnected']),
+  status: z.enum(["connected", "expired", "revoked", "disconnected"]),
   permissions: z.array(z.string()).nullable().optional(),
   metadata: z.record(z.any()).nullable().optional(),
   created_by: z.string().nullable().optional(),
@@ -72,15 +76,21 @@ export const BrandKitSchema = z.object({
   secondaryColor: z.string().optional(),
   accentColor: z.string().optional(),
   fontFamily: z.string().optional(),
-  colors: z.object({
-    value: z.any().optional(),
-    source: z.string().optional(),
-  }).optional(),
-  keywords: z.object({
-    value: z.array(z.string()).optional(),
-    source: z.string().optional(),
-  }).optional(),
-  about_blurb: z.object({ value: z.string().optional(), source: z.string().optional() }).optional(),
+  colors: z
+    .object({
+      value: z.any().optional(),
+      source: z.string().optional(),
+    })
+    .optional(),
+  keywords: z
+    .object({
+      value: z.array(z.string()).optional(),
+      source: z.string().optional(),
+    })
+    .optional(),
+  about_blurb: z
+    .object({ value: z.string().optional(), source: z.string().optional() })
+    .optional(),
 });
 
 export type BrandKit = z.infer<typeof BrandKitSchema>;

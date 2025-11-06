@@ -4,8 +4,16 @@
  * Handles reminders and escalations based on configured rules
  */
 
-import { escalationRules, escalationEvents, postApprovals, clientSettings } from './dbClient';
-import { DEFAULT_ESCALATION_CONFIG, type EscalationConfig } from '@shared/escalation';
+import {
+  escalationRules,
+  escalationEvents,
+  postApprovals,
+  clientSettings,
+} from "./dbClient";
+import {
+  DEFAULT_ESCALATION_CONFIG,
+  type EscalationConfig,
+} from "@shared/escalation";
 
 // ==================== ESCALATION SCHEDULER ====================
 
@@ -25,29 +33,32 @@ export class EscalationScheduler {
    */
   public start(): void {
     if (this.isRunning) {
-      console.warn('[Escalation Scheduler] Already running');
+      console.warn("[Escalation Scheduler] Already running");
       return;
     }
 
     if (!this.config.enabled) {
-      console.log('[Escalation Scheduler] Disabled in configuration');
+      console.log("[Escalation Scheduler] Disabled in configuration");
       return;
     }
 
     this.isRunning = true;
     console.log(
-      `[Escalation Scheduler] Starting (interval: ${this.config.intervalMs}ms, maxAge: ${this.config.maxAgeHours}h)`
+      `[Escalation Scheduler] Starting (interval: ${this.config.intervalMs}ms, maxAge: ${this.config.maxAgeHours}h)`,
     );
 
     // Schedule immediate first run
     this.runEscalationBatch().catch((error) => {
-      console.error('[Escalation Scheduler] First run error:', error);
+      console.error("[Escalation Scheduler] First run error:", error);
     });
 
     // Schedule recurring runs
     this.schedulerId = setInterval(() => {
       this.runEscalationBatch().catch((error) => {
-        console.error('[Escalation Scheduler] Error in escalation batch:', error);
+        console.error(
+          "[Escalation Scheduler] Error in escalation batch:",
+          error,
+        );
       });
     }, this.config.intervalMs);
   }
@@ -57,7 +68,7 @@ export class EscalationScheduler {
    */
   public stop(): void {
     if (!this.isRunning) {
-      console.warn('[Escalation Scheduler] Not running');
+      console.warn("[Escalation Scheduler] Not running");
       return;
     }
 
@@ -67,7 +78,7 @@ export class EscalationScheduler {
     }
 
     this.isRunning = false;
-    console.log('[Escalation Scheduler] Stopped');
+    console.log("[Escalation Scheduler] Stopped");
   }
 
   /**
@@ -100,7 +111,7 @@ export class EscalationScheduler {
       // Query pending escalations that are ready to send
       const pendingEscalations = await escalationEvents.getPendingForDelivery(
         this.config.maxAgeHours,
-        this.config.maxConcurrent
+        this.config.maxConcurrent,
       );
 
       let successful = 0;
@@ -114,14 +125,14 @@ export class EscalationScheduler {
         } catch (error) {
           console.error(
             `[Escalation Scheduler] Failed to process escalation ${escalation.id}:`,
-            error
+            error,
           );
           failed++;
 
           // Log failure
           await escalationEvents.logAttemptFailure(
             escalation.id,
-            error instanceof Error ? error.message : 'Unknown error'
+            error instanceof Error ? error.message : "Unknown error",
           );
         }
       }
@@ -132,7 +143,7 @@ export class EscalationScheduler {
 
       if (successful > 0 || failed > 0) {
         console.log(
-          `[Escalation Scheduler] Batch complete (duration: ${duration}ms, processed: ${pendingEscalations.length}, successful: ${successful}, failed: ${failed})`
+          `[Escalation Scheduler] Batch complete (duration: ${duration}ms, processed: ${pendingEscalations.length}, successful: ${successful}, failed: ${failed})`,
         );
       }
 
@@ -144,7 +155,10 @@ export class EscalationScheduler {
     } catch (error) {
       const duration = Date.now() - startTime;
       this.lastRunDuration = duration;
-      console.error(`[Escalation Scheduler] Batch error (duration: ${duration}ms):`, error);
+      console.error(
+        `[Escalation Scheduler] Batch error (duration: ${duration}ms):`,
+        error,
+      );
 
       return {
         processed: 0,
@@ -174,7 +188,9 @@ export class EscalationScheduler {
       approval = await postApprovals.getById(escalation.approval_id);
       if (!approval) {
         // If approval_id provided but missing, log and continue (some escalations may target posts instead)
-        console.warn(`Approval not found for escalation ${escalation.id}: ${escalation.approval_id}`);
+        console.warn(
+          `Approval not found for escalation ${escalation.id}: ${escalation.approval_id}`,
+        );
       }
     }
 
@@ -185,25 +201,53 @@ export class EscalationScheduler {
     }
 
     // Get brand for notification preferences
-    const clientSettingsData = await clientSettings.getByBrandId(escalation.brand_id);
+    const clientSettingsData = await clientSettings.getByBrandId(
+      escalation.brand_id,
+    );
 
     // Check notification preferences
-    if (!this.shouldSendNotification(escalation.escalation_level, clientSettingsData)) {
+    if (
+      !this.shouldSendNotification(
+        escalation.escalation_level,
+        clientSettingsData,
+      )
+    ) {
       console.log(
-        `[Escalation Scheduler] Skipping escalation ${escalation.id} (notification disabled by user)`
+        `[Escalation Scheduler] Skipping escalation ${escalation.id} (notification disabled by user)`,
       );
-      await escalationEvents.markAsResolved(escalation.id, 'system', 'Skipped due to user preferences');
+      await escalationEvents.markAsResolved(
+        escalation.id,
+        "system",
+        "Skipped due to user preferences",
+      );
       return;
     }
 
     // Send notification
-    if (escalation.notification_type === 'email' || (rule && (rule as any).send_email)) {
-      await this.sendEmailNotification(escalation as any, approval as any, rule as any, clientSettingsData);
+    if (
+      escalation.notification_type === "email" ||
+      (rule && (rule as any).send_email)
+    ) {
+      await this.sendEmailNotification(
+        escalation as any,
+        approval as any,
+        rule as any,
+        clientSettingsData,
+      );
     }
 
-    if (escalation.notification_type === 'slack' || ((rule as any).send_slack && escalation.notification_type !== 'email')) {
-      await this.sendSlackNotification(escalation as any, approval as any, rule as any).catch((err: any) => {
-        console.warn(`[Escalation Scheduler] Failed to send Slack notification: ${err?.message || err}`);
+    if (
+      escalation.notification_type === "slack" ||
+      ((rule as any).send_slack && escalation.notification_type !== "email")
+    ) {
+      await this.sendSlackNotification(
+        escalation as any,
+        approval as any,
+        rule as any,
+      ).catch((err: any) => {
+        console.warn(
+          `[Escalation Scheduler] Failed to send Slack notification: ${err?.message || err}`,
+        );
       });
     }
 
@@ -215,19 +259,23 @@ export class EscalationScheduler {
    * Send email notification
    */
   private async sendEmailNotification(
-    escalation: { id: string; escalated_to_user_id?: string; escalation_level: string; },
+    escalation: {
+      id: string;
+      escalated_to_user_id?: string;
+      escalation_level: string;
+    },
     approval: { post_id?: string; status?: string; created_at?: string },
     rule: { trigger_hours?: number },
-    clientSettingsData: any
+    clientSettingsData: any,
   ): Promise<void> {
     const recipient = escalation.escalated_to_user_id;
     if (!recipient) {
-      throw new Error('No escalation recipient specified');
+      throw new Error("No escalation recipient specified");
     }
 
     try {
       // Determine email template based on escalation level
-      const isEscalation = escalation.escalation_level.includes('escalation');
+      const isEscalation = escalation.escalation_level.includes("escalation");
       const subject = isEscalation
         ? `⚠️ Escalation: Approval pending for ${approval.post_id}`
         : `📌 Reminder: Approval pending for ${approval.post_id}`;
@@ -246,28 +294,37 @@ Please review and take action at your earliest convenience.
       // Log email notification (actual sending would use emailService)
       console.log(
         `[Escalation Scheduler] Would send email to ${recipient} for escalation ${escalation.id}:`,
-        { subject, message }
+        { subject, message },
       );
     } catch (error) {
-      throw new Error(`Email notification failed: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `Email notification failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
   /**
    * Send Slack notification
    */
-  private async sendSlackNotification(escalation: { id: string }, _approval: unknown, _rule: unknown): Promise<void> {
+  private async sendSlackNotification(
+    escalation: { id: string },
+    _approval: unknown,
+    _rule: unknown,
+  ): Promise<void> {
     // This would integrate with Slack service (not implemented in this phase)
     // Placeholder for future Slack integration
     console.log(
-      `[Escalation Scheduler] Would send Slack notification for escalation ${escalation.id} (not yet implemented)`
+      `[Escalation Scheduler] Would send Slack notification for escalation ${escalation.id} (not yet implemented)`,
     );
   }
 
   /**
    * Check if notification should be sent based on user preferences
    */
-  private shouldSendNotification(escalationLevel: string, clientSettings: any): boolean {
+  private shouldSendNotification(
+    escalationLevel: string,
+    clientSettings: any,
+  ): boolean {
     if (!clientSettings) {
       // Default: send if no preferences found
       return true;
@@ -279,12 +336,12 @@ Please review and take action at your earliest convenience.
     }
 
     // For escalations (not reminders), always send
-    if (escalationLevel.includes('escalation')) {
+    if (escalationLevel.includes("escalation")) {
       return true;
     }
 
     // For reminders, check if reminder notifications are enabled
-    if (escalationLevel.includes('reminder')) {
+    if (escalationLevel.includes("reminder")) {
       return clientSettings.approvalReminders !== false;
     }
 
@@ -299,10 +356,10 @@ Please review and take action at your earliest convenience.
     successful: number;
     failed: number;
   }> {
-    console.log('[Escalation Scheduler] Manual escalation batch triggered');
+    console.log("[Escalation Scheduler] Manual escalation batch triggered");
     const result = await this.runEscalationBatch();
     console.log(
-      `[Escalation Scheduler] Manual batch result: processed=${result.processed}, successful=${result.successful}, failed=${result.failed}`
+      `[Escalation Scheduler] Manual batch result: processed=${result.processed}, successful=${result.successful}, failed=${result.failed}`,
     );
     return result;
   }
@@ -315,7 +372,9 @@ let schedulerInstance: EscalationScheduler | null = null;
 /**
  * Get or create escalation scheduler instance
  */
-export function getEscalationScheduler(config?: Partial<EscalationConfig>): EscalationScheduler {
+export function getEscalationScheduler(
+  config?: Partial<EscalationConfig>,
+): EscalationScheduler {
   if (!schedulerInstance) {
     schedulerInstance = new EscalationScheduler(config);
   }
@@ -326,7 +385,9 @@ export function getEscalationScheduler(config?: Partial<EscalationConfig>): Esca
  * Initialize and start the escalation scheduler
  * Call this during application startup
  */
-export function initializeEscalationScheduler(config?: Partial<EscalationConfig>): EscalationScheduler {
+export function initializeEscalationScheduler(
+  config?: Partial<EscalationConfig>,
+): EscalationScheduler {
   const scheduler = getEscalationScheduler(config);
 
   // Only start if not already running

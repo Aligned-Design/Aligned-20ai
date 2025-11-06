@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import { RequestHandler } from "express";
 
 interface MediaAsset {
   id: string;
@@ -63,68 +63,82 @@ interface SEOMetadataResponse {
 }
 
 // Helper function stubs
-async function getCategoryUsage(_bucketName: string, _brandId: string): Promise<Record<string, { count: number; size: number }>> {
+async function getCategoryUsage(
+  _bucketName: string,
+  _brandId: string,
+): Promise<Record<string, { count: number; size: number }>> {
   return {
     graphics: { count: 0, size: 0 },
     images: { count: 0, size: 0 },
     logos: { count: 0, size: 0 },
-    videos: { count: 0, size: 0 }
+    videos: { count: 0, size: 0 },
   };
 }
 
-async function getSignedUrl(bucketName: string, assetPath: string, expirationSeconds: number): Promise<string> {
+async function getSignedUrl(
+  bucketName: string,
+  assetPath: string,
+  expirationSeconds: number,
+): Promise<string> {
   return `https://storage.example.com/${bucketName}/${assetPath}?expires=${expirationSeconds}`;
 }
 
-async function checkDuplicate(_bucketName: string, _hash: string, _brandId: string): Promise<MediaAsset | null> {
+async function checkDuplicate(
+  _bucketName: string,
+  _hash: string,
+  _brandId: string,
+): Promise<MediaAsset | null> {
   return null;
 }
 
-function generateSEOMetadata(asset: MediaAsset, _context: string): { altText: string; title: string; description: string } {
+function generateSEOMetadata(
+  asset: MediaAsset,
+  _context: string,
+): { altText: string; title: string; description: string } {
   return {
     altText: asset.originalName,
     title: `Image: ${asset.originalName}`,
-    description: `Digital asset: ${asset.originalName}`
+    description: `Digital asset: ${asset.originalName}`,
   };
 }
 
 export const uploadMedia: RequestHandler = async (req, res) => {
   try {
     const { brandId, tenantId } = req.body;
-    
+
     if (!brandId || !tenantId) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'brandId and tenantId required' 
+      return res.status(400).json({
+        success: false,
+        error: "brandId and tenantId required",
       });
     }
 
     // Mock successful upload response
     const asset: MediaAsset = {
       id: `asset_${Date.now()}`,
-      filename: 'placeholder.jpg',
-      originalName: 'placeholder.jpg',
-      category: 'images',
-      mimeType: 'image/jpeg',
+      filename: "placeholder.jpg",
+      originalName: "placeholder.jpg",
+      category: "images",
+      mimeType: "image/jpeg",
       size: 1024000,
       brandId,
       tenantId,
       bucketPath: `${tenantId}/${brandId}/images/placeholder.jpg`,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     const response: MediaUploadResponse = {
       success: true,
       asset,
-      uploadId: asset.id
+      uploadId: asset.id,
     };
 
     res.json(response);
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Upload failed'
+      error: error instanceof Error ? error.message : "Upload failed",
     });
   }
 };
@@ -132,9 +146,9 @@ export const uploadMedia: RequestHandler = async (req, res) => {
 export const listMedia: RequestHandler = async (req, res) => {
   try {
     const { brandId } = req.query;
-    
+
     if (!brandId) {
-      return res.status(400).json({ error: 'brandId required' });
+      return res.status(400).json({ error: "brandId required" });
     }
 
     const response: MediaListResponse = {
@@ -147,14 +161,14 @@ export const listMedia: RequestHandler = async (req, res) => {
         logos: 0,
         videos: 0,
         ai_exports: 0,
-        client_uploads: 0
-      }
+        client_uploads: 0,
+      },
     };
 
     res.json(response);
   } catch (error) {
     res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to list media'
+      error: error instanceof Error ? error.message : "Failed to list media",
     });
   }
 };
@@ -165,14 +179,20 @@ export const getStorageUsage: RequestHandler = async (req, res) => {
     const { tenantId } = req.query;
 
     if (!tenantId) {
-      return res.status(400).json({ error: 'tenantId required' });
+      return res.status(400).json({ error: "tenantId required" });
     }
 
     const bucketName = `tenant-${tenantId}`;
     const categoryBreakdown = await getCategoryUsage(bucketName, brandId);
 
-    const totalSize = Object.values(categoryBreakdown).reduce((sum, cat) => sum + cat.size, 0);
-    const totalCount = Object.values(categoryBreakdown).reduce((sum, cat) => sum + cat.count, 0);
+    const totalSize = Object.values(categoryBreakdown).reduce(
+      (sum, cat) => sum + cat.size,
+      0,
+    );
+    const totalCount = Object.values(categoryBreakdown).reduce(
+      (sum, cat) => sum + cat.count,
+      0,
+    );
 
     const response: StorageUsageResponse = {
       brandId,
@@ -180,14 +200,15 @@ export const getStorageUsage: RequestHandler = async (req, res) => {
       assetCount: totalCount,
       bucketName,
       categoryBreakdown,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
 
     res.json(response);
   } catch (error) {
-    console.error('Storage usage error:', error);
+    console.error("Storage usage error:", error);
     res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to get storage usage'
+      error:
+        error instanceof Error ? error.message : "Failed to get storage usage",
     });
   }
 };
@@ -201,9 +222,9 @@ export const getAssetUrl: RequestHandler = async (req, res) => {
 
     res.json({ url: signedUrl });
   } catch (error) {
-    console.error('Asset URL error:', error);
+    console.error("Asset URL error:", error);
     res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to get asset URL'
+      error: error instanceof Error ? error.message : "Failed to get asset URL",
     });
   }
 };
@@ -213,58 +234,69 @@ export const checkDuplicateAsset: RequestHandler = async (req, res) => {
     const { hash, brandId, tenantId } = req.query;
 
     if (!hash || !brandId || !tenantId) {
-      return res.status(400).json({ error: 'hash, brandId, and tenantId required' });
+      return res
+        .status(400)
+        .json({ error: "hash, brandId, and tenantId required" });
     }
 
     const bucketName = `tenant-${tenantId}`;
-    const existingAsset = await checkDuplicate(bucketName, hash as string, brandId as string);
+    const existingAsset = await checkDuplicate(
+      bucketName,
+      hash as string,
+      brandId as string,
+    );
 
     const response: DuplicateCheckResponse = {
       isDuplicate: !!existingAsset,
       existingAsset: existingAsset || undefined,
-      similarity: existingAsset ? 1.0 : 0
+      similarity: existingAsset ? 1.0 : 0,
     };
 
     res.json(response);
   } catch (error) {
-    console.error('Duplicate check error:', error);
+    console.error("Duplicate check error:", error);
     res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to check duplicates'
+      error:
+        error instanceof Error ? error.message : "Failed to check duplicates",
     });
   }
 };
 
 export const generateSEOMetadataRoute: RequestHandler = async (req, res) => {
   try {
-    const { assetId, context = 'web', targetKeywords = [] } = req.body as SEOMetadataRequest;
+    const {
+      assetId,
+      context = "web",
+      targetKeywords = [],
+    } = req.body as SEOMetadataRequest;
 
     // TODO: Fetch asset from database
     // const asset = await db.assets.findById(assetId);
-    
+
     // Mock asset for now
     const asset: MediaAsset = {
       id: assetId,
-      filename: 'sample.jpg',
-      originalName: 'sample.jpg',
-      category: 'images',
-      mimeType: 'image/jpeg',
+      filename: "sample.jpg",
+      originalName: "sample.jpg",
+      category: "images",
+      mimeType: "image/jpeg",
       size: 1024,
-      hash: 'mock-hash',
-      tags: ['business', 'professional'],
-      brandId: 'mock-brand',
-      tenantId: 'mock-tenant',
-      bucketPath: 'mock/path',
+      hash: "mock-hash",
+      tags: ["business", "professional"],
+      brandId: "mock-brand",
+      tenantId: "mock-tenant",
+      bucketPath: "mock/path",
       variants: [],
       metadata: {
         width: 1920,
         height: 1080,
-        keywords: ['professional', 'business'],
-        aiTags: ['corporate', 'modern'],
+        keywords: ["professional", "business"],
+        aiTags: ["corporate", "modern"],
         usedIn: [],
-        usageCount: 0
+        usageCount: 0,
       },
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     const seoData = generateSEOMetadata(asset, context);
@@ -273,15 +305,22 @@ export const generateSEOMetadataRoute: RequestHandler = async (req, res) => {
       altText: seoData.altText,
       title: seoData.title,
       description: seoData.description,
-      keywords: ([...(asset.metadata?.keywords as string[] || []), ...targetKeywords] || []),
-      optimizedMetadata: asset.metadata || {}
+      keywords:
+        [
+          ...((asset.metadata?.keywords as string[]) || []),
+          ...targetKeywords,
+        ] || [],
+      optimizedMetadata: asset.metadata || {},
     };
 
     res.json(response);
   } catch (error) {
-    console.error('SEO metadata generation error:', error);
+    console.error("SEO metadata generation error:", error);
     res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to generate SEO metadata'
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to generate SEO metadata",
     });
   }
 };
@@ -291,13 +330,14 @@ export const trackAssetUsage: RequestHandler = async (req, res) => {
     const { assetId, usedIn } = req.body;
 
     if (!assetId || !usedIn) {
-      return res.status(400).json({ error: 'assetId and usedIn required' });
+      return res.status(400).json({ error: "assetId and usedIn required" });
     }
 
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to track asset usage'
+      error:
+        error instanceof Error ? error.message : "Failed to track asset usage",
     });
   }
 };

@@ -3,7 +3,7 @@
  * Handles all database operations for publishing jobs and logs
  */
 
-import { supabase } from './supabase';
+import { supabase } from "./supabase";
 
 export interface PublishingJobRecord {
   id: string;
@@ -12,7 +12,7 @@ export interface PublishingJobRecord {
   content: Record<string, unknown>;
   platforms: string[];
   scheduled_at?: string;
-  status: 'pending' | 'processing' | 'published' | 'failed' | 'scheduled';
+  status: "pending" | "processing" | "published" | "failed" | "scheduled";
   retry_count: number;
   max_retries: number;
   published_at?: string;
@@ -52,10 +52,10 @@ export class PublishingDBService {
     content: Record<string, unknown>,
     platforms: string[],
     scheduledAt?: Date,
-    userId?: string
+    userId?: string,
   ): Promise<PublishingJobRecord> {
     const { data, error } = await supabase
-      .from('publishing_jobs')
+      .from("publishing_jobs")
       .insert({
         brand_id: brandId,
         tenant_id: tenantId,
@@ -63,7 +63,8 @@ export class PublishingDBService {
         platforms,
         scheduled_at: scheduledAt?.toISOString(),
         created_by: userId,
-        status: scheduledAt && scheduledAt > new Date() ? 'scheduled' : 'pending'
+        status:
+          scheduledAt && scheduledAt > new Date() ? "scheduled" : "pending",
       })
       .select()
       .single();
@@ -75,15 +76,18 @@ export class PublishingDBService {
   /**
    * Get a publishing job by ID
    */
-  async getPublishingJob(jobId: string, brandId: string): Promise<PublishingJobRecord | null> {
+  async getPublishingJob(
+    jobId: string,
+    brandId: string,
+  ): Promise<PublishingJobRecord | null> {
     const { data, error } = await supabase
-      .from('publishing_jobs')
-      .select('*')
-      .eq('id', jobId)
-      .eq('brand_id', brandId)
+      .from("publishing_jobs")
+      .select("*")
+      .eq("id", jobId)
+      .eq("brand_id", brandId)
       .single();
 
-    if (error && error.code === 'PGRST116') return null; // Not found
+    if (error && error.code === "PGRST116") return null; // Not found
     if (error) throw new Error(`Failed to fetch job: ${error.message}`);
     return data as PublishingJobRecord;
   }
@@ -93,14 +97,15 @@ export class PublishingDBService {
    */
   async getPendingJobs(limit: number = 50): Promise<PublishingJobRecord[]> {
     const { data, error } = await supabase
-      .from('publishing_jobs')
-      .select('*')
-      .in('status', ['pending', 'scheduled'])
-      .lt('scheduled_at', new Date().toISOString())
-      .order('created_at', { ascending: true })
+      .from("publishing_jobs")
+      .select("*")
+      .in("status", ["pending", "scheduled"])
+      .lt("scheduled_at", new Date().toISOString())
+      .order("created_at", { ascending: true })
       .limit(limit);
 
-    if (error) throw new Error(`Failed to fetch pending jobs: ${error.message}`);
+    if (error)
+      throw new Error(`Failed to fetch pending jobs: ${error.message}`);
     return data as PublishingJobRecord[];
   }
 
@@ -110,15 +115,15 @@ export class PublishingDBService {
   async updateJobStatus(
     jobId: string,
     status: string,
-    updates?: Partial<PublishingJobRecord>
+    updates?: Partial<PublishingJobRecord>,
   ): Promise<PublishingJobRecord> {
     const { data, error } = await supabase
-      .from('publishing_jobs')
+      .from("publishing_jobs")
       .update({
         status,
-        ...updates
+        ...updates,
       })
-      .eq('id', jobId)
+      .eq("id", jobId)
       .select()
       .single();
 
@@ -131,9 +136,9 @@ export class PublishingDBService {
    */
   async incrementRetryCount(jobId: string): Promise<PublishingJobRecord> {
     const job = await supabase
-      .from('publishing_jobs')
-      .select('retry_count, max_retries')
-      .eq('id', jobId)
+      .from("publishing_jobs")
+      .select("retry_count, max_retries")
+      .eq("id", jobId)
       .single();
 
     if (job.error) throw new Error(`Failed to fetch job: ${job.error.message}`);
@@ -142,16 +147,17 @@ export class PublishingDBService {
     const shouldFail = newRetryCount >= job.data.max_retries;
 
     const { data, error } = await supabase
-      .from('publishing_jobs')
+      .from("publishing_jobs")
       .update({
         retry_count: newRetryCount,
-        status: shouldFail ? 'failed' : 'scheduled'
+        status: shouldFail ? "failed" : "scheduled",
       })
-      .eq('id', jobId)
+      .eq("id", jobId)
       .select()
       .single();
 
-    if (error) throw new Error(`Failed to update retry count: ${error.message}`);
+    if (error)
+      throw new Error(`Failed to update retry count: ${error.message}`);
     return data as PublishingJobRecord;
   }
 
@@ -160,37 +166,43 @@ export class PublishingDBService {
    */
   async markJobPublished(jobId: string): Promise<PublishingJobRecord> {
     const { data, error } = await supabase
-      .from('publishing_jobs')
+      .from("publishing_jobs")
       .update({
-        status: 'published',
+        status: "published",
         published_at: new Date().toISOString(),
         retry_count: 0,
-        last_error: null
+        last_error: null,
       })
-      .eq('id', jobId)
+      .eq("id", jobId)
       .select()
       .single();
 
-    if (error) throw new Error(`Failed to mark job as published: ${error.message}`);
+    if (error)
+      throw new Error(`Failed to mark job as published: ${error.message}`);
     return data as PublishingJobRecord;
   }
 
   /**
    * Mark job as failed
    */
-  async markJobFailed(jobId: string, error: string, errorDetails?: Record<string, unknown>): Promise<PublishingJobRecord> {
+  async markJobFailed(
+    jobId: string,
+    error: string,
+    errorDetails?: Record<string, unknown>,
+  ): Promise<PublishingJobRecord> {
     const { data, error: dbError } = await supabase
-      .from('publishing_jobs')
+      .from("publishing_jobs")
       .update({
-        status: 'failed',
+        status: "failed",
         last_error: error,
-        last_error_details: errorDetails
+        last_error_details: errorDetails,
       })
-      .eq('id', jobId)
+      .eq("id", jobId)
       .select()
       .single();
 
-    if (dbError) throw new Error(`Failed to mark job as failed: ${dbError.message}`);
+    if (dbError)
+      throw new Error(`Failed to mark job as failed: ${dbError.message}`);
     return data as PublishingJobRecord;
   }
 
@@ -212,22 +224,23 @@ export class PublishingDBService {
       contentSnapshot?: any;
       requestMetadata?: any;
       responseMetadata?: any;
-    }
+    },
   ): Promise<PublishingLogRecord> {
     const { data, error } = await supabase
-      .from('publishing_logs')
+      .from("publishing_logs")
       .insert({
         job_id: jobId,
         brand_id: brandId,
         platform,
         status,
         attempt_number: attemptNumber,
-        ...options
+        ...options,
       })
       .select()
       .single();
 
-    if (error) throw new Error(`Failed to create publishing log: ${error.message}`);
+    if (error)
+      throw new Error(`Failed to create publishing log: ${error.message}`);
     return data as PublishingLogRecord;
   }
 
@@ -236,12 +249,13 @@ export class PublishingDBService {
    */
   async getPublishingLogs(jobId: string): Promise<PublishingLogRecord[]> {
     const { data, error } = await supabase
-      .from('publishing_logs')
-      .select('*')
-      .eq('job_id', jobId)
-      .order('created_at', { ascending: false });
+      .from("publishing_logs")
+      .select("*")
+      .eq("job_id", jobId)
+      .order("created_at", { ascending: false });
 
-    if (error) throw new Error(`Failed to fetch publishing logs: ${error.message}`);
+    if (error)
+      throw new Error(`Failed to fetch publishing logs: ${error.message}`);
     return data as PublishingLogRecord[];
   }
 
@@ -251,22 +265,25 @@ export class PublishingDBService {
   async getBrandPublishingLogs(
     brandId: string,
     platform?: string,
-    limit: number = 100
+    limit: number = 100,
   ): Promise<PublishingLogRecord[]> {
     let query = supabase
-      .from('publishing_logs')
-      .select('*')
-      .eq('brand_id', brandId);
+      .from("publishing_logs")
+      .select("*")
+      .eq("brand_id", brandId);
 
     if (platform) {
-      query = query.eq('platform', platform);
+      query = query.eq("platform", platform);
     }
 
     const { data, error } = await query
-      .order('created_at', { ascending: false })
+      .order("created_at", { ascending: false })
       .limit(limit);
 
-    if (error) throw new Error(`Failed to fetch brand publishing logs: ${error.message}`);
+    if (error)
+      throw new Error(
+        `Failed to fetch brand publishing logs: ${error.message}`,
+      );
     return data as PublishingLogRecord[];
   }
 
@@ -283,10 +300,10 @@ export class PublishingDBService {
     itemsFailed: number,
     startedAt: Date,
     completedAt?: Date,
-    error?: { message: string; details: any }
+    error?: { message: string; details: any },
   ): Promise<void> {
     const { error: dbError } = await supabase
-      .from('platform_sync_logs')
+      .from("platform_sync_logs")
       .insert({
         brand_id: brandId,
         tenant_id: tenantId,
@@ -297,39 +314,46 @@ export class PublishingDBService {
         items_failed: itemsFailed,
         started_at: startedAt.toISOString(),
         completed_at: completedAt?.toISOString(),
-        duration_ms: completedAt ? completedAt.getTime() - startedAt.getTime() : null,
+        duration_ms: completedAt
+          ? completedAt.getTime() - startedAt.getTime()
+          : null,
         error_message: error?.message,
-        error_details: error?.details
+        error_details: error?.details,
       });
 
-    if (dbError) throw new Error(`Failed to create sync log: ${dbError.message}`);
+    if (dbError)
+      throw new Error(`Failed to create sync log: ${dbError.message}`);
   }
 
   /**
    * Get platform statistics for a brand
    */
-  async getPlatformStats(brandId: string, days: number = 30): Promise<Record<string, unknown>> {
+  async getPlatformStats(
+    brandId: string,
+    days: number = 30,
+  ): Promise<Record<string, unknown>> {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
     const { data, error } = await supabase
-      .from('publishing_logs')
-      .select('platform, status')
-      .eq('brand_id', brandId)
-      .gte('created_at', startDate.toISOString());
+      .from("publishing_logs")
+      .select("platform, status")
+      .eq("brand_id", brandId)
+      .gte("created_at", startDate.toISOString());
 
-    if (error) throw new Error(`Failed to fetch platform stats: ${error.message}`);
+    if (error)
+      throw new Error(`Failed to fetch platform stats: ${error.message}`);
 
     // Aggregate stats by platform and status
     const stats: Record<string, any> = {};
-    (data as any[]).forEach(log => {
+    (data as any[]).forEach((log) => {
       if (!stats[log.platform]) {
         stats[log.platform] = {
           total: 0,
           published: 0,
           failed: 0,
           pending: 0,
-          successRate: 0
+          successRate: 0,
         };
       }
 
@@ -351,26 +375,26 @@ export class PublishingDBService {
   async getJobHistory(
     brandId: string,
     limit: number = 50,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<{ jobs: PublishingJobRecord[]; total: number }> {
     // Get total count
     const { count } = await supabase
-      .from('publishing_jobs')
-      .select('*', { count: 'exact', head: true })
-      .eq('brand_id', brandId);
+      .from("publishing_jobs")
+      .select("*", { count: "exact", head: true })
+      .eq("brand_id", brandId);
 
     // Get paginated results
     const { data, error } = await supabase
-      .from('publishing_jobs')
-      .select('*')
-      .eq('brand_id', brandId)
-      .order('created_at', { ascending: false })
+      .from("publishing_jobs")
+      .select("*")
+      .eq("brand_id", brandId)
+      .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) throw new Error(`Failed to fetch job history: ${error.message}`);
     return {
       jobs: data as PublishingJobRecord[],
-      total: count || 0
+      total: count || 0,
     };
   }
 
@@ -379,18 +403,25 @@ export class PublishingDBService {
    * Fetches posting_config and timezone from brands table
    */
   async getBrandPostingConfig(
-    brandId: string
-  ): Promise<{ posting_config: Record<string, unknown>; timezone: string } | null> {
+    brandId: string,
+  ): Promise<{
+    posting_config: Record<string, unknown>;
+    timezone: string;
+  } | null> {
     const { data, error } = await supabase
-      .from('brands')
-      .select('posting_config, timezone')
-      .eq('id', brandId)
+      .from("brands")
+      .select("posting_config, timezone")
+      .eq("id", brandId)
       .single();
 
-    if (error && error.code === 'PGRST116') return null; // Not found
-    if (error) throw new Error(`Failed to fetch brand config: ${error.message}`);
+    if (error && error.code === "PGRST116") return null; // Not found
+    if (error)
+      throw new Error(`Failed to fetch brand config: ${error.message}`);
 
-    return data as { posting_config: Record<string, unknown>; timezone: string };
+    return data as {
+      posting_config: Record<string, unknown>;
+      timezone: string;
+    };
   }
 }
 

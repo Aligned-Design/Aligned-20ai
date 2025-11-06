@@ -1,29 +1,32 @@
-import { RequestHandler } from 'express';
+import { RequestHandler } from "express";
 
 import {
   Platform,
   PublishResponse,
   PublishingJob,
   ConnectionStatus,
-  PostContent
-} from '@shared/publishing';
-import { validatePostContent, validateScheduleTime } from '../lib/platform-validators';
+  PostContent,
+} from "@shared/publishing";
+import {
+  validatePostContent,
+  validateScheduleTime,
+} from "../lib/platform-validators";
 import {
   generateOAuthUrl,
   exchangeCodeForToken,
-  refreshAccessToken
-} from '../lib/oauth-manager';
-import { publishingQueue } from '../lib/publishing-queue';
-import { connectionsDB } from '../lib/connections-db-service';
-import { publishingDBService } from '../lib/publishing-db-service';
-import { getPlatformAPI } from '../lib/platform-apis';
-import { errorFormatter } from '../lib/error-formatter';
+  refreshAccessToken,
+} from "../lib/oauth-manager";
+import { publishingQueue } from "../lib/publishing-queue";
+import { connectionsDB } from "../lib/connections-db-service";
+import { publishingDBService } from "../lib/publishing-db-service";
+import { getPlatformAPI } from "../lib/platform-apis";
+import { errorFormatter } from "../lib/error-formatter";
 import {
   InitiateOAuthSchema,
   PublishContentSchema,
   GetJobsQuerySchema,
-  validateQuery
-} from '@shared/validation-schemas';
+  validateQuery,
+} from "@shared/validation-schemas";
 
 // OAuth initiation
 export const initiateOAuth: RequestHandler = async (req, res) => {
@@ -36,10 +39,14 @@ export const initiateOAuth: RequestHandler = async (req, res) => {
 
     res.json(oauthFlow);
   } catch (error) {
-    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
-      path: req.path,
-      requestId: req.headers['x-request-id'] as string
-    });
+    errorFormatter.sendError(
+      res,
+      error instanceof Error ? error : new Error(String(error)),
+      {
+        path: req.path,
+        requestId: req.headers["x-request-id"] as string,
+      },
+    );
   }
 };
 
@@ -50,25 +57,29 @@ export const handleOAuthCallback: RequestHandler = async (req, res) => {
     const { code, state, error } = req.query;
 
     if (error) {
-      return res.redirect(`/integrations?error=${encodeURIComponent(error as string)}`);
+      return res.redirect(
+        `/integrations?error=${encodeURIComponent(error as string)}`,
+      );
     }
 
     if (!code || !state) {
-      const errorMsg = 'Missing authorization code or state parameter';
-      return res.redirect(`/integrations?error=${encodeURIComponent(errorMsg)}`);
+      const errorMsg = "Missing authorization code or state parameter";
+      return res.redirect(
+        `/integrations?error=${encodeURIComponent(errorMsg)}`,
+      );
     }
 
     // ✅ SECURE: exchangeCodeForToken validates state from cache
     const tokenData = await exchangeCodeForToken(
       platform as Platform,
       code as string,
-      state as string
+      state as string,
     );
 
-    const [_stateToken, brandId] = (state as string).split(':');
+    const [_stateToken, brandId] = (state as string).split(":");
 
     // Get tenantId and userId from auth context (in production, from req.user or session)
-    const tenantId = (req as any).user?.tenantId || 'tenant-123';
+    const tenantId = (req as any).user?.tenantId || "tenant-123";
     const userId = (req as any).user?.id;
 
     // Store connection in database
@@ -79,18 +90,22 @@ export const handleOAuthCallback: RequestHandler = async (req, res) => {
       tokenData.accessToken,
       tokenData.accountInfo.id,
       tokenData.accountInfo.name || tokenData.accountInfo.username,
-      tokenData.accountInfo.picture?.data?.url || tokenData.accountInfo.profile_image_url,
+      tokenData.accountInfo.picture?.data?.url ||
+        tokenData.accountInfo.profile_image_url,
       tokenData.refreshToken,
-      tokenData.expiresIn ? new Date(Date.now() + tokenData.expiresIn * 1000) : undefined,
+      tokenData.expiresIn
+        ? new Date(Date.now() + tokenData.expiresIn * 1000)
+        : undefined,
       [], // TODO: Extract permissions from token response
       tokenData.accountInfo,
-      userId
+      userId,
     );
 
-    res.redirect('/integrations?success=Connected successfully');
+    res.redirect("/integrations?success=Connected successfully");
   } catch (error) {
-    console.error('OAuth callback error:', error);
-    const errorMsg = error instanceof Error ? error.message : 'Connection failed';
+    console.error("OAuth callback error:", error);
+    const errorMsg =
+      error instanceof Error ? error.message : "Connection failed";
     res.redirect(`/integrations?error=${encodeURIComponent(errorMsg)}`);
   }
 };
@@ -104,22 +119,26 @@ export const getConnections: RequestHandler = async (req, res) => {
     const connections: any[] = await connectionsDB.getBrandConnections(brandId);
 
     // Transform to ConnectionStatus format
-    const connectionStatuses: ConnectionStatus[] = connections.map(conn => ({
+    const connectionStatuses: ConnectionStatus[] = connections.map((conn) => ({
       platform: conn.platform as Platform,
-      connected: conn.status === 'connected',
+      connected: conn.status === "connected",
       accountName: conn.account_name,
       profilePicture: conn.profile_picture,
       tokenExpiry: conn.token_expires_at,
       permissions: conn.permissions || [],
-      needsReauth: conn.status === 'expired' || conn.status === 'revoked'
+      needsReauth: conn.status === "expired" || conn.status === "revoked",
     }));
 
     res.json(connectionStatuses);
   } catch (error) {
-    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
-      path: req.path,
-      requestId: req.headers['x-request-id'] as string
-    });
+    errorFormatter.sendError(
+      res,
+      error instanceof Error ? error : new Error(String(error)),
+      {
+        path: req.path,
+        requestId: req.headers["x-request-id"] as string,
+      },
+    );
   }
 };
 
@@ -133,10 +152,14 @@ export const disconnectPlatform: RequestHandler = async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
-      path: req.path,
-      requestId: req.headers['x-request-id'] as string
-    });
+    errorFormatter.sendError(
+      res,
+      error instanceof Error ? error : new Error(String(error)),
+      {
+        path: req.path,
+        requestId: req.headers["x-request-id"] as string,
+      },
+    );
   }
 };
 
@@ -144,9 +167,15 @@ export const disconnectPlatform: RequestHandler = async (req, res) => {
 export const publishContent: RequestHandler = async (req, res) => {
   try {
     // ✅ VALIDATED: Request body validated against PublishContentSchema
-    const { brandId, platforms, content: contentText, scheduledAt, validateOnly } = PublishContentSchema.parse(req.body);
+    const {
+      brandId,
+      platforms,
+      content: contentText,
+      scheduledAt,
+      validateOnly,
+    } = PublishContentSchema.parse(req.body);
 
-    const tenantId = (req as any).user?.tenantId || 'tenant-123';
+    const tenantId = (req as any).user?.tenantId || "tenant-123";
     const userId = (req as any).user?.id;
 
     // Convert content string to PostContent object
@@ -162,7 +191,7 @@ export const publishContent: RequestHandler = async (req, res) => {
       validationResults.push(...platformValidation);
 
       // Check for errors
-      const hasErrors = platformValidation.some(r => r.status === 'error');
+      const hasErrors = platformValidation.some((r) => r.status === "error");
       if (hasErrors && !validateOnly) {
         errors.push(`${platform}: Content validation failed`);
         continue;
@@ -170,10 +199,13 @@ export const publishContent: RequestHandler = async (req, res) => {
 
       // Validate schedule time if provided
       if (scheduledAt) {
-        const scheduleValidation = validateScheduleTime(platform, new Date(scheduledAt));
+        const scheduleValidation = validateScheduleTime(
+          platform,
+          new Date(scheduledAt),
+        );
         validationResults.push(scheduleValidation);
 
-        if (scheduleValidation.status === 'error' && !validateOnly) {
+        if (scheduleValidation.status === "error" && !validateOnly) {
           errors.push(`${platform}: ${scheduleValidation.message}`);
           continue;
         }
@@ -187,7 +219,7 @@ export const publishContent: RequestHandler = async (req, res) => {
           content as unknown as Record<string, unknown>,
           [platform],
           scheduledAt ? new Date(scheduledAt) : undefined,
-          userId
+          userId,
         );
 
         // Add to in-memory queue for processing
@@ -198,14 +230,14 @@ export const publishContent: RequestHandler = async (req, res) => {
           postId: dbJob.id,
           platform,
           connectionId: `${platform}-${brandId}`,
-          status: 'pending',
+          status: "pending",
           scheduledAt,
           content,
           validationResults: platformValidation,
           retryCount: 0,
           maxRetries: 3,
           createdAt: dbJob.created_at,
-          updatedAt: dbJob.updated_at
+          updatedAt: dbJob.updated_at,
         };
 
         jobs.push(job);
@@ -217,15 +249,19 @@ export const publishContent: RequestHandler = async (req, res) => {
       success: errors.length === 0,
       jobs,
       validationResults,
-      errors: errors.length > 0 ? errors : undefined
+      errors: errors.length > 0 ? errors : undefined,
     };
 
     res.json(response);
   } catch (error) {
-    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
-      path: req.path,
-      requestId: req.headers['x-request-id'] as string
-    });
+    errorFormatter.sendError(
+      res,
+      error instanceof Error ? error : new Error(String(error)),
+      {
+        path: req.path,
+        requestId: req.headers["x-request-id"] as string,
+      },
+    );
   }
 };
 
@@ -234,20 +270,25 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
   try {
     const { brandId } = req.params;
     // ✅ VALIDATED: Query parameters validated against GetJobsQuerySchema
-    const { __status, platform, limit, offset } = validateQuery(GetJobsQuerySchema, req.query);
+    const { __status, platform, limit, offset } = validateQuery(
+      GetJobsQuerySchema,
+      req.query,
+    );
 
     // Fetch from database for persistence across server restarts
     const { jobs, total } = await publishingDBService.getJobHistory(
       brandId,
       limit,
-      offset
+      offset,
     );
     const jobsAny: any[] = (jobs as any) || [];
 
     // Filter by platform if specified
     let filteredJobs = jobsAny;
-    if (platform && platform !== 'all') {
-      filteredJobs = jobsAny.filter(job => job.platforms?.includes(platform as string));
+    if (platform && platform !== "all") {
+      filteredJobs = jobsAny.filter((job) =>
+        job.platforms?.includes(platform as string),
+      );
     }
 
     // Filter by brand
@@ -259,7 +300,7 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
       brandId: job.brand_id,
       tenantId: job.tenant_id,
       postId: job.id,
-      platform: (job.platforms?.[0] || 'instagram') as Platform,
+      platform: (job.platforms?.[0] || "instagram") as Platform,
       connectionId: `${job.platforms?.[0]}-${job.brand_id}`,
       status: job.status as any,
       scheduledAt: job.scheduled_at,
@@ -273,20 +314,24 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
       lastError: job.last_error,
       errorDetails: job.last_error_details,
       createdAt: job.created_at,
-      updatedAt: job.updated_at
+      updatedAt: job.updated_at,
     }));
 
     res.json({
       jobs: publishingJobs,
       total,
       limit,
-      offset
+      offset,
     });
   } catch (error) {
-    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
-      path: req.path,
-      requestId: req.headers['x-request-id'] as string
-    });
+    errorFormatter.sendError(
+      res,
+      error instanceof Error ? error : new Error(String(error)),
+      {
+        path: req.path,
+        requestId: req.headers["x-request-id"] as string,
+      },
+    );
   }
 };
 
@@ -300,16 +345,20 @@ export const retryJob: RequestHandler = async (req, res) => {
     if (success) {
       res.json({ success: true });
     } else {
-      errorFormatter.sendError(res, new Error('Job cannot be retried'), {
+      errorFormatter.sendError(res, new Error("Job cannot be retried"), {
         path: req.path,
-        requestId: req.headers['x-request-id'] as string
+        requestId: req.headers["x-request-id"] as string,
       });
     }
   } catch (error) {
-    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
-      path: req.path,
-      requestId: req.headers['x-request-id'] as string
-    });
+    errorFormatter.sendError(
+      res,
+      error instanceof Error ? error : new Error(String(error)),
+      {
+        path: req.path,
+        requestId: req.headers["x-request-id"] as string,
+      },
+    );
   }
 };
 
@@ -323,16 +372,20 @@ export const cancelJob: RequestHandler = async (req, res) => {
     if (success) {
       res.json({ success: true });
     } else {
-      errorFormatter.sendError(res, new Error('Job cannot be cancelled'), {
+      errorFormatter.sendError(res, new Error("Job cannot be cancelled"), {
         path: req.path,
-        requestId: req.headers['x-request-id'] as string
+        requestId: req.headers["x-request-id"] as string,
       });
     }
   } catch (error) {
-    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
-      path: req.path,
-      requestId: req.headers['x-request-id'] as string
-    });
+    errorFormatter.sendError(
+      res,
+      error instanceof Error ? error : new Error(String(error)),
+      {
+        path: req.path,
+        requestId: req.headers["x-request-id"] as string,
+      },
+    );
   }
 };
 
@@ -342,12 +395,15 @@ export const verifyConnection: RequestHandler = async (req, res) => {
     const { brandId, platform } = req.params;
 
     // Get connection from database
-    const connection = await connectionsDB.getConnection(brandId, platform as Platform);
+    const connection = await connectionsDB.getConnection(
+      brandId,
+      platform as Platform,
+    );
 
     if (!connection) {
       return res.status(404).json({
         verified: false,
-        error: 'Connection not found'
+        error: "Connection not found",
       });
     }
 
@@ -359,25 +415,29 @@ export const verifyConnection: RequestHandler = async (req, res) => {
       if (expiresAt <= now) {
         return res.status(200).json({
           verified: false,
-          error: 'Token expired',
+          error: "Token expired",
           tokenExpiresAt: connection.token_expires_at,
-          needsRefresh: true
+          needsRefresh: true,
         });
       }
     }
 
     // Check connection status
-    if (connection.status !== 'connected') {
+    if (connection.status !== "connected") {
       return res.status(200).json({
         verified: false,
         error: `Connection status: ${connection.status}`,
-        connectionStatus: connection.status
+        connectionStatus: connection.status,
       });
     }
 
     // Try a simple API call to verify the token still works
     try {
-      const __platformAPI = getPlatformAPI(platform as Platform, connection.access_token, connection.account_id);
+      const __platformAPI = getPlatformAPI(
+        platform as Platform,
+        connection.access_token,
+        connection.account_id,
+      );
 
       // For now, just verify the connection object is valid
       // In production, you might make a simple test API call
@@ -388,20 +448,24 @@ export const verifyConnection: RequestHandler = async (req, res) => {
         accountId: connection.account_id,
         tokenExpiresAt: connection.token_expires_at,
         lastVerified: connection.last_verified_at,
-        status: connection.status
+        status: connection.status,
       });
     } catch (error) {
       return res.status(200).json({
         verified: false,
-        error: 'Failed to verify connection',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        error: "Failed to verify connection",
+        details: error instanceof Error ? error.message : "Unknown error",
       });
     }
   } catch (error) {
-    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
-      path: req.path,
-      requestId: req.headers['x-request-id'] as string
-    });
+    errorFormatter.sendError(
+      res,
+      error instanceof Error ? error : new Error(String(error)),
+      {
+        path: req.path,
+        requestId: req.headers["x-request-id"] as string,
+      },
+    );
   }
 };
 
@@ -411,10 +475,13 @@ export const refreshToken: RequestHandler = async (req, res) => {
     const { brandId, platform } = req.params;
 
     // Get connection from database
-    const connection = await connectionsDB.getConnection(brandId, platform as Platform);
+    const connection = await connectionsDB.getConnection(
+      brandId,
+      platform as Platform,
+    );
 
     if (!connection) {
-      return res.status(404).json({ error: 'Connection not found' });
+      return res.status(404).json({ error: "Connection not found" });
     }
 
     // Refresh the token
@@ -424,14 +491,14 @@ export const refreshToken: RequestHandler = async (req, res) => {
       brandId: connection.brand_id,
       tenantId: connection.tenant_id,
       accountId: connection.account_id,
-      accountName: connection.account_name || '',
+      accountName: connection.account_name || "",
       accessToken: connection.access_token,
       refreshToken: connection.refresh_token,
       status: connection.status as any,
       permissions: connection.permissions || [],
       metadata: connection.metadata,
       createdAt: connection.created_at,
-      updatedAt: connection.updated_at
+      updatedAt: connection.updated_at,
     });
 
     // Update connection with new tokens
@@ -439,15 +506,21 @@ export const refreshToken: RequestHandler = async (req, res) => {
       connection.id,
       tokenData.accessToken,
       tokenData.refreshToken,
-      tokenData.expiresIn ? new Date(Date.now() + tokenData.expiresIn * 1000) : undefined
+      tokenData.expiresIn
+        ? new Date(Date.now() + tokenData.expiresIn * 1000)
+        : undefined,
     );
 
     res.json({ success: true });
   } catch (error) {
-    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
-      path: req.path,
-      requestId: req.headers['x-request-id'] as string
-    });
+    errorFormatter.sendError(
+      res,
+      error instanceof Error ? error : new Error(String(error)),
+      {
+        path: req.path,
+        requestId: req.headers["x-request-id"] as string,
+      },
+    );
   }
 };
 
@@ -462,32 +535,37 @@ export const publishBlogPost: RequestHandler = async (req, res) => {
       mediaUrls,
       tags,
       categories,
-      scheduledFor
+      scheduledFor,
     } = req.body;
 
     if (!title || !content) {
       return res.status(400).json({
-        error: 'Missing required fields: title, content'
+        error: "Missing required fields: title, content",
       });
     }
 
-    const supportedPlatforms = ['wordpress', 'squarespace', 'wix'];
+    const supportedPlatforms = ["wordpress", "squarespace", "wix"];
     if (!supportedPlatforms.includes(platform)) {
       return res.status(400).json({
-        error: `Blog publishing not supported for ${platform}`
+        error: `Blog publishing not supported for ${platform}`,
       });
     }
 
     // Get connection
-    const connection = await connectionsDB.getConnection(brandId, platform as Platform);
-    if (!connection || connection.status !== 'connected') {
+    const connection = await connectionsDB.getConnection(
+      brandId,
+      platform as Platform,
+    );
+    if (!connection || connection.status !== "connected") {
       return res.status(401).json({
-        error: 'Platform not connected or connection expired'
+        error: "Platform not connected or connection expired",
       });
     }
 
     // Import the integration service dynamically to avoid circular dependencies
-    const { IntegrationService } = await import('../lib/integrations/integration-service');
+    const { IntegrationService } = await import(
+      "../lib/integrations/integration-service"
+    );
 
     const result = await IntegrationService.publishBlogPost(
       platform as any,
@@ -499,20 +577,24 @@ export const publishBlogPost: RequestHandler = async (req, res) => {
         mediaUrls,
         tags,
         categories,
-        scheduledFor
-      }
+        scheduledFor,
+      },
     );
 
     res.json({
       success: true,
-      message: `Blog post published to ${platform}${scheduledFor ? ' (scheduled)' : ''}`,
-      result
+      message: `Blog post published to ${platform}${scheduledFor ? " (scheduled)" : ""}`,
+      result,
     });
   } catch (error) {
-    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
-      path: req.path,
-      requestId: req.headers['x-request-id'] as string
-    });
+    errorFormatter.sendError(
+      res,
+      error instanceof Error ? error : new Error(String(error)),
+      {
+        path: req.path,
+        requestId: req.headers["x-request-id"] as string,
+      },
+    );
   }
 };
 
@@ -527,32 +609,37 @@ export const publishEmailCampaign: RequestHandler = async (req, res) => {
       htmlContent,
       listIds,
       excerpt,
-      scheduledFor
+      scheduledFor,
     } = req.body;
 
     if (!title || !subject || !content) {
       return res.status(400).json({
-        error: 'Missing required fields: title, subject, content'
+        error: "Missing required fields: title, subject, content",
       });
     }
 
-    const supportedPlatforms = ['mailchimp', 'squarespace', 'wix'];
+    const supportedPlatforms = ["mailchimp", "squarespace", "wix"];
     if (!supportedPlatforms.includes(platform)) {
       return res.status(400).json({
-        error: `Email publishing not supported for ${platform}`
+        error: `Email publishing not supported for ${platform}`,
       });
     }
 
     // Get connection
-    const connection = await connectionsDB.getConnection(brandId, platform as Platform);
-    if (!connection || connection.status !== 'connected') {
+    const connection = await connectionsDB.getConnection(
+      brandId,
+      platform as Platform,
+    );
+    if (!connection || connection.status !== "connected") {
       return res.status(401).json({
-        error: 'Platform not connected or connection expired'
+        error: "Platform not connected or connection expired",
       });
     }
 
     // Import the integration service dynamically
-    const { IntegrationService } = await import('../lib/integrations/integration-service');
+    const { IntegrationService } = await import(
+      "../lib/integrations/integration-service"
+    );
 
     const result = await IntegrationService.publishEmailCampaign(
       platform as any,
@@ -564,19 +651,23 @@ export const publishEmailCampaign: RequestHandler = async (req, res) => {
         htmlContent,
         listIds,
         excerpt,
-        scheduledFor
-      }
+        scheduledFor,
+      },
     );
 
     res.json({
       success: true,
-      message: `Email campaign published to ${platform}${scheduledFor ? ' (scheduled)' : ''}`,
-      result
+      message: `Email campaign published to ${platform}${scheduledFor ? " (scheduled)" : ""}`,
+      result,
     });
   } catch (error) {
-    errorFormatter.sendError(res, error instanceof Error ? error : new Error(String(error)), {
-      path: req.path,
-      requestId: req.headers['x-request-id'] as string
-    });
+    errorFormatter.sendError(
+      res,
+      error instanceof Error ? error : new Error(String(error)),
+      {
+        path: req.path,
+        requestId: req.headers["x-request-id"] as string,
+      },
+    );
   }
 };

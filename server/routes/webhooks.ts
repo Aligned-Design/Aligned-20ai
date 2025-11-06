@@ -3,16 +3,16 @@
  * Endpoints for receiving and managing webhook events from external providers
  */
 
-import { RequestHandler } from 'express';
-import { z } from 'zod';
+import { RequestHandler } from "express";
+import { z } from "zod";
 import {
   WebhookProvider,
   WebhookLogsQuerySchema,
   generateIdempotencyKey,
-} from '@shared/webhooks';
-import { webhookHandler } from '../lib/webhook-handler';
-import { webhookEvents } from '../lib/dbClient';
-import { logAuditAction } from '../lib/audit-logger';
+} from "@shared/webhooks";
+import { webhookHandler } from "../lib/webhook-handler";
+import { webhookEvents } from "../lib/dbClient";
+import { logAuditAction } from "../lib/audit-logger";
 
 // ==================== TYPES & VALIDATION ====================
 
@@ -62,16 +62,21 @@ const HubSpotWebhookBodySchema = z.object({
 /**
  * Get webhook signature from request headers
  */
-function _getSignatureFromRequest(provider: WebhookProvider, headers: Record<string, unknown>): string | null {
+function _getSignatureFromRequest(
+  provider: WebhookProvider,
+  headers: Record<string, unknown>,
+): string | null {
   const headerMap: Record<WebhookProvider, string> = {
-    zapier: 'x-zapier-signature',
-    make: 'x-hook-secret-key',
-    slack: 'x-slack-signature',
-    hubspot: 'x-hubspot-signature',
+    zapier: "x-zapier-signature",
+    make: "x-hook-secret-key",
+    slack: "x-slack-signature",
+    hubspot: "x-hubspot-signature",
   };
 
   const headerName = headerMap[provider];
-  return (headers[headerName] || headers[headerName.toLowerCase()]) as string | null;
+  return (headers[headerName] || headers[headerName.toLowerCase()]) as
+    | string
+    | null;
 }
 
 /**
@@ -79,10 +84,10 @@ function _getSignatureFromRequest(provider: WebhookProvider, headers: Record<str
  */
 function _getWebhookSecret(provider: WebhookProvider): string {
   const secrets: Record<WebhookProvider, string> = {
-    zapier: process.env.WEBHOOK_SECRET_ZAPIER || 'zapier-secret',
-    make: process.env.WEBHOOK_SECRET_MAKE || 'make-secret',
-    slack: process.env.WEBHOOK_SECRET_SLACK || 'slack-secret',
-    hubspot: process.env.WEBHOOK_SECRET_HUBSPOT || 'hubspot-secret',
+    zapier: process.env.WEBHOOK_SECRET_ZAPIER || "zapier-secret",
+    make: process.env.WEBHOOK_SECRET_MAKE || "make-secret",
+    slack: process.env.WEBHOOK_SECRET_SLACK || "slack-secret",
+    hubspot: process.env.WEBHOOK_SECRET_HUBSPOT || "hubspot-secret",
   };
 
   return secrets[provider];
@@ -96,23 +101,31 @@ function _getWebhookSecret(provider: WebhookProvider): string {
  */
 export const handleZapierWebhook: RequestHandler = async (req, res) => {
   try {
-    const brandId = req.headers['x-brand-id'] as string;
+    const brandId = req.headers["x-brand-id"] as string;
     if (!brandId) {
-      return res.status(400).json({ error: 'Missing required header: x-brand-id' });
+      return res
+        .status(400)
+        .json({ error: "Missing required header: x-brand-id" });
     }
 
     // Validate request body
     const validationResult = ZapierWebhookBodySchema.safeParse(req.body);
     if (!validationResult.success) {
-      return res.status(400).json({ error: 'Validation failed', details: validationResult.error.errors });
+      return res
+        .status(400)
+        .json({
+          error: "Validation failed",
+          details: validationResult.error.errors,
+        });
     }
 
     const body = validationResult.data;
-    const idempotencyKey = body.id || generateIdempotencyKey('zapier', body.action, Date.now());
+    const idempotencyKey =
+      body.id || generateIdempotencyKey("zapier", body.action, Date.now());
 
     // Handle webhook event
     const response = await webhookHandler.handleEvent({
-      provider: 'zapier',
+      provider: "zapier",
       brandId,
       eventType: body.action,
       payload: body.data || {},
@@ -121,8 +134,12 @@ export const handleZapierWebhook: RequestHandler = async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    console.error('[Zapier Webhook] Error:', error);
-    res.status(500).json({ error: error instanceof Error ? error.message : 'Internal server error' });
+    console.error("[Zapier Webhook] Error:", error);
+    res
+      .status(500)
+      .json({
+        error: error instanceof Error ? error.message : "Internal server error",
+      });
   }
 };
 
@@ -132,23 +149,31 @@ export const handleZapierWebhook: RequestHandler = async (req, res) => {
  */
 export const handleMakeWebhook: RequestHandler = async (req, res) => {
   try {
-    const brandId = req.headers['x-brand-id'] as string;
+    const brandId = req.headers["x-brand-id"] as string;
     if (!brandId) {
-      return res.status(400).json({ error: 'Missing required header: x-brand-id' });
+      return res
+        .status(400)
+        .json({ error: "Missing required header: x-brand-id" });
     }
 
     // Validate request body
     const validationResult = MakeWebhookBodySchema.safeParse(req.body);
     if (!validationResult.success) {
-      return res.status(400).json({ error: 'Validation failed', details: validationResult.error.errors });
+      return res
+        .status(400)
+        .json({
+          error: "Validation failed",
+          details: validationResult.error.errors,
+        });
     }
 
     const body = validationResult.data;
-    const idempotencyKey = body.webhook_id || generateIdempotencyKey('make', body.event, Date.now());
+    const idempotencyKey =
+      body.webhook_id || generateIdempotencyKey("make", body.event, Date.now());
 
     // Handle webhook event
     const response = await webhookHandler.handleEvent({
-      provider: 'make',
+      provider: "make",
       brandId,
       eventType: body.event,
       payload: body.data || {},
@@ -157,8 +182,12 @@ export const handleMakeWebhook: RequestHandler = async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    console.error('[Make Webhook] Error:', error);
-    res.status(500).json({ error: error instanceof Error ? error.message : 'Internal server error' });
+    console.error("[Make Webhook] Error:", error);
+    res
+      .status(500)
+      .json({
+        error: error instanceof Error ? error.message : "Internal server error",
+      });
   }
 };
 
@@ -168,27 +197,29 @@ export const handleMakeWebhook: RequestHandler = async (req, res) => {
  */
 export const handleSlackWebhook: RequestHandler = async (req, res) => {
   try {
-    const brandId = req.headers['x-brand-id'] as string;
+    const brandId = req.headers["x-brand-id"] as string;
     if (!brandId) {
-      return res.status(400).json({ error: 'Missing required header: x-brand-id' });
+      return res
+        .status(400)
+        .json({ error: "Missing required header: x-brand-id" });
     }
 
     const body = req.body;
 
     // Handle Slack URL verification challenge
-    if (body.type === 'url_verification') {
+    if (body.type === "url_verification") {
       return res.json({ challenge: body.challenge });
     }
 
     // Handle Slack event
-    if (body.type === 'event_callback' && body.event) {
+    if (body.type === "event_callback" && body.event) {
       const event = body.event;
       const idempotencyKey = `slack-${event.event_ts || Date.now()}`;
 
       const response = await webhookHandler.handleEvent({
-        provider: 'slack',
+        provider: "slack",
         brandId,
-        eventType: event.type || 'unknown',
+        eventType: event.type || "unknown",
         payload: event,
         idempotencyKey,
       });
@@ -198,8 +229,12 @@ export const handleSlackWebhook: RequestHandler = async (req, res) => {
       res.json({ ok: true });
     }
   } catch (error) {
-    console.error('[Slack Webhook] Error:', error);
-    res.status(500).json({ error: error instanceof Error ? error.message : 'Internal server error' });
+    console.error("[Slack Webhook] Error:", error);
+    res
+      .status(500)
+      .json({
+        error: error instanceof Error ? error.message : "Internal server error",
+      });
   }
 };
 
@@ -209,9 +244,11 @@ export const handleSlackWebhook: RequestHandler = async (req, res) => {
  */
 export const handleHubSpotWebhook: RequestHandler = async (req, res) => {
   try {
-    const brandId = req.headers['x-brand-id'] as string;
+    const brandId = req.headers["x-brand-id"] as string;
     if (!brandId) {
-      return res.status(400).json({ error: 'Missing required header: x-brand-id' });
+      return res
+        .status(400)
+        .json({ error: "Missing required header: x-brand-id" });
     }
 
     const body = req.body;
@@ -224,14 +261,14 @@ export const handleHubSpotWebhook: RequestHandler = async (req, res) => {
       // Validate event
       const validationResult = HubSpotWebhookBodySchema.safeParse(event);
       if (!validationResult.success) {
-        console.warn('[HubSpot Webhook] Invalid event:', event);
+        console.warn("[HubSpot Webhook] Invalid event:", event);
         continue;
       }
 
       const idempotencyKey = `hubspot-${event.eventId}`;
 
       const response = await webhookHandler.handleEvent({
-        provider: 'hubspot',
+        provider: "hubspot",
         brandId,
         eventType: event.subscriptionType,
         payload: event,
@@ -242,10 +279,18 @@ export const handleHubSpotWebhook: RequestHandler = async (req, res) => {
       responses.push(response);
     }
 
-    res.json({ success: true, processed: responses.length, results: responses });
+    res.json({
+      success: true,
+      processed: responses.length,
+      results: responses,
+    });
   } catch (error) {
-    console.error('[HubSpot Webhook] Error:', error);
-    res.status(500).json({ error: error instanceof Error ? error.message : 'Internal server error' });
+    console.error("[HubSpot Webhook] Error:", error);
+    res
+      .status(500)
+      .json({
+        error: error instanceof Error ? error.message : "Internal server error",
+      });
   }
 };
 
@@ -256,20 +301,22 @@ export const handleHubSpotWebhook: RequestHandler = async (req, res) => {
 export const getWebhookStatus: RequestHandler = async (req, res) => {
   try {
     const { eventId } = req.params;
-    const brandId = req.headers['x-brand-id'] as string;
+    const brandId = req.headers["x-brand-id"] as string;
 
     if (!brandId) {
-      return res.status(400).json({ error: 'Missing required header: x-brand-id' });
+      return res
+        .status(400)
+        .json({ error: "Missing required header: x-brand-id" });
     }
 
     const eventStatus: any = await webhookHandler.getEventStatus(eventId);
     if (!eventStatus) {
-      return res.status(404).json({ error: 'Event not found' });
+      return res.status(404).json({ error: "Event not found" });
     }
 
     // Verify brand ownership
     if (eventStatus.brand_id !== brandId) {
-      return res.status(403).json({ error: 'Unauthorized' });
+      return res.status(403).json({ error: "Unauthorized" });
     }
 
     res.json({
@@ -296,8 +343,12 @@ export const getWebhookStatus: RequestHandler = async (req, res) => {
       })),
     });
   } catch (error) {
-    console.error('[Webhook Status] Error:', error);
-    res.status(500).json({ error: error instanceof Error ? error.message : 'Internal server error' });
+    console.error("[Webhook Status] Error:", error);
+    res
+      .status(500)
+      .json({
+        error: error instanceof Error ? error.message : "Internal server error",
+      });
   }
 };
 
@@ -307,15 +358,22 @@ export const getWebhookStatus: RequestHandler = async (req, res) => {
  */
 export const getWebhookLogs: RequestHandler = async (req, res) => {
   try {
-    const brandId = req.headers['x-brand-id'] as string;
+    const brandId = req.headers["x-brand-id"] as string;
     if (!brandId) {
-      return res.status(400).json({ error: 'Missing required header: x-brand-id' });
+      return res
+        .status(400)
+        .json({ error: "Missing required header: x-brand-id" });
     }
 
     // Validate query parameters
     const validationResult = WebhookLogsQuerySchema.safeParse(req.query);
     if (!validationResult.success) {
-      return res.status(400).json({ error: 'Validation failed', details: validationResult.error.errors });
+      return res
+        .status(400)
+        .json({
+          error: "Validation failed",
+          details: validationResult.error.errors,
+        });
     }
 
     const query = validationResult.data;
@@ -351,8 +409,12 @@ export const getWebhookLogs: RequestHandler = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('[Webhook Logs] Error:', error);
-    res.status(500).json({ error: error instanceof Error ? error.message : 'Internal server error' });
+    console.error("[Webhook Logs] Error:", error);
+    res
+      .status(500)
+      .json({
+        error: error instanceof Error ? error.message : "Internal server error",
+      });
   }
 };
 
@@ -363,38 +425,51 @@ export const getWebhookLogs: RequestHandler = async (req, res) => {
 export const retryWebhookEvent: RequestHandler = async (req, res) => {
   try {
     const { eventId } = req.params;
-    const brandId = req.headers['x-brand-id'] as string;
-    const userId = req.headers['x-user-id'] as string;
-    const userEmail = req.headers['x-user-email'] as string;
+    const brandId = req.headers["x-brand-id"] as string;
+    const userId = req.headers["x-user-id"] as string;
+    const userEmail = req.headers["x-user-email"] as string;
 
     if (!brandId) {
-      return res.status(400).json({ error: 'Missing required header: x-brand-id' });
+      return res
+        .status(400)
+        .json({ error: "Missing required header: x-brand-id" });
     }
 
     // Get event
     const event = await webhookHandler.getEventStatus(eventId);
     if (!event) {
-      return res.status(404).json({ error: 'Event not found' });
+      return res.status(404).json({ error: "Event not found" });
     }
 
     // Verify brand ownership
     if (event.brand_id !== brandId) {
-      return res.status(403).json({ error: 'Unauthorized' });
+      return res.status(403).json({ error: "Unauthorized" });
     }
 
     // Log audit trail
-    await logAuditAction(brandId, eventId, userId || 'system', userEmail || 'system', 'WEBHOOK_RETRY_TRIGGERED', {
-      provider: event.provider,
-      eventType: event.event_type,
-    });
+    await logAuditAction(
+      brandId,
+      eventId,
+      userId || "system",
+      userEmail || "system",
+      "WEBHOOK_RETRY_TRIGGERED",
+      {
+        provider: event.provider,
+        eventType: event.event_type,
+      },
+    );
 
     res.json({
       success: true,
-      message: 'Webhook retry triggered',
+      message: "Webhook retry triggered",
       eventId,
     });
   } catch (error) {
-    console.error('[Webhook Retry] Error:', error);
-    res.status(500).json({ error: error instanceof Error ? error.message : 'Internal server error' });
+    console.error("[Webhook Retry] Error:", error);
+    res
+      .status(500)
+      .json({
+        error: error instanceof Error ? error.message : "Internal server error",
+      });
   }
 };

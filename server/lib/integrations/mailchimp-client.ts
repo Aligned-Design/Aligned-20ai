@@ -5,12 +5,12 @@
 
 export interface MailchimpCampaign {
   id?: string;
-  type: 'regular' | 'plaintext' | 'absplit' | 'rss' | 'variate';
+  type: "regular" | "plaintext" | "absplit" | "rss" | "variate";
   recipients: {
     list_id: string;
     segment_opts?: {
       saved_segment_id: number;
-      match: 'any' | 'all';
+      match: "any" | "all";
     };
   };
   settings: {
@@ -47,23 +47,23 @@ export class MailchimpClient {
   constructor(apiKey: string) {
     this.apiKey = apiKey;
     // Extract server prefix from API key (e.g., us1, us2, etc.)
-    const parts = apiKey.split('-');
-    this.serverPrefix = parts[1] || 'us1';
+    const parts = apiKey.split("-");
+    this.serverPrefix = parts[1] || "us1";
     this.baseUrl = `https://${this.serverPrefix}.api.mailchimp.com/3.0`;
   }
 
   private async request<T>(
     endpoint: string,
-    method: string = 'GET',
-    body?: any
+    method: string = "GET",
+    body?: any,
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
     const response = await fetch(url, {
       method,
       headers: {
-        'Authorization': `Basic ${Buffer.from(`anystring:${this.apiKey}`).toString('base64')}`,
-        'Content-Type': 'application/json',
+        Authorization: `Basic ${Buffer.from(`anystring:${this.apiKey}`).toString("base64")}`,
+        "Content-Type": "application/json",
       },
       body: body ? JSON.stringify(body) : undefined,
     });
@@ -77,34 +77,54 @@ export class MailchimpClient {
   }
 
   async getLists(): Promise<any> {
-    return this.request<any>('/lists');
+    return this.request<any>("/lists");
   }
 
   async getListSegments(listId: string): Promise<MailchimpListSegment[]> {
-    const response = await this.request<{ segments: MailchimpListSegment[] }>(`/lists/${listId}/segments`);
+    const response = await this.request<{ segments: MailchimpListSegment[] }>(
+      `/lists/${listId}/segments`,
+    );
     return response.segments || [];
   }
 
   async createCampaign(campaign: MailchimpCampaign): Promise<any> {
-    return this.request<any>('/campaigns', 'POST', campaign);
+    return this.request<any>("/campaigns", "POST", campaign);
   }
 
-  async updateCampaign(campaignId: string, updates: Partial<MailchimpCampaign>): Promise<any> {
-    return this.request<any>(`/campaigns/${campaignId}`, 'PATCH', updates);
+  async updateCampaign(
+    campaignId: string,
+    updates: Partial<MailchimpCampaign>,
+  ): Promise<any> {
+    return this.request<any>(`/campaigns/${campaignId}`, "PATCH", updates);
   }
 
   async setCampaignContent(campaignId: string, content: any): Promise<any> {
-    return this.request<any>(`/campaigns/${campaignId}/content`, 'PUT', content);
+    return this.request<any>(
+      `/campaigns/${campaignId}/content`,
+      "PUT",
+      content,
+    );
   }
 
   async sendCampaign(campaignId: string): Promise<any> {
-    return this.request<any>(`/campaigns/${campaignId}/actions/send`, 'POST', {});
+    return this.request<any>(
+      `/campaigns/${campaignId}/actions/send`,
+      "POST",
+      {},
+    );
   }
 
-  async scheduleCampaign(campaignId: string, scheduleTime: string): Promise<any> {
-    return this.request<any>(`/campaigns/${campaignId}/actions/schedule`, 'POST', {
-      schedule_time: scheduleTime,
-    });
+  async scheduleCampaign(
+    campaignId: string,
+    scheduleTime: string,
+  ): Promise<any> {
+    return this.request<any>(
+      `/campaigns/${campaignId}/actions/schedule`,
+      "POST",
+      {
+        schedule_time: scheduleTime,
+      },
+    );
   }
 
   async getCampaignStatus(campaignId: string): Promise<any> {
@@ -112,6 +132,6 @@ export class MailchimpClient {
   }
 
   async deleteCampaign(campaignId: string): Promise<void> {
-    await this.request(`/campaigns/${campaignId}`, 'DELETE');
+    await this.request(`/campaigns/${campaignId}`, "DELETE");
   }
 }

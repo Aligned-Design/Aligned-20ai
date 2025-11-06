@@ -60,7 +60,10 @@ export default function Support() {
               </h3>
               <p className="text-sm text-slate-600">
                 Email us at{" "}
-                <a href="mailto:support@aligned.ai" className="text-[var(--accent-lime)]">
+                <a
+                  href="mailto:support@aligned.ai"
+                  className="text-[var(--accent-lime)]"
+                >
                   support@aligned.ai
                 </a>{" "}
                 or use the chat in the app.

@@ -1,14 +1,14 @@
-import { PublishingJob, JobStatusUpdate } from '@shared/publishing';
-import { validatePostContent } from './platform-validators';
-import { connectionsDB } from './connections-db-service';
-import { publishingDBService } from './publishing-db-service';
-import { getPlatformAPI } from './platform-apis';
+import { PublishingJob, JobStatusUpdate } from "@shared/publishing";
+import { validatePostContent } from "./platform-validators";
+import { connectionsDB } from "./connections-db-service";
+import { publishingDBService } from "./publishing-db-service";
+import { getPlatformAPI } from "./platform-apis";
 import {
   isWeekend,
   canPostOnDate,
   calculatePostingDelay,
-  getWeekendPostingFromConfig
-} from './weekend-posting-utils';
+  getWeekendPostingFromConfig,
+} from "./weekend-posting-utils";
 
 interface PublishResult {
   success: boolean;
@@ -25,17 +25,17 @@ export class PublishingQueue {
   async addJob(job: PublishingJob): Promise<void> {
     // Validate content before adding to queue
     const validationResults = validatePostContent(job.platform, job.content);
-    const hasErrors = validationResults.some(r => r.status === 'error');
-    
+    const hasErrors = validationResults.some((r) => r.status === "error");
+
     if (hasErrors) {
-      job.status = 'failed';
-      job.lastError = 'Content validation failed';
+      job.status = "failed";
+      job.lastError = "Content validation failed";
       job.validationResults = validationResults;
     }
-    
+
     this.jobs.set(job.id, job);
-    
-    if (job.status === 'pending') {
+
+    if (job.status === "pending") {
       this.processJob(job.id);
     }
   }
@@ -46,7 +46,7 @@ export class PublishingQueue {
     }
 
     const job = this.jobs.get(jobId);
-    if (!job || job.status !== 'pending') {
+    if (!job || job.status !== "pending") {
       return;
     }
 
@@ -54,7 +54,7 @@ export class PublishingQueue {
 
     try {
       // Update status to processing
-      await this.updateJobStatus(jobId, { status: 'processing' });
+      await this.updateJobStatus(jobId, { status: "processing" });
 
       // Check if scheduled for future
       if (job.scheduledAt && new Date(job.scheduledAt) > new Date()) {
@@ -68,16 +68,26 @@ export class PublishingQueue {
       // Check weekend posting restrictions
       if (job.scheduledAt) {
         const scheduledDate = new Date(job.scheduledAt);
-        const brandConfig = await publishingDBService.getBrandPostingConfig(job.brandId);
-        const weekendPostingEnabled = getWeekendPostingFromConfig(brandConfig?.posting_config);
-        const brandTimezone = brandConfig?.timezone || 'UTC';
+        const brandConfig = await publishingDBService.getBrandPostingConfig(
+          job.brandId,
+        );
+        const weekendPostingEnabled = getWeekendPostingFromConfig(
+          brandConfig?.posting_config,
+        );
+        const brandTimezone = brandConfig?.timezone || "UTC";
 
         // If weekend posting is disabled and scheduled for weekend, reschedule
-        if (!canPostOnDate(scheduledDate, weekendPostingEnabled, brandTimezone)) {
-          const nextAvailable = calculatePostingDelay(scheduledDate, weekendPostingEnabled, brandTimezone);
+        if (
+          !canPostOnDate(scheduledDate, weekendPostingEnabled, brandTimezone)
+        ) {
+          const nextAvailable = calculatePostingDelay(
+            scheduledDate,
+            weekendPostingEnabled,
+            brandTimezone,
+          );
           console.log(
             `[Publishing Queue] Weekend posting disabled for brand ${job.brandId}. ` +
-            `Rescheduling from ${scheduledDate.toISOString()} to ${nextAvailable.toISOString()}`
+              `Rescheduling from ${scheduledDate.toISOString()} to ${nextAvailable.toISOString()}`,
           );
 
           const delay = nextAvailable.getTime() - Date.now();
@@ -94,16 +104,23 @@ export class PublishingQueue {
 
       if (result.success) {
         await this.updateJobStatus(jobId, {
-          status: 'published',
+          status: "published",
           platformPostId: result.platformPostId,
           platformUrl: result.platformUrl,
-          publishedAt: new Date().toISOString()
+          publishedAt: new Date().toISOString(),
         });
       } else {
-        await this.handleJobFailure(jobId, result.error || 'Unknown error', result.errorDetails);
+        await this.handleJobFailure(
+          jobId,
+          result.error || "Unknown error",
+          result.errorDetails,
+        );
       }
     } catch (error) {
-      await this.handleJobFailure(jobId, error instanceof Error ? error.message : 'Processing error');
+      await this.handleJobFailure(
+        jobId,
+        error instanceof Error ? error.message : "Processing error",
+      );
     } finally {
       this.processing.delete(jobId);
     }
@@ -112,15 +129,15 @@ export class PublishingQueue {
   private async publishToPlatform(job: PublishingJob): Promise<PublishResult> {
     try {
       switch (job.platform) {
-        case 'instagram':
+        case "instagram":
           return await this.publishToInstagram(job);
-        case 'facebook':
+        case "facebook":
           return await this.publishToFacebook(job);
-        case 'linkedin':
+        case "linkedin":
           return await this.publishToLinkedIn(job);
-        case 'twitter':
+        case "twitter":
           return await this.publishToTwitter(job);
-        case 'google_business':
+        case "google_business":
           return await this.publishToGoogleBusiness(job);
         default:
           throw new Error(`Unsupported platform: ${job.platform}`);
@@ -128,8 +145,8 @@ export class PublishingQueue {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Publishing failed',
-        errorDetails: error
+        error: error instanceof Error ? error.message : "Publishing failed",
+        errorDetails: error,
       };
     }
   }
@@ -137,17 +154,24 @@ export class PublishingQueue {
   private async publishToInstagram(job: PublishingJob): Promise<PublishResult> {
     try {
       // Get connection from database
-      const connection = await connectionsDB.getConnection(job.brandId, 'instagram');
+      const connection = await connectionsDB.getConnection(
+        job.brandId,
+        "instagram",
+      );
       if (!connection) {
-        throw new Error('Instagram account not connected');
+        throw new Error("Instagram account not connected");
       }
 
-      if (connection.status !== 'connected') {
+      if (connection.status !== "connected") {
         throw new Error(`Instagram connection status: ${connection.status}`);
       }
 
       // Get Instagram API client
-      const instagramAPI = getPlatformAPI('instagram', connection.access_token, connection.account_id);
+      const instagramAPI = getPlatformAPI(
+        "instagram",
+        connection.access_token,
+        connection.account_id,
+      );
 
       // Publish to Instagram
       const result = await instagramAPI.publishPost(job.content);
@@ -157,14 +181,14 @@ export class PublishingQueue {
         await publishingDBService.createPublishingLog(
           job.id,
           job.brandId,
-          'instagram',
-          'published',
+          "instagram",
+          "published",
           1,
           {
             platformPostId: result.platformPostId,
             platformPostUrl: result.platformUrl,
-            contentSnapshot: job.content
-          }
+            contentSnapshot: job.content,
+          },
         );
 
         return result;
@@ -173,23 +197,26 @@ export class PublishingQueue {
         await publishingDBService.createPublishingLog(
           job.id,
           job.brandId,
-          'instagram',
-          'failed',
+          "instagram",
+          "failed",
           1,
           {
             errorCode: result.errorCode,
             errorMessage: result.error,
-            contentSnapshot: job.content
-          }
+            contentSnapshot: job.content,
+          },
         );
 
-        throw new Error(result.error || 'Instagram publish failed');
+        throw new Error(result.error || "Instagram publish failed");
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Instagram publishing failed',
-        errorDetails: error
+        error:
+          error instanceof Error
+            ? error.message
+            : "Instagram publishing failed",
+        errorDetails: error,
       };
     }
   }
@@ -197,17 +224,24 @@ export class PublishingQueue {
   private async publishToFacebook(job: PublishingJob): Promise<PublishResult> {
     try {
       // Get connection from database
-      const connection = await connectionsDB.getConnection(job.brandId, 'facebook');
+      const connection = await connectionsDB.getConnection(
+        job.brandId,
+        "facebook",
+      );
       if (!connection) {
-        throw new Error('Facebook account not connected');
+        throw new Error("Facebook account not connected");
       }
 
-      if (connection.status !== 'connected') {
+      if (connection.status !== "connected") {
         throw new Error(`Facebook connection status: ${connection.status}`);
       }
 
       // Get Facebook API client
-      const facebookAPI = getPlatformAPI('facebook', connection.access_token, connection.account_id);
+      const facebookAPI = getPlatformAPI(
+        "facebook",
+        connection.access_token,
+        connection.account_id,
+      );
 
       // Publish to Facebook
       const result = await facebookAPI.publishPost(job.content);
@@ -217,14 +251,14 @@ export class PublishingQueue {
         await publishingDBService.createPublishingLog(
           job.id,
           job.brandId,
-          'facebook',
-          'published',
+          "facebook",
+          "published",
           1,
           {
             platformPostId: result.platformPostId,
             platformPostUrl: result.platformUrl,
-            contentSnapshot: job.content
-          }
+            contentSnapshot: job.content,
+          },
         );
 
         return result;
@@ -233,23 +267,24 @@ export class PublishingQueue {
         await publishingDBService.createPublishingLog(
           job.id,
           job.brandId,
-          'facebook',
-          'failed',
+          "facebook",
+          "failed",
           1,
           {
             errorCode: result.errorCode,
             errorMessage: result.error,
-            contentSnapshot: job.content
-          }
+            contentSnapshot: job.content,
+          },
         );
 
-        throw new Error(result.error || 'Facebook publish failed');
+        throw new Error(result.error || "Facebook publish failed");
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Facebook publishing failed',
-        errorDetails: error
+        error:
+          error instanceof Error ? error.message : "Facebook publishing failed",
+        errorDetails: error,
       };
     }
   }
@@ -257,17 +292,24 @@ export class PublishingQueue {
   private async publishToLinkedIn(job: PublishingJob): Promise<PublishResult> {
     try {
       // Get connection from database
-      const connection = await connectionsDB.getConnection(job.brandId, 'linkedin');
+      const connection = await connectionsDB.getConnection(
+        job.brandId,
+        "linkedin",
+      );
       if (!connection) {
-        throw new Error('LinkedIn account not connected');
+        throw new Error("LinkedIn account not connected");
       }
 
-      if (connection.status !== 'connected') {
+      if (connection.status !== "connected") {
         throw new Error(`LinkedIn connection status: ${connection.status}`);
       }
 
       // Get LinkedIn API client
-      const linkedinAPI = getPlatformAPI('linkedin', connection.access_token, connection.account_id);
+      const linkedinAPI = getPlatformAPI(
+        "linkedin",
+        connection.access_token,
+        connection.account_id,
+      );
 
       // Publish to LinkedIn
       const result = await linkedinAPI.publishPost(job.content);
@@ -277,14 +319,14 @@ export class PublishingQueue {
         await publishingDBService.createPublishingLog(
           job.id,
           job.brandId,
-          'linkedin',
-          'published',
+          "linkedin",
+          "published",
           1,
           {
             platformPostId: result.platformPostId,
             platformPostUrl: result.platformUrl,
-            contentSnapshot: job.content
-          }
+            contentSnapshot: job.content,
+          },
         );
 
         return result;
@@ -293,23 +335,24 @@ export class PublishingQueue {
         await publishingDBService.createPublishingLog(
           job.id,
           job.brandId,
-          'linkedin',
-          'failed',
+          "linkedin",
+          "failed",
           1,
           {
             errorCode: result.errorCode,
             errorMessage: result.error,
-            contentSnapshot: job.content
-          }
+            contentSnapshot: job.content,
+          },
         );
 
-        throw new Error(result.error || 'LinkedIn publish failed');
+        throw new Error(result.error || "LinkedIn publish failed");
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'LinkedIn publishing failed',
-        errorDetails: error
+        error:
+          error instanceof Error ? error.message : "LinkedIn publishing failed",
+        errorDetails: error,
       };
     }
   }
@@ -317,17 +360,24 @@ export class PublishingQueue {
   private async publishToTwitter(job: PublishingJob): Promise<PublishResult> {
     try {
       // Get connection from database
-      const connection = await connectionsDB.getConnection(job.brandId, 'twitter');
+      const connection = await connectionsDB.getConnection(
+        job.brandId,
+        "twitter",
+      );
       if (!connection) {
-        throw new Error('Twitter account not connected');
+        throw new Error("Twitter account not connected");
       }
 
-      if (connection.status !== 'connected') {
+      if (connection.status !== "connected") {
         throw new Error(`Twitter connection status: ${connection.status}`);
       }
 
       // Get Twitter API client
-      const twitterAPI = getPlatformAPI('twitter', connection.access_token, connection.account_id);
+      const twitterAPI = getPlatformAPI(
+        "twitter",
+        connection.access_token,
+        connection.account_id,
+      );
 
       // Publish to Twitter
       const result = await twitterAPI.publishPost(job.content);
@@ -337,14 +387,14 @@ export class PublishingQueue {
         await publishingDBService.createPublishingLog(
           job.id,
           job.brandId,
-          'twitter',
-          'published',
+          "twitter",
+          "published",
           1,
           {
             platformPostId: result.platformPostId,
             platformPostUrl: result.platformUrl,
-            contentSnapshot: job.content
-          }
+            contentSnapshot: job.content,
+          },
         );
 
         return result;
@@ -353,41 +403,53 @@ export class PublishingQueue {
         await publishingDBService.createPublishingLog(
           job.id,
           job.brandId,
-          'twitter',
-          'failed',
+          "twitter",
+          "failed",
           1,
           {
             errorCode: result.errorCode,
             errorMessage: result.error,
-            contentSnapshot: job.content
-          }
+            contentSnapshot: job.content,
+          },
         );
 
-        throw new Error(result.error || 'Twitter publish failed');
+        throw new Error(result.error || "Twitter publish failed");
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Twitter publishing failed',
-        errorDetails: error
+        error:
+          error instanceof Error ? error.message : "Twitter publishing failed",
+        errorDetails: error,
       };
     }
   }
 
-  private async publishToGoogleBusiness(job: PublishingJob): Promise<PublishResult> {
+  private async publishToGoogleBusiness(
+    job: PublishingJob,
+  ): Promise<PublishResult> {
     try {
       // Get connection from database
-      const connection = await connectionsDB.getConnection(job.brandId, 'google_business');
+      const connection = await connectionsDB.getConnection(
+        job.brandId,
+        "google_business",
+      );
       if (!connection) {
-        throw new Error('Google Business Profile not connected');
+        throw new Error("Google Business Profile not connected");
       }
 
-      if (connection.status !== 'connected') {
-        throw new Error(`Google Business connection status: ${connection.status}`);
+      if (connection.status !== "connected") {
+        throw new Error(
+          `Google Business connection status: ${connection.status}`,
+        );
       }
 
       // Get Google Business API client
-      const googleAPI = getPlatformAPI('google_business', connection.access_token, connection.account_id);
+      const googleAPI = getPlatformAPI(
+        "google_business",
+        connection.access_token,
+        connection.account_id,
+      );
 
       // Publish to Google Business
       const result = await googleAPI.publishPost(job.content);
@@ -397,14 +459,14 @@ export class PublishingQueue {
         await publishingDBService.createPublishingLog(
           job.id,
           job.brandId,
-          'google_business',
-          'published',
+          "google_business",
+          "published",
           1,
           {
             platformPostId: result.platformPostId,
             platformPostUrl: result.platformUrl,
-            contentSnapshot: job.content
-          }
+            contentSnapshot: job.content,
+          },
         );
 
         return result;
@@ -413,28 +475,35 @@ export class PublishingQueue {
         await publishingDBService.createPublishingLog(
           job.id,
           job.brandId,
-          'google_business',
-          'failed',
+          "google_business",
+          "failed",
           1,
           {
             errorCode: result.errorCode,
             errorMessage: result.error,
-            contentSnapshot: job.content
-          }
+            contentSnapshot: job.content,
+          },
         );
 
-        throw new Error(result.error || 'Google Business publish failed');
+        throw new Error(result.error || "Google Business publish failed");
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Google Business publishing failed',
-        errorDetails: error
+        error:
+          error instanceof Error
+            ? error.message
+            : "Google Business publishing failed",
+        errorDetails: error,
       };
     }
   }
 
-  private async handleJobFailure(jobId: string, error: string, errorDetails?: any): Promise<void> {
+  private async handleJobFailure(
+    jobId: string,
+    error: string,
+    errorDetails?: any,
+  ): Promise<void> {
     const job = this.jobs.get(jobId);
     if (!job) return;
 
@@ -445,22 +514,25 @@ export class PublishingQueue {
     if (job.retryCount < job.maxRetries) {
       // Schedule retry with exponential backoff
       const retryDelay = Math.min(1000 * Math.pow(2, job.retryCount), 30000); // Max 30 seconds
-      
+
       setTimeout(() => {
-        job.status = 'pending';
+        job.status = "pending";
         this.processJob(jobId);
       }, retryDelay);
     } else {
-      job.status = 'failed';
+      job.status = "failed";
     }
 
     await this.updateJobStatus(jobId, {
       status: job.status,
-      error: error
+      error: error,
     });
   }
 
-  private async updateJobStatus(jobId: string, update: Partial<JobStatusUpdate>): Promise<void> {
+  private async updateJobStatus(
+    jobId: string,
+    update: Partial<JobStatusUpdate>,
+  ): Promise<void> {
     const job = this.jobs.get(jobId);
     if (!job) return;
 
@@ -488,27 +560,29 @@ export class PublishingQueue {
   }
 
   getJobsByBrand(brandId: string): PublishingJob[] {
-    return Array.from(this.jobs.values()).filter(job => job.brandId === brandId);
+    return Array.from(this.jobs.values()).filter(
+      (job) => job.brandId === brandId,
+    );
   }
 
   async cancelJob(jobId: string): Promise<boolean> {
     const job = this.jobs.get(jobId);
-    if (!job || job.status === 'published' || job.status === 'processing') {
+    if (!job || job.status === "published" || job.status === "processing") {
       return false;
     }
 
-    await this.updateJobStatus(jobId, { status: 'cancelled' });
+    await this.updateJobStatus(jobId, { status: "cancelled" });
     return true;
   }
 
   async retryJob(jobId: string): Promise<boolean> {
     const job = this.jobs.get(jobId);
-    if (!job || job.status !== 'failed') {
+    if (!job || job.status !== "failed") {
       return false;
     }
 
     job.retryCount = 0;
-    await this.updateJobStatus(jobId, { status: 'pending' });
+    await this.updateJobStatus(jobId, { status: "pending" });
     this.processJob(jobId);
     return true;
   }
@@ -520,11 +594,14 @@ export class PublishingQueue {
       const config = await publishingDBService.getBrandPostingConfig(brandId);
       return config;
     } catch (error) {
-      console.error(`Failed to get posting config for brand ${brandId}:`, error);
+      console.error(
+        `Failed to get posting config for brand ${brandId}:`,
+        error,
+      );
       // Default config: allow weekend posting
       return {
         posting_config: { weekendPostingEnabled: true },
-        timezone: 'UTC'
+        timezone: "UTC",
       };
     }
   }

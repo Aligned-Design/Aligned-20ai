@@ -3,7 +3,7 @@
  * Real implementations for Instagram, Facebook, LinkedIn, Twitter, and Google Business
  */
 
-import { PostContent, Platform } from '@shared/publishing';
+import { PostContent, Platform } from "@shared/publishing";
 
 interface PublishResult {
   success: boolean;
@@ -21,7 +21,7 @@ interface PublishResult {
 export class InstagramAPI {
   private accessToken: string;
   private pageId: string;
-  private baseUrl = 'https://graph.instagram.com/v18.0';
+  private baseUrl = "https://graph.instagram.com/v18.0";
 
   constructor(accessToken: string, pageId: string) {
     this.accessToken = accessToken;
@@ -35,23 +35,23 @@ export class InstagramAPI {
       const containerResponse = await fetch(
         `${this.baseUrl}/${this.pageId}/media`,
         {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             image_url: content.images?.[0],
             caption: content.text,
-            access_token: this.accessToken
-          })
-        }
+            access_token: this.accessToken,
+          }),
+        },
       );
 
       if (!containerResponse.ok) {
-        const error = await containerResponse.json() as any;
+        const error = (await containerResponse.json()) as any;
         return {
           success: false,
-          error: error.error?.message || 'Failed to create media container',
+          error: error.error?.message || "Failed to create media container",
           errorCode: error.error?.code,
-          errorDetails: error
+          errorDetails: error,
         };
       }
 
@@ -61,22 +61,22 @@ export class InstagramAPI {
       const publishResponse = await fetch(
         `${this.baseUrl}/${this.pageId}/media_publish`,
         {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             creation_id: container.id,
-            access_token: this.accessToken
-          })
-        }
+            access_token: this.accessToken,
+          }),
+        },
       );
 
       if (!publishResponse.ok) {
-        const error = await publishResponse.json() as any;
+        const error = (await publishResponse.json()) as any;
         return {
           success: false,
-          error: error.error?.message || 'Failed to publish media',
+          error: error.error?.message || "Failed to publish media",
           errorCode: error.error?.code,
-          errorDetails: error
+          errorDetails: error,
         };
       }
 
@@ -85,13 +85,13 @@ export class InstagramAPI {
       return {
         success: true,
         platformPostId: result.id,
-        platformUrl: `https://instagram.com/p/${result.id}`
+        platformUrl: `https://instagram.com/p/${result.id}`,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Instagram API error',
-        errorDetails: error
+        error: error instanceof Error ? error.message : "Instagram API error",
+        errorDetails: error,
       };
     }
   }
@@ -104,7 +104,7 @@ export class InstagramAPI {
 export class FacebookAPI {
   private accessToken: string;
   private pageId: string;
-  private baseUrl = 'https://graph.facebook.com/v18.0';
+  private baseUrl = "https://graph.facebook.com/v18.0";
 
   constructor(accessToken: string, pageId: string) {
     this.accessToken = accessToken;
@@ -115,7 +115,7 @@ export class FacebookAPI {
     try {
       const body: any = {
         message: content.text,
-        access_token: this.accessToken
+        access_token: this.accessToken,
       };
 
       // Add media if provided
@@ -123,22 +123,19 @@ export class FacebookAPI {
         body.link = content.images[0];
       }
 
-      const response = await fetch(
-        `${this.baseUrl}/${this.pageId}/feed`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        }
-      );
+      const response = await fetch(`${this.baseUrl}/${this.pageId}/feed`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
 
       if (!response.ok) {
-        const error = await response.json() as any;
+        const error = (await response.json()) as any;
         return {
           success: false,
-          error: error.error?.message || 'Failed to publish post',
+          error: error.error?.message || "Failed to publish post",
           errorCode: error.error?.code,
-          errorDetails: error
+          errorDetails: error,
         };
       }
 
@@ -147,13 +144,13 @@ export class FacebookAPI {
       return {
         success: true,
         platformPostId: result.id,
-        platformUrl: `https://facebook.com/${result.id}`
+        platformUrl: `https://facebook.com/${result.id}`,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Facebook API error',
-        errorDetails: error
+        error: error instanceof Error ? error.message : "Facebook API error",
+        errorDetails: error,
       };
     }
   }
@@ -166,7 +163,7 @@ export class FacebookAPI {
 export class LinkedInAPI {
   private accessToken: string;
   private actorId: string;
-  private baseUrl = 'https://api.linkedin.com/rest';
+  private baseUrl = "https://api.linkedin.com/rest";
 
   constructor(accessToken: string, actorId: string) {
     this.accessToken = accessToken;
@@ -178,58 +175,55 @@ export class LinkedInAPI {
       const body: any = {
         author: `urn:li:person:${this.actorId}`,
         commentary: content.text,
-        visibility: 'PUBLIC',
+        visibility: "PUBLIC",
         distribution: {
-          feedDistribution: 'MAIN_FEED',
+          feedDistribution: "MAIN_FEED",
           targetEntities: [],
-          thirdPartyDistributionChannels: []
-        }
+          thirdPartyDistributionChannels: [],
+        },
       };
 
       // Add media if provided
       if (content.images?.[0]) {
         body.content = {
           media: {
-            id: content.images[0]
-          }
+            id: content.images[0],
+          },
         };
       }
 
-      const response = await fetch(
-        `${this.baseUrl}/posts`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.accessToken}`,
-            'LinkedIn-Version': '202301'
-          },
-          body: JSON.stringify(body)
-        }
-      );
+      const response = await fetch(`${this.baseUrl}/posts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.accessToken}`,
+          "LinkedIn-Version": "202301",
+        },
+        body: JSON.stringify(body),
+      });
 
       if (!response.ok) {
-        const error = await response.json() as any;
+        const error = (await response.json()) as any;
         return {
           success: false,
-          error: error.message || 'Failed to publish post',
+          error: error.message || "Failed to publish post",
           errorCode: error.status,
-          errorDetails: error
+          errorDetails: error,
         };
       }
 
-      const postId = response.headers.get('x-linkedin-id') || 'unknown';
+      const postId = response.headers.get("x-linkedin-id") || "unknown";
 
       return {
         success: true,
         platformPostId: postId,
-        platformUrl: `https://linkedin.com/feed/update/${postId}`
+        platformUrl: `https://linkedin.com/feed/update/${postId}`,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'LinkedIn API error',
-        errorDetails: error
+        error: error instanceof Error ? error.message : "LinkedIn API error",
+        errorDetails: error,
       };
     }
   }
@@ -241,7 +235,7 @@ export class LinkedInAPI {
  */
 export class TwitterAPI {
   private accessToken: string;
-  private baseUrl = 'https://api.twitter.com/2';
+  private baseUrl = "https://api.twitter.com/2";
 
   constructor(accessToken: string) {
     this.accessToken = accessToken;
@@ -250,36 +244,33 @@ export class TwitterAPI {
   async publishPost(content: PostContent): Promise<PublishResult> {
     try {
       const body: any = {
-        text: content.text
+        text: content.text,
       };
 
       // Twitter media handling
       if (content.images?.[0]) {
         // Note: In production, would need to upload media first to get media_ids
         body.media = {
-          media_ids: [content.images[0]]
+          media_ids: [content.images[0]],
         };
       }
 
-      const response = await fetch(
-        `${this.baseUrl}/tweets`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.accessToken}`
-          },
-          body: JSON.stringify(body)
-        }
-      );
+      const response = await fetch(`${this.baseUrl}/tweets`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.accessToken}`,
+        },
+        body: JSON.stringify(body),
+      });
 
       if (!response.ok) {
-        const error = await response.json() as any;
+        const error = (await response.json()) as any;
         return {
           success: false,
-          error: error.detail || 'Failed to publish tweet',
+          error: error.detail || "Failed to publish tweet",
           errorCode: error.type,
-          errorDetails: error
+          errorDetails: error,
         };
       }
 
@@ -288,13 +279,13 @@ export class TwitterAPI {
       return {
         success: true,
         platformPostId: result.data.id,
-        platformUrl: `https://twitter.com/i/web/status/${result.data.id}`
+        platformUrl: `https://twitter.com/i/web/status/${result.data.id}`,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Twitter API error',
-        errorDetails: error
+        error: error instanceof Error ? error.message : "Twitter API error",
+        errorDetails: error,
       };
     }
   }
@@ -307,7 +298,7 @@ export class TwitterAPI {
 export class GoogleBusinessAPI {
   private accessToken: string;
   private businessAccountId: string;
-  private baseUrl = 'https://mybusinesscontent.googleapis.com/v1';
+  private baseUrl = "https://mybusinesscontent.googleapis.com/v1";
 
   constructor(accessToken: string, businessAccountId: string) {
     this.accessToken = accessToken;
@@ -319,39 +310,39 @@ export class GoogleBusinessAPI {
       const postData: any = {
         summary: content.text,
         callToAction: {
-          actionType: 'LEARN_MORE'
-        }
+          actionType: "LEARN_MORE",
+        },
       };
 
       // Add media if provided
       if (content.images?.[0]) {
         postData.media = [
           {
-            mediaFormat: 'IMAGE',
-            sourceUrl: content.images[0]
-          }
+            mediaFormat: "IMAGE",
+            sourceUrl: content.images[0],
+          },
         ];
       }
 
       const response = await fetch(
         `${this.baseUrl}/accounts/${this.businessAccountId}/posts`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.accessToken}`
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.accessToken}`,
           },
-          body: JSON.stringify(postData)
-        }
+          body: JSON.stringify(postData),
+        },
       );
 
       if (!response.ok) {
-        const error = await response.json() as any;
+        const error = (await response.json()) as any;
         return {
           success: false,
-          error: error.error?.message || 'Failed to publish post',
+          error: error.error?.message || "Failed to publish post",
           errorCode: error.error?.code,
-          errorDetails: error
+          errorDetails: error,
         };
       }
 
@@ -360,13 +351,14 @@ export class GoogleBusinessAPI {
       return {
         success: true,
         platformPostId: result.name,
-        platformUrl: `https://www.google.com/business/location/${this.businessAccountId}`
+        platformUrl: `https://www.google.com/business/location/${this.businessAccountId}`,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Google Business API error',
-        errorDetails: error
+        error:
+          error instanceof Error ? error.message : "Google Business API error",
+        errorDetails: error,
       };
     }
   }
@@ -378,18 +370,18 @@ export class GoogleBusinessAPI {
 export function getPlatformAPI(
   platform: Platform,
   accessToken: string,
-  accountId: string
+  accountId: string,
 ): InstagramAPI | FacebookAPI | LinkedInAPI | TwitterAPI | GoogleBusinessAPI {
   switch (platform) {
-    case 'instagram':
+    case "instagram":
       return new InstagramAPI(accessToken, accountId);
-    case 'facebook':
+    case "facebook":
       return new FacebookAPI(accessToken, accountId);
-    case 'linkedin':
+    case "linkedin":
       return new LinkedInAPI(accessToken, accountId);
-    case 'twitter':
+    case "twitter":
       return new TwitterAPI(accessToken);
-    case 'google_business':
+    case "google_business":
       return new GoogleBusinessAPI(accessToken, accountId);
     default:
       throw new Error(`Unsupported platform: ${platform}`);

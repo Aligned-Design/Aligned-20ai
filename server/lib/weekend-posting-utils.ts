@@ -13,16 +13,16 @@
  * @param timezone - IANA timezone string (e.g., 'America/New_York')
  * @returns true if the date is Saturday or Sunday in the given timezone
  */
-export function isWeekend(date: Date, timezone: string = 'UTC'): boolean {
+export function isWeekend(date: Date, timezone: string = "UTC"): boolean {
   try {
     // Get day of week in the specified timezone
-    const formatter = new Intl.DateTimeFormat('en-US', {
+    const formatter = new Intl.DateTimeFormat("en-US", {
       timeZone: timezone,
-      weekday: 'long'
+      weekday: "long",
     });
 
     const dayName = formatter.format(date);
-    return dayName === 'Saturday' || dayName === 'Sunday';
+    return dayName === "Saturday" || dayName === "Sunday";
   } catch (error) {
     // Fallback to UTC if timezone is invalid
     console.warn(`Invalid timezone ${timezone}, falling back to UTC:`, error);
@@ -42,7 +42,7 @@ export function isWeekend(date: Date, timezone: string = 'UTC'): boolean {
 export function canPostOnDate(
   date: Date,
   weekendPostingEnabled: boolean,
-  timezone: string = 'UTC'
+  timezone: string = "UTC",
 ): boolean {
   // If weekend posting is enabled, all days are allowed
   if (weekendPostingEnabled) {
@@ -64,7 +64,7 @@ export function canPostOnDate(
 export function getNextPostingDate(
   currentDate: Date,
   weekendPostingEnabled: boolean,
-  timezone: string = 'UTC'
+  timezone: string = "UTC",
 ): Date {
   if (weekendPostingEnabled) {
     // All days are available
@@ -76,7 +76,10 @@ export function getNextPostingDate(
   let attempts = 0;
   const maxAttempts = 7; // Max 7 days to find a weekday
 
-  while (!canPostOnDate(nextDate, weekendPostingEnabled, timezone) && attempts < maxAttempts) {
+  while (
+    !canPostOnDate(nextDate, weekendPostingEnabled, timezone) &&
+    attempts < maxAttempts
+  ) {
     nextDate.setDate(nextDate.getDate() + 1);
     attempts++;
   }
@@ -96,7 +99,7 @@ export function getNextPostingDate(
 export function calculatePostingDelay(
   scheduledTime: Date,
   weekendPostingEnabled: boolean,
-  timezone: string = 'UTC'
+  timezone: string = "UTC",
 ): Date {
   if (canPostOnDate(scheduledTime, weekendPostingEnabled, timezone)) {
     // No delay needed
@@ -121,7 +124,7 @@ export function getPostingStats(
   startDate: Date,
   endDate: Date,
   weekendPostingEnabled: boolean,
-  timezone: string = 'UTC'
+  timezone: string = "UTC",
 ): {
   totalDays: number;
   availableDays: number;
@@ -154,7 +157,7 @@ export function getPostingStats(
     totalDays,
     availableDays,
     weekendDays,
-    weekdayDays
+    weekdayDays,
   };
 }
 
@@ -165,7 +168,10 @@ export function getPostingStats(
  * @param timezone - IANA timezone string
  * @returns Human-readable status string
  */
-export function getWeekendPostingStatus(enabled: boolean, timezone: string = 'UTC'): string {
+export function getWeekendPostingStatus(
+  enabled: boolean,
+  timezone: string = "UTC",
+): string {
   if (enabled) {
     return `Weekend posting enabled (Timezone: ${timezone})`;
   }
@@ -185,7 +191,7 @@ export function getWeekendPostingFromConfig(postingConfig: unknown): boolean {
     return true;
   }
 
-  if (typeof postingConfig === 'string') {
+  if (typeof postingConfig === "string") {
     try {
       const parsed = JSON.parse(postingConfig);
       return parsed.weekendPostingEnabled !== false;
@@ -194,7 +200,11 @@ export function getWeekendPostingFromConfig(postingConfig: unknown): boolean {
     }
   }
 
-  if (typeof postingConfig === 'object' && postingConfig !== null && 'weekendPostingEnabled' in postingConfig) {
+  if (
+    typeof postingConfig === "object" &&
+    postingConfig !== null &&
+    "weekendPostingEnabled" in postingConfig
+  ) {
     // @ts-ignore - runtime check above ensures property exists
     return (postingConfig as any).weekendPostingEnabled !== false;
   }

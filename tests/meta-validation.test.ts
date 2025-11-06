@@ -1,8 +1,8 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { z } from 'zod';
+import { promises as fs } from "fs";
+import path from "path";
+import { z } from "zod";
 
-const META_DIR = path.resolve(process.cwd(), 'src', 'pages');
+const META_DIR = path.resolve(process.cwd(), "src", "pages");
 
 const metaSchema = z.object({
   title: z.string().min(1),
@@ -18,17 +18,17 @@ const metaSchema = z.object({
 async function listMetaFiles() {
   const entries = await fs.readdir(META_DIR, { withFileTypes: true });
   return entries
-    .filter((e) => e.isFile() && e.name.endsWith('.meta.json'))
+    .filter((e) => e.isFile() && e.name.endsWith(".meta.json"))
     .map((e) => path.join(META_DIR, e.name));
 }
 
-describe('meta.json schema validation', () => {
-  it('all meta files should match the schema', async () => {
+describe("meta.json schema validation", () => {
+  it("all meta files should match the schema", async () => {
     const files = await listMetaFiles();
     expect(files.length).toBeGreaterThan(0);
 
     for (const file of files) {
-      const raw = await fs.readFile(file, 'utf-8');
+      const raw = await fs.readFile(file, "utf-8");
       let data;
       try {
         data = JSON.parse(raw);
@@ -38,7 +38,9 @@ describe('meta.json schema validation', () => {
 
       const result = metaSchema.safeParse(data);
       if (!result.success) {
-        throw new Error(`Schema validation failed for ${file}: ${JSON.stringify(result.error.format(), null, 2)}`);
+        throw new Error(
+          `Schema validation failed for ${file}: ${JSON.stringify(result.error.format(), null, 2)}`,
+        );
       }
     }
   });

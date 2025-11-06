@@ -3,17 +3,18 @@ import {
   generateBuilderContent,
   generateDesignVisuals,
   validateAIProviders,
-  getAvailableProviders
+  getAvailableProviders,
 } from "../workers/ai-generation";
 
-import type { AIGenerationRequest } from '@shared/api';
+import type { AIGenerationRequest } from "@shared/api";
 
 export const generateContent: RequestHandler = async (req, res) => {
   try {
     // Validate AI providers are configured
     if (!validateAIProviders()) {
       return res.status(500).json({
-        error: 'No AI providers configured. Please set OPENAI_API_KEY or ANTHROPIC_API_KEY'
+        error:
+          "No AI providers configured. Please set OPENAI_API_KEY or ANTHROPIC_API_KEY",
       });
     }
 
@@ -21,24 +22,24 @@ export const generateContent: RequestHandler = async (req, res) => {
 
     if (!prompt || !agentType) {
       return res.status(400).json({
-        error: 'Missing required fields: prompt, agentType'
+        error: "Missing required fields: prompt, agentType",
       });
     }
 
     const result = await generateBuilderContent({
       prompt,
       agentType,
-      provider
+      provider,
     });
 
     res.json(result);
   } catch (error) {
-    console.error('AI content generation failed:', error);
+    console.error("AI content generation failed:", error);
     res.status(500).json({
-      error: 'Content generation failed',
+      error: "Content generation failed",
       content: "",
       provider: "",
-      agentType: ""
+      agentType: "",
     });
   }
 };
@@ -48,7 +49,8 @@ export const generateDesign: RequestHandler = async (req, res) => {
     // Validate AI providers are configured
     if (!validateAIProviders()) {
       return res.status(500).json({
-        error: 'No AI providers configured. Please set OPENAI_API_KEY or ANTHROPIC_API_KEY'
+        error:
+          "No AI providers configured. Please set OPENAI_API_KEY or ANTHROPIC_API_KEY",
       });
     }
 
@@ -56,24 +58,24 @@ export const generateDesign: RequestHandler = async (req, res) => {
 
     if (!prompt) {
       return res.status(400).json({
-        error: 'Missing required field: prompt'
+        error: "Missing required field: prompt",
       });
     }
 
     const result = await generateDesignVisuals({
       prompt,
       agentType: "design",
-      provider
+      provider,
     });
 
     res.json(result);
   } catch (error) {
-    console.error('AI design generation failed:', error);
+    console.error("AI design generation failed:", error);
     res.status(500).json({
-      error: 'Design generation failed',
+      error: "Design generation failed",
       content: "",
       provider: "",
-      agentType: "design"
+      agentType: "design",
     });
   }
 };
@@ -81,19 +83,19 @@ export const generateDesign: RequestHandler = async (req, res) => {
 export const getProviders: RequestHandler = (req, res) => {
   try {
     const providers = getAvailableProviders();
-    
+
     res.json({
       success: true,
       providers,
-      default: providers[0] || null
+      default: providers[0] || null,
     });
   } catch (error) {
-    console.error('Failed to get AI providers:', error);
+    console.error("Failed to get AI providers:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get providers',
+      error: "Failed to get providers",
       providers: [],
-      default: null
+      default: null,
     });
   }
 };

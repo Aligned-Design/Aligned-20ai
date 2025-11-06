@@ -84,14 +84,16 @@ router.post("/crawl/start", async (req, res) => {
       const job = crawlJobs.get(job_id);
       if (job) {
         job.status = "failed";
-        job.error = (error instanceof Error ? error.message : String(error));
+        job.error = error instanceof Error ? error.message : String(error);
         job.completed_at = new Date().toISOString();
       }
     });
 
     res.json({ job_id, status: "pending" });
   } catch (error: unknown) {
-    res.status(500).json({ error: (error instanceof Error ? error.message : String(error)) });
+    res
+      .status(500)
+      .json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -178,7 +180,7 @@ async function runCrawlJob(
     job.keywords = keywords;
   } catch (error: unknown) {
     job.status = "failed";
-    job.error = (error instanceof Error ? error.message : String(error));
+    job.error = error instanceof Error ? error.message : String(error);
     job.completed_at = new Date().toISOString();
   }
 }
@@ -235,7 +237,9 @@ router.get("/crawl/result/:jobId", async (req, res) => {
 
     res.json(job);
   } catch (error: unknown) {
-    res.status(500).json({ error: (error instanceof Error ? error.message : String(error)) });
+    res
+      .status(500)
+      .json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -311,7 +315,9 @@ router.post("/brand-kit/apply", async (req, res) => {
 
     res.json({ success: true, applied: changes.length });
   } catch (error: unknown) {
-    res.status(500).json({ error: (error instanceof Error ? error.message : String(error)) });
+    res
+      .status(500)
+      .json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -332,7 +338,11 @@ router.get("/brand-kit/history/:brandId", async (req, res) => {
       .limit(field ? 10 : 100);
 
     if (error) {
-      return res.status(500).json({ error: (error instanceof Error ? error.message : String(error)) });
+      return res
+        .status(500)
+        .json({
+          error: error instanceof Error ? error.message : String(error),
+        });
     }
 
     // Filter by field if specified
@@ -342,7 +352,9 @@ router.get("/brand-kit/history/:brandId", async (req, res) => {
 
     res.json({ history });
   } catch (error: unknown) {
-    res.status(500).json({ error: (error instanceof Error ? error.message : String(error)) });
+    res
+      .status(500)
+      .json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -402,7 +414,9 @@ router.post("/brand-kit/revert", async (req, res) => {
 
     res.json({ success: true, field, value: historyEntry.old_value });
   } catch (error: unknown) {
-    res.status(500).json({ error: (error instanceof Error ? error.message : String(error)) });
+    res
+      .status(500)
+      .json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 
