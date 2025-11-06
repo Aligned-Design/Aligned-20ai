@@ -202,7 +202,7 @@ export class ConnectionsDBService {
     refreshToken?: string,
     tokenExpiresAt?: Date,
   ): Promise<PlatformConnectionRecord> {
-    const updateData: unknown = {
+    const updateData: Record<string, any> = {
       access_token: accessToken,
       last_verified_at: new Date().toISOString(),
     };
