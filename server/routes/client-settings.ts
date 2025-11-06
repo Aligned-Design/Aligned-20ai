@@ -219,7 +219,7 @@ export const updateEmailPreferences: RequestHandler = async (req, res) => {
 
     // Update in database
     const updatedSettings = await dbClientSettings.update(clientId, brandId, {
-      email_preferences: updatedPreferences,
+      email_preferences: updatedPreferences as Record<string, unknown>,
       last_modified_by: userEmail,
     });
     const apiSettings = dbRecordToClientSettings(updatedSettings);
