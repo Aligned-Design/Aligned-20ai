@@ -157,7 +157,16 @@ export class EscalationScheduler {
   /**
    * Process a single escalation event
    */
-  private async processEscalation(escalation: unknown): Promise<void> {
+  // Define minimal escalation event shape used by scheduler
+  private async processEscalation(escalation: {
+    id: string;
+    approval_id: string;
+    rule_id: string;
+    brand_id: string;
+    escalation_level: string;
+    notification_type?: string;
+    escalated_to_user_id?: string;
+  }): Promise<void> {
     // Get approval details
     const approval = await postApprovals.getById(escalation.approval_id);
     if (!approval) {
@@ -183,13 +192,13 @@ export class EscalationScheduler {
     }
 
     // Send notification
-    if (escalation.notification_type === 'email' || rule.send_email) {
+    if (escalation.notification_type === 'email' || (rule && (rule as any).send_email)) {
       await this.sendEmailNotification(escalation, approval, rule, clientSettingsData);
     }
 
-    if (escalation.notification_type === 'slack' || (rule.send_slack && escalation.notification_type !== 'email')) {
-      await this.sendSlackNotification(escalation, approval, rule).catch((err) => {
-        console.warn(`[Escalation Scheduler] Failed to send Slack notification: ${err.message}`);
+    if (escalation.notification_type === 'slack' || ((rule as any).send_slack && escalation.notification_type !== 'email')) {
+      await this.sendSlackNotification(escalation, approval, rule).catch((err: any) => {
+        console.warn(`[Escalation Scheduler] Failed to send Slack notification: ${err?.message || err}`);
       });
     }
 
