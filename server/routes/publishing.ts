@@ -101,7 +101,7 @@ export const getConnections: RequestHandler = async (req, res) => {
     const { brandId } = req.params;
 
     // Fetch connections from database
-    const connections = await connectionsDB.getBrandConnections(brandId);
+    const connections: any[] = await connectionsDB.getBrandConnections(brandId);
 
     // Transform to ConnectionStatus format
     const connectionStatuses: ConnectionStatus[] = connections.map(conn => ({
@@ -184,7 +184,7 @@ export const publishContent: RequestHandler = async (req, res) => {
         const dbJob = await publishingDBService.createPublishingJob(
           brandId,
           tenantId,
-          content,
+          content as unknown as Record<string, unknown>,
           [platform],
           scheduledAt ? new Date(scheduledAt) : undefined,
           userId
@@ -242,18 +242,19 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
       limit,
       offset
     );
+    const jobsAny: any[] = (jobs as any) || [];
 
     // Filter by platform if specified
-    let filteredJobs = jobs;
+    let filteredJobs = jobsAny;
     if (platform && platform !== 'all') {
-      filteredJobs = jobs.filter(job => job.platforms?.includes(platform as string));
+      filteredJobs = jobsAny.filter(job => job.platforms?.includes(platform as string));
     }
 
     // Filter by brand
-    filteredJobs = filteredJobs.filter(job => job.brand_id === brandId);
+    filteredJobs = filteredJobs.filter((job: any) => job.brand_id === brandId);
 
     // Transform database records to PublishingJob format
-    const publishingJobs: PublishingJob[] = filteredJobs.map(job => ({
+    const publishingJobs: PublishingJob[] = filteredJobs.map((job: any) => ({
       id: job.id,
       brandId: job.brand_id,
       tenantId: job.tenant_id,
@@ -266,7 +267,7 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
       platformPostId: undefined,
       platformUrl: undefined,
       content: job.content,
-      validationResults: job.validation_results || [],
+      validationResults: (job.validation_results as any[]) || [],
       retryCount: job.retry_count || 0,
       maxRetries: job.max_retries || 3,
       lastError: job.last_error,
