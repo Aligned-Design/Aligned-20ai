@@ -70,7 +70,7 @@ export const getInsights: RequestHandler = async (req, res) => {
       platform: m.platform as any,
       postId: m.post_id,
       date: m.date,
-      metrics: m.metrics,
+      metrics: m.metrics as any,
       metadata: m.metadata,
       createdAt: m.created_at,
       updatedAt: m.updated_at
@@ -82,7 +82,7 @@ export const getInsights: RequestHandler = async (req, res) => {
       platform: m.platform as any,
       postId: m.post_id,
       date: m.date,
-      metrics: m.metrics,
+      metrics: m.metrics as any,
       metadata: m.metadata,
       createdAt: m.created_at,
       updatedAt: m.updated_at
@@ -123,7 +123,7 @@ export const getForecast: RequestHandler = async (req, res) => {
       platform: m.platform as any,
       postId: m.post_id,
       date: m.date,
-      metrics: m.metrics,
+      metrics: m.metrics as any,
       metadata: m.metadata,
       createdAt: m.created_at,
       updatedAt: m.updated_at
@@ -356,7 +356,7 @@ export const getAlerts: RequestHandler = async (req, res) => {
       platform: m.platform as any,
       postId: m.post_id,
       date: m.date,
-      metrics: m.metrics,
+      metrics: m.metrics as any,
       metadata: m.metadata,
       createdAt: m.created_at,
       updatedAt: m.updated_at
@@ -368,7 +368,7 @@ export const getAlerts: RequestHandler = async (req, res) => {
       platform: m.platform as any,
       postId: m.post_id,
       date: m.date,
-      metrics: m.metrics,
+      metrics: m.metrics as any,
       metadata: m.metadata,
       createdAt: m.created_at,
       updatedAt: m.updated_at
