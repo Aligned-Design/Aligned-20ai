@@ -81,8 +81,8 @@ export class MailchimpClient {
   }
 
   async getListSegments(listId: string): Promise<MailchimpListSegment[]> {
-    const response = await this.request<unknown>(`/lists/${listId}/segments`);
-    return response.segments;
+    const response = await this.request<{ segments: MailchimpListSegment[] }>(`/lists/${listId}/segments`);
+    return response.segments || [];
   }
 
   async createCampaign(campaign: MailchimpCampaign): Promise<unknown> {
