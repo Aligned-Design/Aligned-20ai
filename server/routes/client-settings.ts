@@ -76,7 +76,7 @@ export const getClientSettings: RequestHandler = async (req, res) => {
       const defaultSettings = {
         client_id: clientId,
         brand_id: brandId,
-        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences,
+        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences as Record<string, unknown>,
         timezone: DEFAULT_CLIENT_SETTINGS.timezone,
         language: DEFAULT_CLIENT_SETTINGS.language,
         unsubscribed_from_all: false,
@@ -132,7 +132,7 @@ export const updateClientSettings: RequestHandler = async (req, res) => {
       currentSettings = await dbClientSettings.create({
         client_id: clientId,
         brand_id: brandId,
-        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences,
+        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences as Record<string, unknown>,
         timezone: DEFAULT_CLIENT_SETTINGS.timezone,
         language: DEFAULT_CLIENT_SETTINGS.language,
         unsubscribed_from_all: false,
@@ -203,7 +203,7 @@ export const updateEmailPreferences: RequestHandler = async (req, res) => {
       currentSettings = await dbClientSettings.create({
         client_id: clientId,
         brand_id: brandId,
-        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences,
+        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences as Record<string, unknown>,
         timezone: DEFAULT_CLIENT_SETTINGS.timezone,
         language: DEFAULT_CLIENT_SETTINGS.language,
         unsubscribed_from_all: false,
@@ -263,7 +263,7 @@ export const generateUnsubscribeLink: RequestHandler = async (req, res) => {
       currentSettings = await dbClientSettings.create({
         client_id: clientId,
         brand_id: brandId,
-        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences,
+        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences as Record<string, unknown>,
         timezone: DEFAULT_CLIENT_SETTINGS.timezone,
         language: DEFAULT_CLIENT_SETTINGS.language,
         unsubscribed_from_all: false,
