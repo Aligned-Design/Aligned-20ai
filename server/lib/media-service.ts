@@ -186,7 +186,7 @@ class MediaService {
         status: 'uploading'
       });
 
-      const { error: uploadError, __data } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from(bucketName)
         .upload(assetPath, file, {
           contentType: mimeType,
