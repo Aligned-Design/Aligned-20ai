@@ -249,7 +249,7 @@ export class TwitterAPI {
 
   async publishPost(content: PostContent): Promise<PublishResult> {
     try {
-      const body: unknown = {
+      const body: any = {
         text: content.text
       };
 
