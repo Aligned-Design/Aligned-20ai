@@ -91,8 +91,10 @@ router.post("/generate/doc", async (req, res) => {
       .single();
 
     if (brandKitError) {
-      throw new Error(`Failed to load brand kit: ${brandKitError.message}`);
+      throw new Error(`Failed to load brand kit: ${brandKitError?.message || String(brandKitError)}`);
     }
+
+    const parsedBrandKit = parseBrandKit(brandKit || {});
 
     let attempts = 0;
     let output: DocOutput | undefined;
