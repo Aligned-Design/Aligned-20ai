@@ -98,7 +98,9 @@ export class ConnectionsDBService {
 
       if (error)
         throw new Error(`Failed to update connection: ${error.message}`);
-      return data as PlatformConnectionRecord;
+      // runtime-validate
+      const parsed = parsePlatformConnection(data);
+      return parsed as any;
     } else {
       // Insert new connection
       const { data, error } = await supabase
@@ -109,7 +111,8 @@ export class ConnectionsDBService {
 
       if (error)
         throw new Error(`Failed to create connection: ${error.message}`);
-      return data as PlatformConnectionRecord;
+      const parsed = parsePlatformConnection(data);
+      return parsed as any;
     }
   }
 
