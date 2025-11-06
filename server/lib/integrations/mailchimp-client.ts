@@ -85,30 +85,30 @@ export class MailchimpClient {
     return response.segments || [];
   }
 
-  async createCampaign(campaign: MailchimpCampaign): Promise<unknown> {
-    return this.request('/campaigns', 'POST', campaign);
+  async createCampaign(campaign: MailchimpCampaign): Promise<any> {
+    return this.request<any>('/campaigns', 'POST', campaign);
   }
 
-  async updateCampaign(campaignId: string, updates: Partial<MailchimpCampaign>): Promise<unknown> {
-    return this.request(`/campaigns/${campaignId}`, 'PATCH', updates);
+  async updateCampaign(campaignId: string, updates: Partial<MailchimpCampaign>): Promise<any> {
+    return this.request<any>(`/campaigns/${campaignId}`, 'PATCH', updates);
   }
 
-  async setCampaignContent(campaignId: string, content: unknown): Promise<unknown> {
-    return this.request(`/campaigns/${campaignId}/content`, 'PUT', content);
+  async setCampaignContent(campaignId: string, content: any): Promise<any> {
+    return this.request<any>(`/campaigns/${campaignId}/content`, 'PUT', content);
   }
 
-  async sendCampaign(campaignId: string): Promise<unknown> {
-    return this.request(`/campaigns/${campaignId}/actions/send`, 'POST', {});
+  async sendCampaign(campaignId: string): Promise<any> {
+    return this.request<any>(`/campaigns/${campaignId}/actions/send`, 'POST', {});
   }
 
-  async scheduleCampaign(campaignId: string, scheduleTime: string): Promise<unknown> {
-    return this.request(`/campaigns/${campaignId}/actions/schedule`, 'POST', {
+  async scheduleCampaign(campaignId: string, scheduleTime: string): Promise<any> {
+    return this.request<any>(`/campaigns/${campaignId}/actions/schedule`, 'POST', {
       schedule_time: scheduleTime,
     });
   }
 
-  async getCampaignStatus(campaignId: string): Promise<unknown> {
-    return this.request(`/campaigns/${campaignId}`);
+  async getCampaignStatus(campaignId: string): Promise<any> {
+    return this.request<any>(`/campaigns/${campaignId}`);
   }
 
   async deleteCampaign(campaignId: string): Promise<void> {
