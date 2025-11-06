@@ -140,7 +140,7 @@ export class ConnectionsDBService {
         return null;
       }
 
-      return data as PlatformConnectionRecord;
+      return parsePlatformConnection(data) as any;
     } catch (error) {
       throw error;
     }
