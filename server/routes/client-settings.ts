@@ -76,7 +76,7 @@ export const getClientSettings: RequestHandler = async (req, res) => {
       const defaultSettings = {
         client_id: clientId,
         brand_id: brandId,
-        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences as Record<string, unknown>,
+        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences as unknown as Record<string, unknown>,
         timezone: DEFAULT_CLIENT_SETTINGS.timezone,
         language: DEFAULT_CLIENT_SETTINGS.language,
         unsubscribed_from_all: false,
@@ -132,7 +132,7 @@ export const updateClientSettings: RequestHandler = async (req, res) => {
       currentSettings = await dbClientSettings.create({
         client_id: clientId,
         brand_id: brandId,
-        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences as Record<string, unknown>,
+        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences as unknown as Record<string, unknown>,
         timezone: DEFAULT_CLIENT_SETTINGS.timezone,
         language: DEFAULT_CLIENT_SETTINGS.language,
         unsubscribed_from_all: false,
@@ -203,7 +203,7 @@ export const updateEmailPreferences: RequestHandler = async (req, res) => {
       currentSettings = await dbClientSettings.create({
         client_id: clientId,
         brand_id: brandId,
-        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences as Record<string, unknown>,
+        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences as unknown as Record<string, unknown>,
         timezone: DEFAULT_CLIENT_SETTINGS.timezone,
         language: DEFAULT_CLIENT_SETTINGS.language,
         unsubscribed_from_all: false,
@@ -219,7 +219,7 @@ export const updateEmailPreferences: RequestHandler = async (req, res) => {
 
     // Update in database
     const updatedSettings = await dbClientSettings.update(clientId, brandId, {
-      email_preferences: updatedPreferences as Record<string, unknown>,
+      email_preferences: updatedPreferences as unknown as Record<string, unknown>,
       last_modified_by: userEmail,
     });
     const apiSettings = dbRecordToClientSettings(updatedSettings);
@@ -263,7 +263,7 @@ export const generateUnsubscribeLink: RequestHandler = async (req, res) => {
       currentSettings = await dbClientSettings.create({
         client_id: clientId,
         brand_id: brandId,
-        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences as Record<string, unknown>,
+        email_preferences: DEFAULT_CLIENT_SETTINGS.emailPreferences as unknown as Record<string, unknown>,
         timezone: DEFAULT_CLIENT_SETTINGS.timezone,
         language: DEFAULT_CLIENT_SETTINGS.language,
         unsubscribed_from_all: false,
