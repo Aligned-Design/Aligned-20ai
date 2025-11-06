@@ -38,8 +38,8 @@ export default function Index() {
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-6 py-12 md:py-20 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-3 rounded-full bg-white/6 backdrop-blur-sm px-4 py-2 text-sm font-medium text-[#C9F06A] mb-6 border border-white/10 shadow-sm">
-            <Sparkles className="h-4 w-4 text-[#C9F06A]" />
+          <div className="inline-flex items-center gap-3 rounded-full bg-white/6 backdrop-blur-sm px-4 py-2 text-sm font-medium text-[var(--accent-lime)] mb-6 border border-white/10 shadow-sm">
+            <Sparkles className="h-4 w-4 text-[var(--accent-lime)]" />
             Aligned AI Platform
           </div>
 
@@ -47,7 +47,7 @@ export default function Index() {
             <div className="rounded-2xl bg-white/6 backdrop-blur-md border border-white/8 p-12 shadow-2xl">
               <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
                 Intelligent Brand Content
-                <span className="text-[#C9F06A]"> at Scale</span>
+                <span className="text-[var(--accent-lime)]"> at Scale</span>
               </h1>
 
               <p className="text-lg md:text-xl text-slate-200 mb-8 max-w-2xl mx-auto leading-relaxed">
@@ -199,32 +199,32 @@ export default function Index() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
             <Feature
-              icon={<Users className="h-5 w-5 text-[#C9F06A]" />}
+              icon={<Users className="h-5 w-5 text-[var(--accent-lime)]" />}
               title="Seamless Approval"
               desc="Threaded feedback, audit trails, and one-click approvals."
             />
             <Feature
-              icon={<LinkIcon className="h-5 w-5 text-[#C9F06A]" />}
+              icon={<LinkIcon className="h-5 w-5 text-[var(--accent-lime)]" />}
               title="Auto Publishing"
               desc="Push approved posts to Instagram, Facebook, LinkedIn, X, and GMB."
             />
             <Feature
-              icon={<Shield className="h-5 w-5 text-[#C9F06A]" />}
+              icon={<Shield className="h-5 w-5 text-[var(--accent-lime)]" />}
               title="Brand Isolation"
               desc="Separate, secure workspaces—no crossover, no confusion."
             />
             <Feature
-              icon={<Lock className="h-5 w-5 text-[#C9F06A]" />}
+              icon={<Lock className="h-5 w-5 text-[var(--accent-lime)]" />}
               title="Enterprise Security"
               desc="Role-based permissions and encryption for privacy and control."
             />
             <Feature
-              icon={<BarChart3 className="h-5 w-5 text-[#C9F06A]" />}
+              icon={<BarChart3 className="h-5 w-5 text-[var(--accent-lime)]" />}
               title="Real-time Analytics"
               desc="Interactive dashboards with AI-powered recommendations."
             />
             <Feature
-              icon={<Calendar className="h-5 w-5 text-[#C9F06A]" />}
+              icon={<Calendar className="h-5 w-5 text-[var(--accent-lime)]" />}
               title="Smart Scheduling"
               desc="AI-optimized posting times based on audience insights."
             />
@@ -354,7 +354,7 @@ function WorkflowStep({
   color: "blue" | "purple" | "green" | "orange";
 }) {
   const colorClasses: Record<string, string> = {
-    blue: "bg-white/8 text-[#C9F06A]",
+    blue: "bg-white/8 text-[var(--accent-lime)]",
     purple: "bg-white/8 text-[#C49CFF]",
     green: "bg-white/8 text-[#9EFFB8]",
     orange: "bg-white/8 text-[#FFD58A]",
@@ -384,7 +384,7 @@ function Feature({
 }) {
   return (
     <div className="p-6 rounded-2xl bg-white border border-gray-100 hover:shadow-lg transition-transform hover:-translate-y-1 h-full">
-      <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center mb-4 text-[#C9F06A]">
+      <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center mb-4 text-[var(--accent-lime)]">
         {icon}
       </div>
       <h3 className="font-semibold text-slate-900 mb-2">{title}</h3>
