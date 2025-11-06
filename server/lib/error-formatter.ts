@@ -4,7 +4,7 @@
  * Converts various error types into standardized API error responses
  */
 
-import { Response } from 'express';
+import { Response, Request, NextFunction } from 'express';
 import {
   ErrorCode,
   APIError,
