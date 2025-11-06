@@ -229,6 +229,8 @@ class MediaService {
         brandId
       );
 
+      const metadataObj = (metadata && typeof metadata === 'object') ? metadata as Record<string, any> : {};
+
       // 5. AI Auto-tagging
       onProgress?.({
         fileIndex: 0,
@@ -258,7 +260,7 @@ class MediaService {
         hash,
         thumbnailPath: variants.find(v => v.size === 'thumbnail')?.path,
         metadata: {
-          ...metadata,
+          ...metadataObj,
           aiTags,
           usageCount: 0,
           usedIn: [],
