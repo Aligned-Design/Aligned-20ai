@@ -108,7 +108,7 @@ router.post("/generate/doc", async (req, res) => {
         // Generate content with AI
         const aiOutput = await generateDocContent(
           docInput,
-          brandKit,
+          parsedBrandKit,
           safetyConfig,
         );
 
@@ -122,10 +122,10 @@ router.post("/generate/doc", async (req, res) => {
             platform: docInput.platform,
           },
           {
-            tone_keywords: brandKit.toneKeywords || [],
-            brandPersonality: brandKit.brandPersonality || [],
-            writingStyle: brandKit.writingStyle,
-            commonPhrases: brandKit.commonPhrases,
+            tone_keywords: parsedBrandKit.toneKeywords || [],
+            brandPersonality: parsedBrandKit.brandPersonality || [],
+            writingStyle: parsedBrandKit.writingStyle,
+            commonPhrases: parsedBrandKit.commonPhrases,
             required_disclaimers: safetyConfig.required_disclaimers,
             required_hashtags: safetyConfig.required_hashtags,
             banned_phrases: safetyConfig.banned_phrases,
@@ -305,7 +305,7 @@ router.post("/generate/design", async (req, res) => {
     const parsedBrandKit = parseBrandKit(brandKit || {});
 
     // Generate design recommendations
-    const output = await generateDesignContent(input as DesignInput, brandKit);
+    const output = await generateDesignContent(input as DesignInput, parsedBrandKit);
 
     // Log the generation
     const logEntry = {
