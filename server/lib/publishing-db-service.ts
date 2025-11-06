@@ -321,7 +321,7 @@ export class PublishingDBService {
     if (error) throw new Error(`Failed to fetch platform stats: ${error.message}`);
 
     // Aggregate stats by platform and status
-    const stats: Record<string, unknown> = {};
+    const stats: Record<string, any> = {};
     (data as any[]).forEach(log => {
       if (!stats[log.platform]) {
         stats[log.platform] = {
