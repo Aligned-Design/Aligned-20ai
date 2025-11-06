@@ -115,16 +115,14 @@ export class WixClient {
     });
   }
 
-  async getContactLists(): Promise<unknown[]> {
-    const response = await this.request<unknown>('/contacts/lists');
-    return response.lists || [];
+  async getContactLists(): Promise<any[]> {
+    const response = await this.request('/contacts/lists');
+    return (response && response.lists) || [];
   }
 
-  async getContacts(limit: number = 20): Promise<unknown[]> {
-    const response = await this.request<unknown>(
-      `/contacts/contacts?limit=${limit}`
-    );
-    return response.contacts || [];
+  async getContacts(limit: number = 20): Promise<any[]> {
+    const response = await this.request(`/contacts/contacts?limit=${limit}`);
+    return (response && response.contacts) || [];
   }
 
   async createEmailCampaign(campaign: WixEmailCampaign): Promise<WixEmailCampaign> {
