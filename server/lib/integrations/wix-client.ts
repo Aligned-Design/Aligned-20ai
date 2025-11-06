@@ -54,8 +54,8 @@ export class WixClient {
   private async request<T>(
     endpoint: string,
     method: string = 'GET',
-    body?: Record<string, unknown>
-  ): Promise<T> {
+    body?: any
+  ): Promise<any> {
     const url = `${this.baseUrl}${endpoint}`;
 
     const response = await fetch(url, {
