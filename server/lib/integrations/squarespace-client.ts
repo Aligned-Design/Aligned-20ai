@@ -76,7 +76,7 @@ export class SquarespaceClient {
   }
 
   async getBlogPosts(limit: number = 20): Promise<SquarespacePost[]> {
-    const response = await this.request<unknown>(
+    const response = await this.request<{ items: SquarespacePost[] }>(
       `/sites/${this.siteId}/blog/posts?limit=${limit}`
     );
     return response.items || [];
