@@ -210,9 +210,9 @@ export class EscalationScheduler {
    * Send email notification
    */
   private async sendEmailNotification(
-    escalation: unknown,
-    approval: unknown,
-    rule: unknown,
+    escalation: { id: string; escalated_to_user_id?: string; escalation_level: string; },
+    approval: { post_id?: string; status?: string; created_at?: string },
+    rule: { trigger_hours?: number },
     clientSettingsData: any
   ): Promise<void> {
     const recipient = escalation.escalated_to_user_id;
