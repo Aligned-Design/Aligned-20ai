@@ -20,7 +20,7 @@ import crypto from 'crypto';
 /**
  * Helper function to convert database record to API response format
  */
-function dbRecordToClientSettings(record: unknown): ClientSettings {
+function dbRecordToClientSettings(record: any): ClientSettings {
   return {
     id: record.id,
     clientId: record.client_id,
@@ -40,7 +40,7 @@ function dbRecordToClientSettings(record: unknown): ClientSettings {
 /**
  * Helper function to convert API input to database format
  */
-function clientSettingsToDbRecord(settings: Partial<ClientSettings>): unknown {
+function clientSettingsToDbRecord(settings: Partial<ClientSettings>): any {
   return {
     client_id: settings.clientId,
     brand_id: settings.brandId,
