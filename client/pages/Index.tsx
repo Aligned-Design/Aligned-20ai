@@ -87,7 +87,7 @@ export default function Index() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-16 items-stretch">
-            <Card className="rounded-2xl bg-white border border-gray-100 p-6 shadow-md transform transition-transform hover:-translate-y-2 h-full">
+            <Card className="rounded-3xl bg-[var(--surface-0)] border border-gray-100 p-6 shadow-sm transform-gpu transition-transform hover:scale-[1.02] h-full">
               <CardHeader>
                 <div className="inline-flex items-center gap-2 rounded-lg bg-white/8 px-3 py-1.5 text-xs font-medium text-[#A6E22E] w-fit">
                   <FileText className="h-3 w-3 text-[#A6E22E]" />
@@ -103,7 +103,7 @@ export default function Index() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl bg-white border border-gray-100 p-6 shadow-md transform transition-transform hover:-translate-y-2 h-full">
+            <Card className="rounded-3xl bg-[var(--surface-0)] border border-gray-100 p-6 shadow-sm transform-gpu transition-transform hover:scale-[1.02] h-full">
               <CardHeader>
                 <div className="inline-flex items-center gap-2 rounded-lg bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--accent-lav)] w-fit">
                   <Palette className="h-3 w-3 text-[var(--accent-lav)]" />
@@ -121,7 +121,7 @@ export default function Index() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl bg-white border border-gray-100 p-6 shadow-md transform transition-transform hover:-translate-y-2 h-full">
+            <Card className="rounded-3xl bg-[var(--surface-0)] border border-gray-100 p-6 shadow-sm transform-gpu transition-transform hover:scale-[1.02] h-full">
               <CardHeader>
                 <div className="inline-flex items-center gap-2 rounded-lg bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--accent-teal)] w-fit">
                   <Brain className="h-3 w-3 text-[var(--accent-teal)]" />
