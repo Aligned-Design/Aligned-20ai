@@ -251,7 +251,7 @@ Please review and take action at your earliest convenience.
   /**
    * Send Slack notification
    */
-  private async sendSlackNotification(escalation: unknown, _approval: unknown, _rule: unknown): Promise<void> {
+  private async sendSlackNotification(escalation: { id: string }, _approval: unknown, _rule: unknown): Promise<void> {
     // This would integrate with Slack service (not implemented in this phase)
     // Placeholder for future Slack integration
     console.log(
