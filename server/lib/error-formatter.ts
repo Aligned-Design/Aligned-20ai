@@ -252,9 +252,9 @@ export const errorFormatter = new ErrorFormatter();
  */
 export function errorHandlingMiddleware(
   err: Error,
-  req: unknown,
+  req: Request,
   res: Response,
-  next: any
+  next: NextFunction
 ): void {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
