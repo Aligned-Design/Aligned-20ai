@@ -262,7 +262,7 @@ export const getWebhookStatus: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: 'Missing required header: x-brand-id' });
     }
 
-    const eventStatus = await webhookHandler.getEventStatus(eventId);
+    const eventStatus: any = await webhookHandler.getEventStatus(eventId);
     if (!eventStatus) {
       return res.status(404).json({ error: 'Event not found' });
     }
@@ -286,7 +286,7 @@ export const getWebhookStatus: RequestHandler = async (req, res) => {
         deliveredAt: eventStatus.delivered_at,
         lastError: eventStatus.last_error,
       },
-      attempts: eventStatus.attempts.map((a: unknown) => ({
+      attempts: (eventStatus.attempts as any[]).map((a: any) => ({
         attemptNumber: a.attempt_number,
         status: a.status,
         error: a.error,
@@ -331,7 +331,7 @@ export const getWebhookLogs: RequestHandler = async (req, res) => {
 
     res.json({
       success: true,
-      events: events.map((e) => ({
+      events: (events as any[]).map((e: any) => ({
         id: e.id,
         provider: e.provider,
         eventType: e.event_type,
