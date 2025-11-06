@@ -67,7 +67,7 @@ export const BrandKitSchema = z.object({
   toneKeywords: z.array(z.string()).optional(),
   brandPersonality: z.array(z.string()).optional(),
   writingStyle: z.string().optional(),
-  commonPhrases: z.array(z.string()).optional(),
+  commonPhrases: z.string().optional(),
   primaryColor: z.string().optional(),
   secondaryColor: z.string().optional(),
   accentColor: z.string().optional(),
