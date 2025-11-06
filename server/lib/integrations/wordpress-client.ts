@@ -80,11 +80,11 @@ export class WordPressClient {
     return fetch(`${this.siteUrl}/wp-json`).then((r: Response) => r.json());
   }
 
-  async getPosts(params?: Record<string, unknown>): Promise<WordPressPost[]> {
-    const queryString = new URLSearchParams(
-      params || { per_page: 20, order: 'desc', orderby: 'date' }
-    );
-    return this.request(`/posts?${queryString}`);
+  async getPosts(params?: Record<string, string>): Promise<WordPressPost[]> {
+    const defaults = { per_page: '20', order: 'desc', orderby: 'date' } as Record<string, string>;
+    const queryParams = { ...defaults, ...(params || {}) };
+    const queryString = new URLSearchParams(queryParams);
+    return this.request(`/posts?${queryString.toString()}`) as Promise<WordPressPost[]>;
   }
 
   async getPost(postId: number): Promise<WordPressPost> {
