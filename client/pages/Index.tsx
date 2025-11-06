@@ -123,8 +123,8 @@ export default function Index() {
 
             <Card className="rounded-2xl bg-white border border-gray-100 p-6 shadow-md transform transition-transform hover:-translate-y-2 h-full">
               <CardHeader>
-                <div className="inline-flex items-center gap-2 rounded-lg bg-white/8 px-3 py-1.5 text-xs font-medium text-[#9EFFB8] w-fit">
-                  <Brain className="h-3 w-3 text-[#9EFFB8]" />
+                <div className="inline-flex items-center gap-2 rounded-lg bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--accent-teal)] w-fit">
+                  <Brain className="h-3 w-3 text-[var(--accent-teal)]" />
                   Advisor Agent
                 </div>
                 <CardTitle className="text-slate-900">
@@ -356,7 +356,7 @@ function WorkflowStep({
   const colorClasses: Record<string, string> = {
     blue: "bg-white/8 text-[var(--accent-lime)]",
     purple: "bg-white/8 text-[var(--accent-lav)]",
-    green: "bg-white/8 text-[#9EFFB8]",
+    green: "bg-white/8 text-[var(--accent-teal)]",
     orange: "bg-white/8 text-[#FFD58A]",
   };
 
