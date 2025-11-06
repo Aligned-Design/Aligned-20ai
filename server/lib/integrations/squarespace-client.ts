@@ -82,45 +82,45 @@ export class SquarespaceClient {
     return response.items || [];
   }
 
-  async createBlogPost(post: SquarespacePost): Promise<SquarespacePost> {
-    return this.request(`/sites/${this.siteId}/blog/posts`, 'POST', post);
+  async createBlogPost(post: SquarespacePost): Promise<any> {
+    return this.request<any>(`/sites/${this.siteId}/blog/posts`, 'POST', post);
   }
 
-  async updateBlogPost(postId: string, updates: Partial<SquarespacePost>): Promise<SquarespacePost> {
-    return this.request(`/sites/${this.siteId}/blog/posts/${postId}`, 'PATCH', updates);
+  async updateBlogPost(postId: string, updates: Partial<SquarespacePost>): Promise<any> {
+    return this.request<any>(`/sites/${this.siteId}/blog/posts/${postId}`, 'PATCH', updates);
   }
 
   async deleteBlogPost(postId: string): Promise<void> {
-    await this.request(`/sites/${this.siteId}/blog/posts/${postId}`, 'DELETE');
+    await this.request<any>(`/sites/${this.siteId}/blog/posts/${postId}`, 'DELETE');
   }
 
-  async publishBlogPost(postId: string): Promise<SquarespacePost> {
-    return this.request(`/sites/${this.siteId}/blog/posts/${postId}`, 'PATCH', {
+  async publishBlogPost(postId: string): Promise<any> {
+    return this.request<any>(`/sites/${this.siteId}/blog/posts/${postId}`, 'PATCH', {
       publishedOn: Math.floor(Date.now() / 1000),
     });
   }
 
-  async getEmailLists(): Promise<unknown> {
-    return this.request(`/sites/${this.siteId}/email/lists`);
+  async getEmailLists(): Promise<any> {
+    return this.request<any>(`/sites/${this.siteId}/email/lists`);
   }
 
-  async createEmailCampaign(campaign: SquarespaceEmailCampaign): Promise<SquarespaceEmailCampaign> {
-    return this.request(`/sites/${this.siteId}/email/campaigns`, 'POST', campaign);
+  async createEmailCampaign(campaign: SquarespaceEmailCampaign): Promise<any> {
+    return this.request<any>(`/sites/${this.siteId}/email/campaigns`, 'POST', campaign);
   }
 
   async updateEmailCampaign(
     campaignId: string,
     updates: Partial<SquarespaceEmailCampaign>
-  ): Promise<SquarespaceEmailCampaign> {
-    return this.request(`/sites/${this.siteId}/email/campaigns/${campaignId}`, 'PATCH', updates);
+  ): Promise<any> {
+    return this.request<any>(`/sites/${this.siteId}/email/campaigns/${campaignId}`, 'PATCH', updates);
   }
 
-  async sendEmailCampaign(campaignId: string): Promise<unknown> {
-    return this.request(`/sites/${this.siteId}/email/campaigns/${campaignId}/send`, 'POST', {});
+  async sendEmailCampaign(campaignId: string): Promise<any> {
+    return this.request<any>(`/sites/${this.siteId}/email/campaigns/${campaignId}/send`, 'POST', {});
   }
 
-  async scheduleEmailCampaign(campaignId: string, sendAt: number): Promise<unknown> {
-    return this.request(`/sites/${this.siteId}/email/campaigns/${campaignId}`, 'PATCH', {
+  async scheduleEmailCampaign(campaignId: string, sendAt: number): Promise<any> {
+    return this.request<any>(`/sites/${this.siteId}/email/campaigns/${campaignId}`, 'PATCH', {
       schedule: { sendAt },
     });
   }
