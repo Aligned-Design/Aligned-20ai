@@ -106,7 +106,15 @@ export async function exchangeCodeForToken(
 
   // ✅ SECURE: Retrieve and validate state from cache
   // This prevents CSRF attacks and verifies we initiated this OAuth flow
-  const stateData = oauthStateCache.retrieve(state);
+  let stateData = oauthStateCache.retrieve(state);
+
+  // Some flows may append additional context to the state (e.g. `${state}:${brandId}`),
+  // try falling back to the raw state token if first lookup fails.
+  if (!stateData && state.includes(':')) {
+    const rawState = state.split(':')[0];
+    stateData = oauthStateCache.retrieve(rawState);
+  }
+
   if (!stateData) {
     throw new Error(
       'Invalid or expired OAuth state. The authorization request may have expired. Please start again.'
@@ -120,7 +128,7 @@ export async function exchangeCodeForToken(
     );
   }
 
-  const { __brandId, codeVerifier } = stateData;
+  const { brandId, codeVerifier } = stateData;
 
   const tokenParams = new URLSearchParams({
     client_id: config.clientId,
