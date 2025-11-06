@@ -12,7 +12,7 @@ interface PreferencesResponse {
 }
 
 // Mock user preferences - in production this would come from database
-const mockPreferences: unknown = {
+const mockPreferences: any = {
   userId: 'user-123',
   id: 'pref-123',
   basic: {
