@@ -99,7 +99,7 @@ export default function ReviewsCarousel() {
           {reviews.map((r, idx) => (
             <article
               key={idx}
-              className="snap-start flex-shrink-0 w-full md:w-1/3 max-w-md md:max-w-none rounded-2xl bg-white border border-gray-100 p-6 shadow-md"
+              className="snap-start flex-shrink-0 w-full md:w-1/3 max-w-md md:max-w-none rounded-3xl bg-[var(--surface-0)] border border-gray-100 p-6 shadow-sm"
               aria-roledescription="testimonial"
             >
               <div className="flex items-start gap-4">
@@ -109,7 +109,7 @@ export default function ReviewsCarousel() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 text-[#C9F06A]">
+                  <div className="flex items-center gap-2 text-[var(--accent-lime)]">
                     <Star className="w-4 h-4" />
                     <Star className="w-4 h-4" />
                     <Star className="w-4 h-4" />
