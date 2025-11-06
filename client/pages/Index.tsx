@@ -27,7 +27,7 @@ export default function Index() {
   return (
     <div
       className="min-h-screen relative overflow-hidden"
-      style={{ background: "linear-gradient(180deg,#071025 0%,#2b0f3a 60%)" }}
+      style={{ background: "var(--hero-gradient)" }}
     >
       {/* subtle radial glow layers */}
       <div aria-hidden className="absolute inset-0 pointer-events-none">
