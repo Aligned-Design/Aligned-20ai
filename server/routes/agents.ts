@@ -299,8 +299,10 @@ router.post("/generate/design", async (req, res) => {
       .single();
 
     if (brandKitError) {
-      throw new Error(`Failed to load brand kit: ${brandKitError.message}`);
+      throw new Error(`Failed to load brand kit: ${brandKitError?.message || String(brandKitError)}`);
     }
+
+    const parsedBrandKit = parseBrandKit(brandKit || {});
 
     // Generate design recommendations
     const output = await generateDesignContent(input as DesignInput, brandKit);
