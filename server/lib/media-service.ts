@@ -124,7 +124,7 @@ class MediaService {
 
     if (error || !data) return 0;
 
-    return data.reduce((sum: number, row: unknown) => sum + (row.file_size || 0), 0);
+    return data.reduce((sum: number, row: any) => sum + (typeof row.file_size === 'number' ? row.file_size : 0), 0);
   }
 
   /**
