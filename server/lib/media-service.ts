@@ -260,6 +260,8 @@ class MediaService {
         hash,
         thumbnailPath: variants.find(v => v.size === 'thumbnail')?.path,
         metadata: {
+          width: metadataObj.width || 0,
+          height: metadataObj.height || 0,
           ...metadataObj,
           aiTags,
           usageCount: 0,
