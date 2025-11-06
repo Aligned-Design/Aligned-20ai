@@ -116,10 +116,10 @@ export class WebhookHandler {
    * Deliver/process a webhook event
    * Simulates actual delivery. In production, this would invoke the real handler
    */
-  private async deliverEvent(eventId: string, event: unknown): Promise<boolean> {
+  private async deliverEvent(eventId: string, event: any): Promise<boolean> {
     try {
       // Log the attempt
-      const attemptNumber = event.attempt_count + 1;
+      const attemptNumber = (event?.attempt_count || 0) + 1;
       const backoffMs = attemptNumber > 1 ? calculateBackoffDelay(attemptNumber - 1, this.retryConfig) : 0;
 
       // In production, you would call the actual event handler here
