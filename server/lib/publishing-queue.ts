@@ -434,7 +434,7 @@ export class PublishingQueue {
     }
   }
 
-  private async handleJobFailure(jobId: string, error: string, errorDetails?: unknown): Promise<void> {
+  private async handleJobFailure(jobId: string, error: string, errorDetails?: any): Promise<void> {
     const job = this.jobs.get(jobId);
     if (!job) return;
 
