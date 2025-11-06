@@ -774,7 +774,8 @@ class MediaService {
   /**
    * Map database row to MediaAsset
    */
-  private mapAssetRow(row: unknown): MediaAsset {
+  private mapAssetRow(row: any): MediaAsset {
+    const meta = (row && row.metadata && typeof row.metadata === 'object') ? row.metadata : {};
     return {
       id: row.id,
       brandId: row.brand_id,
@@ -787,15 +788,15 @@ class MediaService {
       size: row.file_size,
       hash: row.hash,
       thumbnailPath: row.thumbnail_url,
-      tags: row.metadata?.aiTags || [],
+      tags: meta.aiTags || [],
       metadata: {
-        width: row.metadata?.width || 0,
-        height: row.metadata?.height || 0,
-        keywords: row.metadata?.keywords || [],
-        aiTags: row.metadata?.aiTags || [],
+        width: meta.width || 0,
+        height: meta.height || 0,
+        keywords: meta.keywords || [],
+        aiTags: meta.aiTags || [],
         usedIn: row.used_in || [],
         usageCount: row.usage_count || 0,
-        ...row.metadata
+        ...meta
       },
       variants: row.variants || [],
       createdAt: row.created_at,
