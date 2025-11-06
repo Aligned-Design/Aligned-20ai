@@ -188,13 +188,10 @@ async function runCrawlJob(
  */
 function extractKeywords(text: string): string[] {
   const words = text.toLowerCase().match(/\b[a-z]{4,}\b/g) || [];
-  const wordFreq = words.reduce(
-    (acc, word) => {
-      acc[word] = (acc[word] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>,
-  );
+  const wordFreq: Record<string, number> = {};
+  for (const word of words) {
+    wordFreq[word] = (wordFreq[word] || 0) + 1;
+  }
 
   const stopWords = new Set([
     "that",
@@ -340,7 +337,7 @@ router.get("/brand-kit/history/:brandId", async (req, res) => {
 
     // Filter by field if specified
     const history = field
-      ? data.filter((entry: unknown) => entry.field === field)
+      ? (data as any[]).filter((entry: any) => entry.field === field)
       : data;
 
     res.json({ history });
@@ -438,7 +435,7 @@ async function saveHistory(brand_id: string, entries: FieldHistoryEntry[]) {
       .order("created_at", { ascending: false });
 
     if (allEntries && allEntries.length > 10) {
-      const toDelete = allEntries.slice(10).map((e: unknown) => e.id);
+      const toDelete = (allEntries as any[]).slice(10).map((e: any) => e.id);
       await supabase.from("brand_kit_history").delete().in("id", toDelete);
     }
   }
