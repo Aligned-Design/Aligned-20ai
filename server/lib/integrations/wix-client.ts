@@ -76,15 +76,13 @@ export class WixClient {
     return response.json() as Promise<T>;
   }
 
-  async getSiteInfo(): Promise<unknown> {
-    return this.request('/contacts/sites');
+  async getSiteInfo(): Promise<any> {
+    return this.request(`/contacts/sites`);
   }
 
   async getBlogPosts(limit: number = 20): Promise<WixBlogPost[]> {
-    const response = await this.request<unknown>(
-      `/blogs/posts?limit=${limit}&sort=PUBLISHED_DATE_DESC`
-    );
-    return response.posts || [];
+    const response = await this.request(`/blogs/posts?limit=${limit}&sort=PUBLISHED_DATE_DESC`);
+    return (response && response.posts) || [];
   }
 
   async getBlogPost(postId: string): Promise<WixBlogPost> {
