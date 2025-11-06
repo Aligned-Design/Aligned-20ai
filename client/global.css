@@ -34,6 +34,17 @@
     --card-shadow: 0 8px 24px rgba(16,18,32,0.12);
 
     --transition-short: 200ms;
+
+    /* Legacy token mappings (for component compatibility) */
+    --primary: var(--accent-lime);
+    --primary-foreground: var(--indigo-deep);
+    --secondary: var(--surface-1);
+    --secondary-foreground: var(--text-main);
+    --muted: var(--surface-1);
+    --muted-foreground: var(--text-muted);
+    --accent: var(--accent-teal);
+    --accent-foreground: var(--text-main);
+
   }
 
   .dark {
