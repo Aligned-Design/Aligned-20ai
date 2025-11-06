@@ -71,8 +71,8 @@ export class SquarespaceClient {
     return response.json() as Promise<T>;
   }
 
-  async getSiteInfo(): Promise<unknown> {
-    return this.request(`/sites/${this.siteId}`);
+  async getSiteInfo(): Promise<any> {
+    return this.request<any>(`/sites/${this.siteId}`);
   }
 
   async getBlogPosts(limit: number = 20): Promise<SquarespacePost[]> {
