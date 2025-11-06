@@ -2,9 +2,9 @@ import sharp from 'sharp';
 import { MediaMetadata, MediaCategory, MediaAsset } from '@shared/media';
 
 interface RawMetadata {
-  exif?: unknown;
-  iptc?: unknown;
-  xmp?: unknown;
+  exif?: any;
+  iptc?: any;
+  xmp?: any;
 }
 
 export async function extractMetadata(
