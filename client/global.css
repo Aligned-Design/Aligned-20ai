@@ -25,7 +25,7 @@
     --hero-gradient: linear-gradient(135deg, #0E1030 0%, #1A1F4F 60%, #2A2F6C 100%);
 
     /* utility mappings used across the app */
-    --background: 255 100% 100%; /* fallback HSL/unused */
+    --background: var(--surface-1);
     --foreground: 222.2 84% 4.9%;
     --card: var(--surface-0);
     --card-foreground: 222.2 84% 4.9%;
