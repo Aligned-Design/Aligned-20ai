@@ -76,11 +76,11 @@ export default function BrandSnapshot() {
   const __visualSummary = (brand.visual_summary as any) || {};
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--surface-1)]">
       <div className="bg-white border-b py-16">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="inline-flex items-center gap-2 mb-4">
-            <CheckCircle2 className="h-12 w-12 text-[#C9F06A]" />
+            <CheckCircle2 className="h-12 w-12 text-[var(--accent-lime)]" />
           </div>
           <h1 className="text-4xl font-bold mb-4 text-slate-900">
             Here's Your Brand Snapshot
