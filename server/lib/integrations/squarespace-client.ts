@@ -50,7 +50,7 @@ export class SquarespaceClient {
   private async request<T>(
     endpoint: string,
     method: string = 'GET',
-    body?: Record<string, unknown>
+    body?: any
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
