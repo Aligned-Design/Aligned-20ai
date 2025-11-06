@@ -65,15 +65,18 @@ export async function recoverPublishingJobs(): Promise<void> {
         `Failed to fetch processing jobs: ${processingError.message}`,
       );
 
-    const totalJobs =
-      pendingJobs.length + scheduledJobs.length + processingJobs.length;
+    const pending = Array.isArray(pendingJobs) ? pendingJobs : [];
+    const scheduled = Array.isArray(scheduledJobs) ? scheduledJobs : [];
+    const processing = Array.isArray(processingJobs) ? processingJobs : [];
+
+    const totalJobs = pending.length + scheduled.length + processing.length;
     console.log(`📊 Found ${totalJobs} jobs to recover:`);
-    console.log(`   - Pending: ${pendingJobs.length}`);
-    console.log(`   - Scheduled: ${scheduledJobs.length}`);
-    console.log(`   - Processing (crashed): ${processingJobs.length}`);
+    console.log(`   - Pending: ${pending.length}`);
+    console.log(`   - Scheduled: ${scheduled.length}`);
+    console.log(`   - Processing (crashed): ${processing.length}`);
 
     // 1. Handle processing jobs (they crashed)
-    for (const job of processingJobs) {
+    for (const job of processing) {
       console.log(`🔧 Recovering crashed job ${job.id}`);
       // Mark as pending to retry
       await publishingDBService.updateJobStatus(job.id, "pending");
@@ -84,13 +87,13 @@ export async function recoverPublishingJobs(): Promise<void> {
     }
 
     // 2. Handle pending jobs
-    for (const job of pendingJobs) {
+    for (const job of pending) {
       const queueJob = dbJobToQueueJob(job);
       await publishingQueue.addJob(queueJob);
     }
 
     // 3. Handle scheduled jobs (only if they're due now or past due)
-    for (const job of scheduledJobs) {
+    for (const job of scheduled) {
       if (job.scheduled_at) {
         const scheduledTime = new Date(job.scheduled_at);
         if (scheduledTime <= new Date()) {
