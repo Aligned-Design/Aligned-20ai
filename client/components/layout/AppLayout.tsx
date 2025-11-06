@@ -74,9 +74,9 @@ export function AppLayout({
   const navItems = userRole === "agency" ? agencyNavItems : clientNavItems;
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-[var(--surface-1)]">
       {/* Sidebar */}
-      <div className="w-64 bg-[#0B0C10] text-slate-200 border-r border-gray-800 flex flex-col">
+      <div className="w-64 bg-[var(--indigo-deep)] text-white border-r border-[rgba(255,255,255,0.06)] flex flex-col">
         {/* Logo */}
         <div className="p-6 border-b border-gray-800">
           <div className="flex items-center gap-3">
@@ -100,7 +100,7 @@ export function AppLayout({
               <input
                 type="text"
                 placeholder="Search..."
-                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-700 rounded-md bg-[#0B0C10] text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#C9F06A] focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 text-sm border border-[rgba(255,255,255,0.06)] rounded-md bg-[var(--indigo-deep)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent-lime)] focus:border-transparent"
               />
             </div>
           </div>
@@ -121,8 +121,8 @@ export function AppLayout({
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-[#071025] text-white border border-gray-800"
-                    : "text-slate-200 hover:bg-[#071025]/20 hover:text-white",
+                    ? "bg-[var(--indigo-mid)] text-white border border-[rgba(255,255,255,0.06)]"
+                    : "text-white/90 hover:bg-[var(--indigo-mid)]/20 hover:text-white",
                 )}
               >
                 <Icon className="h-5 w-5" />
