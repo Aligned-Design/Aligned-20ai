@@ -194,5 +194,10 @@ export function getWeekendPostingFromConfig(postingConfig: unknown): boolean {
     }
   }
 
-  return postingConfig.weekendPostingEnabled !== false;
+  if (typeof postingConfig === 'object' && postingConfig !== null && 'weekendPostingEnabled' in postingConfig) {
+    // @ts-ignore - runtime check above ensures property exists
+    return (postingConfig as any).weekendPostingEnabled !== false;
+  }
+
+  return true;
 }
