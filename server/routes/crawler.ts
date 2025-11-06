@@ -29,7 +29,7 @@ const router = Router();
 // Use shared supabase client from server/lib/supabase.ts
 
 // In-memory job store (use Redis in production)
-const crawlJobs = new Map<string, unknown>();
+const crawlJobs = new Map<string, any>();
 
 /**
  * POST /api/crawl/start
@@ -102,7 +102,7 @@ async function runCrawlJob(
   job_id: string,
   brand_id: string,
   url: string,
-  currentBrandKit: unknown,
+  currentBrandKit: any,
 ) {
   const job = crawlJobs.get(job_id);
   if (!job) return;
