@@ -279,7 +279,7 @@ export default function BrandSnapshot() {
         </div>
 
         <div className="mt-8 rounded-xl border bg-white p-8 text-center">
-          <Sparkles className="mx-auto h-12 w-12 text-[#C9F06A] mb-4" />
+          <Sparkles className="mx-auto h-12 w-12 text-[var(--accent-lime)] mb-4" />
           <h3 className="text-2xl font-bold mb-2 text-slate-900">
             Your AI Agents Are Ready!
           </h3>
