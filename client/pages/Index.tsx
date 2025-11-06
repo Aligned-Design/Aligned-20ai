@@ -384,7 +384,7 @@ function Feature({
 }) {
   return (
     <div className="p-6 rounded-3xl bg-[var(--surface-0)] border border-gray-100 hover:shadow-lg transition-transform hover:scale-[1.02] h-full">
-      <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center mb-4 text-[var(--accent-lime)]">
+      <div className="w-10 h-10 bg-[var(--surface-1)] rounded-lg flex items-center justify-center mb-4 text-[var(--accent-lime)]">
         {icon}
       </div>
       <h3 className="font-semibold text-slate-900 mb-2">{title}</h3>
