@@ -6,6 +6,8 @@ import {
   getAvailableProviders
 } from "../workers/ai-generation";
 
+import type { AIGenerationRequest } from '@shared/api';
+
 export const generateContent: RequestHandler = async (req, res) => {
   try {
     // Validate AI providers are configured
