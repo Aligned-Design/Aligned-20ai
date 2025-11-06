@@ -46,7 +46,7 @@ router.post("/generate/doc", async (req, res) => {
       input,
       safety_mode = "safe",
       __idempotency_key,
-    } = req.body as GenerationRequest;
+    } = req.body as any;
     const docInput = input as DocInput;
 
     if (!brand_id || !input) {
@@ -573,7 +573,7 @@ router.get("/", (req, res) => {
 // Helper functions for content generation
 async function generateDocContent(
   input: DocInput,
-  brandKit: unknown,
+  brandKit: any,
   _safetyConfig: BrandSafetyConfig,
 ): Promise<DocOutput> {
   const template = await loadPromptTemplate("doc", "v1.0", "en");
@@ -647,7 +647,7 @@ async function generateDocContent(
 
 async function generateDesignContent(
   input: DesignInput,
-  brandKit: unknown,
+  brandKit: any,
 ): Promise<DesignOutput> {
   const template = await loadPromptTemplate("design", "v1.0", "en");
 
