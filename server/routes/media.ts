@@ -273,7 +273,7 @@ export const generateSEOMetadataRoute: RequestHandler = async (req, res) => {
       altText: seoData.altText,
       title: seoData.title,
       description: seoData.description,
-      keywords: [...(asset.metadata?.keywords || []), ...targetKeywords],
+      keywords: ([...(asset.metadata?.keywords as string[] || []), ...targetKeywords] || []),
       optimizedMetadata: asset.metadata || {}
     };
 
