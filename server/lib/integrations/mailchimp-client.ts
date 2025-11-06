@@ -76,8 +76,8 @@ export class MailchimpClient {
     return response.json() as Promise<T>;
   }
 
-  async getLists(): Promise<unknown> {
-    return this.request('/lists');
+  async getLists(): Promise<any> {
+    return this.request<any>('/lists');
   }
 
   async getListSegments(listId: string): Promise<MailchimpListSegment[]> {
