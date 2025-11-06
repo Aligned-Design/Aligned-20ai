@@ -24,6 +24,7 @@ import {
   AdvisorOutput,
   BrandSafetyConfig,
 } from "../../client/types/agent-config";
+import { parseBrandKit } from "../../src/types/guards";
 import { calculateBFS } from "../agents/brand-fidelity-scorer";
 import { lintContent, autoFixContent } from "../agents/content-linter";
 import { generateWithAI, loadPromptTemplate } from "../workers/ai-generation";
