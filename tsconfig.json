@@ -16,7 +16,7 @@
     "types": ["vite/client", "vitest/globals"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./client/*"],
+      "@/*": ["./client/*", "./src/*"],
       "@shared/*": ["./shared/*"]
     }
   },
