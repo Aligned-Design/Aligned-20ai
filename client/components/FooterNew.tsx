@@ -12,31 +12,31 @@ export default function FooterNew() {
           </div>
 
           <nav className="flex gap-6 flex-wrap">
-            <Link to="/" className="text-slate-300 hover:text-white">
+            <Link to="/" className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]">
               Home
             </Link>
-            <Link to="/features" className="text-slate-300 hover:text-white">
+            <Link to="/features" className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]">
               Features
             </Link>
             <Link
               to="/integrations-marketing"
-              className="text-slate-300 hover:text-white"
+              className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]"
             >
               Integrations
             </Link>
-            <Link to="/pricing" className="text-slate-300 hover:text-white">
+            <Link to="/pricing" className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]">
               Pricing
             </Link>
-            <Link to="/about" className="text-slate-300 hover:text-white">
+            <Link to="/about" className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]">
               About
             </Link>
-            <Link to="/contact" className="text-slate-300 hover:text-white">
+            <Link to="/contact" className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]">
               Contact
             </Link>
-            <Link to="/terms" className="text-slate-300 hover:text-white">
+            <Link to="/terms" className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]">
               Terms
             </Link>
-            <Link to="/privacy" className="text-slate-300 hover:text-white">
+            <Link to="/privacy" className="text-[var(--text-main)] hover:text-[var(--indigo-mid)]">
               Privacy
             </Link>
           </nav>
@@ -66,7 +66,7 @@ export default function FooterNew() {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-white/6 pt-6 text-center text-sm text-slate-400">
+        <div className="mt-8 border-t border-gray-200 pt-6 text-center text-sm text-[var(--text-muted)]">
           © 2025 Aligned AI. All rights reserved.
         </div>
       </div>
