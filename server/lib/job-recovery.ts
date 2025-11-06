@@ -116,14 +116,15 @@ export async function recoverPublishingJobs(): Promise<void> {
 /**
  * Convert database job record to publishing queue format
  */
-function dbJobToQueueJob(dbJob: unknown): PublishingJob {
+function dbJobToQueueJob(dbJob: any): PublishingJob {
+  const platforms = Array.isArray(dbJob.platforms) ? dbJob.platforms : [];
   return {
     id: dbJob.id,
     brandId: dbJob.brand_id,
     tenantId: dbJob.tenant_id,
     postId: dbJob.id, // Use same ID as job ID
-    platform: dbJob.platforms?.[0] || "instagram", // Get first platform
-    connectionId: `${dbJob.platforms?.[0]}-${dbJob.brand_id}`,
+    platform: platforms[0] || "instagram", // Get first platform
+    connectionId: `${platforms[0] || 'unknown'}-${dbJob.brand_id}`,
     status: dbJob.status as any,
     scheduledAt: dbJob.scheduled_at,
     publishedAt: dbJob.published_at,
