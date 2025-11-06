@@ -63,6 +63,32 @@ export const PublishingJobRowSchema = z.object({
 });
 export type PublishingJobRow = z.infer<typeof PublishingJobRowSchema>;
 
+export const BrandKitSchema = z.object({
+  toneKeywords: z.array(z.string()).optional(),
+  brandPersonality: z.array(z.string()).optional(),
+  writingStyle: z.string().optional(),
+  commonPhrases: z.array(z.string()).optional(),
+  primaryColor: z.string().optional(),
+  secondaryColor: z.string().optional(),
+  accentColor: z.string().optional(),
+  fontFamily: z.string().optional(),
+  colors: z.object({
+    value: z.any().optional(),
+    source: z.string().optional(),
+  }).optional(),
+  keywords: z.object({
+    value: z.array(z.string()).optional(),
+    source: z.string().optional(),
+  }).optional(),
+  about_blurb: z.object({ value: z.string().optional(), source: z.string().optional() }).optional(),
+});
+
+export type BrandKit = z.infer<typeof BrandKitSchema>;
+
+export function parseBrandKit(data: unknown) {
+  return BrandKitSchema.parse(data || {});
+}
+
 // Utility parsers
 export function parsePlatformConnection(data: unknown) {
   return PlatformConnectionRecordSchema.parse(data);
