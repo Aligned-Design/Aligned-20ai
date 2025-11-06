@@ -128,8 +128,8 @@ function dbJobToQueueJob(dbJob: unknown): PublishingJob {
     brandId: parsed.brand_id,
     tenantId: parsed.tenant_id,
     postId: parsed.id, // Use same ID as job ID
-    platform: platforms[0] || "instagram",
-    connectionId: `${platforms[0] || 'unknown'}-${parsed.brand_id}`,
+    platform: (platforms[0] as Platform) || ('instagram' as Platform),
+    connectionId: `${(platforms[0] || 'unknown')}-${parsed.brand_id}`,
     status: parsed.status as any,
     scheduledAt: parsed.scheduled_at,
     publishedAt: parsed.published_at,
