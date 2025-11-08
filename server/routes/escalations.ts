@@ -24,6 +24,11 @@ import {
   UpdateEscalationEventSchema,
   calculateEscalationTime,
 } from "@shared/escalation";
+import {
+  AppError,
+  asyncHandler,
+} from "../lib/error-middleware";
+import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 
 const router = Router();
 
@@ -46,7 +51,14 @@ const requireBrandId: RequestHandler = (
 ) => {
   const brandId = req.headers["x-brand-id"];
   if (!brandId) {
-    return res.status(400).json({ error: "Missing x-brand-id header" });
+    throw new AppError(
+      ErrorCode.MISSING_REQUIRED_FIELD,
+      "Missing required header: x-brand-id",
+      HTTP_STATUS.BAD_REQUEST,
+      "warning",
+      undefined,
+      "Please provide x-brand-id header in your request"
+    );
   }
   (req as AuthRequest).brandId = brandId as string;
   next();
@@ -73,10 +85,14 @@ router.get("/rules", async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error("[Escalation Routes] GET /rules error:", error);
-    res.status(500).json({
-      error: "Failed to fetch escalation rules",
-      message: error instanceof Error ? error.message : "Unknown error",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to fetch escalation rules",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 
@@ -90,7 +106,12 @@ router.get("/rules/:ruleId", async (req: AuthRequest, res: Response) => {
 
     const rule = await escalationRules.getById(ruleId);
     if (!rule) {
-      return res.status(404).json({ error: "Escalation rule not found" });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        "Escalation rule not found",
+        HTTP_STATUS.NOT_FOUND,
+        "info"
+      );
     }
 
     res.json({
@@ -99,10 +120,14 @@ router.get("/rules/:ruleId", async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error("[Escalation Routes] GET /rules/:ruleId error:", error);
-    res.status(500).json({
-      error: "Failed to fetch escalation rule",
-      message: error instanceof Error ? error.message : "Unknown error",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to fetch escalation rule",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 
@@ -147,17 +172,30 @@ router.post("/rules", async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        error: "Invalid request",
-        details: error.errors,
-      });
+      const validationErrors = error.errors.map((e) => ({
+        field: e.path.join("."),
+        message: e.message,
+        code: e.code,
+      }));
+      throw new AppError(
+        ErrorCode.VALIDATION_ERROR,
+        "Request validation failed",
+        HTTP_STATUS.UNPROCESSABLE_ENTITY,
+        "warning",
+        { validationErrors },
+        "Please review the validation errors and retry"
+      );
     }
 
     console.error("[Escalation Routes] POST /rules error:", error);
-    res.status(500).json({
-      error: "Failed to create escalation rule",
-      message: error instanceof Error ? error.message : "Unknown error",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to create escalation rule",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 
@@ -175,7 +213,12 @@ router.put("/rules/:ruleId", async (req: AuthRequest, res: Response) => {
     // Verify rule exists
     const existingRule = await escalationRules.getById(ruleId);
     if (!existingRule) {
-      return res.status(404).json({ error: "Escalation rule not found" });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        "Escalation rule not found",
+        HTTP_STATUS.NOT_FOUND,
+        "info"
+      );
     }
 
     // Validate request
@@ -205,17 +248,30 @@ router.put("/rules/:ruleId", async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        error: "Invalid request",
-        details: error.errors,
-      });
+      const validationErrors = error.errors.map((e) => ({
+        field: e.path.join("."),
+        message: e.message,
+        code: e.code,
+      }));
+      throw new AppError(
+        ErrorCode.VALIDATION_ERROR,
+        "Request validation failed",
+        HTTP_STATUS.UNPROCESSABLE_ENTITY,
+        "warning",
+        { validationErrors },
+        "Please review the validation errors and retry"
+      );
     }
 
     console.error("[Escalation Routes] PUT /rules/:ruleId error:", error);
-    res.status(500).json({
-      error: "Failed to update escalation rule",
-      message: error instanceof Error ? error.message : "Unknown error",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to update escalation rule",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 
@@ -233,7 +289,12 @@ router.delete("/rules/:ruleId", async (req: AuthRequest, res: Response) => {
     // Verify rule exists
     const existingRule = await escalationRules.getById(ruleId);
     if (!existingRule) {
-      return res.status(404).json({ error: "Escalation rule not found" });
+      throw new AppError(
+      ErrorCode.NOT_FOUND,
+      "Escalation rule not found",
+      HTTP_STATUS.NOT_FOUND,
+      "info"
+    );
     }
 
     // Delete rule
@@ -315,7 +376,12 @@ router.get("/events/:eventId", async (req: AuthRequest, res: Response) => {
 
     const event = await escalationEvents.getById(eventId);
     if (!event) {
-      return res.status(404).json({ error: "Escalation event not found" });
+      throw new AppError(
+      ErrorCode.NOT_FOUND,
+      "Escalation event not found",
+      HTTP_STATUS.NOT_FOUND,
+      "info"
+    );
     }
 
     res.json({
@@ -347,13 +413,23 @@ router.post("/events", async (req: AuthRequest, res: Response) => {
     // Get rule for scheduling calculation
     const rule = await escalationRules.getById(payload.rule_id);
     if (!rule) {
-      return res.status(404).json({ error: "Escalation rule not found" });
+      throw new AppError(
+      ErrorCode.NOT_FOUND,
+      "Escalation rule not found",
+      HTTP_STATUS.NOT_FOUND,
+      "info"
+    );
     }
 
     // Get approval for timing reference
     const approval = await postApprovals.getById(payload.approval_id);
     if (!approval) {
-      return res.status(404).json({ error: "Approval not found" });
+      throw new AppError(
+      ErrorCode.NOT_FOUND,
+      "Approval not found",
+      HTTP_STATUS.NOT_FOUND,
+      "info"
+    );
     }
 
     // Calculate scheduled send time
@@ -423,7 +499,12 @@ router.put("/events/:eventId", async (req: AuthRequest, res: Response) => {
     // Verify event exists
     const existingEvent = await escalationEvents.getById(eventId);
     if (!existingEvent) {
-      return res.status(404).json({ error: "Escalation event not found" });
+      throw new AppError(
+      ErrorCode.NOT_FOUND,
+      "Escalation event not found",
+      HTTP_STATUS.NOT_FOUND,
+      "info"
+    );
     }
 
     // Validate request
