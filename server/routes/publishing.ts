@@ -20,7 +20,8 @@ import { publishingQueue } from "../lib/publishing-queue";
 import { connectionsDB } from "../lib/connections-db-service";
 import { publishingDBService } from "../lib/publishing-db-service";
 import { getPlatformAPI } from "../lib/platform-apis";
-import { errorFormatter } from "../lib/error-formatter";
+import { AppError } from "../lib/error-middleware";
+import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 import {
   InitiateOAuthSchema,
   PublishContentSchema,
@@ -39,13 +40,16 @@ export const initiateOAuth: RequestHandler = async (req, res) => {
 
     res.json(oauthFlow);
   } catch (error) {
-    errorFormatter.sendError(
-      res,
-      error instanceof Error ? error : new Error(String(error)),
-      {
-        path: req.path,
-        requestId: req.headers["x-request-id"] as string,
-      },
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to initiate OAuth flow",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
     );
   }
 };
@@ -159,13 +163,16 @@ export const getConnections: RequestHandler = async (req, res) => {
 
     res.json(connectionStatuses);
   } catch (error) {
-    errorFormatter.sendError(
-      res,
-      error instanceof Error ? error : new Error(String(error)),
-      {
-        path: req.path,
-        requestId: req.headers["x-request-id"] as string,
-      },
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to fetch connections",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
     );
   }
 };
@@ -180,13 +187,16 @@ export const disconnectPlatform: RequestHandler = async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    errorFormatter.sendError(
-      res,
-      error instanceof Error ? error : new Error(String(error)),
-      {
-        path: req.path,
-        requestId: req.headers["x-request-id"] as string,
-      },
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to disconnect platform",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
     );
   }
 };
@@ -282,13 +292,16 @@ export const publishContent: RequestHandler = async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    errorFormatter.sendError(
-      res,
-      error instanceof Error ? error : new Error(String(error)),
-      {
-        path: req.path,
-        requestId: req.headers["x-request-id"] as string,
-      },
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to publish content",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
     );
   }
 };
@@ -352,13 +365,16 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
       offset,
     });
   } catch (error) {
-    errorFormatter.sendError(
-      res,
-      error instanceof Error ? error : new Error(String(error)),
-      {
-        path: req.path,
-        requestId: req.headers["x-request-id"] as string,
-      },
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to get publishing jobs",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
     );
   }
 };
@@ -373,19 +389,24 @@ export const retryJob: RequestHandler = async (req, res) => {
     if (success) {
       res.json({ success: true });
     } else {
-      errorFormatter.sendError(res, new Error("Job cannot be retried"), {
-        path: req.path,
-        requestId: req.headers["x-request-id"] as string,
-      });
+      throw new AppError(
+        ErrorCode.INTERNAL_ERROR,
+        "Job cannot be retried",
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        "error"
+      );
     }
   } catch (error) {
-    errorFormatter.sendError(
-      res,
-      error instanceof Error ? error : new Error(String(error)),
-      {
-        path: req.path,
-        requestId: req.headers["x-request-id"] as string,
-      },
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to retry job",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
     );
   }
 };
@@ -400,19 +421,24 @@ export const cancelJob: RequestHandler = async (req, res) => {
     if (success) {
       res.json({ success: true });
     } else {
-      errorFormatter.sendError(res, new Error("Job cannot be cancelled"), {
-        path: req.path,
-        requestId: req.headers["x-request-id"] as string,
-      });
+      throw new AppError(
+        ErrorCode.INTERNAL_ERROR,
+        "Job cannot be cancelled",
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        "error"
+      );
     }
   } catch (error) {
-    errorFormatter.sendError(
-      res,
-      error instanceof Error ? error : new Error(String(error)),
-      {
-        path: req.path,
-        requestId: req.headers["x-request-id"] as string,
-      },
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to cancel job",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
     );
   }
 };
@@ -429,10 +455,12 @@ export const verifyConnection: RequestHandler = async (req, res) => {
     );
 
     if (!connection) {
-      return res.status(404).json({
-        verified: false,
-        error: "Connection not found",
-      });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        "Connection not found",
+        HTTP_STATUS.NOT_FOUND,
+        "info"
+      );
     }
 
     // Check if token is expired
@@ -486,13 +514,16 @@ export const verifyConnection: RequestHandler = async (req, res) => {
       });
     }
   } catch (error) {
-    errorFormatter.sendError(
-      res,
-      error instanceof Error ? error : new Error(String(error)),
-      {
-        path: req.path,
-        requestId: req.headers["x-request-id"] as string,
-      },
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to verify connection",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
     );
   }
 };
@@ -509,7 +540,12 @@ export const refreshToken: RequestHandler = async (req, res) => {
     );
 
     if (!connection) {
-      return res.status(404).json({ error: "Connection not found" });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        "Connection not found",
+        HTTP_STATUS.NOT_FOUND,
+        "info"
+      );
     }
 
     // Refresh the token
@@ -541,13 +577,16 @@ export const refreshToken: RequestHandler = async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    errorFormatter.sendError(
-      res,
-      error instanceof Error ? error : new Error(String(error)),
-      {
-        path: req.path,
-        requestId: req.headers["x-request-id"] as string,
-      },
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to refresh token",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
     );
   }
 };
@@ -567,16 +606,26 @@ export const publishBlogPost: RequestHandler = async (req, res) => {
     } = req.body;
 
     if (!title || !content) {
-      return res.status(400).json({
-        error: "Missing required fields: title, content",
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required fields: title, content",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning",
+        undefined,
+        "Please provide both title and content in your request"
+      );
     }
 
     const supportedPlatforms = ["wordpress", "squarespace", "wix"];
     if (!supportedPlatforms.includes(platform)) {
-      return res.status(400).json({
-        error: `Blog publishing not supported for ${platform}`,
-      });
+      throw new AppError(
+        ErrorCode.INVALID_FORMAT,
+        `Blog publishing not supported for ${platform}`,
+        HTTP_STATUS.BAD_REQUEST,
+        "warning",
+        undefined,
+        `Please use one of the supported platforms: ${supportedPlatforms.join(", ")}`
+      );
     }
 
     // Get connection
@@ -585,9 +634,14 @@ export const publishBlogPost: RequestHandler = async (req, res) => {
       platform as Platform,
     );
     if (!connection || connection.status !== "connected") {
-      return res.status(401).json({
-        error: "Platform not connected or connection expired",
-      });
+      throw new AppError(
+        ErrorCode.UNAUTHORIZED,
+        "Platform not connected or connection expired",
+        HTTP_STATUS.UNAUTHORIZED,
+        "warning",
+        undefined,
+        "Please reconnect your platform and try again"
+      );
     }
 
     // Import the integration service dynamically to avoid circular dependencies
@@ -615,13 +669,16 @@ export const publishBlogPost: RequestHandler = async (req, res) => {
       result,
     });
   } catch (error) {
-    errorFormatter.sendError(
-      res,
-      error instanceof Error ? error : new Error(String(error)),
-      {
-        path: req.path,
-        requestId: req.headers["x-request-id"] as string,
-      },
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to publish blog post",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
     );
   }
 };
@@ -641,16 +698,26 @@ export const publishEmailCampaign: RequestHandler = async (req, res) => {
     } = req.body;
 
     if (!title || !subject || !content) {
-      return res.status(400).json({
-        error: "Missing required fields: title, subject, content",
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required fields: title, subject, content",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning",
+        undefined,
+        "Please provide title, subject, and content in your request"
+      );
     }
 
     const supportedPlatforms = ["mailchimp", "squarespace", "wix"];
     if (!supportedPlatforms.includes(platform)) {
-      return res.status(400).json({
-        error: `Email publishing not supported for ${platform}`,
-      });
+      throw new AppError(
+        ErrorCode.INVALID_FORMAT,
+        `Email publishing not supported for ${platform}`,
+        HTTP_STATUS.BAD_REQUEST,
+        "warning",
+        undefined,
+        `Please use one of the supported platforms: ${supportedPlatforms.join(", ")}`
+      );
     }
 
     // Get connection
@@ -659,9 +726,14 @@ export const publishEmailCampaign: RequestHandler = async (req, res) => {
       platform as Platform,
     );
     if (!connection || connection.status !== "connected") {
-      return res.status(401).json({
-        error: "Platform not connected or connection expired",
-      });
+      throw new AppError(
+        ErrorCode.UNAUTHORIZED,
+        "Platform not connected or connection expired",
+        HTTP_STATUS.UNAUTHORIZED,
+        "warning",
+        undefined,
+        "Please reconnect your platform and try again"
+      );
     }
 
     // Import the integration service dynamically
@@ -689,13 +761,16 @@ export const publishEmailCampaign: RequestHandler = async (req, res) => {
       result,
     });
   } catch (error) {
-    errorFormatter.sendError(
-      res,
-      error instanceof Error ? error : new Error(String(error)),
-      {
-        path: req.path,
-        requestId: req.headers["x-request-id"] as string,
-      },
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to publish email campaign",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
     );
   }
 };
