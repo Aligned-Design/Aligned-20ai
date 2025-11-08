@@ -5,6 +5,8 @@
  */
 
 import { RequestHandler } from "express";
+import { AppError } from "../lib/error-middleware";
+import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 import {
   ClientSettings,
   ClientSettingsSchema,
@@ -68,9 +70,12 @@ export const getClientSettings: RequestHandler = async (req, res) => {
     const brandId = req.headers["x-brand-id"] as string;
 
     if (!clientId || !brandId) {
-      return res.status(400).json({
-        error: "Missing required headers: x-client-id, x-brand-id",
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required headers: x-client-id, x-brand-id",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     let settings = await dbClientSettings.get(clientId, brandId);
@@ -101,11 +106,14 @@ export const getClientSettings: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("[Client Settings] Get error:", error);
-    const statusCode = error instanceof DatabaseError ? 500 : 500;
-    res.status(statusCode).json({
-      error:
-        error instanceof Error ? error.message : "Failed to retrieve settings",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Failed to retrieve settings",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -121,18 +129,30 @@ export const updateClientSettings: RequestHandler = async (req, res) => {
     const userEmail = req.headers["x-user-email"] as string;
 
     if (!clientId || !brandId) {
-      return res.status(400).json({
-        error: "Missing required headers: x-client-id, x-brand-id",
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required headers: x-client-id, x-brand-id",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     // Validate update payload
     const validationResult = UpdateClientSettingsSchema.safeParse(req.body);
     if (!validationResult.success) {
-      return res.status(400).json({
-        error: "Validation failed",
-        details: validationResult.error.errors,
-      });
+      const validationErrors = validationResult.error.errors.map((e) => ({
+        field: e.path.join("."),
+        message: e.message,
+        code: e.code,
+      }));
+      throw new AppError(
+        ErrorCode.VALIDATION_ERROR,
+        "Request validation failed",
+        HTTP_STATUS.UNPROCESSABLE_ENTITY,
+        "warning",
+        { validationErrors },
+        "Please review the validation errors and retry your request"
+      );
     }
 
     // Get current settings or create defaults
@@ -198,10 +218,14 @@ export const updateClientSettings: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("[Client Settings] Update error:", error);
-    res.status(500).json({
-      error:
-        error instanceof Error ? error.message : "Failed to update settings",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Failed to update settings",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -268,12 +292,16 @@ export const updateEmailPreferences: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("[Client Settings] Email preferences error:", error);
-    res.status(500).json({
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to update email preferences",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error
+        ? error.message
+        : "Failed to update email preferences",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -322,12 +350,16 @@ export const generateUnsubscribeLink: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("[Client Settings] Generate unsubscribe error:", error);
-    res.status(500).json({
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to generate unsubscribe link",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error
+        ? error.message
+        : "Failed to generate unsubscribe link",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -340,9 +372,12 @@ export const unsubscribeFromEmails: RequestHandler = async (req, res) => {
     const { unsubscribeToken, fromType } = req.body as UnsubscribeRequest;
 
     if (!unsubscribeToken) {
-      return res.status(400).json({
-        error: "Unsubscribe token is required",
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Unsubscribe token is required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     // Find settings by token
@@ -350,9 +385,12 @@ export const unsubscribeFromEmails: RequestHandler = async (req, res) => {
       await dbClientSettings.findByUnsubscribeToken(unsubscribeToken);
 
     if (!settings) {
-      return res.status(404).json({
-        error: "Invalid or expired unsubscribe token",
-      });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        "Invalid or expired unsubscribe token",
+        HTTP_STATUS.NOT_FOUND,
+        "info"
+      );
     }
 
     let updatePayload: any;
@@ -400,12 +438,16 @@ export const unsubscribeFromEmails: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("[Client Settings] Unsubscribe error:", error);
-    res.status(500).json({
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to process unsubscribe",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error
+        ? error.message
+        : "Failed to process unsubscribe",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -423,9 +465,12 @@ export const resubscribeToEmails: RequestHandler = async (req, res) => {
     const settings = await dbClientSettings.get(clientId, brandId);
 
     if (!settings) {
-      return res.status(404).json({
-        error: "Client settings not found",
-      });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        "Client settings not found",
+        HTTP_STATUS.NOT_FOUND,
+        "info"
+      );
     }
 
     const unsubscribedTypes = new Set(settings.unsubscribed_types || []);
@@ -455,9 +500,14 @@ export const resubscribeToEmails: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("[Client Settings] Resubscribe error:", error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : "Failed to resubscribe",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Failed to resubscribe",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -470,9 +520,12 @@ export const verifyUnsubscribeToken: RequestHandler = async (req, res) => {
     const { token } = req.query as { token: string };
 
     if (!token) {
-      return res.status(400).json({
-        error: "Token is required",
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Token is required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     // Find settings by token
@@ -492,8 +545,13 @@ export const verifyUnsubscribeToken: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("[Client Settings] Verify token error:", error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : "Failed to verify token",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Failed to verify token",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
