@@ -50,10 +50,6 @@ class OAuthStateCache {
       expiresAt: now + ttlSeconds * 1000,
       ttlSeconds,
     });
-
-    console.log(
-      `✅ OAuth state stored: ${state.substring(0, 8)}... for platform ${platform}`,
-    );
   }
 
   /**
@@ -65,7 +61,6 @@ class OAuthStateCache {
     const stateData = this.states.get(state);
 
     if (!stateData) {
-      console.warn(`❌ OAuth state not found: ${state.substring(0, 8)}...`);
       return null;
     }
 
@@ -76,16 +71,12 @@ class OAuthStateCache {
     // Apply grace only for normal/default TTLs (avoid masking very short TTL tests)
     const applyGrace = ttl >= 0.05; // in seconds (50ms)
     if (now > stateData.expiresAt + (applyGrace ? GRACE_MS : 0)) {
-      console.warn(`❌ OAuth state expired: ${state.substring(0, 8)}...`);
       this.states.delete(state);
       return null;
     }
 
     // Delete state to prevent replay attacks
     this.states.delete(state);
-    console.log(
-      `✅ OAuth state validated and consumed: ${state.substring(0, 8)}...`,
-    );
 
     return stateData;
   }
@@ -135,17 +126,11 @@ class OAuthStateCache {
    */
   cleanup(): void {
     const now = Date.now();
-    let removedCount = 0;
 
     for (const [state, data] of this.states.entries()) {
       if (now > data.expiresAt) {
         this.states.delete(state);
-        removedCount++;
       }
-    }
-
-    if (removedCount > 0) {
-      console.log(`🧹 Cleaned up ${removedCount} expired OAuth states`);
     }
   }
 
@@ -204,7 +189,6 @@ class OAuthStateCache {
    */
   clear(): void {
     this.states.clear();
-    console.log("🧹 OAuth state cache cleared");
   }
 }
 

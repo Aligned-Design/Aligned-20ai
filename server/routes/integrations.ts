@@ -1,5 +1,13 @@
 import { Router, RequestHandler } from "express";
 import { Integration, SyncEvent, WebhookEvent, IntegrationType } from "@shared/integrations";
+import {
+  GetIntegrationsQuerySchema,
+  CreateIntegrationBodySchema,
+  UpdateIntegrationBodySchema,
+  PlatformSchema,
+  BrandIdSchema,
+} from "../lib/validation-schemas";
+import { validateQuery, validateBody, validateRequest } from "../lib/validation-middleware";
 
 const router = Router();
 
@@ -33,22 +41,24 @@ const mockIntegrations: Integration[] = [
 ];
 
 // Get all integrations for a brand
-router.get("/", (async (req, res) => {
-  try {
-    const { brandId } = req.query;
-    
-    if (!brandId) {
-      return res.status(400).json({ error: 'brandId required' });
+router.get(
+  "/",
+  validateQuery(GetIntegrationsQuerySchema),
+  (async (req, res) => {
+    try {
+      const { brandId } = req.query as { brandId: string };
+      const integrations = mockIntegrations.filter(
+        (int) => int.brandId === brandId
+      );
+      res.json(integrations);
+    } catch (error) {
+      res.status(500).json({
+        error:
+          error instanceof Error ? error.message : "Failed to fetch integrations",
+      });
     }
-
-    const integrations = mockIntegrations.filter(int => int.brandId === brandId);
-    res.json(integrations);
-  } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to fetch integrations'
-    });
-  }
-}) as RequestHandler);
+  }) as RequestHandler
+);
 
 // Get available integration templates
 router.get("/templates", (async (req, res) => {
@@ -144,24 +154,28 @@ router.get("/templates", (async (req, res) => {
 }) as RequestHandler);
 
 // Start OAuth flow
-router.post("/oauth/start", (async (req, res) => {
-  try {
-    const { type, brandId, redirectUrl } = req.body;
+router.post(
+  "/oauth/start",
+  validateBody(CreateIntegrationBodySchema),
+  (async (req, res) => {
+    try {
+      const { type, brandId } = req.body as {
+        type: IntegrationType;
+        brandId: string;
+      };
 
-    if (!type || !brandId) {
-      return res.status(400).json({ error: 'type and brandId required' });
+      // Generate OAuth URL based on integration type
+      const authUrl = generateOAuthUrl(type, brandId);
+
+      res.json({ authUrl });
+    } catch (error) {
+      res.status(500).json({
+        error:
+          error instanceof Error ? error.message : "Failed to start OAuth flow",
+      });
     }
-
-    // Generate OAuth URL based on integration type
-    const authUrl = generateOAuthUrl(type as IntegrationType, brandId, redirectUrl);
-    
-    res.json({ authUrl });
-  } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to start OAuth flow'
-    });
-  }
-}) as RequestHandler);
+  }) as RequestHandler
+);
 
 // Complete OAuth flow
 router.post("/oauth/callback", (async (req, res) => {
