@@ -1,5 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { aiMetricsService } from '../lib/ai-metrics';
+import { AppError } from '../lib/error-middleware';
+import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
 
 const router = Router();
 
@@ -20,10 +22,14 @@ router.get('/ai/snapshot', (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error getting AI metrics snapshot:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get metrics snapshot'
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Failed to get metrics snapshot',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 });
 
@@ -47,10 +53,14 @@ router.get('/ai/alerts', (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error getting AI metrics alerts:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get alerts'
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Failed to get alerts',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 });
 
@@ -74,10 +84,14 @@ router.get('/ai/detailed', (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error getting detailed AI metrics:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get detailed metrics'
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Failed to get detailed metrics',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 });
 
@@ -105,10 +119,14 @@ router.get('/ai/summary', (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error getting AI metrics summary:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get summary'
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Failed to get summary',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 });
 

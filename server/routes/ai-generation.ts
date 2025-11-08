@@ -5,6 +5,8 @@ import {
   validateAIProviders,
   getAvailableProviders,
 } from "../workers/ai-generation";
+import { AppError } from "../lib/error-middleware";
+import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 
 import type { AIGenerationRequest } from "@shared/api";
 
@@ -12,18 +14,27 @@ export const generateContent: RequestHandler = async (req, res) => {
   try {
     // Validate AI providers are configured
     if (!validateAIProviders()) {
-      return res.status(500).json({
-        error:
-          "No AI providers configured. Please set OPENAI_API_KEY or ANTHROPIC_API_KEY",
-      });
+      throw new AppError(
+        ErrorCode.INTERNAL_ERROR,
+        "No AI providers configured. Please set OPENAI_API_KEY or ANTHROPIC_API_KEY",
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        "error",
+        undefined,
+        "Please configure an AI provider and try again"
+      );
     }
 
     const { prompt, agentType, provider } = req.body as any;
 
     if (!prompt || !agentType) {
-      return res.status(400).json({
-        error: "Missing required fields: prompt, agentType",
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required fields: prompt, agentType",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning",
+        undefined,
+        "Please provide both prompt and agentType in your request"
+      );
     }
 
     const result = await generateBuilderContent({
@@ -35,12 +46,17 @@ export const generateContent: RequestHandler = async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error("AI content generation failed:", error);
-    res.status(500).json({
-      error: "Content generation failed",
-      content: "",
-      provider: "",
-      agentType: "",
-    });
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Content generation failed",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -48,18 +64,27 @@ export const generateDesign: RequestHandler = async (req, res) => {
   try {
     // Validate AI providers are configured
     if (!validateAIProviders()) {
-      return res.status(500).json({
-        error:
-          "No AI providers configured. Please set OPENAI_API_KEY or ANTHROPIC_API_KEY",
-      });
+      throw new AppError(
+        ErrorCode.INTERNAL_ERROR,
+        "No AI providers configured. Please set OPENAI_API_KEY or ANTHROPIC_API_KEY",
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        "error",
+        undefined,
+        "Please configure an AI provider and try again"
+      );
     }
 
     const { prompt, provider } = req.body as AIGenerationRequest;
 
     if (!prompt) {
-      return res.status(400).json({
-        error: "Missing required field: prompt",
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required field: prompt",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning",
+        undefined,
+        "Please provide a prompt in your request"
+      );
     }
 
     const result = await generateDesignVisuals({
@@ -71,12 +96,17 @@ export const generateDesign: RequestHandler = async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error("AI design generation failed:", error);
-    res.status(500).json({
-      error: "Design generation failed",
-      content: "",
-      provider: "",
-      agentType: "design",
-    });
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Design generation failed",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -91,11 +121,13 @@ export const getProviders: RequestHandler = (req, res) => {
     });
   } catch (error) {
     console.error("Failed to get AI providers:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to get providers",
-      providers: [],
-      default: null,
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to get providers",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };

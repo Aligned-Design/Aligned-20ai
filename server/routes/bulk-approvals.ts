@@ -8,6 +8,8 @@ import { RequestHandler } from 'express';
 import { z } from 'zod';
 import { logAuditAction } from '../lib/audit-logger';
 import { postApprovals as dbPostApprovals} from '../lib/dbClient';
+import { AppError } from '../lib/error-middleware';
+import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
 
 // ==================== TYPES & VALIDATION ====================
 
@@ -43,18 +45,32 @@ export const bulkApproveOrReject: RequestHandler = async (req, res) => {
     const userEmail = req.headers['x-user-email'] as string;
 
     if (!clientId || !brandId) {
-      return res.status(400).json({
-        error: 'Missing required headers: x-client-id, x-brand-id',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required headers: x-client-id, x-brand-id',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning',
+        undefined,
+        'Please provide x-client-id and x-brand-id headers in your request'
+      );
     }
 
     // Validate request payload
     const validationResult = BulkApprovalRequestSchema.safeParse(req.body);
     if (!validationResult.success) {
-      return res.status(400).json({
-        error: 'Validation failed',
-        details: validationResult.error.errors,
-      });
+      const validationErrors = validationResult.error.errors.map((e) => ({
+        field: e.path.join('.'),
+        message: e.message,
+        code: e.code,
+      }));
+      throw new AppError(
+        ErrorCode.VALIDATION_ERROR,
+        'Request validation failed',
+        HTTP_STATUS.UNPROCESSABLE_ENTITY,
+        'warning',
+        { validationErrors },
+        'Please review the validation errors and retry your request'
+      );
     }
 
     const { postIds, action, note } = validationResult.data;
@@ -122,9 +138,17 @@ export const bulkApproveOrReject: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error('[Bulk Approvals] Error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to process bulk approval',
-    });
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Failed to process bulk approval',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 };
 
@@ -138,17 +162,25 @@ export const getApprovalStatus: RequestHandler = async (req, res) => {
     const brandId = req.headers['x-brand-id'] as string;
 
     if (!brandId) {
-      return res.status(400).json({
-        error: 'Missing required header: x-brand-id',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required header: x-brand-id',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning',
+        undefined,
+        'Please provide x-brand-id header in your request'
+      );
     }
 
     const approval = await dbPostApprovals.get(brandId, postId);
 
     if (!approval) {
-      return res.status(404).json({
-        error: 'Approval record not found',
-      });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        'Approval record not found',
+        HTTP_STATUS.NOT_FOUND,
+        'info'
+      );
     }
 
     // Convert to camelCase response format
@@ -170,9 +202,17 @@ export const getApprovalStatus: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error('[Approval Status] Error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to get approval status',
-    });
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Failed to get approval status',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 };
 
@@ -186,15 +226,25 @@ export const getBatchApprovalStatus: RequestHandler = async (req, res) => {
     const brandId = req.headers['x-brand-id'] as string;
 
     if (!brandId) {
-      return res.status(400).json({
-        error: 'Missing required header: x-brand-id',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required header: x-brand-id',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning',
+        undefined,
+        'Please provide x-brand-id header in your request'
+      );
     }
 
     if (!postIds || !Array.isArray(postIds)) {
-      return res.status(400).json({
-        error: 'postIds array is required',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'postIds array is required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning',
+        undefined,
+        'Please provide postIds array in your request body'
+      );
     }
 
     // Fetch all approvals in parallel
@@ -230,9 +280,17 @@ export const getBatchApprovalStatus: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error('[Batch Status] Error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to get batch approval status',
-    });
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Failed to get batch approval status',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 };
 
@@ -246,15 +304,25 @@ export const lockPostsAfterApproval: RequestHandler = async (req, res) => {
     const brandId = req.headers['x-brand-id'] as string;
 
     if (!brandId) {
-      return res.status(400).json({
-        error: 'Missing required header: x-brand-id',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required header: x-brand-id',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning',
+        undefined,
+        'Please provide x-brand-id header in your request'
+      );
     }
 
     if (!postIds || !Array.isArray(postIds)) {
-      return res.status(400).json({
-        error: 'postIds array is required',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'postIds array is required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning',
+        undefined,
+        'Please provide postIds array in your request body'
+      );
     }
 
     // Update posts to set locked flag in database
@@ -272,8 +340,16 @@ export const lockPostsAfterApproval: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error('[Lock Posts] Error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to lock posts',
-    });
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Failed to lock posts',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 };
