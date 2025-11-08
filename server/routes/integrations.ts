@@ -297,7 +297,7 @@ router.delete("/:integrationId", (async (req, res, next) => {
 }) as RequestHandler);
 
 // Get sync events
-router.get("/:integrationId/sync-events", (async (req, res) => {
+router.get("/:integrationId/sync-events", (async (req, res, next) => {
   try {
     const { __integrationId } = req.params;
     const { __limit = '50', __offset = '0' } = req.query;
@@ -311,14 +311,12 @@ router.get("/:integrationId/sync-events", (async (req, res) => {
       hasMore: false
     });
   } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to fetch sync events'
-    });
+    next(error);
   }
 }) as RequestHandler);
 
 // Webhook handlers
-router.post("/webhooks/:type", (async (req, res) => {
+router.post("/webhooks/:type", (async (req, res, next) => {
   try {
     const { type } = req.params;
     const payload = req.body;
@@ -326,7 +324,14 @@ router.post("/webhooks/:type", (async (req, res) => {
 
     // Verify webhook signature
     if (!verifyWebhookSignature(type as IntegrationType, payload, signature)) {
-      return res.status(401).json({ error: 'Invalid signature' });
+      throw new AppError(
+        ErrorCode.UNAUTHORIZED,
+        'Invalid webhook signature',
+        HTTP_STATUS.UNAUTHORIZED,
+        'warning',
+        undefined,
+        'Webhook signature verification failed'
+      );
     }
 
     // Process webhook
@@ -346,9 +351,7 @@ router.post("/webhooks/:type", (async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to process webhook'
-    });
+    next(error);
   }
 }) as RequestHandler);
 
