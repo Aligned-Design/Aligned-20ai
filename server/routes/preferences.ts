@@ -1,5 +1,8 @@
 import { RequestHandler } from "express";
 import { UserPreferences } from "@shared/preferences";
+import { preferencesDB } from "../lib/preferences-db-service";
+import { AppError } from "../lib/error-middleware";
+import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 
 interface PreferencesUpdateRequest {
   [key: string]: unknown;
@@ -11,150 +14,132 @@ interface PreferencesResponse {
   error?: string;
 }
 
-// Mock user preferences - in production this would come from database
-const mockPreferences: any = {
-  userId: "user-123",
-  id: "pref-123",
-  basic: {
-    theme: "auto",
-    language: "en",
-    timezone: "America/New_York",
-    dateTimeFormat: "12h",
-    homePageView: "dashboard",
-    emailNotifications: {
-      approvals: true,
-      newReview: true,
-      failedPost: true,
-      analyticsDigest: true,
-    },
-    digestFrequency: "weekly",
-    appNotifications: true,
-    inAppMessageSounds: true,
-    dashboardDensity: "comfortable",
-    cardAnimation: "smooth",
-    analyticsStyle: "graph-heavy",
-    fontSize: "medium",
-    quickActionsOnHover: true,
-  },
-  advanced: {
-    analyticsEmailCadence: "0 9 * * 1",
-    reportFormat: "html",
-    aiInsightLevel: "detailed",
-    showBenchmarks: true,
-    includeCompetitorMentions: false,
-    tonePreset: "safe",
-    voiceAdaptationSpeed: "balanced",
-    autoGenerateNextMonthPlan: false,
-    autoApproveAISuggestions: false,
-    languageStyle: "us-english",
-    aiRegenerationTriggers: "auto-on-low-bfs",
-    draftVisibility: "internal-only",
-    commentTagAlerts: "immediate",
-    clientCommentVisibility: true,
-    autoMeetingSummaries: true,
-    taskIntegration: "none",
-    meetingNotesToAI: "ask-each-time",
-    autoSaveInterval: "30s",
-    approvalWorkflow: "1-step",
-    graceWindowHours: 24,
-    postFailureHandling: "auto-retry",
-    twoFactorAuth: false,
-    sessionTimeout: "8h",
-    ipWhitelist: [],
-    autoDataExport: false,
-    dataExportFrequency: "monthly",
-  },
-  agencyOverrides: {},
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-  lastSyncedAt: new Date().toISOString(),
-};
-
-export const getPreferences: RequestHandler = async (req, res) => {
+export const getPreferences: RequestHandler = async (req, res, next) => {
   try {
-    // TODO: Get userId from authentication middleware
-    const __userId = "user-123";
+    // Get userId from authentication context (from Issue #6)
+    const userId = (req as any).user?.id || (req as any).userId;
+    const { brandId } = req.query;
 
-    // TODO: Fetch from database
-    // const preferences = await db.preferences.findByUserId(userId);
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.UNAUTHORIZED,
+        "User ID is required",
+        HTTP_STATUS.UNAUTHORIZED,
+        "warning"
+      );
+    }
+
+    if (!brandId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "brandId is required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
+    }
+
+    // Fetch preferences from database
+    const preferences = await preferencesDB.getPreferences(userId, brandId as string);
 
     const response: PreferencesResponse = {
       success: true,
-      preferences: mockPreferences,
+      preferences: (preferences || {}) as unknown as UserPreferences,
     };
 
     res.json(response);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to fetch preferences",
-    });
+    next(error);
   }
 };
 
-export const updatePreferences: RequestHandler = async (req, res) => {
+export const updatePreferences: RequestHandler = async (req, res, next) => {
   try {
-    const { section, preferences }: PreferencesUpdateRequest = req.body;
-    const __userId = "user-123"; // TODO: Get from auth
+    // Get userId from authentication context (from Issue #6)
+    const userId = (req as any).user?.id || (req as any).userId;
+    const { brandId, ...updateData } = req.body;
 
-    if (!section || !preferences) {
-      return res.status(400).json({
-        success: false,
-        error: "Section and preferences are required",
-      });
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.UNAUTHORIZED,
+        "User ID is required",
+        HTTP_STATUS.UNAUTHORIZED,
+        "warning"
+      );
     }
 
-    // TODO: Update in database
-    // await db.preferences.updateSection(userId, section, preferences);
-
-    // Mock update
-    if (section === "basic") {
-      Object.assign(mockPreferences.basic, preferences);
-    } else if (section === "advanced") {
-      Object.assign(mockPreferences.advanced, preferences);
-    } else if (section === "agency") {
-      mockPreferences.agencyOverrides = {
-        ...mockPreferences.agencyOverrides,
-        ...preferences,
-      };
+    if (!brandId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "brandId is required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
-    mockPreferences.updatedAt = new Date().toISOString();
+    if (!updateData || Object.keys(updateData).length === 0) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "At least one preference field is required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
+    }
+
+    // Update preferences in database
+    const updatedPreferences = await preferencesDB.updatePreferences(
+      userId,
+      brandId,
+      updateData
+    );
 
     const response: PreferencesResponse = {
       success: true,
-      preferences: mockPreferences,
+      preferences: (updatedPreferences || {}) as unknown as UserPreferences,
     };
 
     res.json(response);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to update preferences",
-    });
+    next(error);
   }
 };
 
-export const exportPreferences: RequestHandler = async (req, res) => {
+export const exportPreferences: RequestHandler = async (req, res, next) => {
   try {
-    const __userId = "user-123"; // TODO: Get from auth
+    // Get userId from authentication context (from Issue #6)
+    const userId = (req as any).user?.id || (req as any).userId;
+    const { brandId } = req.query;
 
-    // TODO: Fetch from database
-    const preferences = mockPreferences;
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.UNAUTHORIZED,
+        "User ID is required",
+        HTTP_STATUS.UNAUTHORIZED,
+        "warning"
+      );
+    }
+
+    if (!brandId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "brandId is required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
+    }
+
+    // Fetch preferences from database for export
+    const exportData = await preferencesDB.exportPreferences(
+      userId,
+      brandId as string
+    );
 
     res.setHeader("Content-Type", "application/json");
     res.setHeader(
       "Content-Disposition",
-      "attachment; filename=user-preferences.json",
+      `attachment; filename=preferences-${brandId}-${new Date().toISOString().split('T')[0]}.json`,
     );
-    res.json(preferences);
+    res.json(exportData);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to export preferences",
-    });
+    next(error);
   }
 };

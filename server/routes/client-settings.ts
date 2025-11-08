@@ -355,7 +355,7 @@ export const unsubscribeFromEmails: RequestHandler = async (req, res) => {
       });
     }
 
-    let updatePayload: unknown;
+    let updatePayload: any;
 
     if (fromType) {
       // Unsubscribe from specific notification type
@@ -363,15 +363,15 @@ export const unsubscribeFromEmails: RequestHandler = async (req, res) => {
       unsubscribedTypes.add(fromType);
 
       updatePayload = {
-        unsubscribedTypes: Array.from(
+        unsubscribed_types: Array.from(
           unsubscribedTypes,
         ) as EmailNotificationType[],
       };
     } else {
       // Unsubscribe from all
       updatePayload = {
-        unsubscribedFromAll: true,
-        unsubscribedTypes: [
+        unsubscribed_from_all: true,
+        unsubscribed_types: [
           "approvals_needed",
           "approval_reminders",
           "publish_failures",

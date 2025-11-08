@@ -1,157 +1,132 @@
 import { RequestHandler } from 'express';
 import { WhiteLabelConfig, WhiteLabelRequest, WhiteLabelResponse } from '@shared/branding';
+import { whiteLabelDB } from '../lib/white-label-db-service';
+import { AppError } from '../lib/error-middleware';
+import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
 
-// Mock white-label configs - in production this would be in database
-const mockConfigs: Record<string, WhiteLabelConfig> = {
-  'agency-123': {
-    id: 'wl-123',
-    agencyId: 'agency-123',
-    isActive: true,
-    branding: {
-      companyName: 'Creative Agency Pro',
-      logoUrl: 'https://example.com/logo.png',
-      tagline: 'Elevating Brands Through Social Media',
-    },
-    colors: {
-      primary: '#2563eb',
-      secondary: '#64748b',
-      accent: '#3b82f6',
-      background: '#ffffff',
-      surface: '#f8fafc',
-      text: {
-        primary: '#0f172a',
-        secondary: '#475569',
-        muted: '#94a3b8'
-      },
-      border: '#e2e8f0',
-      success: '#059669',
-      warning: '#d97706',
-      error: '#dc2626'
-    },
+// Helper function to map database record to API response
+function mapWhiteLabelRecord(record: any): WhiteLabelConfig {
+  return {
+    id: record.id,
+    agencyId: record.agency_id,
+    isActive: record.is_active,
+    branding: record.metadata?.branding || {},
+    colors: record.metadata?.colors || {},
     domain: {
-      custom: 'clients.creativeagency.com',
+      custom: record.domain || '',
       isPrimary: true
     },
-    footer: {
-      copyrightText: '© 2024 Creative Agency Pro. All rights reserved.',
-      showPoweredBy: false,
-      customLinks: [
-        { label: 'Support', url: 'mailto:support@creativeagency.com', openInNewTab: false }
-      ],
-      supportEmail: 'support@creativeagency.com'
-    },
-    email: {
-      fromName: 'Creative Agency Pro',
-      fromEmail: 'noreply@creativeagency.com',
-      headerColor: '#2563eb',
-      footerText: 'Creative Agency Pro - Social Media Management'
-    },
-    features: {
-      hideAlignedAIBranding: true,
-      customLoginPage: true,
-      customDashboardTitle: 'Client Portal',
-      allowClientBranding: true
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-};
+    footer: record.metadata?.footer || {},
+    email: record.metadata?.email || {},
+    features: record.metadata?.features || {},
+    createdAt: record.created_at,
+    updatedAt: record.updated_at
+  };
+}
 
-export const getWhiteLabelConfig: RequestHandler = async (req, res) => {
+export const getWhiteLabelConfig: RequestHandler = async (req, res, next) => {
   try {
-    // TODO: Get agencyId from authentication
-    const agencyId = 'agency-123';
-    
-    const config = mockConfigs[agencyId];
-    
+    // Get agencyId from path parameter or authentication context
+    const agencyId = (req.params.agencyId || (req as any).agencyId || (req as any).user?.agencyId);
+
+    if (!agencyId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "agencyId is required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
+    }
+
+    // Fetch config from database
+    const configRecord = await whiteLabelDB.getWhiteLabelConfig(agencyId);
+
     const response: WhiteLabelResponse = {
       success: true,
-      config: config || getDefaultConfig(agencyId)
+      config: configRecord ? mapWhiteLabelRecord(configRecord) : getDefaultConfig(agencyId)
     };
 
     res.json(response);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to fetch white-label config'
-    });
+    next(error);
   }
 };
 
-export const getConfigByDomain: RequestHandler = async (req, res) => {
+export const getConfigByDomain: RequestHandler = async (req, res, next) => {
   try {
     const { domain } = req.query;
-    
+
     if (!domain) {
-      return res.status(400).json({
-        success: false,
-        error: 'Domain parameter required'
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "domain parameter is required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
-    // Find config by custom domain
-    const config = Object.values(mockConfigs).find(
-      config => config.domain.custom === domain
-    );
+    // Find config by custom domain in database
+    const configRecord = await whiteLabelDB.getConfigByDomain(domain as string);
 
     const response: WhiteLabelResponse = {
       success: true,
-      config: config || undefined
+      config: configRecord ? mapWhiteLabelRecord(configRecord) : undefined
     };
 
     res.json(response);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to fetch config by domain'
-    });
+    next(error);
   }
 };
 
-export const updateWhiteLabelConfig: RequestHandler = async (req, res) => {
+export const updateWhiteLabelConfig: RequestHandler = async (req, res, next) => {
   try {
     const { config: updates, previewMode }: WhiteLabelRequest = req.body;
-    const agencyId = 'agency-123'; // TODO: Get from auth
+    // Get agencyId from path parameter or authentication context
+    const agencyId = (req.params.agencyId || (req as any).agencyId || (req as any).user?.agencyId);
+
+    if (!agencyId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "agencyId is required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
+    }
 
     if (!updates) {
-      return res.status(400).json({
-        success: false,
-        error: 'Config updates required'
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "config updates are required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
-    let currentConfig = mockConfigs[agencyId] || getDefaultConfig(agencyId);
-
-    // Deep merge updates
-    currentConfig = {
-      ...currentConfig,
-      ...updates,
-      branding: { ...currentConfig.branding, ...updates.branding },
-      colors: { ...currentConfig.colors, ...updates.colors },
-      domain: { ...currentConfig.domain, ...updates.domain },
-      footer: { ...currentConfig.footer, ...updates.footer },
-      email: { ...currentConfig.email, ...updates.email },
-      features: { ...currentConfig.features, ...updates.features },
-      updatedAt: new Date().toISOString()
-    };
-
-    if (!previewMode) {
-      // TODO: Save to database
-      mockConfigs[agencyId] = currentConfig;
+    if (previewMode) {
+      // Return preview without saving to database
+      const previewConfig = getDefaultConfig(agencyId);
+      const response: WhiteLabelResponse = {
+        success: true,
+        config: previewConfig,
+        previewUrl: `https://preview.alignedai.com/${agencyId}`
+      };
+      res.json(response);
+      return;
     }
+
+    // Update and save to database
+    const updatedRecord = await whiteLabelDB.updateWhiteLabelConfig(agencyId, updates as any);
+    const config = mapWhiteLabelRecord(updatedRecord);
 
     const response: WhiteLabelResponse = {
       success: true,
-      config: currentConfig,
-      previewUrl: previewMode ? `https://preview.alignedai.com/${agencyId}` : undefined
+      config
     };
 
     res.json(response);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to update white-label config'
-    });
+    next(error);
   }
 };
 

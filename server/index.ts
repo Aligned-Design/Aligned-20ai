@@ -1,9 +1,20 @@
 // dotenv not required in this dev environment; environment variables are injected by the runtime/DevServerControl.
-import express from "express";
+import express, { Request } from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
+import { getCorsConfig, validateCorsConfig } from "./lib/cors-config";
+import { addRequestId, errorHandler, notFoundHandler } from "./lib/error-middleware";
 import { handleDemo } from "./routes/demo";
+
+// Extend Express Request type to include request ID
+declare global {
+  namespace Express {
+    interface Request {
+      id?: string;
+    }
+  }
+}
 import integrationsRouter from "./routes/integrations";
 import agentsRouter from "./routes/agents";
 import {
@@ -207,12 +218,16 @@ export function createServer() {
   const _PORT = process.env.PORT || 8080;
   const _isDev = process.env.NODE_ENV !== "production";
 
+  // Validate CORS configuration at startup
+  if (!validateCorsConfig()) {
+    throw new Error("Invalid CORS configuration");
+  }
+
   // Middleware
-  app.use(
-    cors({
-      origin: process.env.FRONTEND_URL || "http://localhost:8080",
-    }),
-  );
+  app.use(cors(getCorsConfig()));
+
+  // Add request ID for tracing
+  app.use(addRequestId);
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
@@ -220,7 +235,7 @@ export function createServer() {
   // Log incoming API requests (helpful for debugging proxy/routing issues)
   app.use((req, res, next) => {
     if (req.path.startsWith("/api")) {
-      console.log("Incoming API request:", req.method, req.originalUrl);
+      console.log("Incoming API request:", req.method, req.originalUrl, `[${req.id}]`);
     }
     next();
   });
@@ -1396,6 +1411,10 @@ export function createServer() {
   // New AI routes
   app.post("/api/ai/generate", generateContent);
   app.get("/api/ai/providers", getProviderStatus);
+
+  // Error handling (must be registered after all routes)
+  app.use(notFoundHandler);
+  app.use(errorHandler);
 
   return app;
 }

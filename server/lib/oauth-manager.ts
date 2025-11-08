@@ -58,6 +58,12 @@ const OAUTH_CONFIGS: Record<Platform, OAuthConfig> = {
   },
 };
 
+/**
+ * ✅ SECURE: Generate OAuth URL with secure state token
+ * - State token is 64-character hex string (no information disclosure)
+ * - brandId is stored securely in backend cache, NOT in state parameter
+ * - Prevents information disclosure in OAuth provider logs
+ */
 export function generateOAuthUrl(
   platform: Platform,
   brandId: string,
@@ -68,13 +74,15 @@ export function generateOAuthUrl(
 
   // Store state and code verifier in secure cache with 10-minute expiration
   // This prevents CSRF attacks and ensures state can only be used once
+  // brandId is stored securely in backend, not exposed in state parameter
   oauthStateCache.store(state, brandId, platform, codeVerifier);
 
   const params = new URLSearchParams({
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
     scope: config.scope.join(" "),
-    state: `${state}:${brandId}`,
+    // ✅ SECURE: State token only, no brandId (prevents information disclosure)
+    state,
     response_type: "code",
   });
 
@@ -93,12 +101,19 @@ export function generateOAuthUrl(
   return {
     platform,
     authUrl,
-    state: `${state}:${brandId}`,
+    // ✅ SECURE: Return state token only (no brandId exposure)
+    state,
     codeVerifier: platform === "twitter" ? codeVerifier : undefined,
     expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(), // 10 minutes
   };
 }
 
+/**
+ * ✅ SECURE: Exchange OAuth code for access token
+ * - Validates state from cache to prevent CSRF
+ * - Retrieves brandId from backend cache (not from state parameter)
+ * - Verifies platform matches the original request
+ */
 export async function exchangeCodeForToken(
   platform: Platform,
   code: string,
@@ -108,19 +123,14 @@ export async function exchangeCodeForToken(
   refreshToken?: string;
   expiresIn?: number;
   accountInfo: unknown;
+  brandId: string;
 }> {
   const config = OAUTH_CONFIGS[platform];
 
   // ✅ SECURE: Retrieve and validate state from cache
   // This prevents CSRF attacks and verifies we initiated this OAuth flow
-  let stateData = oauthStateCache.retrieve(state);
-
-  // Some flows may append additional context to the state (e.g. `${state}:${brandId}`),
-  // try falling back to the raw state token if first lookup fails.
-  if (!stateData && state.includes(":")) {
-    const rawState = state.split(":")[0];
-    stateData = oauthStateCache.retrieve(rawState);
-  }
+  // State is now just the token - no information disclosure
+  const stateData = oauthStateCache.retrieve(state);
 
   if (!stateData) {
     throw new Error(
@@ -128,13 +138,14 @@ export async function exchangeCodeForToken(
     );
   }
 
-  // Verify platform matches
+  // Verify platform matches the original request
   if (stateData.platform !== platform) {
     throw new Error(
       `Platform mismatch: expected ${stateData.platform}, got ${platform}`,
     );
   }
 
+  // ✅ SECURE: Retrieve brandId from backend cache, not from state parameter
   const { brandId, codeVerifier } = stateData;
 
   const tokenParams = new URLSearchParams({
@@ -176,6 +187,8 @@ export async function exchangeCodeForToken(
     refreshToken: tokenData.refresh_token,
     expiresIn: tokenData.expires_in,
     accountInfo,
+    // ✅ SECURE: brandId comes from cache, not from state parameter
+    brandId,
   };
 }
 
