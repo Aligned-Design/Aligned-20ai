@@ -1,5 +1,7 @@
 import { RequestHandler } from "express";
 import { analyticsDB } from "../lib/analytics-db-service";
+import { AppError } from "../lib/error-middleware";
+import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 
 export const getAnalytics: RequestHandler = async (req, res) => {
   try {
@@ -74,7 +76,14 @@ export const getAnalytics: RequestHandler = async (req, res) => {
     res.json(analytics);
   } catch (error) {
     console.error("Failed to fetch analytics:", error);
-    res.status(500).json({ error: "Failed to fetch analytics" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to fetch analytics",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -142,7 +151,14 @@ export const getInsights: RequestHandler = async (req, res) => {
     res.json({ insights, totalCount: insights.length });
   } catch (error) {
     console.error("Failed to fetch insights:", error);
-    res.status(500).json({ error: "Failed to fetch insights" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to fetch insights",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -184,7 +200,14 @@ export const getForecast: RequestHandler = async (req, res) => {
     res.json(forecast);
   } catch (error) {
     console.error("Failed to generate forecast:", error);
-    res.status(500).json({ error: "Failed to generate forecast" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to generate forecast",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -200,8 +223,16 @@ export const processVoiceQuery: RequestHandler = async (req, res) => {
       ],
     };
     res.json(response);
-  } catch (_error) {
-    res.status(500).json({ error: "Failed to process voice query" });
+  } catch (error) {
+    console.error("Failed to process voice query:", error);
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to process voice query",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -248,7 +279,14 @@ export const provideFeedback: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("Failed to submit feedback:", error);
-    res.status(500).json({ error: "Failed to submit feedback" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to submit feedback",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -281,7 +319,14 @@ export const getGoals: RequestHandler = async (req, res) => {
     res.json({ goals: goalsWithProgress });
   } catch (error) {
     console.error("Failed to fetch goals:", error);
-    res.status(500).json({ error: "Failed to fetch goals" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to fetch goals",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -310,7 +355,14 @@ export const createGoal: RequestHandler = async (req, res) => {
     res.status(201).json(newGoal);
   } catch (error) {
     console.error("Failed to create goal:", error);
-    res.status(500).json({ error: "Failed to create goal" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to create goal",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -339,7 +391,14 @@ export const syncPlatformData: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("Failed to sync platform data:", error);
-    res.status(500).json({ error: "Failed to sync platform data" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to sync platform data",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -365,7 +424,14 @@ export const addOfflineMetric: RequestHandler = async (req, res) => {
     res.json({ message: "Offline metric added", metric, value, date });
   } catch (error) {
     console.error("Failed to add offline metric:", error);
-    res.status(500).json({ error: "Failed to add offline metric" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to add offline metric",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -406,7 +472,14 @@ export const getEngagementHeatmap: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("Failed to generate heatmap:", error);
-    res.status(500).json({ error: "Failed to generate heatmap" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to generate heatmap",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -483,7 +556,14 @@ export const getAlerts: RequestHandler = async (req, res) => {
     res.json({ alerts });
   } catch (error) {
     console.error("Failed to fetch alerts:", error);
-    res.status(500).json({ error: "Failed to fetch alerts" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to fetch alerts",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -497,6 +577,13 @@ export const acknowledgeAlert: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("Failed to acknowledge alert:", error);
-    res.status(500).json({ error: "Failed to acknowledge alert" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to acknowledge alert",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };

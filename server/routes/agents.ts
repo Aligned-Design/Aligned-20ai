@@ -14,6 +14,8 @@
 import { Router } from "express";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
+import { AppError } from "../lib/error-middleware";
+import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 import {
   GenerationRequest,
   GenerationResponse,
@@ -51,10 +53,12 @@ router.post("/generate/doc", async (req, res) => {
     const docInput = input as DocInput;
 
     if (!brand_id || !input) {
-      return res.status(400).json({
-        success: false,
-        error: "Missing required fields: brand_id, input",
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required fields: brand_id, input",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     // Load brand safety config
@@ -268,13 +272,14 @@ router.post("/generate/doc", async (req, res) => {
     res.json(response);
   } catch (error) {
     console.error("Doc generation error:", error);
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : "Internal server error",
-      needs_review: false,
-      blocked: false,
-      log_id: "",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Internal server error",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 
@@ -287,10 +292,12 @@ router.post("/generate/design", async (req, res) => {
     const { brand_id, input } = req.body as GenerationRequest;
 
     if (!brand_id || !input) {
-      return res.status(400).json({
-        success: false,
-        error: "Missing required fields: brand_id, input",
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required fields: brand_id, input",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     // Load brand kit for visual context
@@ -349,13 +356,14 @@ router.post("/generate/design", async (req, res) => {
     res.json(response);
   } catch (error) {
     console.error("Design generation error:", error);
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : "Internal server error",
-      needs_review: false,
-      blocked: false,
-      log_id: "",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Internal server error",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 
@@ -368,10 +376,12 @@ router.post("/generate/advisor", async (req, res) => {
     const { brand_id } = req.body as GenerationRequest;
 
     if (!brand_id) {
-      return res.status(400).json({
-        success: false,
-        error: "Missing required field: brand_id",
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required field: brand_id",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     // Check cache first
@@ -445,13 +455,14 @@ router.post("/generate/advisor", async (req, res) => {
     res.json(response);
   } catch (error) {
     console.error("Advisor generation error:", error);
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : "Internal server error",
-      needs_review: false,
-      blocked: false,
-      log_id: "",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Internal server error",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 
@@ -464,7 +475,12 @@ router.post("/bfs/calculate", async (req, res) => {
     const { content, brand_id } = req.body;
 
     if (!content || !brand_id) {
-      return res.status(400).json({ error: "Missing content or brand_id" });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing content or brand_id",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     // Load brand kit
@@ -484,7 +500,14 @@ router.post("/bfs/calculate", async (req, res) => {
     res.json(bfs);
   } catch (error) {
     console.error("BFS calculation error:", error);
-    res.status(500).json({ error: "Failed to calculate BFS" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to calculate BFS",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 
@@ -512,7 +535,14 @@ router.get("/review/queue/:brandId", async (req, res) => {
     res.json({ queue: reviewQueue || [] });
   } catch (error) {
     console.error("Review queue error:", error);
-    res.status(500).json({ error: "Failed to load review queue" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to load review queue",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 
@@ -541,7 +571,14 @@ router.post("/review/approve/:logId", async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     console.error("Approval error:", error);
-    res.status(500).json({ error: "Failed to approve content" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to approve content",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 
@@ -570,7 +607,14 @@ router.post("/review/reject/:logId", async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     console.error("Rejection error:", error);
-    res.status(500).json({ error: "Failed to reject content" });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to reject content",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 

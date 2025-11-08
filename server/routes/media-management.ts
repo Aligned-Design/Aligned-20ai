@@ -7,6 +7,8 @@ import { Router, Request, Response } from 'express';
 import { mediaService } from '../lib/media-service';
 import { supabase } from '../lib/supabase';
 import multer from 'multer';
+import { AppError } from '../lib/error-middleware';
+import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
 
 const router = Router();
 
@@ -39,18 +41,22 @@ router.post('/upload', upload.array('files', 20), async (req: Request, res: Resp
     const tenantId = req.query.tenantId as string;
 
     if (!brandId || !tenantId || !category) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing required fields: brandId, tenantId, category'
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required fields: brandId, tenantId, category',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     const files = req.files as Express.Multer.File[];
     if (!files || files.length === 0) {
-      return res.status(400).json({
-        success: false,
-        error: 'No files provided'
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'No files provided',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     // Verify brand belongs to tenant
@@ -62,10 +68,12 @@ router.post('/upload', upload.array('files', 20), async (req: Request, res: Resp
       .limit(1);
 
     if (brandError || !brand || brand.length === 0) {
-      return res.status(403).json({
-        success: false,
-        error: 'Unauthorized: Brand not found'
-      });
+      throw new AppError(
+        ErrorCode.FORBIDDEN,
+        'Unauthorized: Brand not found',
+        HTTP_STATUS.FORBIDDEN,
+        'warning'
+      );
     }
 
     const uploadedAssets = [];
@@ -106,10 +114,14 @@ router.post('/upload', upload.array('files', 20), async (req: Request, res: Resp
     });
   } catch (error) {
     console.error('Upload error:', error);
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Upload failed'
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Upload failed',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 });
 
@@ -129,10 +141,12 @@ router.get('/list', async (req: Request, res: Response) => {
     const sortOrder = (req.query.sortOrder as 'asc' | 'desc') || 'desc';
 
     if (!brandId) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing required field: brandId'
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required field: brandId',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     const { assets, total } = await mediaService.listAssets(brandId as string, {
@@ -157,10 +171,14 @@ router.get('/list', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('List error:', error);
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to list assets'
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Failed to list assets',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 });
 
@@ -174,10 +192,12 @@ router.get('/search', async (req: Request, res: Response) => {
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
 
     if (!brandId) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing required field: brandId'
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required field: brandId',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     // Search by tags if provided
@@ -209,10 +229,14 @@ router.get('/search', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Search error:', error);
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Search failed'
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Search failed',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 });
 
@@ -232,10 +256,14 @@ router.get('/storage/:brandId', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Storage usage error:', error);
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to get storage usage'
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Failed to get storage usage',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 });
 
@@ -249,10 +277,12 @@ router.get('/:assetId', async (req: Request, res: Response) => {
     const { brandId } = req.query;
 
     if (!brandId) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing required field: brandId'
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required field: brandId',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     const { data, error } = await supabase
@@ -263,10 +293,12 @@ router.get('/:assetId', async (req: Request, res: Response) => {
       .limit(1);
 
     if (error || !data || data.length === 0) {
-      return res.status(404).json({
-        success: false,
-        error: 'Asset not found'
-      });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        'Asset not found',
+        HTTP_STATUS.NOT_FOUND,
+        'info'
+      );
     }
 
     res.json({
@@ -275,10 +307,14 @@ router.get('/:assetId', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Get asset error:', error);
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to get asset'
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Failed to get asset',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 });
 
@@ -292,10 +328,12 @@ router.post('/:assetId/delete', async (req: Request, res: Response) => {
     const { brandId } = req.body;
 
     if (!brandId) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing required field: brandId'
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required field: brandId',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     await mediaService.deleteAsset(assetId, brandId);
@@ -306,10 +344,14 @@ router.post('/:assetId/delete', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Delete error:', error);
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to delete asset'
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Failed to delete asset',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 });
 
@@ -323,10 +365,12 @@ router.post('/:assetId/track-usage', async (req: Request, res: Response) => {
     const { brandId, usedIn } = req.body;
 
     if (!brandId || !usedIn) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing required fields: brandId, usedIn'
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required fields: brandId, usedIn',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     await mediaService.trackAssetUsage(assetId, usedIn, brandId);
@@ -337,10 +381,14 @@ router.post('/:assetId/track-usage', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Track usage error:', error);
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to track usage'
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Failed to track usage',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 });
 
@@ -353,10 +401,12 @@ router.post('/bulk-delete', async (req: Request, res: Response) => {
     const { assetIds, brandId } = req.body;
 
     if (!assetIds || !Array.isArray(assetIds) || !brandId) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing required fields: assetIds (array), brandId'
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required fields: assetIds (array), brandId',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     const results = {
@@ -384,10 +434,14 @@ router.post('/bulk-delete', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Bulk delete error:', error);
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Bulk delete failed'
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Bulk delete failed',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 });
 
@@ -400,10 +454,12 @@ router.post('/organize', async (req: Request, res: Response) => {
     const { assetIds, newCategory, brandId } = req.body;
 
     if (!assetIds || !Array.isArray(assetIds) || !newCategory || !brandId) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing required fields: assetIds, newCategory, brandId'
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required fields: assetIds, newCategory, brandId',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     const { error } = await supabase
@@ -413,10 +469,12 @@ router.post('/organize', async (req: Request, res: Response) => {
       .eq('brand_id', brandId);
 
     if (error) {
-      return res.status(400).json({
-        success: false,
-        error: error.message
-      });
+      throw new AppError(
+        ErrorCode.VALIDATION_ERROR,
+        error.message,
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     res.json({
@@ -426,10 +484,14 @@ router.post('/organize', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Organize error:', error);
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to organize assets'
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      'Failed to organize assets',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 });
 
