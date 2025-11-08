@@ -16,12 +16,26 @@ import {
   refreshToken,
   verifyConnection
 } from './publishing';
+import { oauthRateLimiters } from '../lib/rate-limiting';
+import { validateOAuthState } from '../lib/csrf-middleware';
+import { extractAuthMiddleware } from '../lib/auth-middleware';
 
 const router = Router();
 
-// OAuth routes
-router.post('/oauth/initiate', initiateOAuth);
-router.get('/oauth/callback/:platform', handleOAuthCallback);
+/**
+ * ✅ SECURE: OAuth routes with rate limiting and CSRF validation
+ * - Rate limited to prevent brute force attacks
+ * - CSRF state validation on callback
+ * - Auth context extraction on callback (required by handler)
+ */
+router.post('/oauth/initiate', oauthRateLimiters.initiate, initiateOAuth);
+router.get(
+  '/oauth/callback/:platform',
+  oauthRateLimiters.callback,
+  validateOAuthState,
+  extractAuthMiddleware,
+  handleOAuthCallback
+);
 
 // Connection management routes
 router.get('/:brandId/connections', getConnections);

@@ -50,18 +50,26 @@ export const initiateOAuth: RequestHandler = async (req, res) => {
   }
 };
 
-// OAuth callback handler
+/**
+ * ✅ SECURE: OAuth callback handler with full security checks
+ * - Validates CSRF state token from cache
+ * - Requires authenticated user context
+ * - Validates user has access to target brand
+ * - Rate limited to prevent brute force
+ */
 export const handleOAuthCallback: RequestHandler = async (req, res) => {
   try {
     const { platform } = req.params;
     const { code, state, error } = req.query;
 
+    // Handle OAuth provider errors
     if (error) {
       return res.redirect(
         `/integrations?error=${encodeURIComponent(error as string)}`,
       );
     }
 
+    // Validate required parameters
     if (!code || !state) {
       const errorMsg = "Missing authorization code or state parameter";
       return res.redirect(
@@ -70,17 +78,37 @@ export const handleOAuthCallback: RequestHandler = async (req, res) => {
     }
 
     // ✅ SECURE: exchangeCodeForToken validates state from cache
+    // and returns brandId from backend cache (not from state parameter)
     const tokenData = await exchangeCodeForToken(
       platform as Platform,
       code as string,
       state as string,
     );
 
-    const [_stateToken, brandId] = (state as string).split(":");
+    const { brandId } = tokenData;
 
-    // Get tenantId and userId from auth context (in production, from req.user or session)
-    const tenantId = (req as any).user?.tenantId || "tenant-123";
-    const userId = (req as any).user?.id;
+    // ✅ SECURE: Require authentication context
+    const authContext = (req as any).auth;
+    if (!authContext || !authContext.userId) {
+      const errorMsg =
+        "Authentication required to complete OAuth authorization";
+      return res.redirect(
+        `/integrations?error=${encodeURIComponent(errorMsg)}`,
+      );
+    }
+
+    // ✅ SECURE: Validate user has access to this brand
+    const { canAccessBrand } = await import("../lib/auth-context");
+    if (!canAccessBrand(authContext, brandId)) {
+      const errorMsg = "You do not have permission to access this brand";
+      return res.redirect(
+        `/integrations?error=${encodeURIComponent(errorMsg)}`,
+      );
+    }
+
+    // Use authenticated context
+    const tenantId = authContext.tenantId || "tenant-123";
+    const userId = authContext.userId;
 
     // Store connection in database
     await connectionsDB.upsertConnection(
