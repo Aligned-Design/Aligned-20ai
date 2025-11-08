@@ -61,7 +61,7 @@ describe('Database Services - Integration Suite', () => {
     it('should handle storage quota validation', () => {
       const quota = 10737418240;
       const used = 9737418240;
-      const fileSize = 1000000000; // 1GB
+      const fileSize = 1000000001; // Just over 1GB to exceed quota
       const wouldExceed = used + fileSize > quota;
       expect(wouldExceed).toBe(true);
     });
@@ -400,7 +400,7 @@ describe('Database Services - Integration Suite', () => {
         500,
         'critical'
       );
-      expect(error.errorCode).toBe(ErrorCode.DATABASE_ERROR);
+      expect(error.code).toBe(ErrorCode.DATABASE_ERROR);
     });
 
     it('should throw NOT_FOUND for missing resources', () => {
@@ -431,7 +431,7 @@ describe('Database Services - Integration Suite', () => {
         'critical',
         { table: 'users', operation: 'INSERT' }
       );
-      expect(error.context).toBeDefined();
+      expect(error.details).toBeDefined();
     });
   });
 
