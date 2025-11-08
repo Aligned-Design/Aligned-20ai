@@ -5,6 +5,8 @@
 
 import { RequestHandler } from 'express';
 import { z } from 'zod';
+import { AppError } from '../lib/error-middleware';
+import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
 import {
   queryAuditLogs,
   getAuditStatistics,
@@ -42,18 +44,30 @@ export const getAuditLogs: RequestHandler = async (req, res) => {
     const brandId = req.headers['x-brand-id'] as string;
 
     if (!brandId) {
-      return res.status(400).json({
-        error: 'Missing required header: x-brand-id',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required header: x-brand-id',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     // Validate query parameters
     const validationResult = AuditLogQuerySchema.safeParse(req.query);
     if (!validationResult.success) {
-      return res.status(400).json({
-        error: 'Validation failed',
-        details: validationResult.error.errors,
-      });
+      const validationErrors = validationResult.error.errors.map((e) => ({
+        field: e.path.join('.'),
+        message: e.message,
+        code: e.code,
+      }));
+      throw new AppError(
+        ErrorCode.VALIDATION_ERROR,
+        'Request validation failed',
+        HTTP_STATUS.UNPROCESSABLE_ENTITY,
+        'warning',
+        { validationErrors },
+        'Please review the validation errors and retry your request'
+      );
     }
 
     const validData = validationResult.data;
@@ -82,9 +96,14 @@ export const getAuditLogs: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error('[Audit Logs] Query error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to query audit logs',
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : 'Failed to query audit logs',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 };
 
@@ -98,15 +117,21 @@ export const getPostAuditLog: RequestHandler = async (req, res) => {
     const brandId = req.headers['x-brand-id'] as string;
 
     if (!brandId) {
-      return res.status(400).json({
-        error: 'Missing required header: x-brand-id',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required header: x-brand-id',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     if (!postId) {
-      return res.status(400).json({
-        error: 'Post ID is required',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Post ID is required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     const logs = await getPostAuditTrail(brandId, postId);
@@ -119,9 +144,14 @@ export const getPostAuditLog: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error('[Post Audit Trail] Error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to get audit trail',
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : 'Failed to get audit trail',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 };
 
@@ -135,9 +165,12 @@ export const getAuditStats: RequestHandler = async (req, res) => {
     const { startDate, endDate } = req.query as { startDate?: string; endDate?: string };
 
     if (!brandId) {
-      return res.status(400).json({
-        error: 'Missing required header: x-brand-id',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required header: x-brand-id',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     const stats = await getAuditStatistics(brandId, startDate, endDate);
@@ -152,9 +185,14 @@ export const getAuditStats: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error('[Audit Stats] Error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to get audit statistics',
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : 'Failed to get audit statistics',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 };
 
@@ -172,15 +210,21 @@ export const exportAuditLogsHandler: RequestHandler = async (req, res) => {
     };
 
     if (!brandId) {
-      return res.status(400).json({
-        error: 'Missing required header: x-brand-id',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required header: x-brand-id',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     if (!startDate || !endDate) {
-      return res.status(400).json({
-        error: 'startDate and endDate are required',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'startDate and endDate are required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     const exportFormat = format || 'csv';
@@ -218,9 +262,14 @@ export const exportAuditLogsHandler: RequestHandler = async (req, res) => {
     }
   } catch (error) {
     console.error('[Audit Export] Error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to export audit logs',
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : 'Failed to export audit logs',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 };
 
@@ -234,9 +283,12 @@ export const searchAuditLogs: RequestHandler = async (req, res) => {
     const { postId, actorEmail, action, startDate, endDate, limit = 50, offset = 0 } = req.body;
 
     if (!brandId) {
-      return res.status(400).json({
-        error: 'Missing required header: x-brand-id',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Missing required header: x-brand-id',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     const query: AuditLogQuery = {
@@ -275,9 +327,14 @@ export const searchAuditLogs: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error('[Audit Search] Error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to search audit logs',
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : 'Failed to search audit logs',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 };
 
@@ -307,8 +364,13 @@ export const getAuditActions: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error('[Audit Actions] Error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to get audit actions',
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : 'Failed to get audit actions',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'error',
+      error instanceof Error ? { originalError: error.message } : undefined,
+      'Please try again later or contact support'
+    );
   }
 };
