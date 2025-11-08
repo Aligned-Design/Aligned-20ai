@@ -4,6 +4,8 @@ This directory contains comprehensive documentation about the system architectur
 
 ## Contents
 
+- **ALIGNED_20AI_ROADMAP.md** - Full product roadmap, workflows, and development phases
+
 - **AI_DESIGN_SYSTEM.md** - AI-powered design system and component guidelines
 - **DESIGN_SYSTEM.md** - Visual design system, colors, typography, and components
 - **AGENTS.md** - AI agents architecture and agent configuration
@@ -55,6 +57,13 @@ The database is organized around several key entity groups:
 - **Analytics:** Metrics and engagement data
 - **Webhooks:** Event tracking and retry scheduling
 - **Escalations:** Priority queues and rules
+
+## Architecture Index
+- [Aligned 20AI Roadmap](./ALIGNED_20AI_ROADMAP.md)
+- [Agents Overview](./AGENTS.md)
+- [AI Design System](./AI_DESIGN_SYSTEM.md)
+- [Aligned AI Sitemap](./ALIGNED_AI_SITEMAP.md)
+- [Design System](./DESIGN_SYSTEM.md)
 
 All tables include proper indexing and RLS policies for security.
 
