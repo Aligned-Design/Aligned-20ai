@@ -26,11 +26,13 @@ class OAuthStateCache {
 
   /**
    * Store OAuth state with expiration
-   * @param state - Random state token
+   * SECURITY: Validates state format to prevent invalid/malicious states
+   * @param state - Random state token (must be 64-char hex string)
    * @param brandId - Brand identifier
    * @param platform - Social platform
    * @param codeVerifier - PKCE code verifier
    * @param ttlSeconds - Time to live (default 10 minutes)
+   * @throws Error if state is invalid format
    */
   store(
     state: string,
@@ -39,6 +41,21 @@ class OAuthStateCache {
     codeVerifier: string,
     ttlSeconds: number = 10 * 60,
   ): void {
+    // SECURITY: Validate state format before storing
+    if (!state || typeof state !== "string") {
+      throw new Error("Invalid state: must be a non-empty string");
+    }
+
+    if (state.length !== 64) {
+      throw new Error(
+        `Invalid state: must be exactly 64 characters (got ${state.length})`
+      );
+    }
+
+    if (!/^[a-f0-9]+$/i.test(state)) {
+      throw new Error("Invalid state: must be hexadecimal characters only");
+    }
+
     const now = Date.now();
 
     this.states.set(state, {

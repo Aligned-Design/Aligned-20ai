@@ -10,26 +10,31 @@ import { ErrorCode, HTTP_STATUS } from "./error-responses";
 
 /**
  * Validate OAuth state parameter format
- * States should be hex strings (at least 64 characters for 32 bytes)
+ * States should be hex strings (exactly 64 characters for 32 bytes)
+ * No compound formats allowed (no colons, no brandId encoding)
  */
 function isValidStateFormat(state: string): boolean {
-  // State should be at least 64 characters (32 bytes in hex)
-  if (!state || state.length < 64) {
+  // State must be exactly 64 characters (32 bytes in hex)
+  // Not >= 64, exactly 64 to prevent compound state formats
+  if (!state || state.length !== 64) {
     return false;
   }
 
   // State should only contain hex characters (0-9, a-f)
-  // Allow colons for compound states like "state:brandId"
-  const validStateRegex = /^[a-f0-9:]+$/i;
+  // SECURITY: No colons allowed - compound state format "token:brandId" is UNSAFE
+  // BrandId must be stored securely in backend cache, never in state parameter
+  const validStateRegex = /^[a-f0-9]+$/i;
   return validStateRegex.test(state);
 }
 
 /**
- * Extract raw state token from compound state (e.g., "token:brandId" -> "token")
+ * Extract raw state token
+ * DEPRECATED: No longer supports compound states (e.g., "token:brandId")
+ * State is now always a single 64-character hex token
  */
-function extractRawStateToken(compoundState: string): string {
-  const parts = compoundState.split(":");
-  return parts[0];
+function extractRawStateToken(state: string): string {
+  // State is no longer compound, return as-is
+  return state;
 }
 
 /**
@@ -55,7 +60,7 @@ export function validateOAuthState(
     );
   }
 
-  // Validate state format
+  // Validate state format (must be exactly 64 hex chars, no compound formats)
   if (!isValidStateFormat(state)) {
     throw new AppError(
       ErrorCode.INVALID_FORMAT,
@@ -63,28 +68,18 @@ export function validateOAuthState(
       HTTP_STATUS.BAD_REQUEST,
       "warning",
       { state: state.substring(0, 10) + "..." },
-      "State parameter appears to be corrupted or invalid"
+      "State parameter must be a 64-character hex string"
     );
   }
 
-  // Extract raw token from compound state if needed
+  // Extract raw token (no longer compound, just return as-is)
   const rawStateToken = extractRawStateToken(state);
-  if (!rawStateToken || rawStateToken.length < 64) {
-    throw new AppError(
-      ErrorCode.INVALID_FORMAT,
-      "OAuth state token is too short",
-      HTTP_STATUS.BAD_REQUEST,
-      "warning",
-      undefined,
-      "State parameter must contain a valid OAuth token"
-    );
-  }
 
   // Attach validated state to request for downstream handlers
   (_req as any).validatedState = {
     fullState: state,
     rawToken: rawStateToken,
-    parts: state.split(":"),
+    parts: [rawStateToken], // Now always single element since no colons allowed
   };
 
   next();
