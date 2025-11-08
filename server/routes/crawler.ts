@@ -11,6 +11,8 @@
 import { Router } from "express";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
+import { AppError } from "../lib/error-middleware";
+import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 import {
   processBrandIntake,
   crawlWebsite,
@@ -40,7 +42,12 @@ router.post("/crawl/start", async (req, res) => {
     const { brand_id, url } = req.body;
 
     if (!brand_id || !url) {
-      return res.status(400).json({ error: "brand_id and url are required" });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "brand_id and url are required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     // Verify user has access to brand
@@ -53,7 +60,12 @@ router.post("/crawl/start", async (req, res) => {
       .single();
 
     if (memberError || !member) {
-      return res.status(403).json({ error: "Access denied" });
+      throw new AppError(
+        ErrorCode.FORBIDDEN,
+        "Access denied",
+        HTTP_STATUS.FORBIDDEN,
+        "warning"
+      );
     }
 
     // Get current brand_kit
@@ -64,7 +76,12 @@ router.post("/crawl/start", async (req, res) => {
       .single();
 
     if (brandError) {
-      return res.status(404).json({ error: "Brand not found" });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        "Brand not found",
+        HTTP_STATUS.NOT_FOUND,
+        "info"
+      );
     }
 
     const job_id = `crawl_${Date.now()}_${Math.random().toString(36).substring(7)}`;
@@ -90,10 +107,16 @@ router.post("/crawl/start", async (req, res) => {
     });
 
     res.json({ job_id, status: "pending" });
-  } catch (error: unknown) {
-    res
-      .status(500)
-      .json({ error: error instanceof Error ? error.message : String(error) });
+  } catch (error) {
+    console.error("[Crawler] Start crawl error:", error);
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Failed to start crawl",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 
@@ -232,14 +255,25 @@ router.get("/crawl/result/:jobId", async (req, res) => {
     const job = crawlJobs.get(jobId);
 
     if (!job) {
-      return res.status(404).json({ error: "Job not found" });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        "Job not found",
+        HTTP_STATUS.NOT_FOUND,
+        "info"
+      );
     }
 
     res.json(job);
-  } catch (error: unknown) {
-    res
-      .status(500)
-      .json({ error: error instanceof Error ? error.message : String(error) });
+  } catch (error) {
+    console.error("[Crawler] Get crawl result error:", error);
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Failed to get crawl result",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 
@@ -255,7 +289,12 @@ router.post("/brand-kit/apply", async (req, res) => {
     };
 
     if (!brand_id || !changes || !Array.isArray(changes)) {
-      return res.status(400).json({ error: "brand_id and changes[] required" });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "brand_id and changes[] required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     const userId = req.headers["x-user-id"];
@@ -268,7 +307,12 @@ router.post("/brand-kit/apply", async (req, res) => {
       .single();
 
     if (brandError) {
-      return res.status(404).json({ error: "Brand not found" });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        "Brand not found",
+        HTTP_STATUS.NOT_FOUND,
+        "info"
+      );
     }
 
     const brandKit = brand.brand_kit || {};
@@ -307,17 +351,28 @@ router.post("/brand-kit/apply", async (req, res) => {
       .eq("id", brand_id);
 
     if (updateError) {
-      return res.status(500).json({ error: "Failed to update brand kit" });
+      throw new AppError(
+        ErrorCode.INTERNAL_ERROR,
+        "Failed to update brand kit",
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        "error"
+      );
     }
 
     // Save history
     await saveHistory(brand_id, history);
 
     res.json({ success: true, applied: changes.length });
-  } catch (error: unknown) {
-    res
-      .status(500)
-      .json({ error: error instanceof Error ? error.message : String(error) });
+  } catch (error) {
+    console.error("[Crawler] Apply brand kit error:", error);
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Failed to apply changes",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 
@@ -338,11 +393,13 @@ router.get("/brand-kit/history/:brandId", async (req, res) => {
       .limit(field ? 10 : 100);
 
     if (error) {
-      return res
-        .status(500)
-        .json({
-          error: error instanceof Error ? error.message : String(error),
-        });
+      throw new AppError(
+        ErrorCode.INTERNAL_ERROR,
+        error instanceof Error ? error.message : "Failed to fetch history",
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        "error",
+        error instanceof Error ? { originalError: error.message } : undefined
+      );
     }
 
     // Filter by field if specified
@@ -351,10 +408,16 @@ router.get("/brand-kit/history/:brandId", async (req, res) => {
       : data;
 
     res.json({ history });
-  } catch (error: unknown) {
-    res
-      .status(500)
-      .json({ error: error instanceof Error ? error.message : String(error) });
+  } catch (error) {
+    console.error("[Crawler] Get history error:", error);
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Failed to get history",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 
@@ -367,9 +430,12 @@ router.post("/brand-kit/revert", async (req, res) => {
     const { brand_id, field, history_id } = req.body;
 
     if (!brand_id || !field || !history_id) {
-      return res
-        .status(400)
-        .json({ error: "brand_id, field, and history_id required" });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "brand_id, field, and history_id required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     // Get history entry
@@ -380,7 +446,12 @@ router.post("/brand-kit/revert", async (req, res) => {
       .single();
 
     if (historyError || !historyEntry) {
-      return res.status(404).json({ error: "History entry not found" });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        "History entry not found",
+        HTTP_STATUS.NOT_FOUND,
+        "info"
+      );
     }
 
     // Get current brand_kit
@@ -391,7 +462,12 @@ router.post("/brand-kit/revert", async (req, res) => {
       .single();
 
     if (brandError) {
-      return res.status(404).json({ error: "Brand not found" });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        "Brand not found",
+        HTTP_STATUS.NOT_FOUND,
+        "info"
+      );
     }
 
     const brandKit = brand.brand_kit || {};
@@ -409,14 +485,25 @@ router.post("/brand-kit/revert", async (req, res) => {
       .eq("id", brand_id);
 
     if (updateError) {
-      return res.status(500).json({ error: "Failed to revert field" });
+      throw new AppError(
+        ErrorCode.INTERNAL_ERROR,
+        "Failed to revert field",
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        "error"
+      );
     }
 
     res.json({ success: true, field, value: historyEntry.old_value });
-  } catch (error: unknown) {
-    res
-      .status(500)
-      .json({ error: error instanceof Error ? error.message : String(error) });
+  } catch (error) {
+    console.error("[Crawler] Revert field error:", error);
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Failed to revert field",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 });
 

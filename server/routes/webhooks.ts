@@ -5,6 +5,8 @@
 
 import { RequestHandler } from "express";
 import { z } from "zod";
+import { AppError } from "../lib/error-middleware";
+import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 import {
   WebhookProvider,
   WebhookLogsQuerySchema,
@@ -103,20 +105,30 @@ export const handleZapierWebhook: RequestHandler = async (req, res) => {
   try {
     const brandId = req.headers["x-brand-id"] as string;
     if (!brandId) {
-      return res
-        .status(400)
-        .json({ error: "Missing required header: x-brand-id" });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required header: x-brand-id",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     // Validate request body
     const validationResult = ZapierWebhookBodySchema.safeParse(req.body);
     if (!validationResult.success) {
-      return res
-        .status(400)
-        .json({
-          error: "Validation failed",
-          details: validationResult.error.errors,
-        });
+      const validationErrors = validationResult.error.errors.map((e) => ({
+        field: e.path.join("."),
+        message: e.message,
+        code: e.code,
+      }));
+      throw new AppError(
+        ErrorCode.VALIDATION_ERROR,
+        "Request validation failed",
+        HTTP_STATUS.UNPROCESSABLE_ENTITY,
+        "warning",
+        { validationErrors },
+        "Please review the validation errors and retry your request"
+      );
     }
 
     const body = validationResult.data;
@@ -135,11 +147,14 @@ export const handleZapierWebhook: RequestHandler = async (req, res) => {
     res.json(response);
   } catch (error) {
     console.error("[Zapier Webhook] Error:", error);
-    res
-      .status(500)
-      .json({
-        error: error instanceof Error ? error.message : "Internal server error",
-      });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Internal server error",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -151,20 +166,30 @@ export const handleMakeWebhook: RequestHandler = async (req, res) => {
   try {
     const brandId = req.headers["x-brand-id"] as string;
     if (!brandId) {
-      return res
-        .status(400)
-        .json({ error: "Missing required header: x-brand-id" });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required header: x-brand-id",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     // Validate request body
     const validationResult = MakeWebhookBodySchema.safeParse(req.body);
     if (!validationResult.success) {
-      return res
-        .status(400)
-        .json({
-          error: "Validation failed",
-          details: validationResult.error.errors,
-        });
+      const validationErrors = validationResult.error.errors.map((e) => ({
+        field: e.path.join("."),
+        message: e.message,
+        code: e.code,
+      }));
+      throw new AppError(
+        ErrorCode.VALIDATION_ERROR,
+        "Request validation failed",
+        HTTP_STATUS.UNPROCESSABLE_ENTITY,
+        "warning",
+        { validationErrors },
+        "Please review the validation errors and retry your request"
+      );
     }
 
     const body = validationResult.data;
@@ -183,11 +208,14 @@ export const handleMakeWebhook: RequestHandler = async (req, res) => {
     res.json(response);
   } catch (error) {
     console.error("[Make Webhook] Error:", error);
-    res
-      .status(500)
-      .json({
-        error: error instanceof Error ? error.message : "Internal server error",
-      });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Internal server error",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -199,9 +227,12 @@ export const handleSlackWebhook: RequestHandler = async (req, res) => {
   try {
     const brandId = req.headers["x-brand-id"] as string;
     if (!brandId) {
-      return res
-        .status(400)
-        .json({ error: "Missing required header: x-brand-id" });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required header: x-brand-id",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     const body = req.body;
@@ -230,11 +261,14 @@ export const handleSlackWebhook: RequestHandler = async (req, res) => {
     }
   } catch (error) {
     console.error("[Slack Webhook] Error:", error);
-    res
-      .status(500)
-      .json({
-        error: error instanceof Error ? error.message : "Internal server error",
-      });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Internal server error",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -246,9 +280,12 @@ export const handleHubSpotWebhook: RequestHandler = async (req, res) => {
   try {
     const brandId = req.headers["x-brand-id"] as string;
     if (!brandId) {
-      return res
-        .status(400)
-        .json({ error: "Missing required header: x-brand-id" });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required header: x-brand-id",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     const body = req.body;
@@ -286,11 +323,14 @@ export const handleHubSpotWebhook: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("[HubSpot Webhook] Error:", error);
-    res
-      .status(500)
-      .json({
-        error: error instanceof Error ? error.message : "Internal server error",
-      });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Internal server error",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -304,19 +344,32 @@ export const getWebhookStatus: RequestHandler = async (req, res) => {
     const brandId = req.headers["x-brand-id"] as string;
 
     if (!brandId) {
-      return res
-        .status(400)
-        .json({ error: "Missing required header: x-brand-id" });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required header: x-brand-id",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
-    const eventStatus: any = await webhookHandler.getEventStatus(eventId);
+    const eventStatus = (await webhookHandler.getEventStatus(eventId)) as any;
     if (!eventStatus) {
-      return res.status(404).json({ error: "Event not found" });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        "Event not found",
+        HTTP_STATUS.NOT_FOUND,
+        "info"
+      );
     }
 
     // Verify brand ownership
     if (eventStatus.brand_id !== brandId) {
-      return res.status(403).json({ error: "Unauthorized" });
+      throw new AppError(
+        ErrorCode.FORBIDDEN,
+        "Unauthorized",
+        HTTP_STATUS.FORBIDDEN,
+        "warning"
+      );
     }
 
     res.json({
@@ -344,11 +397,14 @@ export const getWebhookStatus: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("[Webhook Status] Error:", error);
-    res
-      .status(500)
-      .json({
-        error: error instanceof Error ? error.message : "Internal server error",
-      });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Internal server error",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -360,20 +416,30 @@ export const getWebhookLogs: RequestHandler = async (req, res) => {
   try {
     const brandId = req.headers["x-brand-id"] as string;
     if (!brandId) {
-      return res
-        .status(400)
-        .json({ error: "Missing required header: x-brand-id" });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required header: x-brand-id",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     // Validate query parameters
     const validationResult = WebhookLogsQuerySchema.safeParse(req.query);
     if (!validationResult.success) {
-      return res
-        .status(400)
-        .json({
-          error: "Validation failed",
-          details: validationResult.error.errors,
-        });
+      const validationErrors = validationResult.error.errors.map((e) => ({
+        field: e.path.join("."),
+        message: e.message,
+        code: e.code,
+      }));
+      throw new AppError(
+        ErrorCode.VALIDATION_ERROR,
+        "Request validation failed",
+        HTTP_STATUS.UNPROCESSABLE_ENTITY,
+        "warning",
+        { validationErrors },
+        "Please review the validation errors and retry your request"
+      );
     }
 
     const query = validationResult.data;
@@ -410,11 +476,14 @@ export const getWebhookLogs: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("[Webhook Logs] Error:", error);
-    res
-      .status(500)
-      .json({
-        error: error instanceof Error ? error.message : "Internal server error",
-      });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Internal server error",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -430,20 +499,33 @@ export const retryWebhookEvent: RequestHandler = async (req, res) => {
     const userEmail = req.headers["x-user-email"] as string;
 
     if (!brandId) {
-      return res
-        .status(400)
-        .json({ error: "Missing required header: x-brand-id" });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "Missing required header: x-brand-id",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     // Get event
-    const event = await webhookHandler.getEventStatus(eventId);
+    const event = (await webhookHandler.getEventStatus(eventId)) as any;
     if (!event) {
-      return res.status(404).json({ error: "Event not found" });
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        "Event not found",
+        HTTP_STATUS.NOT_FOUND,
+        "info"
+      );
     }
 
     // Verify brand ownership
     if (event.brand_id !== brandId) {
-      return res.status(403).json({ error: "Unauthorized" });
+      throw new AppError(
+        ErrorCode.FORBIDDEN,
+        "Unauthorized",
+        HTTP_STATUS.FORBIDDEN,
+        "warning"
+      );
     }
 
     // Log audit trail
@@ -466,10 +548,13 @@ export const retryWebhookEvent: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("[Webhook Retry] Error:", error);
-    res
-      .status(500)
-      .json({
-        error: error instanceof Error ? error.message : "Internal server error",
-      });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Internal server error",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
