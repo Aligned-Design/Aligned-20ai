@@ -1,38 +1,7 @@
 import { RequestHandler, Response } from "express";
 import { BrandIntelligence } from "@shared/brand-intelligence";
-
-/**
- * Ensures all API responses are JSON with proper headers
- * @param res Express response object
- */
-function setJsonHeaders(res: Response): void {
-  res.set({
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-cache, no-store, must-revalidate",
-  });
-}
-
-/**
- * Sends a JSON error response with proper status code and headers
- * @param res Express response object
- * @param status HTTP status code
- * @param error Error message or object
- */
-function sendJsonError(
-  res: Response,
-  status: number,
-  error: string | { error?: string; message?: string; code?: string },
-): Response {
-  setJsonHeaders(res);
-
-  const errorObj = typeof error === "string" ? { error } : error;
-
-  return res.status(status).json({
-    error: errorObj.error || errorObj.message || "An error occurred",
-    code: (errorObj as any).code || "UNKNOWN_ERROR",
-    timestamp: new Date().toISOString(),
-  });
-}
+import { AppError } from "../lib/error-middleware";
+import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 
 export const getBrandIntelligence: RequestHandler = async (req, res) => {
   try {
@@ -40,14 +9,26 @@ export const getBrandIntelligence: RequestHandler = async (req, res) => {
 
     // Validate required parameter
     if (!brandId) {
-      return sendJsonError(res, 400, {
-        error: "brandId parameter is required",
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "brandId parameter is required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning",
+        undefined,
+        "Please provide brandId as a URL parameter"
+      );
     }
 
     // Validate brandId format (basic check)
     if (typeof brandId !== "string" || brandId.length === 0) {
-      return sendJsonError(res, 400, { error: "Invalid brandId format" });
+      throw new AppError(
+        ErrorCode.INVALID_FORMAT,
+        "Invalid brandId format",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning",
+        undefined,
+        "brandId must be a non-empty string"
+      );
     }
 
     // Mock comprehensive brand intelligence data
@@ -289,44 +270,31 @@ export const getBrandIntelligence: RequestHandler = async (req, res) => {
       confidenceScore: 0.87,
     };
 
-    // Always return JSON with proper headers
-    setJsonHeaders(res);
+    // Return success response with proper headers
+    res.set({
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+    });
     return res.status(200).json(intelligence);
   } catch (error) {
-    // Log error for debugging
-    try {
-      const safeStringify = (v: any) => {
-        try {
-          return JSON.stringify(v, (_k, val) =>
-            val instanceof Error
-              ? { message: val.message, stack: val.stack }
-              : val,
-          );
-        } catch (e) {
-          return String(v);
-        }
-      };
-      console.error(`[Brand Intelligence API] Error: ${safeStringify(error)}`, {
-        message: error instanceof Error ? error.message : "Unknown error",
-        brandId: req.params.brandId,
-        timestamp: new Date().toISOString(),
-      });
-    } catch (logErr) {
-      console.error(
-        "[Brand Intelligence API] Error (logging failed):",
-        String(logErr),
-      );
-      console.error("[Brand Intelligence API] Original error:", error);
+    console.error("[Brand Intelligence API] Error:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      brandId: req.params.brandId,
+      timestamp: new Date().toISOString(),
+    });
+
+    if (error instanceof AppError) {
+      throw error;
     }
 
-    // Return structured JSON error response
-    return sendJsonError(res, 500, {
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to load brand intelligence",
-      code: "BRAND_INTELLIGENCE_ERROR",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to load brand intelligence",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
@@ -339,59 +307,59 @@ export const submitRecommendationFeedback: RequestHandler = async (
 
     // Validate required fields
     if (!recommendationId) {
-      return sendJsonError(res, 400, { error: "recommendationId is required" });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "recommendationId is required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning",
+        undefined,
+        "Please provide recommendationId in your request body"
+      );
     }
 
     if (!action || !["accepted", "rejected"].includes(action)) {
-      return sendJsonError(res, 400, {
-        error: 'action must be either "accepted" or "rejected"',
-      });
+      throw new AppError(
+        ErrorCode.INVALID_FORMAT,
+        'action must be either "accepted" or "rejected"',
+        HTTP_STATUS.BAD_REQUEST,
+        "warning",
+        undefined,
+        'Please provide action as either "accepted" or "rejected"'
+      );
     }
 
     // TODO: Store feedback in database
     // TODO: Use feedback to improve future recommendations
     // const feedbackId = await storeFeedback({ recommendationId, action, timestamp: new Date() });
 
-    setJsonHeaders(res);
+    res.set({
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+    });
     return res.status(200).json({
       success: true,
       message: "Feedback recorded successfully",
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    try {
-      const safeStringify = (v: any) => {
-        try {
-          return JSON.stringify(v, (_k, val) =>
-            val instanceof Error
-              ? { message: val.message, stack: val.stack }
-              : val,
-          );
-        } catch (e) {
-          return String(v);
-        }
-      };
-      console.error(
-        `[Brand Intelligence Feedback] Error: ${safeStringify(error)}`,
-        {
-          message: error instanceof Error ? error.message : "Unknown error",
-          recommendationId: (req.body as any)?.recommendationId,
-          timestamp: new Date().toISOString(),
-        },
-      );
-    } catch (logErr) {
-      console.error(
-        "[Brand Intelligence Feedback] Error (logging failed):",
-        String(logErr),
-      );
-      console.error("[Brand Intelligence Feedback] Original error:", error);
+    console.error("[Brand Intelligence Feedback] Error:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      recommendationId: (req.body as any)?.recommendationId,
+      timestamp: new Date().toISOString(),
+    });
+
+    if (error instanceof AppError) {
+      throw error;
     }
 
-    return sendJsonError(res, 500, {
-      error:
-        error instanceof Error ? error.message : "Failed to record feedback",
-      code: "FEEDBACK_ERROR",
-    });
+    throw new AppError(
+      ErrorCode.INTERNAL_ERROR,
+      "Failed to record feedback",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "error",
+      error instanceof Error ? { originalError: error.message } : undefined,
+      "Please try again later or contact support"
+    );
   }
 };
 
