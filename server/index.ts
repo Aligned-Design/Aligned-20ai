@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
+import { getCorsConfig, validateCorsConfig } from "./lib/cors-config";
 import { handleDemo } from "./routes/demo";
 import integrationsRouter from "./routes/integrations";
 import agentsRouter from "./routes/agents";
@@ -207,12 +208,13 @@ export function createServer() {
   const _PORT = process.env.PORT || 8080;
   const _isDev = process.env.NODE_ENV !== "production";
 
+  // Validate CORS configuration at startup
+  if (!validateCorsConfig()) {
+    throw new Error("Invalid CORS configuration");
+  }
+
   // Middleware
-  app.use(
-    cors({
-      origin: process.env.FRONTEND_URL || "http://localhost:8080",
-    }),
-  );
+  app.use(cors(getCorsConfig()));
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
