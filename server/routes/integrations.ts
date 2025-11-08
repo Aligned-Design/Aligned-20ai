@@ -8,60 +8,62 @@ import {
   BrandIdSchema,
 } from "../lib/validation-schemas";
 import { validateQuery, validateBody, validateRequest } from "../lib/validation-middleware";
+import { integrationsDB } from "../lib/integrations-db-service";
+import { AppError } from "../lib/error-middleware";
+import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 
 const router = Router();
 
-// Mock data for integrations
-const mockIntegrations: Integration[] = [
-  {
-    id: 'int_slack_1',
-    type: 'slack',
-    name: 'Team Workspace',
-    brandId: 'brand_1',
-    status: 'connected',
+// Helper function to map database record to API response
+function mapConnectionRecord(record: any): Integration {
+  return {
+    id: record.id,
+    type: record.provider as IntegrationType,
+    name: record.account_name || `${record.provider} Account`,
+    brandId: record.brand_id,
+    status: record.status,
     credentials: {
-      accessToken: 'xoxb-***',
-      refreshToken: 'xoxr-***',
-      expiresAt: '2024-12-31T23:59:59Z'
+      accessToken: record.access_token || '',
+      refreshToken: record.refresh_token,
+      expiresAt: record.token_expires_at,
     },
-    settings: {
-      syncEnabled: true,
-      syncFrequency: 'realtime',
-      syncDirection: 'bidirectional',
-      autoSync: true,
-      filterRules: [
-        { field: 'channel', operator: 'in', value: ['#marketing', '#approvals'] }
-      ]
-    },
-    permissions: ['channels:read', 'chat:write', 'files:read'],
-    lastSyncAt: '2024-01-15T10:30:00Z',
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-15T10:30:00Z'
-  }
-];
+    settings: record.settings || {},
+    permissions: record.scopes || [],
+    lastSyncAt: record.last_synced_at,
+    createdAt: record.created_at,
+    updatedAt: record.updated_at,
+  };
+}
 
 // Get all integrations for a brand
 router.get(
   "/",
   validateQuery(GetIntegrationsQuerySchema),
-  (async (req, res) => {
+  (async (req, res, next) => {
     try {
       const { brandId } = req.query as { brandId: string };
-      const integrations = mockIntegrations.filter(
-        (int) => int.brandId === brandId
-      );
+
+      if (!brandId) {
+        throw new AppError(
+          ErrorCode.MISSING_REQUIRED_FIELD,
+          "brandId is required",
+          HTTP_STATUS.BAD_REQUEST,
+          "warning"
+        );
+      }
+
+      // Fetch connections from database
+      const connections = await integrationsDB.getBrandConnections(brandId);
+      const integrations = connections.map(mapConnectionRecord);
       res.json(integrations);
     } catch (error) {
-      res.status(500).json({
-        error:
-          error instanceof Error ? error.message : "Failed to fetch integrations",
-      });
+      next(error);
     }
   }) as RequestHandler
 );
 
 // Get available integration templates
-router.get("/templates", (async (req, res) => {
+router.get("/templates", (async (req, res, next) => {
   try {
     const templates = [
       {
@@ -147,9 +149,7 @@ router.get("/templates", (async (req, res) => {
 
     res.json(templates);
   } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to fetch templates'
-    });
+    next(error);
   }
 }) as RequestHandler);
 
@@ -157,135 +157,142 @@ router.get("/templates", (async (req, res) => {
 router.post(
   "/oauth/start",
   validateBody(CreateIntegrationBodySchema),
-  (async (req, res) => {
+  (async (req, res, next) => {
     try {
       const { type, brandId } = req.body as {
         type: IntegrationType;
         brandId: string;
       };
 
+      if (!type || !brandId) {
+        throw new AppError(
+          ErrorCode.MISSING_REQUIRED_FIELD,
+          "type and brandId are required",
+          HTTP_STATUS.BAD_REQUEST,
+          "warning"
+        );
+      }
+
       // Generate OAuth URL based on integration type
       const authUrl = generateOAuthUrl(type, brandId);
 
       res.json({ authUrl });
     } catch (error) {
-      res.status(500).json({
-        error:
-          error instanceof Error ? error.message : "Failed to start OAuth flow",
-      });
+      next(error);
     }
   }) as RequestHandler
 );
 
 // Complete OAuth flow
-router.post("/oauth/callback", (async (req, res) => {
+router.post("/oauth/callback", (async (req, res, next) => {
   try {
-    const { type, code, __state, brandId } = req.body;
+    const { type, code, state, brandId } = req.body;
 
     if (!type || !code || !brandId) {
-      return res.status(400).json({ error: 'type, code, and brandId required' });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "type, code, and brandId are required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
     // Exchange code for tokens
     const credentials = await exchangeCodeForTokens(type as IntegrationType, code);
-    
-    // Create integration record
-    const integration: Integration = {
-      id: `int_${type}_${Date.now()}`,
-      type: type as IntegrationType,
-      name: `${type} Integration`,
-      brandId,
-      status: 'connected',
-      credentials,
-      settings: {
-        syncEnabled: true,
-        syncFrequency: 'realtime',
-        syncDirection: 'bidirectional',
-        autoSync: true
-      },
-      permissions: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
 
-    // TODO: Save to database
-    mockIntegrations.push(integration);
+    // Create connection in database
+    const connectionRecord = await integrationsDB.createConnection(
+      brandId,
+      type as any,
+      credentials.accessToken,
+      {
+        accountUsername: `${type} Account`,
+        refreshToken: credentials.refreshToken,
+        tokenExpiresAt: new Date(credentials.expiresAt),
+      }
+    );
 
     // Start initial sync
+    const integration = mapConnectionRecord(connectionRecord);
     await initiateSync(integration);
 
     res.json({ success: true, integration });
   } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to complete OAuth'
-    });
+    next(error);
   }
 }) as RequestHandler);
 
 // Trigger manual sync
-router.post("/:integrationId/sync", (async (req, res) => {
+router.post("/:integrationId/sync", (async (req, res, next) => {
   try {
     const { integrationId } = req.params;
     const { type } = req.body;
 
-    const integration = mockIntegrations.find(int => int.id === integrationId);
-    if (!integration) {
-      return res.status(404).json({ error: 'Integration not found' });
+    if (!integrationId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "integrationId is required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
-    const syncEvent = await triggerSync(integration, type);
-    
+    // TODO: Fetch integration from database and trigger sync
+    const syncEvent = await triggerSync({ id: integrationId } as any, type);
+
     res.json({ success: true, syncEvent });
   } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to trigger sync'
-    });
+    next(error);
   }
 }) as RequestHandler);
 
 // Update integration settings
-router.put("/:integrationId", (async (req, res) => {
+router.put("/:integrationId", (async (req, res, next) => {
   try {
     const { integrationId } = req.params;
     const updates = req.body;
 
-    const integrationIndex = mockIntegrations.findIndex(int => int.id === integrationId);
-    if (integrationIndex === -1) {
-      return res.status(404).json({ error: 'Integration not found' });
+    if (!integrationId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "integrationId is required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
-    mockIntegrations[integrationIndex] = {
-      ...mockIntegrations[integrationIndex],
-      ...updates,
-      updatedAt: new Date().toISOString()
-    };
+    // Update connection in database
+    const connectionRecord = await integrationsDB.updateConnection(
+      integrationId,
+      updates
+    );
 
-    res.json({ success: true, integration: mockIntegrations[integrationIndex] });
+    res.json({ success: true, integration: mapConnectionRecord(connectionRecord) });
   } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to update integration'
-    });
+    next(error);
   }
 }) as RequestHandler);
 
 // Delete integration
-router.delete("/:integrationId", (async (req, res) => {
+router.delete("/:integrationId", (async (req, res, next) => {
   try {
     const { integrationId } = req.params;
 
-    const integrationIndex = mockIntegrations.findIndex(int => int.id === integrationId);
-    if (integrationIndex === -1) {
-      return res.status(404).json({ error: 'Integration not found' });
+    if (!integrationId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        "integrationId is required",
+        HTTP_STATUS.BAD_REQUEST,
+        "warning"
+      );
     }
 
-    // TODO: Revoke tokens and cleanup
-    mockIntegrations.splice(integrationIndex, 1);
+    // Disconnect and revoke tokens
+    await integrationsDB.disconnectPlatform(integrationId);
 
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to delete integration'
-    });
+    next(error);
   }
 }) as RequestHandler);
 
