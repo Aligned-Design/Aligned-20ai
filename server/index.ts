@@ -1,10 +1,12 @@
 // dotenv not required in this dev environment; environment variables are injected by the runtime/DevServerControl.
 import express, { Request } from "express";
+import { createServer as createHTTPServer } from "http";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import { getCorsConfig, validateCorsConfig } from "./lib/cors-config";
 import { addRequestId, errorHandler, notFoundHandler } from "./lib/error-middleware";
+import { initializeWebSocketServer } from "./lib/websocket-server";
 import { handleDemo } from "./routes/demo";
 
 // Extend Express Request type to include request ID
@@ -215,8 +217,16 @@ function calculateNextScheduled(schedule: any): string {
 
 export function createServer() {
   const app = express();
+  const httpServer = createHTTPServer(app);
   const _PORT = process.env.PORT || 8080;
   const _isDev = process.env.NODE_ENV !== "production";
+
+  // Initialize WebSocket server
+  try {
+    initializeWebSocketServer(httpServer);
+  } catch (error) {
+    console.error("Failed to initialize WebSocket server:", error);
+  }
 
   // Validate CORS configuration at startup
   if (!validateCorsConfig()) {
@@ -1416,15 +1426,15 @@ export function createServer() {
   app.use(notFoundHandler);
   app.use(errorHandler);
 
-  return app;
+  return httpServer;
 }
 
 // Start server if running directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const app = createServer();
+  const server = createServer();
   const port = parseInt(process.env.SERVER_PORT || "3001", 10);
 
-  app.listen(port, async () => {
+  server.listen(port, async () => {
     console.log(`Server running on port ${port}`);
 
     // Initialize PHASE 7: Job Recovery on startup

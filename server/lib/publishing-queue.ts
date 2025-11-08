@@ -9,6 +9,14 @@ import {
   calculatePostingDelay,
   getWeekendPostingFromConfig,
 } from "./weekend-posting-utils";
+import {
+  broadcastJobCreated,
+  broadcastJobApproved,
+  broadcastJobPublishing,
+  broadcastJobCompleted,
+  broadcastJobFailed,
+  broadcastJobRetry,
+} from "./event-broadcaster";
 
 interface PublishResult {
   success: boolean;
@@ -34,6 +42,17 @@ export class PublishingQueue {
     }
 
     this.jobs.set(job.id, job);
+
+    // Broadcast job created event
+    try {
+      broadcastJobCreated(job.id, {
+        brandId: job.brandId,
+        platforms: [job.platform],
+        scheduledAt: job.scheduledAt,
+      });
+    } catch (error) {
+      console.warn(`Failed to broadcast job created event: ${error}`);
+    }
 
     if (job.status === "pending") {
       this.processJob(job.id);
@@ -514,6 +533,18 @@ export class PublishingQueue {
     if (job.retryCount < job.maxRetries) {
       // Schedule retry with exponential backoff
       const retryDelay = Math.min(1000 * Math.pow(2, job.retryCount), 30000); // Max 30 seconds
+      const nextAttemptAt = new Date(Date.now() + retryDelay).toISOString();
+
+      // Broadcast retry event
+      try {
+        broadcastJobRetry(jobId, {
+          brandId: job.brandId,
+          retryCount: job.retryCount,
+          nextAttemptAt,
+        });
+      } catch (broadcastError) {
+        console.warn(`Failed to broadcast retry event: ${broadcastError}`);
+      }
 
       setTimeout(() => {
         job.status = "pending";
@@ -551,7 +582,59 @@ export class PublishingQueue {
   }
 
   private emitStatusUpdate(job: PublishingJob): void {
-    // TODO: Implement WebSocket or SSE for real-time updates
+    // Broadcast real-time status updates via WebSocket
+    try {
+      switch (job.status) {
+        case "pending":
+          // Job is pending - it's approved and waiting to start
+          broadcastJobApproved(job.id, {
+            brandId: job.brandId,
+            approvedBy: "system",
+          });
+          break;
+
+        case "processing":
+          // Job is actively publishing
+          broadcastJobPublishing(job.id, {
+            brandId: job.brandId,
+            currentPlatform: job.platform,
+            platformIndex: 0,
+            totalPlatforms: 1,
+          });
+          break;
+
+        case "published":
+          // Job successfully published
+          broadcastJobCompleted(job.id, {
+            brandId: job.brandId,
+            platformsPublished: [job.platform],
+            publishedUrls: job.platformUrl ? { [job.platform]: job.platformUrl } : undefined,
+          });
+          break;
+
+        case "failed":
+          // Job failed
+          broadcastJobFailed(job.id, {
+            brandId: job.brandId,
+            error: job.lastError || "Unknown error",
+            failedPlatforms: [job.platform],
+            retryCount: job.retryCount,
+          });
+          break;
+
+        case "cancelled":
+          // Job was cancelled
+          broadcastJobFailed(job.id, {
+            brandId: job.brandId,
+            error: "Job was cancelled",
+            failedPlatforms: [job.platform],
+          });
+          break;
+      }
+    } catch (error) {
+      console.warn(`Failed to emit status update for job ${job.id}: ${error}`);
+    }
+
     console.log(`Job ${job.id} status: ${job.status}`);
   }
 

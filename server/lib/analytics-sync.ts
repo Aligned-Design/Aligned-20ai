@@ -1,4 +1,10 @@
 import { Platform, AnalyticsMetric } from "@shared/analytics";
+import {
+  broadcastAnalyticsSyncStarted,
+  broadcastAnalyticsSyncProgressUpdate,
+  broadcastAnalyticsSyncCompleted,
+  broadcastInsightsGenerated,
+} from "./event-broadcaster";
 
 interface SyncConfig {
   platform: Platform;
@@ -20,7 +26,19 @@ export class AnalyticsSync {
     console.log(`Starting incremental sync for brand ${brandId}`);
 
     for (const config of configs) {
-      await this.syncPlatform(brandId, config, "incremental");
+      const syncId = `sync-${Date.now()}-${config.platform}`;
+
+      // Emit sync start event
+      try {
+        broadcastAnalyticsSyncStarted(brandId, {
+          syncId,
+          platform: config.platform,
+        });
+      } catch (error) {
+        console.error("Error broadcasting sync started:", error);
+      }
+
+      await this.syncPlatform(brandId, config, "incremental", syncId);
     }
   }
 
@@ -38,7 +56,25 @@ export class AnalyticsSync {
     startDate.setDate(startDate.getDate() - days);
 
     for (const config of configs) {
-      await this.syncPlatformDateRange(brandId, config, startDate, endDate);
+      const syncId = `backfill-${Date.now()}-${config.platform}`;
+
+      // Emit sync start event
+      try {
+        broadcastAnalyticsSyncStarted(brandId, {
+          syncId,
+          platform: config.platform,
+        });
+      } catch (error) {
+        console.error("Error broadcasting sync started:", error);
+      }
+
+      await this.syncPlatformDateRange(
+        brandId,
+        config,
+        startDate,
+        endDate,
+        syncId,
+      );
     }
   }
 
@@ -46,7 +82,9 @@ export class AnalyticsSync {
     brandId: string,
     config: SyncConfig,
     type: "incremental" | "full",
+    syncId?: string,
   ): Promise<void> {
+    const startTime = Date.now();
     try {
       // Validate required credentials
       if (!config.accessToken || config.accessToken.trim() === "") {
@@ -75,9 +113,25 @@ export class AnalyticsSync {
       // Update rate limit info
       this.updateRateLimit(config.platform);
 
+      const duration = Date.now() - startTime;
+
       console.log(
         `✅ Synced ${normalizedMetrics.length} metrics for ${config.platform}`,
       );
+
+      // Emit sync completion event
+      if (syncId) {
+        try {
+          broadcastAnalyticsSyncCompleted(brandId, {
+            syncId,
+            platform: config.platform,
+            recordsProcessed: normalizedMetrics.length,
+            duration,
+          });
+        } catch (error) {
+          console.error("Error broadcasting sync completed:", error);
+        }
+      }
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
       console.error(`❌ Sync failed for ${config.platform}: ${errorMsg}`);
@@ -90,10 +144,15 @@ export class AnalyticsSync {
     config: SyncConfig,
     startDate: Date,
     endDate: Date,
+    syncId?: string,
   ): Promise<void> {
     // Split large date ranges into smaller chunks to avoid timeouts
     const chunkSize = 7; // 7 days per chunk
     let currentDate = new Date(startDate);
+    let totalRecords = 0;
+    const totalDays = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+    );
 
     while (currentDate < endDate) {
       const chunkEnd = new Date(currentDate);
@@ -103,12 +162,35 @@ export class AnalyticsSync {
         chunkEnd.setTime(endDate.getTime());
       }
 
-      await this.syncPlatformChunk(brandId, config, currentDate, chunkEnd);
+      const chunkRecords = await this.syncPlatformChunk(
+        brandId,
+        config,
+        currentDate,
+        chunkEnd,
+        syncId,
+        totalDays,
+      );
+      totalRecords += chunkRecords;
+
       currentDate = new Date(chunkEnd);
       currentDate.setDate(currentDate.getDate() + 1);
 
       // Small delay to avoid rate limits
       await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    // Emit final completion event for historical backfill
+    if (syncId) {
+      try {
+        broadcastAnalyticsSyncCompleted(brandId, {
+          syncId,
+          platform: config.platform,
+          recordsProcessed: totalRecords,
+          duration: 0, // Duration tracked at chunk level
+        });
+      } catch (error) {
+        console.error("Error broadcasting backfill completed:", error);
+      }
     }
   }
 
@@ -117,7 +199,9 @@ export class AnalyticsSync {
     config: SyncConfig,
     startDate: Date,
     endDate: Date,
-  ): Promise<void> {
+    syncId?: string,
+    totalDays?: number,
+  ): Promise<number> {
     try {
       const metrics = await this.fetchPlatformMetricsDateRange(
         config,
@@ -130,8 +214,33 @@ export class AnalyticsSync {
         metrics,
       );
       await this.storeMetrics(normalizedMetrics);
+
+      // Emit progress update if we have a syncId
+      if (syncId && totalDays) {
+        try {
+          const daysDone = Math.ceil(
+            (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+          );
+          const progress = Math.min(
+            99,
+            Math.floor((daysDone / totalDays) * 100),
+          );
+
+          broadcastAnalyticsSyncProgressUpdate(brandId, config.platform, {
+            platform: config.platform,
+            progress,
+            recordsProcessed: normalizedMetrics.length,
+            currentMetric: `Synced ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`,
+          });
+        } catch (error) {
+          console.error("Error broadcasting chunk progress:", error);
+        }
+      }
+
+      return normalizedMetrics.length;
     } catch (error) {
       console.error(`Chunk sync failed for ${config.platform}:`, error);
+      return 0;
     }
   }
 
