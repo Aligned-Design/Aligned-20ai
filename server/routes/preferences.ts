@@ -22,7 +22,7 @@ export const getPreferences: RequestHandler = async (req, res, next) => {
 
     if (!userId) {
       throw new AppError(
-        ErrorCode.AUTHENTICATION_REQUIRED,
+        ErrorCode.UNAUTHORIZED,
         "User ID is required",
         HTTP_STATUS.UNAUTHORIZED,
         "warning"
@@ -43,7 +43,7 @@ export const getPreferences: RequestHandler = async (req, res, next) => {
 
     const response: PreferencesResponse = {
       success: true,
-      preferences: preferences as UserPreferences,
+      preferences: (preferences || {}) as unknown as UserPreferences,
     };
 
     res.json(response);
@@ -60,7 +60,7 @@ export const updatePreferences: RequestHandler = async (req, res, next) => {
 
     if (!userId) {
       throw new AppError(
-        ErrorCode.AUTHENTICATION_REQUIRED,
+        ErrorCode.UNAUTHORIZED,
         "User ID is required",
         HTTP_STATUS.UNAUTHORIZED,
         "warning"
@@ -94,7 +94,7 @@ export const updatePreferences: RequestHandler = async (req, res, next) => {
 
     const response: PreferencesResponse = {
       success: true,
-      preferences: updatedPreferences as UserPreferences,
+      preferences: (updatedPreferences || {}) as unknown as UserPreferences,
     };
 
     res.json(response);
@@ -111,7 +111,7 @@ export const exportPreferences: RequestHandler = async (req, res, next) => {
 
     if (!userId) {
       throw new AppError(
-        ErrorCode.AUTHENTICATION_REQUIRED,
+        ErrorCode.UNAUTHORIZED,
         "User ID is required",
         HTTP_STATUS.UNAUTHORIZED,
         "warning"
