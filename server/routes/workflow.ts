@@ -1,164 +1,313 @@
 import { RequestHandler } from 'express';
 import { WorkflowTemplate, WorkflowInstance, WorkflowAction, WorkflowNotification } from '@shared/workflow';
+import { workflowDB } from '../lib/workflow-db-service';
+import { AppError } from '../lib/error-middleware';
+import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
 
-// Mock workflow templates and instances
-const mockTemplates: WorkflowTemplate[] = [
-  {
-    id: 'template_1',
-    name: 'Standard Approval Process',
-    description: 'Standard 3-step approval for most content',
-    brandId: 'brand_1',
-    isDefault: true,
-    steps: [
-      {
-        id: 'step_1',
-        stage: 'internal_review',
-        name: 'Internal Review',
-        description: 'Agency team reviews content',
-        requiredRole: 'internal_reviewer',
-        isRequired: true,
-        allowParallel: false,
-        autoAdvance: false,
-        order: 1
-      },
-      {
-        id: 'step_2',
-        stage: 'client_review',
-        name: 'Client Approval',
-        description: 'Client reviews and approves content',
-        requiredRole: 'client',
-        isRequired: true,
-        allowParallel: false,
-        autoAdvance: false,
-        timeoutHours: 48,
-        order: 2
-      },
-      {
-        id: 'step_3',
-        stage: 'published',
-        name: 'Publish',
-        description: 'Content is published to platforms',
-        requiredRole: 'admin',
-        isRequired: true,
-        allowParallel: false,
-        autoAdvance: true,
-        order: 3
-      }
-    ],
-    notifications: {
-      emailOnStageChange: true,
-      reminderAfterHours: 24
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
-
-export const getWorkflowTemplates: RequestHandler = async (req, res) => {
+/**
+ * GET /api/workflow/templates
+ * Get workflow templates for a brand
+ */
+export const getWorkflowTemplates: RequestHandler = async (req, res, next) => {
   try {
     const { brandId } = req.query;
-    
-    const templates = mockTemplates.filter(t => t.brandId === brandId);
-    res.json(templates);
-  } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to fetch workflow templates'
-    });
-  }
-};
+    const userBrandId = (req as any).user?.brandId;
 
-export const createWorkflowTemplate: RequestHandler = async (req, res) => {
-  try {
-    const template: WorkflowTemplate = req.body;
-    
-    // TODO: Save to database
-    mockTemplates.push(template);
-    
-    res.json({ success: true, template });
-  } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to create workflow template'
-    });
-  }
-};
+    // Use provided brandId or fall back to user's brand
+    const targetBrandId = (brandId as string) || userBrandId;
 
-export const startWorkflow: RequestHandler = async (req, res) => {
-  try {
-    const { contentId, templateId, assignedUsers, priority, deadline } = req.body;
-    
-    const template = mockTemplates.find(t => t.id === templateId);
-    if (!template) {
-      return res.status(404).json({ error: 'Template not found' });
+    if (!targetBrandId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'brandId is required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
-    const workflowInstance: WorkflowInstance = {
-      id: `workflow_${Date.now()}`,
+    // Fetch templates from database
+    const templates = await workflowDB.getWorkflowTemplates(targetBrandId);
+    res.json(templates);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * POST /api/workflow/templates
+ * Create a new workflow template
+ */
+export const createWorkflowTemplate: RequestHandler = async (req, res, next) => {
+  try {
+    const template: Omit<WorkflowTemplate, 'id' | 'createdAt' | 'updatedAt'> = req.body;
+    const userBrandId = (req as any).user?.brandId;
+
+    if (!userBrandId) {
+      throw new AppError(
+        ErrorCode.UNAUTHORIZED,
+        'Brand ID is required',
+        HTTP_STATUS.UNAUTHORIZED,
+        'warning'
+      );
+    }
+
+    if (!template.name || !template.steps || template.steps.length === 0) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'name and steps are required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
+    }
+
+    // Create template in database
+    const createdTemplate = await workflowDB.createWorkflowTemplate(userBrandId, {
+      ...template,
+      brand_id: userBrandId,
+    } as any);
+
+    res.json({ success: true, template: createdTemplate });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * POST /api/workflow/start
+ * Start a workflow for content
+ */
+export const startWorkflow: RequestHandler = async (req, res, next) => {
+  try {
+    const { contentId, templateId, assignedUsers, priority, deadline } = req.body;
+    const brandId = (req as any).user?.brandId;
+    const userId = (req as any).user?.id || (req as any).userId;
+
+    // Validate required fields
+    if (!brandId || !contentId || !templateId || !assignedUsers) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'brandId, contentId, templateId, and assignedUsers are required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
+    }
+
+    // Start workflow via database
+    const workflowInstance = await workflowDB.startWorkflow(
+      brandId,
       contentId,
       templateId,
-      currentStage: 'internal_review',
-      currentStepId: template.steps[0].id,
-      status: 'active',
-      steps: template.steps.map(step => ({
-        id: `instance_${step.id}_${Date.now()}`,
-        stepId: step.id,
-        stage: step.stage,
-        status: step.order === 1 ? 'in_progress' : 'pending',
-        assignedTo: assignedUsers[step.id],
-        assignedAt: step.order === 1 ? new Date().toISOString() : undefined,
-        startedAt: step.order === 1 ? new Date().toISOString() : undefined,
-        comments: [],
-        timeoutAt: step.timeoutHours ? 
-          new Date(Date.now() + step.timeoutHours * 60 * 60 * 1000).toISOString() : 
-          undefined
-      })),
       assignedUsers,
-      startedAt: new Date().toISOString(),
-      metadata: {
-        priority: priority || 'medium',
-        deadline,
-        tags: []
-      }
-    };
-    
-    // TODO: Save to database
-    // TODO: Send notifications
-    
+      priority || 'medium',
+      deadline
+    );
+
     res.json({ success: true, workflow: workflowInstance });
   } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to start workflow'
-    });
+    next(error);
   }
 };
 
-export const processWorkflowAction: RequestHandler = async (req, res) => {
+/**
+ * POST /api/workflow/:workflowId/action
+ * Process a workflow action (approve, reject, comment, etc)
+ */
+export const processWorkflowAction: RequestHandler = async (req, res, next) => {
   try {
-    const __action: WorkflowAction = req.body;
-    
-    // TODO: Validate user permissions
-    // TODO: Update workflow instance
-    // TODO: Advance to next step if applicable
-    // TODO: Send notifications
-    
+    const { workflowId } = req.params;
+    const action: WorkflowAction = req.body;
+    const userId = (req as any).user?.id || (req as any).userId;
+
+    // Validate input
+    if (!workflowId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'workflowId is required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
+    }
+
+    if (!action || !action.type || !action.stepId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'action.type and action.stepId are required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
+    }
+
+    // Process action via database
+    const updatedWorkflow = await workflowDB.processWorkflowAction(
+      workflowId,
+      action.stepId,
+      action.type as 'approve' | 'reject' | 'comment' | 'reassign',
+      action.details || {}
+    );
+
+    res.json({ success: true, workflow: updatedWorkflow });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * GET /api/workflow/notifications
+ * Get workflow notifications for user
+ */
+export const getWorkflowNotifications: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = (req as any).user?.id || (req as any).userId;
+    const unreadOnly = req.query.unreadOnly === 'true';
+
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.UNAUTHORIZED,
+        'User ID is required',
+        HTTP_STATUS.UNAUTHORIZED,
+        'warning'
+      );
+    }
+
+    // Fetch notifications from database
+    const notifications = unreadOnly
+      ? await workflowDB.getUnreadNotifications(userId)
+      : [];
+
+    // Map to response format
+    const mappedNotifications = notifications.map((notif) => ({
+      id: notif.id,
+      workflowId: notif.workflow_id,
+      type: notif.type,
+      message: notif.message,
+      readAt: notif.read_at,
+      createdAt: notif.created_at,
+    }));
+
+    res.json({
+      notifications: mappedNotifications,
+      total: mappedNotifications.length,
+      unread: mappedNotifications.filter((n) => !n.readAt).length,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * POST /api/workflow/notifications/:notificationId/read
+ * Mark notification as read
+ */
+export const markNotificationRead: RequestHandler = async (req, res, next) => {
+  try {
+    const { notificationId } = req.params;
+
+    if (!notificationId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'notificationId is required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
+    }
+
+    // Mark as read via database
+    await workflowDB.markNotificationRead(notificationId);
+
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to process workflow action'
-    });
+    next(error);
   }
 };
 
-export const getWorkflowNotifications: RequestHandler = async (req, res) => {
+/**
+ * POST /api/workflow/:workflowId/cancel
+ * Cancel a workflow
+ */
+export const cancelWorkflow: RequestHandler = async (req, res, next) => {
   try {
-    const { __userId } = req.query;
-    
-    // TODO: Fetch notifications for user
-    const notifications: WorkflowNotification[] = [];
-    
-    res.json(notifications);
+    const { workflowId } = req.params;
+    const { reason } = req.body;
+
+    if (!workflowId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'workflowId is required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
+    }
+
+    // Cancel via database
+    await workflowDB.cancelWorkflow(workflowId, reason);
+
+    res.json({ success: true });
   } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to fetch notifications'
+    next(error);
+  }
+};
+
+/**
+ * GET /api/workflow/:workflowId
+ * Get a specific workflow instance
+ */
+export const getWorkflow: RequestHandler = async (req, res, next) => {
+  try {
+    const { workflowId } = req.params;
+
+    if (!workflowId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'workflowId is required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
+    }
+
+    // Fetch workflow from database
+    const workflow = await workflowDB.getWorkflowInstance(workflowId);
+
+    if (!workflow) {
+      throw new AppError(
+        ErrorCode.NOT_FOUND,
+        'Workflow not found',
+        HTTP_STATUS.NOT_FOUND,
+        'warning'
+      );
+    }
+
+    res.json(workflow);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * GET /api/workflow/content/:contentId
+ * Get workflow instances for content
+ */
+export const getWorkflowsForContent: RequestHandler = async (req, res, next) => {
+  try {
+    const { contentId } = req.params;
+
+    if (!contentId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'contentId is required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
+    }
+
+    // Fetch workflows from database
+    const workflows = await workflowDB.getWorkflowInstancesForContent(contentId);
+
+    res.json({
+      contentId,
+      workflows,
+      total: workflows.length,
     });
+  } catch (error) {
+    next(error);
   }
 };

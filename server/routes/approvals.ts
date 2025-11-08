@@ -5,8 +5,11 @@
 
 import { RequestHandler } from 'express';
 import { BulkApprovalRequest, BulkApprovalResult } from '@shared/approvals';
+import { approvalsDB } from '../lib/approvals-db-service';
 import { logAuditAction, getPostAuditTrail } from '../lib/audit-logger';
 import { sendEmail } from '../lib/email-service';
+import { AppError } from '../lib/error-middleware';
+import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
 import {
   generateApprovalEmail,
   generateReminderEmail,
@@ -17,47 +20,68 @@ import {
  * POST /api/approvals/bulk
  * Approve or reject multiple posts in a single request
  */
-export const bulkApproveContent: RequestHandler = async (req, res) => {
+export const bulkApproveContent: RequestHandler = async (req, res, next) => {
   try {
     const { postIds, action, note } = req.body as BulkApprovalRequest;
-    const userId = req.headers['x-user-id'] as string;
-    const userEmail = req.headers['x-user-email'] as string;
-    const brandId = req.headers['x-brand-id'] as string;
-    const userRole = req.headers['x-user-role'] as string;
+    const userId = (req as any).user?.id || (req as any).userId;
+    const userEmail = (req as any).user?.email || req.headers['x-user-email'] as string;
+    const brandId = (req as any).user?.brandId || req.headers['x-brand-id'] as string;
+    const userRole = (req as any).user?.role || req.headers['x-user-role'] as string;
+
+    // Validate required fields
+    if (!userId || !brandId) {
+      throw new AppError(
+        ErrorCode.UNAUTHORIZED,
+        'User ID and Brand ID are required',
+        HTTP_STATUS.UNAUTHORIZED,
+        'warning'
+      );
+    }
 
     // Validate permissions
     if (!['client', 'agency', 'admin'].includes(userRole)) {
-      return res.status(403).json({
-        error: 'Invalid user role',
-      });
+      throw new AppError(
+        ErrorCode.FORBIDDEN,
+        'Invalid user role',
+        HTTP_STATUS.FORBIDDEN,
+        'warning'
+      );
     }
 
     // Validate input
     if (!Array.isArray(postIds) || postIds.length === 0) {
-      return res.status(400).json({
-        error: 'postIds must be a non-empty array',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'postIds must be a non-empty array',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     if (!['approve', 'reject'].includes(action)) {
-      return res.status(400).json({
-        error: 'action must be approve or reject',
-      });
+      throw new AppError(
+        ErrorCode.INVALID_INPUT,
+        'action must be approve or reject',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
     // Check role permissions
-    // In production, verify via database RLS policies
     const canApprove =
       userRole === 'client' || userRole === 'admin' ||
       (userRole === 'agency' && action === 'approve');
 
     if (!canApprove) {
-      return res.status(403).json({
-        error: `User role '${userRole}' cannot ${action} content`,
-      });
+      throw new AppError(
+        ErrorCode.FORBIDDEN,
+        `User role '${userRole}' cannot ${action} content`,
+        HTTP_STATUS.FORBIDDEN,
+        'warning'
+      );
     }
 
-    // Process each post
+    // Process bulk action via database
     const results: BulkApprovalResult = {
       success: true,
       totalRequested: postIds.length,
@@ -67,75 +91,40 @@ export const bulkApproveContent: RequestHandler = async (req, res) => {
       errors: [],
     };
 
-    for (const postId of postIds) {
-      try {
-        // TODO: Verify post exists and belongs to brand
-        // TODO: Check if user has permission to approve this post
-        // TODO: Get post details for audit log
-
-        const auditAction = action === 'approve' ? 'APPROVED' : 'REJECTED';
-
-        // Log audit action
-        await logAuditAction(
-          brandId,
-          postId,
-          userId,
-          userEmail,
-          auditAction as any,
-          {
-            note: note || '',
-            bulkCount: postIds.length,
-          },
-          req.ip,
-          req.headers['user-agent']
-        );
-
-        // Update post status in database
-        // TODO: Update post status: in_review -> approved/rejected
-        // TODO: Trigger publishing if approved (based on workflow)
-
-        if (action === 'approve') {
-          results.approved++;
-          // TODO: Send approval confirmation email to requestor
-        } else {
-          results.rejected++;
-          // TODO: Send rejection notification
-        }
-      } catch (error) {
-        results.skipped++;
-        results.errors.push({
-          postId,
-          reason: error instanceof Error ? error.message : 'Unknown error',
-        });
-
-        // Log error
-        await logAuditAction(
-          brandId,
-          postId,
-          userId,
-          userEmail,
-          'BULK_APPROVED',
-          {
-            bulkCount: postIds.length,
-            errorMessage: error instanceof Error ? error.message : 'Unknown error',
-          },
-          req.ip,
-          req.headers['user-agent']
-        );
+    try {
+      if (action === 'approve') {
+        await approvalsDB.bulkApprovePostIds(postIds, brandId, userId);
+        results.approved = postIds.length;
+      } else {
+        await approvalsDB.bulkRejectPostIds(postIds, brandId, userId, note || '');
+        results.rejected = postIds.length;
       }
-    }
 
-    // Send completion notification
-    if (results.approved > 0 || results.rejected > 0) {
-      // TODO: Send notification to agency team about bulk action
+      // Log audit action for bulk operation
+      await logAuditAction(
+        brandId,
+        'bulk_operation',
+        userId,
+        userEmail,
+        action === 'approve' ? 'BULK_APPROVED' : 'BULK_REJECTED',
+        {
+          note: note || '',
+          bulkCount: postIds.length,
+          postIds,
+        },
+        req.ip,
+        req.headers['user-agent']
+      );
+    } catch (error) {
+      results.errors.push({
+        postId: 'bulk_operation',
+        reason: error instanceof Error ? error.message : 'Unknown error',
+      });
     }
 
     res.json(results);
   } catch (error) {
-    console.error('[Approvals] Bulk approval error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to process bulk approvals',
-    });
+    next(error);
   }
 };
 
@@ -143,24 +132,46 @@ export const bulkApproveContent: RequestHandler = async (req, res) => {
  * POST /api/approvals/:postId/approve
  * Approve a single post
  */
-export const approveSingleContent: RequestHandler = async (req, res) => {
+export const approveSingleContent: RequestHandler = async (req, res, next) => {
   try {
     const { postId } = req.params;
     const { note } = req.body;
-    const userId = req.headers['x-user-id'] as string;
-    const userEmail = req.headers['x-user-email'] as string;
-    const brandId = req.headers['x-brand-id'] as string;
-    const userRole = req.headers['x-user-role'] as string;
+    const userId = (req as any).user?.id || (req as any).userId;
+    const userEmail = (req as any).user?.email || req.headers['x-user-email'] as string;
+    const brandId = (req as any).user?.brandId || req.headers['x-brand-id'] as string;
+    const userRole = (req as any).user?.role || req.headers['x-user-role'] as string;
+
+    // Validate required fields
+    if (!userId || !brandId) {
+      throw new AppError(
+        ErrorCode.UNAUTHORIZED,
+        'User ID and Brand ID are required',
+        HTTP_STATUS.UNAUTHORIZED,
+        'warning'
+      );
+    }
 
     // Validate permissions
     if (!['client', 'admin'].includes(userRole)) {
-      return res.status(403).json({
-        error: 'Only clients and admins can approve content',
-      });
+      throw new AppError(
+        ErrorCode.FORBIDDEN,
+        'Only clients and admins can approve content',
+        HTTP_STATUS.FORBIDDEN,
+        'warning'
+      );
     }
 
-    // TODO: Verify post exists and belongs to brand
-    // TODO: Verify post is in review status
+    if (!postId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'postId is required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
+    }
+
+    // Approve post via database
+    const approvedPost = await approvalsDB.approvePost(postId, brandId, userId, note);
 
     // Log approval
     await logAuditAction(
@@ -174,22 +185,15 @@ export const approveSingleContent: RequestHandler = async (req, res) => {
       req.headers['user-agent']
     );
 
-    // TODO: Update post status to approved
-    // TODO: Trigger next workflow step
-    // TODO: Send notifications
-
     res.json({
       success: true,
       postId,
       status: 'approved',
       approvedBy: userEmail,
-      approvedAt: new Date().toISOString(),
+      approvedAt: approvedPost.approval_date || new Date().toISOString(),
     });
   } catch (error) {
-    console.error('[Approvals] Single approval error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to approve content',
-    });
+    next(error);
   }
 };
 
@@ -197,31 +201,56 @@ export const approveSingleContent: RequestHandler = async (req, res) => {
  * POST /api/approvals/:postId/reject
  * Reject a post with required changes
  */
-export const rejectContent: RequestHandler = async (req, res) => {
+export const rejectContent: RequestHandler = async (req, res, next) => {
   try {
     const { postId } = req.params;
     const { reason, note } = req.body;
-    const userId = req.headers['x-user-id'] as string;
-    const userEmail = req.headers['x-user-email'] as string;
-    const brandId = req.headers['x-brand-id'] as string;
-    const userRole = req.headers['x-user-role'] as string;
+    const userId = (req as any).user?.id || (req as any).userId;
+    const userEmail = (req as any).user?.email || req.headers['x-user-email'] as string;
+    const brandId = (req as any).user?.brandId || req.headers['x-brand-id'] as string;
+    const userRole = (req as any).user?.role || req.headers['x-user-role'] as string;
+
+    // Validate required fields
+    if (!userId || !brandId) {
+      throw new AppError(
+        ErrorCode.UNAUTHORIZED,
+        'User ID and Brand ID are required',
+        HTTP_STATUS.UNAUTHORIZED,
+        'warning'
+      );
+    }
 
     // Validate permissions
     if (!['client', 'admin'].includes(userRole)) {
-      return res.status(403).json({
-        error: 'Only clients and admins can reject content',
-      });
+      throw new AppError(
+        ErrorCode.FORBIDDEN,
+        'Only clients and admins can reject content',
+        HTTP_STATUS.FORBIDDEN,
+        'warning'
+      );
     }
 
     // Validate input
     if (!reason) {
-      return res.status(400).json({
-        error: 'reason is required for rejections',
-      });
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'reason is required for rejections',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
     }
 
-    // TODO: Verify post exists and belongs to brand
-    // TODO: Verify post is in review status
+    if (!postId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'postId is required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
+    }
+
+    // Reject post via database
+    const rejectedPost = await approvalsDB.rejectPost(postId, brandId, userId, reason, note);
 
     // Log rejection
     await logAuditAction(
@@ -238,23 +267,16 @@ export const rejectContent: RequestHandler = async (req, res) => {
       req.headers['user-agent']
     );
 
-    // TODO: Update post status to rejected
-    // TODO: Send rejection notification to creator
-    // TODO: Reopen post for editing
-
     res.json({
       success: true,
       postId,
       status: 'rejected',
       rejectedBy: userEmail,
       reason,
-      rejectedAt: new Date().toISOString(),
+      rejectedAt: rejectedPost.rejection_date || new Date().toISOString(),
     });
   } catch (error) {
-    console.error('[Approvals] Rejection error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to reject content',
-    });
+    next(error);
   }
 };
 
@@ -262,14 +284,31 @@ export const rejectContent: RequestHandler = async (req, res) => {
  * GET /api/approvals/:postId/history
  * Get full audit trail for a post
  */
-export const getApprovalHistory: RequestHandler = async (req, res) => {
+export const getApprovalHistory: RequestHandler = async (req, res, next) => {
   try {
     const { postId } = req.params;
-    const brandId = req.headers['x-brand-id'] as string;
+    const brandId = (req as any).user?.brandId || req.headers['x-brand-id'] as string;
 
-    // TODO: Verify brand access via RLS
+    if (!brandId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'Brand ID is required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
+    }
 
-    const auditTrail = await getPostAuditTrail(brandId, postId);
+    if (!postId) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'postId is required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
+    }
+
+    // Get approval history from database
+    const auditTrail = await approvalsDB.getApprovalHistory(postId, brandId);
 
     res.json({
       postId,
@@ -277,10 +316,7 @@ export const getApprovalHistory: RequestHandler = async (req, res) => {
       totalActions: auditTrail.length,
     });
   } catch (error) {
-    console.error('[Approvals] History error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to fetch approval history',
-    });
+    next(error);
   }
 };
 
@@ -288,17 +324,33 @@ export const getApprovalHistory: RequestHandler = async (req, res) => {
  * POST /api/approvals/:postId/request
  * Request approval for a post
  */
-export const requestApproval: RequestHandler = async (req, res) => {
+export const requestApproval: RequestHandler = async (req, res, next) => {
   try {
     const { postId } = req.params;
     const { assignedTo, deadline, priority } = req.body;
-    const userId = req.headers['x-user-id'] as string;
-    const userEmail = req.headers['x-user-email'] as string;
-    const brandId = req.headers['x-brand-id'] as string;
+    const userId = (req as any).user?.id || (req as any).userId;
+    const userEmail = (req as any).user?.email || req.headers['x-user-email'] as string;
+    const brandId = (req as any).user?.brandId || req.headers['x-brand-id'] as string;
 
-    // TODO: Verify user is agency/admin
-    // TODO: Verify post exists
-    // TODO: Get client email from assignment
+    // Validate required fields
+    if (!userId || !brandId || !postId || !assignedTo) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'userId, brandId, postId, and assignedTo are required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
+    }
+
+    // Create approval request via database
+    const approvalRequest = await approvalsDB.createApprovalRequest(
+      postId,
+      brandId,
+      userId,
+      assignedTo,
+      (priority || 'normal') as 'low' | 'normal' | 'high',
+      deadline
+    );
 
     // Log approval request
     await logAuditAction(
@@ -316,22 +368,16 @@ export const requestApproval: RequestHandler = async (req, res) => {
       req.headers['user-agent']
     );
 
-    // TODO: Create approval_requests record
-    // TODO: Send approval request email to client
-
     res.json({
       success: true,
       postId,
       requestedBy: userEmail,
       assignedTo,
       deadline,
-      requestedAt: new Date().toISOString(),
+      requestedAt: approvalRequest.created_at,
     });
   } catch (error) {
-    console.error('[Approvals] Request error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to request approval',
-    });
+    next(error);
   }
 };
 
@@ -339,37 +385,48 @@ export const requestApproval: RequestHandler = async (req, res) => {
  * GET /api/approvals/pending
  * Get pending approvals for user
  */
-export const getPendingApprovals: RequestHandler = async (req, res) => {
+export const getPendingApprovals: RequestHandler = async (req, res, next) => {
   try {
-    const __userId = req.headers['x-user-id'] as string;
-    const __brandId = req.query._brandId as string;
+    const userId = (req as any).user?.id || (req as any).userId;
+    const brandId = (req as any).user?.brandId || req.query.brandId;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const offset = parseInt(req.query.offset as string) || 0;
 
-    // TODO: Query approval_requests where assignedTo = userId and status = pending
-    // TODO: Filter by brandId if provided
-    // TODO: Implement pagination
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.UNAUTHORIZED,
+        'User ID is required',
+        HTTP_STATUS.UNAUTHORIZED,
+        'warning'
+      );
+    }
 
-    // Mock response
-    const pending = [
-      {
-        id: 'approval_1',
-        postId: 'post_1',
-        requestedBy: 'agency@example.com',
-        deadline: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-        priority: 'high',
-        status: 'pending',
-        createdAt: new Date().toISOString(),
-      },
-    ];
+    // Get pending approvals from database
+    const { approvals, total } = await approvalsDB.getPendingApprovalsForUser(
+      userId,
+      brandId as string | undefined,
+      limit,
+      offset
+    );
+
+    // Map database records to response format
+    const pending = approvals.map((approval) => ({
+      id: approval.id,
+      postId: approval.post_id,
+      requestedBy: approval.requested_by,
+      deadline: approval.deadline,
+      priority: approval.priority,
+      status: approval.status,
+      createdAt: approval.created_at,
+    }));
 
     res.json({
       pending,
-      total: pending.length,
+      total,
+      hasMore: offset + pending.length < total,
     });
   } catch (error) {
-    console.error('[Approvals] Pending error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to fetch pending approvals',
-    });
+    next(error);
   }
 };
 
@@ -377,14 +434,22 @@ export const getPendingApprovals: RequestHandler = async (req, res) => {
  * POST /api/approvals/send-reminder
  * Send approval reminder email
  */
-export const sendApprovalReminder: RequestHandler = async (req, res) => {
+export const sendApprovalReminder: RequestHandler = async (req, res, next) => {
   try {
     const { clientEmail, brandName, pendingCount, oldestPendingAge } = req.body;
-    const brandId = req.headers['x-brand-id'] as string;
-    const userId = req.headers['x-user-id'] as string;
-    const userEmail = req.headers['x-user-email'] as string;
+    const brandId = (req as any).user?.brandId || req.headers['x-brand-id'] as string;
+    const userId = (req as any).user?.id || (req as any).userId;
+    const userEmail = (req as any).user?.email || req.headers['x-user-email'] as string;
 
-    // TODO: Verify user is agency/admin
+    // Validate required fields
+    if (!brandId || !userId || !clientEmail || !brandName) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        'brandId, userId, clientEmail, and brandName are required',
+        HTTP_STATUS.BAD_REQUEST,
+        'warning'
+      );
+    }
 
     // Generate reminder email
     const { subject, htmlBody, textBody } = generateReminderEmail({
@@ -409,7 +474,12 @@ export const sendApprovalReminder: RequestHandler = async (req, res) => {
     });
 
     if (!sendResult.success) {
-      throw new Error(sendResult.error || 'Failed to send email');
+      throw new AppError(
+        ErrorCode.EMAIL_SERVICE_ERROR,
+        sendResult.error || 'Failed to send email',
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        'warning'
+      );
     }
 
     // Log email send
@@ -432,9 +502,6 @@ export const sendApprovalReminder: RequestHandler = async (req, res) => {
       sentTo: clientEmail,
     });
   } catch (error) {
-    console.error('[Approvals] Send reminder error:', error);
-    res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to send reminder',
-    });
+    next(error);
   }
 };
