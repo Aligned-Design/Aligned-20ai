@@ -9,6 +9,8 @@ export default defineConfig({
     environment: 'jsdom',
     // Global test setup
     globals: true,
+    // Default test timeout (10 seconds for async operations)
+    testTimeout: 10000,
     // Coverage configuration
     coverage: {
       provider: 'v8',

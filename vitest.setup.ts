@@ -1,5 +1,17 @@
 import { afterEach, beforeAll, afterAll, vi, beforeEach } from 'vitest';
 
+// Set default test environment variables if not already set
+// These are used by Supabase client initialization in tests
+if (!process.env.VITE_SUPABASE_URL) {
+  process.env.VITE_SUPABASE_URL = 'https://xpzvtvycjsccaosahmgz.supabase.co';
+}
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  process.env.SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwenZ0dnljanNjY2Fvc2FobWd6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MjEzODk4OCwiZXhwIjoyMDc3NzE0OTg4fQ.jhL2QsopL9_sK_2L2lKD4vMDHVya5aZskyDMtVUIEcU';
+}
+if (!process.env.VITE_SUPABASE_ANON_KEY) {
+  process.env.VITE_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwenZ0dnljanNjY2Fvc2FobWd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxMzg5ODgsImV4cCI6MjA3NzcxNDk4OH0.sokv6Z-3F-j_iYX0ZISfZDMKAdgzo9jJqAZFevXoGi0';
+}
+
 // Helper to create storage mock with actual data storage
 const createStorageMock = () => {
   const store: Record<string, string> = {};
