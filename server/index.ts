@@ -98,6 +98,7 @@ import { generateContent, getProviderStatus } from "./routes/ai";
 import { generateContent as generateAIContent } from "./routes/ai-generation";
 import { recoverPublishingJobs } from "./lib/job-recovery";
 import publishingRouter from "./routes/publishing-router";
+import builderRouter from "./routes/builder-router";
 import {
   scheduleAnalyticsSyncJobs,
   syncBrandAnalytics,
@@ -279,6 +280,9 @@ export function createServer() {
 
   // Publishing routes (PHASE 7)
   app.use("/api/publishing", publishingRouter);
+
+  // Builder.io routes (AI generation, webhooks)
+  app.use("/api/builder", builderRouter);
 
   // Legacy media routes (kept for backward compatibility)
   app.post("/api/media/upload", uploadMedia);

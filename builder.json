@@ -1,7 +1,7 @@
 {
   "name": "aligned-ai",
   "description": "Multi-platform brand intelligence and content management system",
-  "publicApiKey": "your_builder_public_k39bfc067b694403ca329597d360f18f4",
+  "publicApiKey": "your_builder_public_39bfc067b694403ca329597d360f18f4",
   "runtime": {
     "node": "22",
     "pnpm": ">=9.0.0"
