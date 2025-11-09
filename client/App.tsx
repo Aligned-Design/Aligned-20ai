@@ -42,6 +42,9 @@ const TeamManagement = lazy(() => import("./pages/TeamManagement"));
 const Billing = lazy(() => import("./pages/Billing"));
 const ClientSettings = lazy(() => import("./pages/ClientSettings"));
 
+// Builder.io pages
+const NeonNest = lazy(() => import("./pages/NeonNest"));
+
 // Authentication and missing pages
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -209,6 +212,14 @@ function AppContent() {
         element={
           <Suspense fallback={<PageLoader />}>
             <Support />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/neon-nest"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <NeonNest />
           </Suspense>
         }
       />
