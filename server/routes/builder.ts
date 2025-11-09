@@ -1,74 +1,55 @@
 import { RequestHandler } from "express";
+import { asyncHandler } from "../lib/error-middleware";
 import { generateBuilderContent } from "../workers/ai-generation";
 import { AppError } from "../lib/error-middleware";
 import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 
-export const generateContent: RequestHandler = async (req, res) => {
-  try {
-    const { prompt, contentType, provider } = req.body;
+/**
+ * POST /api/builder/generate
+ * AI-powered content generation for Builder.io
+ */
+export const generateContent: RequestHandler = asyncHandler(async (req, res) => {
+  const { prompt, contentType, provider } = req.body;
 
-    if (!prompt || !contentType) {
-      throw new AppError(
-        ErrorCode.MISSING_REQUIRED_FIELD,
-        'Missing required fields: prompt, contentType',
-        HTTP_STATUS.BAD_REQUEST,
-        'warning',
-        undefined,
-        'Please provide both prompt and contentType in your request'
-      );
-    }
-
-    const result = await generateBuilderContent({ prompt, agentType: contentType, provider });
-
-    res.json({
-      success: true,
-      data: result
-    });
-  } catch (error) {
-    console.error('Builder content generation failed:', error);
-    if (error instanceof AppError) {
-      throw error;
-    }
+  if (!prompt || !contentType) {
     throw new AppError(
-      ErrorCode.INTERNAL_ERROR,
-      'Content generation failed',
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      'error',
-      error instanceof Error ? { originalError: error.message } : undefined,
-      'Please try again later or contact support'
+      ErrorCode.MISSING_REQUIRED_FIELD,
+      'Missing required fields: prompt, contentType',
+      HTTP_STATUS.BAD_REQUEST,
+      'warning',
+      undefined,
+      'Please provide both prompt and contentType in your request'
     );
   }
-};
 
-export const builderWebhook: RequestHandler = async (req, res) => {
-  try {
-    // Handle Builder.io webhooks (content updates, etc.)
-    const { type, data } = req.body;
+  const result = await generateBuilderContent({ prompt, agentType: contentType, provider });
 
-    console.log('Builder.io webhook received:', type, data);
+  res.json({
+    success: true,
+    data: result
+  });
+});
 
-    // Process webhook based on type
-    switch (type) {
-      case 'content.update':
-        // Handle content updates
-        break;
-      case 'content.publish':
-        // Handle content publishing
-        break;
-      default:
-        console.log('Unknown webhook type:', type);
-    }
+/**
+ * POST /api/builder/webhook
+ * Receive webhook events from Builder.io (content.publish, content.update, content.delete)
+ */
+export const builderWebhook: RequestHandler = asyncHandler(async (req, res) => {
+  const { type, data } = req.body;
 
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Builder webhook failed:', error);
-    throw new AppError(
-      ErrorCode.INTERNAL_ERROR,
-      'Webhook processing failed',
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      'error',
-      error instanceof Error ? { originalError: error.message } : undefined,
-      'Please try again later or contact support'
-    );
+  console.log('Builder.io webhook received:', type, data);
+
+  // Process webhook based on type
+  switch (type) {
+    case 'content.update':
+      // TODO: Handle content updates (cache invalidation, etc.)
+      break;
+    case 'content.publish':
+      // TODO: Handle content publishing (trigger builds, etc.)
+      break;
+    default:
+      console.log('Unknown webhook type:', type);
   }
-};
+
+  res.json({ success: true });
+});
