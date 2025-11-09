@@ -9,12 +9,10 @@
  */
 
 import { Router } from "express";
-import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 import { AppError } from "../lib/error-middleware";
 import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 import {
-  processBrandIntake,
   crawlWebsite,
   extractColors,
 } from "../workers/brand-crawler";
@@ -22,8 +20,6 @@ import {
   CrawlerSuggestion,
   FieldChange,
   FieldHistoryEntry,
-  canCrawlerUpdate,
-  createTrackedField,
 } from "../../client/types/brand-kit-field";
 
 const router = Router();
@@ -31,7 +27,7 @@ const router = Router();
 // Use shared supabase client from server/lib/supabase.ts
 
 // In-memory job store (use Redis in production)
-const crawlJobs = new Map<string, any>();
+const crawlJobs = new Map<string, unknown>();
 
 /**
  * POST /api/crawl/start
@@ -127,7 +123,7 @@ async function runCrawlJob(
   job_id: string,
   brand_id: string,
   url: string,
-  currentBrandKit: any,
+  currentBrandKit: unknown,
 ) {
   const job = crawlJobs.get(job_id);
   if (!job) return;
@@ -404,7 +400,7 @@ router.get("/brand-kit/history/:brandId", async (req, res) => {
 
     // Filter by field if specified
     const history = field
-      ? (data as any[]).filter((entry: any) => entry.field === field)
+      ? (data as unknown[]).filter((entry: unknown) => entry.field === field)
       : data;
 
     res.json({ history });
@@ -536,7 +532,7 @@ async function saveHistory(brand_id: string, entries: FieldHistoryEntry[]) {
       .order("created_at", { ascending: false });
 
     if (allEntries && allEntries.length > 10) {
-      const toDelete = (allEntries as any[]).slice(10).map((e: any) => e.id);
+      const toDelete = (allEntries as unknown[]).slice(10).map((e: unknown) => e.id);
       await supabase.from("brand_kit_history").delete().in("id", toDelete);
     }
   }

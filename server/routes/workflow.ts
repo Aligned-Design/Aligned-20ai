@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { WorkflowTemplate, WorkflowInstance, WorkflowAction, WorkflowNotification } from '@shared/workflow';
+import { WorkflowTemplate, WorkflowAction } from '@shared/workflow';
 import { workflowDB } from '../lib/workflow-db-service';
 import { AppError } from '../lib/error-middleware';
 import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
@@ -11,7 +11,7 @@ import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
 export const getWorkflowTemplates: RequestHandler = async (req, res, next) => {
   try {
     const { brandId } = req.query;
-    const userBrandId = (req as any).user?.brandId;
+    const userBrandId = (req as unknown).user?.brandId;
 
     // Use provided brandId or fall back to user's brand
     const targetBrandId = (brandId as string) || userBrandId;
@@ -40,7 +40,7 @@ export const getWorkflowTemplates: RequestHandler = async (req, res, next) => {
 export const createWorkflowTemplate: RequestHandler = async (req, res, next) => {
   try {
     const template: Omit<WorkflowTemplate, 'id' | 'createdAt' | 'updatedAt'> = req.body;
-    const userBrandId = (req as any).user?.brandId;
+    const userBrandId = (req as unknown).user?.brandId;
 
     if (!userBrandId) {
       throw new AppError(
@@ -64,7 +64,7 @@ export const createWorkflowTemplate: RequestHandler = async (req, res, next) => 
     const createdTemplate = await workflowDB.createWorkflowTemplate(userBrandId, {
       ...template,
       brand_id: userBrandId,
-    } as any);
+    } as unknown);
 
     res.json({ success: true, template: createdTemplate });
   } catch (error) {
@@ -79,8 +79,8 @@ export const createWorkflowTemplate: RequestHandler = async (req, res, next) => 
 export const startWorkflow: RequestHandler = async (req, res, next) => {
   try {
     const { contentId, templateId, assignedUsers, priority, deadline } = req.body;
-    const brandId = (req as any).user?.brandId;
-    const userId = (req as any).user?.id || (req as any).userId;
+    const brandId = (req as unknown).user?.brandId;
+    const _userId = (req as unknown).user?.id || (req as unknown).userId;
 
     // Validate required fields
     if (!brandId || !contentId || !templateId || !assignedUsers) {
@@ -116,7 +116,7 @@ export const processWorkflowAction: RequestHandler = async (req, res, next) => {
   try {
     const { workflowId } = req.params;
     const action: WorkflowAction = req.body;
-    const userId = (req as any).user?.id || (req as any).userId;
+    const _userId = (req as unknown).user?.id || (req as unknown).userId;
 
     // Validate input
     if (!workflowId) {
@@ -157,7 +157,7 @@ export const processWorkflowAction: RequestHandler = async (req, res, next) => {
  */
 export const getWorkflowNotifications: RequestHandler = async (req, res, next) => {
   try {
-    const userId = (req as any).user?.id || (req as any).userId;
+    const userId = (req as unknown).user?.id || (req as unknown).userId;
     const unreadOnly = req.query.unreadOnly === 'true';
 
     if (!userId) {

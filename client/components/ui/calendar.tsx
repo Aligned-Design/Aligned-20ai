@@ -59,7 +59,7 @@ function Calendar({
             }
             return <ChevronRight className="h-4 w-4" />;
           },
-        } as any
+        } as unknown
       }
       {...props}
     />

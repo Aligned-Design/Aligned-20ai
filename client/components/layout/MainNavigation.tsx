@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   LayoutDashboard,
-  Building2,
-  Calendar,
   FileText,
   BarChart3,
   Settings,

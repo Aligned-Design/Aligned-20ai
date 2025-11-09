@@ -55,7 +55,7 @@ export class MailchimpClient {
   private async request<T>(
     endpoint: string,
     method: string = "GET",
-    body?: any,
+    body?: unknown,
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
@@ -76,8 +76,8 @@ export class MailchimpClient {
     return response.json() as Promise<T>;
   }
 
-  async getLists(): Promise<any> {
-    return this.request<any>("/lists");
+  async getLists(): Promise<unknown> {
+    return this.request<unknown>("/lists");
   }
 
   async getListSegments(listId: string): Promise<MailchimpListSegment[]> {
@@ -87,27 +87,27 @@ export class MailchimpClient {
     return response.segments || [];
   }
 
-  async createCampaign(campaign: MailchimpCampaign): Promise<any> {
-    return this.request<any>("/campaigns", "POST", campaign);
+  async createCampaign(campaign: MailchimpCampaign): Promise<unknown> {
+    return this.request<unknown>("/campaigns", "POST", campaign);
   }
 
   async updateCampaign(
     campaignId: string,
     updates: Partial<MailchimpCampaign>,
-  ): Promise<any> {
-    return this.request<any>(`/campaigns/${campaignId}`, "PATCH", updates);
+  ): Promise<unknown> {
+    return this.request<unknown>(`/campaigns/${campaignId}`, "PATCH", updates);
   }
 
-  async setCampaignContent(campaignId: string, content: any): Promise<any> {
-    return this.request<any>(
+  async setCampaignContent(campaignId: string, content: unknown): Promise<unknown> {
+    return this.request<unknown>(
       `/campaigns/${campaignId}/content`,
       "PUT",
       content,
     );
   }
 
-  async sendCampaign(campaignId: string): Promise<any> {
-    return this.request<any>(
+  async sendCampaign(campaignId: string): Promise<unknown> {
+    return this.request<unknown>(
       `/campaigns/${campaignId}/actions/send`,
       "POST",
       {},
@@ -117,8 +117,8 @@ export class MailchimpClient {
   async scheduleCampaign(
     campaignId: string,
     scheduleTime: string,
-  ): Promise<any> {
-    return this.request<any>(
+  ): Promise<unknown> {
+    return this.request<unknown>(
       `/campaigns/${campaignId}/actions/schedule`,
       "POST",
       {
@@ -127,8 +127,8 @@ export class MailchimpClient {
     );
   }
 
-  async getCampaignStatus(campaignId: string): Promise<any> {
-    return this.request<any>(`/campaigns/${campaignId}`);
+  async getCampaignStatus(campaignId: string): Promise<unknown> {
+    return this.request<unknown>(`/campaigns/${campaignId}`);
   }
 
   async deleteCampaign(campaignId: string): Promise<void> {

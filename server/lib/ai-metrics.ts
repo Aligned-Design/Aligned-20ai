@@ -266,7 +266,7 @@ class AIMetricsService {
 
   private getEmptySnapshot(agentType: string): AIMetricsSnapshot {
     return {
-      agentType: agentType as any,
+      agentType: agentType as unknown,
       timeRange: {
         start: new Date().toISOString(),
         end: new Date().toISOString()

@@ -12,7 +12,7 @@ import { Server as SocketIOServer } from "socket.io";
 import { io as ioClient } from "socket.io-client";
 
 describe("WebSocket Server", () => {
-  let httpServer: any;
+  let httpServer: unknown;
   let io: SocketIOServer;
 
   beforeEach(() => {

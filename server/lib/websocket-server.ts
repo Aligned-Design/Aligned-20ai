@@ -203,7 +203,7 @@ function setupNotificationsNamespace(io: SocketIOServer): void {
 /**
  * Broadcast job status update to all subscribed clients
  */
-export function broadcastJobStatusUpdate(jobId: string, data: any): void {
+export function broadcastJobStatusUpdate(jobId: string, data: unknown): void {
   const io = getWebSocketInstance();
   const room = `job-${jobId}`;
 
@@ -217,7 +217,7 @@ export function broadcastJobStatusUpdate(jobId: string, data: any): void {
 /**
  * Broadcast analytics sync progress to all subscribed clients
  */
-export function broadcastAnalyticsSyncProgress(brandId: string, data: any): void {
+export function broadcastAnalyticsSyncProgress(brandId: string, data: unknown): void {
   const io = getWebSocketInstance();
   const room = `brand-${brandId}`;
 
@@ -231,7 +231,7 @@ export function broadcastAnalyticsSyncProgress(brandId: string, data: any): void
 /**
  * Broadcast notification to user
  */
-export function broadcastNotificationToUser(userId: string, data: any): void {
+export function broadcastNotificationToUser(userId: string, data: unknown): void {
   const io = getWebSocketInstance();
   const room = `user-${userId}`;
 

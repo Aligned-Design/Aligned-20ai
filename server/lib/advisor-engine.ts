@@ -825,13 +825,13 @@ export class AdvisorEngine {
     };
   }
 
-  private calculateOptimalPostCount(trends: any, daysAhead: number): number {
+  private calculateOptimalPostCount(trends: unknown, daysAhead: number): number {
     return Math.ceil(daysAhead / 3); // Every 3 days
   }
 
   private async generateForecastRecommendations(
     _metrics: AnalyticsMetric[],
-    _trends: any,
+    _trends: unknown,
   ) {
     return {
       bestDays: ["Tuesday", "Wednesday", "Thursday"],
@@ -843,14 +843,14 @@ export class AdvisorEngine {
         facebook: 25,
         linkedin: 20,
         twitter: 15,
-      } as any,
+      } as unknown,
     };
   }
 
   private generateScenario(
-    reach: any,
-    engagement: any,
-    followers: any,
+    reach: unknown,
+    engagement: unknown,
+    followers: unknown,
     multiplier: number,
     days: number,
   ) {
@@ -889,7 +889,7 @@ export class AdvisorEngine {
 
   private async generateInsightDescription(
     type: string,
-    data: any,
+    data: unknown,
   ): Promise<string> {
     // AI-generated descriptions would go here
     // For now, return template-based descriptions

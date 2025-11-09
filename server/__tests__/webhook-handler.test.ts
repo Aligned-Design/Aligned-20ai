@@ -57,7 +57,7 @@ describe("Webhook Handler", () => {
       const signature = "test-sig";
 
       const isValid = handler.verifySignature(
-        "unknown" as any,
+        "unknown" as unknown,
         body,
         signature,
         "secret",
@@ -107,7 +107,7 @@ describe("Webhook Handler", () => {
         status: "delivered",
         attempt_count: 1,
         max_attempts: 5,
-      } as any;
+      } as unknown;
 
       const shouldRetry = shouldRetryWebhook(event);
       expect(shouldRetry).toBe(false);
@@ -119,7 +119,7 @@ describe("Webhook Handler", () => {
         status: "dead_letter",
         attempt_count: 5,
         max_attempts: 5,
-      } as any;
+      } as unknown;
 
       const shouldRetry = shouldRetryWebhook(event);
       expect(shouldRetry).toBe(false);
@@ -131,7 +131,7 @@ describe("Webhook Handler", () => {
         status: "pending",
         attempt_count: 2,
         max_attempts: 5,
-      } as any;
+      } as unknown;
 
       const shouldRetry = shouldRetryWebhook(event);
       expect(shouldRetry).toBe(true);
@@ -143,7 +143,7 @@ describe("Webhook Handler", () => {
         status: "failed",
         attempt_count: 5,
         max_attempts: 5,
-      } as any;
+      } as unknown;
 
       const shouldRetry = shouldRetryWebhook(event);
       expect(shouldRetry).toBe(false);

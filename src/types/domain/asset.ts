@@ -11,8 +11,8 @@ export interface MediaAsset {
   hash?: string;
   thumbnailPath?: string;
   tags?: string[];
-  metadata?: Record<string, any>;
-  variants?: any[];
+  metadata?: Record<string, unknown>;
+  variants?: unknown[];
   createdAt?: string;
   updatedAt?: string;
 }

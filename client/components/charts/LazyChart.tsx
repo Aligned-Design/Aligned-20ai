@@ -10,8 +10,8 @@ export function LazyLineChart({
   data,
   ...props
 }: {
-  data: any[];
-  [key: string]: any;
+  data: unknown[];
+  [key: string]: unknown;
 }) {
   return (
     <Suspense

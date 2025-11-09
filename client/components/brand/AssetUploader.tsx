@@ -11,7 +11,7 @@ interface AssetUploaderProps {
 }
 
 export function AssetUploader({
-  brandId,
+  _brandId,
   category,
   onUpload,
   accept,

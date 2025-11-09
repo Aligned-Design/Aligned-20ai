@@ -7,7 +7,6 @@
  * 3. Design Agent creates visuals using doc output
  */
 
-import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 import {
   AdvisorOutput,

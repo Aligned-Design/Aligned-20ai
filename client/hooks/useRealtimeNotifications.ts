@@ -90,7 +90,7 @@ export function useRealtimeNotifications(
     });
 
     // Receive notifications
-    socket.on("notification:received", (data: any) => {
+    socket.on("notification:received", (data: unknown) => {
       const notification: Notification = {
         id: data.id || `notif-${Date.now()}-${Math.random()}`,
         type: data.type,
@@ -116,7 +116,7 @@ export function useRealtimeNotifications(
       console.log(`Successfully subscribed to notifications for user ${data.userId}`);
     });
 
-    socket.on("error", (err: any) => {
+    socket.on("error", (err: unknown) => {
       const error = new Error(
         typeof err === "string" ? err : err?.message || "WebSocket error"
       );

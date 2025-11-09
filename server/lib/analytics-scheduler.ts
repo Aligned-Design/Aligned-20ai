@@ -80,7 +80,7 @@ export async function syncBrandAnalytics(brandId: string, tenantId: string): Pro
     const syncConfigs = connections
       .filter(conn => conn.status === 'connected')
       .map(conn => ({
-        platform: conn.platform as any,
+        platform: conn.platform as unknown,
         accessToken: conn.access_token,
         accountId: conn.account_id,
         lastSyncAt: conn.last_verified_at || undefined
@@ -238,7 +238,7 @@ export async function getSyncStatus(brandId: string): Promise<{
     const lastLog = logs[0];
     return {
       lastSync: new Date(lastLog.completed_at || lastLog.started_at),
-      status: lastLog.status as any,
+      status: lastLog.status as unknown,
       itemsSynced: lastLog.items_synced,
       itemsFailed: lastLog.items_failed,
       duration: lastLog.duration_ms

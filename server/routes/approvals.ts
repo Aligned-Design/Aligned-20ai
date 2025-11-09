@@ -6,14 +6,12 @@
 import { RequestHandler } from 'express';
 import { BulkApprovalRequest, BulkApprovalResult } from '@shared/approvals';
 import { approvalsDB } from '../lib/approvals-db-service';
-import { logAuditAction, getPostAuditTrail } from '../lib/audit-logger';
+import { logAuditAction } from '../lib/audit-logger';
 import { sendEmail } from '../lib/email-service';
 import { AppError } from '../lib/error-middleware';
 import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
 import {
-  generateApprovalEmail,
   generateReminderEmail,
-  generatePublishFailureEmail,
 } from '../lib/email-templates';
 
 /**
@@ -23,10 +21,10 @@ import {
 export const bulkApproveContent: RequestHandler = async (req, res, next) => {
   try {
     const { postIds, action, note } = req.body as BulkApprovalRequest;
-    const userId = (req as any).user?.id || (req as any).userId;
-    const userEmail = (req as any).user?.email || req.headers['x-user-email'] as string;
-    const brandId = (req as any).user?.brandId || req.headers['x-brand-id'] as string;
-    const userRole = (req as any).user?.role || req.headers['x-user-role'] as string;
+    const userId = (req as unknown).user?.id || (req as unknown).userId;
+    const userEmail = (req as unknown).user?.email || req.headers['x-user-email'] as string;
+    const brandId = (req as unknown).user?.brandId || req.headers['x-brand-id'] as string;
+    const userRole = (req as unknown).user?.role || req.headers['x-user-role'] as string;
 
     // Validate required fields
     if (!userId || !brandId) {
@@ -136,10 +134,10 @@ export const approveSingleContent: RequestHandler = async (req, res, next) => {
   try {
     const { postId } = req.params;
     const { note } = req.body;
-    const userId = (req as any).user?.id || (req as any).userId;
-    const userEmail = (req as any).user?.email || req.headers['x-user-email'] as string;
-    const brandId = (req as any).user?.brandId || req.headers['x-brand-id'] as string;
-    const userRole = (req as any).user?.role || req.headers['x-user-role'] as string;
+    const userId = (req as unknown).user?.id || (req as unknown).userId;
+    const userEmail = (req as unknown).user?.email || req.headers['x-user-email'] as string;
+    const brandId = (req as unknown).user?.brandId || req.headers['x-brand-id'] as string;
+    const userRole = (req as unknown).user?.role || req.headers['x-user-role'] as string;
 
     // Validate required fields
     if (!userId || !brandId) {
@@ -205,10 +203,10 @@ export const rejectContent: RequestHandler = async (req, res, next) => {
   try {
     const { postId } = req.params;
     const { reason, note } = req.body;
-    const userId = (req as any).user?.id || (req as any).userId;
-    const userEmail = (req as any).user?.email || req.headers['x-user-email'] as string;
-    const brandId = (req as any).user?.brandId || req.headers['x-brand-id'] as string;
-    const userRole = (req as any).user?.role || req.headers['x-user-role'] as string;
+    const userId = (req as unknown).user?.id || (req as unknown).userId;
+    const userEmail = (req as unknown).user?.email || req.headers['x-user-email'] as string;
+    const brandId = (req as unknown).user?.brandId || req.headers['x-brand-id'] as string;
+    const userRole = (req as unknown).user?.role || req.headers['x-user-role'] as string;
 
     // Validate required fields
     if (!userId || !brandId) {
@@ -287,7 +285,7 @@ export const rejectContent: RequestHandler = async (req, res, next) => {
 export const getApprovalHistory: RequestHandler = async (req, res, next) => {
   try {
     const { postId } = req.params;
-    const brandId = (req as any).user?.brandId || req.headers['x-brand-id'] as string;
+    const brandId = (req as unknown).user?.brandId || req.headers['x-brand-id'] as string;
 
     if (!brandId) {
       throw new AppError(
@@ -328,9 +326,9 @@ export const requestApproval: RequestHandler = async (req, res, next) => {
   try {
     const { postId } = req.params;
     const { assignedTo, deadline, priority } = req.body;
-    const userId = (req as any).user?.id || (req as any).userId;
-    const userEmail = (req as any).user?.email || req.headers['x-user-email'] as string;
-    const brandId = (req as any).user?.brandId || req.headers['x-brand-id'] as string;
+    const userId = (req as unknown).user?.id || (req as unknown).userId;
+    const userEmail = (req as unknown).user?.email || req.headers['x-user-email'] as string;
+    const brandId = (req as unknown).user?.brandId || req.headers['x-brand-id'] as string;
 
     // Validate required fields
     if (!userId || !brandId || !postId || !assignedTo) {
@@ -387,8 +385,8 @@ export const requestApproval: RequestHandler = async (req, res, next) => {
  */
 export const getPendingApprovals: RequestHandler = async (req, res, next) => {
   try {
-    const userId = (req as any).user?.id || (req as any).userId;
-    const brandId = (req as any).user?.brandId || req.query.brandId;
+    const userId = (req as unknown).user?.id || (req as unknown).userId;
+    const brandId = (req as unknown).user?.brandId || req.query.brandId;
     const limit = parseInt(req.query.limit as string) || 50;
     const offset = parseInt(req.query.offset as string) || 0;
 
@@ -437,9 +435,9 @@ export const getPendingApprovals: RequestHandler = async (req, res, next) => {
 export const sendApprovalReminder: RequestHandler = async (req, res, next) => {
   try {
     const { clientEmail, brandName, pendingCount, oldestPendingAge } = req.body;
-    const brandId = (req as any).user?.brandId || req.headers['x-brand-id'] as string;
-    const userId = (req as any).user?.id || (req as any).userId;
-    const userEmail = (req as any).user?.email || req.headers['x-user-email'] as string;
+    const brandId = (req as unknown).user?.brandId || req.headers['x-brand-id'] as string;
+    const userId = (req as unknown).user?.id || (req as unknown).userId;
+    const userEmail = (req as unknown).user?.email || req.headers['x-user-email'] as string;
 
     // Validate required fields
     if (!brandId || !userId || !clientEmail || !brandName) {

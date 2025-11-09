@@ -4,8 +4,7 @@ import {
   ChaosTestResult, 
   AccessibilityReport, 
   SecurityScanResult,
-  LoadTestResult,
-  PerformanceMetrics 
+  LoadTestResult
 } from '@shared/analytics';
 
 export class QualityGateService {

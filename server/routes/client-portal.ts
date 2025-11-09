@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { ClientDashboardData, ContentComment } from '@shared/client-portal';
+import { _ClientDashboardData as ClientDashboardData, _ContentComment as ContentComment } from '@shared/client-portal';  // unused
 import { clientPortalDB } from '../lib/client-portal-db-service';
 import { AppError } from '../lib/error-middleware';
 import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
@@ -10,8 +10,8 @@ import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
  */
 export const getClientDashboard: RequestHandler = async (req, res, next) => {
   try {
-    const brandId = (req as any).user?.brandId;
-    const clientId = (req as any).user?.id || (req as any).userId;
+    const brandId = (req as unknown).user?.brandId;
+    const clientId = (req as unknown).user?.id || (req as unknown).userId;
 
     if (!brandId) {
       throw new AppError(
@@ -80,8 +80,8 @@ export const approveContent: RequestHandler = async (req, res, next) => {
   try {
     const { contentId } = req.params;
     const { feedback } = req.body;
-    const brandId = (req as any).user?.brandId;
-    const clientId = (req as any).user?.id || (req as any).userId;
+    const brandId = (req as unknown).user?.brandId;
+    const clientId = (req as unknown).user?.id || (req as unknown).userId;
 
     if (!brandId || !clientId || !contentId) {
       throw new AppError(
@@ -120,8 +120,8 @@ export const rejectContent: RequestHandler = async (req, res, next) => {
   try {
     const { contentId } = req.params;
     const { feedback } = req.body;
-    const brandId = (req as any).user?.brandId;
-    const clientId = (req as any).user?.id || (req as any).userId;
+    const brandId = (req as unknown).user?.brandId;
+    const clientId = (req as unknown).user?.id || (req as unknown).userId;
 
     if (!brandId || !clientId || !contentId) {
       throw new AppError(
@@ -169,9 +169,9 @@ export const addContentComment: RequestHandler = async (req, res, next) => {
   try {
     const { contentId } = req.params;
     const { message } = req.body;
-    const userId = (req as any).user?.id || (req as any).userId;
-    const userName = (req as any).user?.name || 'User';
-    const userRole = (req as any).user?.role || 'client';
+    const userId = (req as unknown).user?.id || (req as unknown).userId;
+    const userName = (req as unknown).user?.name || 'User';
+    const userRole = (req as unknown).user?.role || 'client';
 
     if (!contentId || !message?.trim()) {
       throw new AppError(
@@ -187,7 +187,7 @@ export const addContentComment: RequestHandler = async (req, res, next) => {
       contentId,
       userId,
       userName,
-      userRole as any,
+      userRole as unknown,
       message.trim(),
       false
     );
@@ -259,8 +259,8 @@ export const getContentComments: RequestHandler = async (req, res, next) => {
 export const uploadClientMedia: RequestHandler = async (req, res, next) => {
   try {
     const { filename, mimeType, fileSize, path } = req.body;
-    const brandId = (req as any).user?.brandId;
-    const clientId = (req as any).user?.id || (req as any).userId;
+    const brandId = (req as unknown).user?.brandId;
+    const clientId = (req as unknown).user?.id || (req as unknown).userId;
 
     if (!brandId || !clientId || !filename || !mimeType || fileSize === undefined) {
       throw new AppError(
@@ -304,8 +304,8 @@ export const uploadClientMedia: RequestHandler = async (req, res, next) => {
  */
 export const getClientMedia: RequestHandler = async (req, res, next) => {
   try {
-    const brandId = (req as any).user?.brandId;
-    const clientId = (req as any).user?.id || (req as any).userId;
+    const brandId = (req as unknown).user?.brandId;
+    const clientId = (req as unknown).user?.id || (req as unknown).userId;
     const limit = parseInt(req.query.limit as string) || 50;
 
     if (!brandId || !clientId) {
@@ -335,8 +335,8 @@ export const getClientMedia: RequestHandler = async (req, res, next) => {
  */
 export const getPortalContent: RequestHandler = async (req, res, next) => {
   try {
-    const brandId = (req as any).user?.brandId;
-    const status = req.query.status as any;
+    const brandId = (req as unknown).user?.brandId;
+    const status = req.query.status as unknown;
     const limit = parseInt(req.query.limit as string) || 50;
     const offset = parseInt(req.query.offset as string) || 0;
 

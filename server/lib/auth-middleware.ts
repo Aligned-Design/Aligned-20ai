@@ -161,7 +161,7 @@ export function requireBrandAccessMiddleware(
  * Compose multiple auth middleware
  * Useful for common patterns
  */
-export function composeBrandAuthMiddleware(...middlewares: any[]) {
+export function composeBrandAuthMiddleware(...middlewares: unknown[]) {
   return [
     extractAuthMiddleware,
     requireAuthMiddleware,

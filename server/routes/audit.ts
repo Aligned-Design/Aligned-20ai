@@ -75,7 +75,7 @@ export const getAuditLogs: RequestHandler = async (req, res) => {
       brandId,
       postId: validData.postId,
       actorId: validData.actorId,
-      action: validData.action as any,
+      action: validData.action as unknown,
       startDate: validData.startDate,
       endDate: validData.endDate,
       limit: validData.limit,

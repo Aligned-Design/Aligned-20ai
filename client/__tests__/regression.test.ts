@@ -255,7 +255,9 @@ describe('UI State Regression Tests', () => {
     });
 
     it('should scroll to top on new page load', () => {
-      window.scrollY === 0 || window.scroll(0, 0);
+      if (window.scrollY !== 0) {
+        window.scroll(0, 0);
+      }
 
       expect(window.scrollY).toBe(0);
     });
@@ -554,7 +556,7 @@ describe('Performance Regression Tests', () => {
 
     it('should release DOM references', () => {
       let element = document.createElement('div');
-      element = null as any;
+      element = null as unknown;
 
       expect(element).toBeNull();
     });

@@ -38,7 +38,7 @@ export class DatabaseError extends Error {
   }
 }
 
-function handleError(error: any, operation: string): DatabaseError {
+function handleError(error: unknown, operation: string): DatabaseError {
   console.error(`[Database] ${operation} failed:`, error);
 
   const message =

@@ -21,7 +21,7 @@ export interface JobStatusUpdatePayload {
   progress?: number; // 0-100
   currentPlatform?: string;
   error?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 /**

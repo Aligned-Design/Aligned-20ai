@@ -247,7 +247,7 @@ export class AnalyticsSync {
   private async fetchPlatformMetrics(
     config: SyncConfig,
     type: "incremental" | "full",
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     switch (config.platform) {
       case "instagram":
         return this.fetchInstagramMetrics(config, type);
@@ -274,7 +274,7 @@ export class AnalyticsSync {
     config: SyncConfig,
     startDate: Date,
     endDate: Date,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     // Delegate to platform-specific handlers with date range support
     // Most platforms use incremental sync, so we create a temporary config with the date range
     const dateRangeConfig = {
@@ -341,7 +341,7 @@ export class AnalyticsSync {
     config: SyncConfig,
     startDate: Date,
     endDate: Date,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     const startStr = startDate.toISOString();
     const endStr = endDate.toISOString();
 
@@ -354,7 +354,7 @@ export class AnalyticsSync {
         throw new Error(`Instagram API error: ${postsResponse.statusText}`);
       }
 
-      const postsData: any = await postsResponse.json();
+      const postsData: unknown = await postsResponse.json();
       return postsData.data || [];
     } catch (error) {
       console.error("Instagram date-range fetch error:", error);
@@ -366,7 +366,7 @@ export class AnalyticsSync {
     config: SyncConfig,
     startDate: Date,
     endDate: Date,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     const startUnix = Math.floor(startDate.getTime() / 1000);
     const endUnix = Math.floor(endDate.getTime() / 1000);
 
@@ -379,7 +379,7 @@ export class AnalyticsSync {
         throw new Error(`Facebook API error: ${postsResponse.statusText}`);
       }
 
-      const postsData: any = await postsResponse.json();
+      const postsData: unknown = await postsResponse.json();
       return postsData.data || [];
     } catch (error) {
       console.error("Facebook date-range fetch error:", error);
@@ -391,7 +391,7 @@ export class AnalyticsSync {
     config: SyncConfig,
     startDate: Date,
     endDate: Date,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     const startMs = startDate.getTime();
     const endMs = endDate.getTime();
 
@@ -410,9 +410,9 @@ export class AnalyticsSync {
         throw new Error(`LinkedIn API error: ${postsResponse.statusText}`);
       }
 
-      const postsData: any = await postsResponse.json();
+      const postsData: unknown = await postsResponse.json();
       // Filter posts by date range
-      return (postsData.elements || []).filter((post: any) => {
+      return (postsData.elements || []).filter((post: unknown) => {
         const postTime = post.createdTime || 0;
         return postTime >= startMs && postTime <= endMs;
       });
@@ -426,7 +426,7 @@ export class AnalyticsSync {
     config: SyncConfig,
     startDate: Date,
     endDate: Date,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     const startStr = startDate.toISOString();
     const endStr = endDate.toISOString();
 
@@ -444,7 +444,7 @@ export class AnalyticsSync {
         throw new Error(`Twitter API error: ${tweetsResponse.statusText}`);
       }
 
-      const tweetsData: any = await tweetsResponse.json();
+      const tweetsData: unknown = await tweetsResponse.json();
       return tweetsData.data || [];
     } catch (error) {
       console.error("Twitter date-range fetch error:", error);
@@ -456,7 +456,7 @@ export class AnalyticsSync {
     config: SyncConfig,
     startDate: Date,
     endDate: Date,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     try {
       const videosResponse = await fetch(
         "https://open.tiktokapis.com/v1/video/list/",
@@ -490,7 +490,7 @@ export class AnalyticsSync {
         throw new Error(`TikTok API error: ${videosResponse.statusText}`);
       }
 
-      const videosData: any = await videosResponse.json();
+      const videosData: unknown = await videosResponse.json();
       return videosData.data || [];
     } catch (error) {
       console.error("TikTok date-range fetch error:", error);
@@ -502,7 +502,7 @@ export class AnalyticsSync {
     config: SyncConfig,
     startDate: Date,
     endDate: Date,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     try {
       const insightsResponse = await fetch(
         `https://mybusiness.googleapis.com/v1/accounts/*/locations/${config.accountId}/insights:reportInsights?pageSize=100`,
@@ -536,7 +536,7 @@ export class AnalyticsSync {
         );
       }
 
-      const insightsData: any = await insightsResponse.json();
+      const insightsData: unknown = await insightsResponse.json();
       return insightsData.locationInsights || [];
     } catch (error) {
       console.error("Google Business date-range fetch error:", error);
@@ -548,7 +548,7 @@ export class AnalyticsSync {
     config: SyncConfig,
     startDate: Date,
     endDate: Date,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     try {
       const pinsResponse = await fetch(
         `https://api.pinterest.com/v1/user/${config.accountId}/pins?access_token=${config.accessToken}&fields=id,created_at,note,stats`,
@@ -558,9 +558,9 @@ export class AnalyticsSync {
         throw new Error(`Pinterest API error: ${pinsResponse.statusText}`);
       }
 
-      const pinsData: any = await pinsResponse.json();
+      const pinsData: unknown = await pinsResponse.json();
       // Filter by date range
-      return (pinsData.data || []).filter((pin: any) => {
+      return (pinsData.data || []).filter((pin: unknown) => {
         const pinTime = new Date(pin.created_at).getTime();
         return pinTime >= startDate.getTime() && pinTime <= endDate.getTime();
       });
@@ -574,7 +574,7 @@ export class AnalyticsSync {
     config: SyncConfig,
     startDate: Date,
     endDate: Date,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     try {
       const videosResponse = await fetch(
         `https://www.googleapis.com/youtube/v3/search?part=snippet&forMine=true&type=video&maxResults=50&publishedAfter=${startDate.toISOString()}&publishedBefore=${endDate.toISOString()}&access_token=${config.accessToken}`,
@@ -584,7 +584,7 @@ export class AnalyticsSync {
         throw new Error(`YouTube API error: ${videosResponse.statusText}`);
       }
 
-      const videosData: any = await videosResponse.json();
+      const videosData: unknown = await videosResponse.json();
       return videosData.items || [];
     } catch (error) {
       console.error("YouTube date-range fetch error:", error);
@@ -596,7 +596,7 @@ export class AnalyticsSync {
   private async fetchInstagramMetrics(
     config: SyncConfig,
     type: string,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     const sinceDate =
       type === "incremental" && config.lastSyncAt
         ? config.lastSyncAt
@@ -612,14 +612,14 @@ export class AnalyticsSync {
         throw new Error(`Instagram API error: ${postsResponse.statusText}`);
       }
 
-      const postsData: any = await postsResponse.json();
+      const postsData: unknown = await postsResponse.json();
 
       // Fetch account insights
       const accountResponse = await fetch(
         `https://graph.instagram.com/${config.accountId}/insights?metric=reach,impressions,profile_views&period=day&since=${sinceDate}&access_token=${config.accessToken}`,
       );
 
-      const accountData: any = accountResponse.ok
+      const accountData: unknown = accountResponse.ok
         ? await accountResponse.json()
         : { data: [] };
 
@@ -633,7 +633,7 @@ export class AnalyticsSync {
   private async fetchFacebookMetrics(
     config: SyncConfig,
     type: string,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     const sinceDate =
       type === "incremental" && config.lastSyncAt
         ? Math.floor(new Date(config.lastSyncAt).getTime() / 1000)
@@ -649,14 +649,14 @@ export class AnalyticsSync {
         throw new Error(`Facebook API error: ${postsResponse.statusText}`);
       }
 
-      const postsData: any = await postsResponse.json();
+      const postsData: unknown = await postsResponse.json();
 
       // Fetch page insights
       const pageInsightsResponse = await fetch(
         `https://graph.facebook.com/v18.0/${config.accountId}/insights?metric=page_views,page_engaged_users,page_fans&period=day&since=${sinceDate}&access_token=${config.accessToken}`,
       );
 
-      const pageInsightsData: any = pageInsightsResponse.ok
+      const pageInsightsData: unknown = pageInsightsResponse.ok
         ? await pageInsightsResponse.json()
         : { data: [] };
 
@@ -670,7 +670,7 @@ export class AnalyticsSync {
   private async fetchLinkedInMetrics(
     config: SyncConfig,
     type: string,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     const sinceDate =
       type === "incremental" && config.lastSyncAt
         ? new Date(config.lastSyncAt).toISOString()
@@ -692,7 +692,7 @@ export class AnalyticsSync {
         throw new Error(`LinkedIn API error: ${postsResponse.statusText}`);
       }
 
-      const postsData: any = await postsResponse.json();
+      const postsData: unknown = await postsResponse.json();
 
       // Fetch organization insights
       const insightsResponse = await fetch(
@@ -719,7 +719,7 @@ export class AnalyticsSync {
   private async fetchTwitterMetrics(
     config: SyncConfig,
     type: string,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     const sinceDate =
       type === "incremental" && config.lastSyncAt
         ? new Date(config.lastSyncAt).toISOString()
@@ -740,7 +740,7 @@ export class AnalyticsSync {
         throw new Error(`Twitter API error: ${tweetsResponse.statusText}`);
       }
 
-      const tweetsData: any = await tweetsResponse.json();
+      const tweetsData: unknown = await tweetsResponse.json();
       return tweetsData.data || [];
     } catch (error) {
       console.error("Twitter fetch error:", error);
@@ -751,7 +751,7 @@ export class AnalyticsSync {
   private async fetchTikTokMetrics(
     config: SyncConfig,
     _type: string,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     try {
       // Fetch video statistics
       const videosResponse = await fetch(
@@ -780,7 +780,7 @@ export class AnalyticsSync {
         throw new Error(`TikTok API error: ${videosResponse.statusText}`);
       }
 
-      const videosData: any = await videosResponse.json();
+      const videosData: unknown = await videosResponse.json();
       return videosData.data || [];
     } catch (error) {
       console.error("TikTok fetch error:", error);
@@ -791,7 +791,7 @@ export class AnalyticsSync {
   private async fetchGoogleBusinessMetrics(
     config: SyncConfig,
     _type: string,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     try {
       // Fetch location insights
       const insightsResponse = await fetch(
@@ -834,7 +834,7 @@ export class AnalyticsSync {
         );
       }
 
-      const insightsData: any = await insightsResponse.json();
+      const insightsData: unknown = await insightsResponse.json();
       return insightsData.locationInsights || [];
     } catch (error) {
       console.error("Google Business fetch error:", error);
@@ -845,7 +845,7 @@ export class AnalyticsSync {
   private async fetchPinterestMetrics(
     config: SyncConfig,
     _type: string,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     try {
       // Fetch pin analytics
       const pinsResponse = await fetch(
@@ -856,7 +856,7 @@ export class AnalyticsSync {
         throw new Error(`Pinterest API error: ${pinsResponse.statusText}`);
       }
 
-      const pinsData: any = await pinsResponse.json();
+      const pinsData: unknown = await pinsResponse.json();
       return pinsData.data || [];
     } catch (error) {
       console.error("Pinterest fetch error:", error);
@@ -867,7 +867,7 @@ export class AnalyticsSync {
   private async fetchYouTubeMetrics(
     config: SyncConfig,
     _type: string,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     try {
       // Fetch channel and video statistics
       const videosResponse = await fetch(
@@ -878,14 +878,14 @@ export class AnalyticsSync {
         throw new Error(`YouTube API error: ${videosResponse.statusText}`);
       }
 
-      const videosData: any = await videosResponse.json();
+      const videosData: unknown = await videosResponse.json();
 
       // Fetch analytics report
       const analyticsResponse = await fetch(
         `https://youtubeanalytics.googleapis.com/v2/reports?ids=channel=${config.accountId}&start-date=2024-01-01&end-date=2024-12-31&metrics=views,estimatedMinutesWatched,likes,comments,shares&access_token=${config.accessToken}`,
       );
 
-      const analyticsData: any = analyticsResponse.ok
+      const analyticsData: unknown = analyticsResponse.ok
         ? await analyticsResponse.json()
         : { rows: [] };
 
@@ -899,7 +899,7 @@ export class AnalyticsSync {
   private normalizeMetrics(
     brandId: string,
     platform: Platform,
-    rawData: any[],
+    rawData: unknown[],
   ): AnalyticsMetric[] {
     return rawData.map((item, index) => ({
       id: `${platform}_${brandId}_${Date.now()}_${index}`,
@@ -917,7 +917,7 @@ export class AnalyticsSync {
 
   private extractMetrics(
     platform: Platform,
-    item: any,
+    item: unknown,
   ): AnalyticsMetric["metrics"] {
     const base = {
       reach: 0,
@@ -938,20 +938,20 @@ export class AnalyticsSync {
         return {
           ...base,
           reach:
-            item.insights?.data?.find((i: any) => i.name === "reach")
+            item.insights?.data?.find((i: unknown) => i.name === "reach")
               ?.values?.[0]?.value || 0,
           impressions:
-            item.insights?.data?.find((i: any) => i.name === "impressions")
+            item.insights?.data?.find((i: unknown) => i.name === "impressions")
               ?.values?.[0]?.value || 0,
           engagement:
-            item.insights?.data?.find((i: any) => i.name === "engagement")
+            item.insights?.data?.find((i: unknown) => i.name === "engagement")
               ?.values?.[0]?.value || 0,
           likes: item.like_count || 0,
           comments: item.comments_count || 0,
           engagementRate:
             item.like_count && item.insights
               ? ((item.like_count + item.comments_count) /
-                  (item.insights.data.find((i: any) => i.name === "reach")
+                  (item.insights.data.find((i: unknown) => i.name === "reach")
                     ?.values?.[0]?.value || 1)) *
                 100
               : 0,
@@ -964,7 +964,7 @@ export class AnalyticsSync {
 
   private extractMetadata(
     platform: Platform,
-    item: any,
+    item: unknown,
   ): AnalyticsMetric["metadata"] {
     const it = item || {};
     return {
@@ -1061,7 +1061,7 @@ export class AnalyticsSync {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;
-      const errorCode = (error as any)?.code || undefined;
+      const errorCode = (error as unknown)?.code || undefined;
 
       const { error: dbError } = await supabase
         .from("analytics_sync_logs")
@@ -1100,10 +1100,10 @@ export class AnalyticsSync {
    * Scrub PII from metadata before storing in database
    * Removes email addresses, phone numbers, usernames, and other sensitive data
    */
-  private scrubbePII(metadata: any): any {
+  private scrubbePII(metadata: unknown): unknown {
     if (!metadata) return metadata;
 
-    const scrubbedData: any = { ...(metadata || {}) };
+    const scrubbedData: unknown = { ...(metadata || {}) };
 
     // Patterns for common PII
     const patterns = {

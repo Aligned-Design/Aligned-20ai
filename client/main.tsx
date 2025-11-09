@@ -12,7 +12,7 @@ initializeMonitoring();
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <SentryErrorBoundary
-      fallback={(props: any) => {
+      fallback={(props: unknown) => {
         const safeMessage = (() => {
           try {
             if (!props)
@@ -22,13 +22,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               typeof props.error.message === "string"
             )
               return props.error.message;
-            if (props.error && typeof (props.error as any).message === "string")
-              return (props.error as any).message;
+            if (props.error && typeof (props.error as unknown).message === "string")
+              return (props.error as unknown).message;
             return String(
               props.error ??
                 "An unexpected error occurred. Our team has been notified.",
             );
-          } catch (e) {
+          } catch (_e) {
             return "An unexpected error occurred. Our team has been notified.";
           }
         })();

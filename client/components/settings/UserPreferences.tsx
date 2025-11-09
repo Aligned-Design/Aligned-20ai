@@ -14,10 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Accordion,
@@ -76,7 +73,7 @@ export function UserPreferencesComponent({
 
   const savePreferences = async (
     section: keyof UserPreferences | "basic" | "advanced" | "agency",
-    updates: any,
+    updates: unknown,
   ) => {
     try {
       setSaving(true);
@@ -315,13 +312,13 @@ interface BasicPreferencesTabProps {
 }
 
 function BasicPreferencesTab({
-  preferences,
-  onSave,
-  saving,
+  _preferences: preferences,
+  _onSave: onSave,
+  _saving: saving,
 }: BasicPreferencesTabProps) {
   const [localPrefs, setLocalPrefs] = useState(preferences);
 
-  const updatePreference = (key: keyof BasicPreferences, value: any) => {
+  const updatePreference = (key: keyof BasicPreferences, value: unknown) => {
     const updated = { ...localPrefs, [key]: value };
     setLocalPrefs(updated);
     onSave({ [key]: value });
@@ -625,9 +622,9 @@ interface AdvancedPreferencesTabProps {
 }
 
 function AdvancedPreferencesTab({
-  preferences,
-  onSave,
-  saving,
+  _preferences: preferences,
+  _onSave: onSave,
+  _saving: saving,
 }: AdvancedPreferencesTabProps) {
   // ...existing code... Similar structure to BasicPreferencesTab but with advanced settings
   return (
@@ -663,8 +660,8 @@ interface AgencyOverridesTabProps {
 
 function AgencyOverridesTab({
   overrides,
-  onSave,
-  saving,
+  _onSave: onSave,
+  _saving: saving,
 }: AgencyOverridesTabProps) {
   if (!overrides) {
     return (

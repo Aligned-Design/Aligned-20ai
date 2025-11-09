@@ -54,8 +54,8 @@ export class WixClient {
   private async request<T>(
     endpoint: string,
     method: string = "GET",
-    body?: any,
-  ): Promise<any> {
+    body?: unknown,
+  ): Promise<unknown> {
     const url = `${this.baseUrl}${endpoint}`;
 
     const response = await fetch(url, {
@@ -76,7 +76,7 @@ export class WixClient {
     return response.json() as Promise<T>;
   }
 
-  async getSiteInfo(): Promise<any> {
+  async getSiteInfo(): Promise<unknown> {
     return this.request(`/contacts/sites`);
   }
 
@@ -123,12 +123,12 @@ export class WixClient {
     });
   }
 
-  async getContactLists(): Promise<any[]> {
+  async getContactLists(): Promise<unknown[]> {
     const response = await this.request("/contacts/lists");
     return (response && response.lists) || [];
   }
 
-  async getContacts(limit: number = 20): Promise<any[]> {
+  async getContacts(limit: number = 20): Promise<unknown[]> {
     const response = await this.request(`/contacts/contacts?limit=${limit}`);
     return (response && response.contacts) || [];
   }
@@ -167,7 +167,7 @@ export class WixClient {
     return (response && response.campaigns) || [];
   }
 
-  async getMediaItems(limit: number = 20): Promise<any[]> {
+  async getMediaItems(limit: number = 20): Promise<unknown[]> {
     const response = await this.request(
       `/media/items?limit=${limit}&sort=CREATED_DATE_DESC`,
     );
@@ -193,7 +193,7 @@ export class WixClient {
         Authorization: this.accessToken,
         "wix-api-version": "1.0",
       },
-      body: formData as any,
+      body: formData as unknown,
     });
 
     if (!response.ok) {

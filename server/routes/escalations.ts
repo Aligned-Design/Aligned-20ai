@@ -26,7 +26,6 @@ import {
 } from "@shared/escalation";
 import {
   AppError,
-  asyncHandler,
 } from "../lib/error-middleware";
 import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 

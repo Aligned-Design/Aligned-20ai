@@ -205,8 +205,8 @@ export function getWeekendPostingFromConfig(postingConfig: unknown): boolean {
     postingConfig !== null &&
     "weekendPostingEnabled" in postingConfig
   ) {
-    // @ts-ignore - runtime check above ensures property exists
-    return (postingConfig as any).weekendPostingEnabled !== false;
+    // @ts-expect-error - runtime check above ensures property exists
+    return (postingConfig as unknown).weekendPostingEnabled !== false;
   }
 
   return true;

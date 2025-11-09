@@ -84,7 +84,7 @@ export function useRealtimeAnalytics(
     });
 
     // Receive analytics sync progress
-    socket.on("analytics:sync-progress", (data: any) => {
+    socket.on("analytics:sync-progress", (data: unknown) => {
       const event: AnalyticsEvent = {
         syncId: data.syncId || `sync-${Date.now()}`,
         eventType: data.eventType || "analytics:sync-progress",
@@ -107,7 +107,7 @@ export function useRealtimeAnalytics(
       console.log(`Successfully subscribed to brand ${data.brandId}`);
     });
 
-    socket.on("error", (err: any) => {
+    socket.on("error", (err: unknown) => {
       const error = new Error(
         typeof err === "string" ? err : err?.message || "WebSocket error"
       );

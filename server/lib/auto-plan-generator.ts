@@ -62,14 +62,14 @@ export class AutoPlanGenerator {
     const formattedMetrics = metrics.map((m) => ({
       id: m.id,
       brandId: m.brand_id,
-      platform: m.platform as any,
+      platform: m.platform as unknown,
       postId: m.post_id,
       date: m.date,
       metrics: m.metrics,
       metadata: m.metadata,
       createdAt: m.created_at,
       updatedAt: m.updated_at,
-    })) as any[];
+    })) as unknown[];
 
     // Generate forecast for the month
     const forecast = await advisorEngine.generateForecast(
@@ -145,8 +145,8 @@ export class AutoPlanGenerator {
   /**
    * Extract topics from advisor insights
    */
-  private extractTopicsFromInsights(insights: any[]): string[] {
-    const topicInsights = insights.filter((i: any) => i.category === "content");
+  private extractTopicsFromInsights(insights: unknown[]): string[] {
+    const topicInsights = insights.filter((i: unknown) => i.category === "content");
     const topics = new Set<string>();
 
     topicInsights.forEach((insight) => {
@@ -285,7 +285,7 @@ export class AutoPlanGenerator {
     tenantId: string,
     planId: string,
     userId: string,
-  ): Promise<any> {
+  ): Promise<unknown> {
     const { supabase } = await import("./supabase");
 
     const { data, error } = await supabase
@@ -307,7 +307,7 @@ export class AutoPlanGenerator {
   /**
    * Get plan history for a brand
    */
-  async getPlanHistory(brandId: string, limit: number = 12): Promise<any[]> {
+  async getPlanHistory(brandId: string, limit: number = 12): Promise<unknown[]> {
     const { supabase } = await import("./supabase");
 
     const { data, error } = await supabase
@@ -325,7 +325,7 @@ export class AutoPlanGenerator {
   /**
    * Get current month's plan
    */
-  async getCurrentMonthPlan(brandId: string): Promise<any | null> {
+  async getCurrentMonthPlan(brandId: string): Promise<unknown | null> {
     const { supabase } = await import("./supabase");
 
     const monthStart = new Date();

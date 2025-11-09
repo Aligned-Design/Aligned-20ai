@@ -50,7 +50,7 @@ export class SquarespaceClient {
   private async request<T>(
     endpoint: string,
     method: string = "GET",
-    body?: any,
+    body?: unknown,
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
@@ -71,8 +71,8 @@ export class SquarespaceClient {
     return response.json() as Promise<T>;
   }
 
-  async getSiteInfo(): Promise<any> {
-    return this.request<any>(`/sites/${this.siteId}`);
+  async getSiteInfo(): Promise<unknown> {
+    return this.request<unknown>(`/sites/${this.siteId}`);
   }
 
   async getBlogPosts(limit: number = 20): Promise<SquarespacePost[]> {
@@ -82,15 +82,15 @@ export class SquarespaceClient {
     return response.items || [];
   }
 
-  async createBlogPost(post: SquarespacePost): Promise<any> {
-    return this.request<any>(`/sites/${this.siteId}/blog/posts`, "POST", post);
+  async createBlogPost(post: SquarespacePost): Promise<unknown> {
+    return this.request<unknown>(`/sites/${this.siteId}/blog/posts`, "POST", post);
   }
 
   async updateBlogPost(
     postId: string,
     updates: Partial<SquarespacePost>,
-  ): Promise<any> {
-    return this.request<any>(
+  ): Promise<unknown> {
+    return this.request<unknown>(
       `/sites/${this.siteId}/blog/posts/${postId}`,
       "PATCH",
       updates,
@@ -98,14 +98,14 @@ export class SquarespaceClient {
   }
 
   async deleteBlogPost(postId: string): Promise<void> {
-    await this.request<any>(
+    await this.request<unknown>(
       `/sites/${this.siteId}/blog/posts/${postId}`,
       "DELETE",
     );
   }
 
-  async publishBlogPost(postId: string): Promise<any> {
-    return this.request<any>(
+  async publishBlogPost(postId: string): Promise<unknown> {
+    return this.request<unknown>(
       `/sites/${this.siteId}/blog/posts/${postId}`,
       "PATCH",
       {
@@ -114,12 +114,12 @@ export class SquarespaceClient {
     );
   }
 
-  async getEmailLists(): Promise<any> {
-    return this.request<any>(`/sites/${this.siteId}/email/lists`);
+  async getEmailLists(): Promise<unknown> {
+    return this.request<unknown>(`/sites/${this.siteId}/email/lists`);
   }
 
-  async createEmailCampaign(campaign: SquarespaceEmailCampaign): Promise<any> {
-    return this.request<any>(
+  async createEmailCampaign(campaign: SquarespaceEmailCampaign): Promise<unknown> {
+    return this.request<unknown>(
       `/sites/${this.siteId}/email/campaigns`,
       "POST",
       campaign,
@@ -129,16 +129,16 @@ export class SquarespaceClient {
   async updateEmailCampaign(
     campaignId: string,
     updates: Partial<SquarespaceEmailCampaign>,
-  ): Promise<any> {
-    return this.request<any>(
+  ): Promise<unknown> {
+    return this.request<unknown>(
       `/sites/${this.siteId}/email/campaigns/${campaignId}`,
       "PATCH",
       updates,
     );
   }
 
-  async sendEmailCampaign(campaignId: string): Promise<any> {
-    return this.request<any>(
+  async sendEmailCampaign(campaignId: string): Promise<unknown> {
+    return this.request<unknown>(
       `/sites/${this.siteId}/email/campaigns/${campaignId}/send`,
       "POST",
       {},
@@ -148,8 +148,8 @@ export class SquarespaceClient {
   async scheduleEmailCampaign(
     campaignId: string,
     sendAt: number,
-  ): Promise<any> {
-    return this.request<any>(
+  ): Promise<unknown> {
+    return this.request<unknown>(
       `/sites/${this.siteId}/email/campaigns/${campaignId}`,
       "PATCH",
       {

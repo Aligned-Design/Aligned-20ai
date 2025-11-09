@@ -77,7 +77,7 @@ function generateSEOMetadata(
 }
 
 // Helper function to convert database record to API response format
-function mapAssetRecord(record: any): MediaAsset {
+function mapAssetRecord(record: unknown): MediaAsset {
   return {
     id: record.id,
     filename: record.filename,
@@ -99,7 +99,7 @@ function mapAssetRecord(record: any): MediaAsset {
 
 // Helper to compute category breakdown from assets
 function getCategoryBreakdown(
-  assets: any[]
+  assets: unknown[]
 ): Record<string, number> {
   const breakdown: Record<string, number> = {
     graphics: 0,
@@ -143,7 +143,7 @@ export const uploadMedia: RequestHandler = async (req, res, next) => {
       fileSize,
       hash || "",
       "", // URL will be generated separately
-      category as any || "images",
+      category as unknown || "images",
       metadata,
       thumbnailUrl
     );
@@ -368,7 +368,7 @@ export const trackAssetUsage: RequestHandler = async (req, res, next) => {
     }
 
     // Update asset metadata with usage information
-    const updatedMetadata = {
+    const _updatedMetadata = {
       ...(assetRecord.metadata || {}),
       usedIn: Array.isArray(usedIn) ? usedIn : [usedIn],
       lastUsedAt: new Date().toISOString(),

@@ -46,7 +46,7 @@ export class InstagramAPI {
       );
 
       if (!containerResponse.ok) {
-        const error = (await containerResponse.json()) as any;
+        const error = (await containerResponse.json()) as unknown;
         return {
           success: false,
           error: error.error?.message || "Failed to create media container",
@@ -55,7 +55,7 @@ export class InstagramAPI {
         };
       }
 
-      const container = (await containerResponse.json()) as any;
+      const container = (await containerResponse.json()) as unknown;
 
       // Step 2: Publish container
       const publishResponse = await fetch(
@@ -71,7 +71,7 @@ export class InstagramAPI {
       );
 
       if (!publishResponse.ok) {
-        const error = (await publishResponse.json()) as any;
+        const error = (await publishResponse.json()) as unknown;
         return {
           success: false,
           error: error.error?.message || "Failed to publish media",
@@ -80,7 +80,7 @@ export class InstagramAPI {
         };
       }
 
-      const result = (await publishResponse.json()) as any;
+      const result = (await publishResponse.json()) as unknown;
 
       return {
         success: true,
@@ -113,7 +113,7 @@ export class FacebookAPI {
 
   async publishPost(content: PostContent): Promise<PublishResult> {
     try {
-      const body: any = {
+      const body: unknown = {
         message: content.text,
         access_token: this.accessToken,
       };
@@ -130,7 +130,7 @@ export class FacebookAPI {
       });
 
       if (!response.ok) {
-        const error = (await response.json()) as any;
+        const error = (await response.json()) as unknown;
         return {
           success: false,
           error: error.error?.message || "Failed to publish post",
@@ -139,7 +139,7 @@ export class FacebookAPI {
         };
       }
 
-      const result = (await response.json()) as any;
+      const result = (await response.json()) as unknown;
 
       return {
         success: true,
@@ -172,7 +172,7 @@ export class LinkedInAPI {
 
   async publishPost(content: PostContent): Promise<PublishResult> {
     try {
-      const body: any = {
+      const body: unknown = {
         author: `urn:li:person:${this.actorId}`,
         commentary: content.text,
         visibility: "PUBLIC",
@@ -203,7 +203,7 @@ export class LinkedInAPI {
       });
 
       if (!response.ok) {
-        const error = (await response.json()) as any;
+        const error = (await response.json()) as unknown;
         return {
           success: false,
           error: error.message || "Failed to publish post",
@@ -243,7 +243,7 @@ export class TwitterAPI {
 
   async publishPost(content: PostContent): Promise<PublishResult> {
     try {
-      const body: any = {
+      const body: unknown = {
         text: content.text,
       };
 
@@ -265,7 +265,7 @@ export class TwitterAPI {
       });
 
       if (!response.ok) {
-        const error = (await response.json()) as any;
+        const error = (await response.json()) as unknown;
         return {
           success: false,
           error: error.detail || "Failed to publish tweet",
@@ -274,7 +274,7 @@ export class TwitterAPI {
         };
       }
 
-      const result = (await response.json()) as any;
+      const result = (await response.json()) as unknown;
 
       return {
         success: true,
@@ -307,7 +307,7 @@ export class GoogleBusinessAPI {
 
   async publishPost(content: PostContent): Promise<PublishResult> {
     try {
-      const postData: any = {
+      const postData: unknown = {
         summary: content.text,
         callToAction: {
           actionType: "LEARN_MORE",
@@ -337,7 +337,7 @@ export class GoogleBusinessAPI {
       );
 
       if (!response.ok) {
-        const error = (await response.json()) as any;
+        const error = (await response.json()) as unknown;
         return {
           success: false,
           error: error.error?.message || "Failed to publish post",
@@ -346,7 +346,7 @@ export class GoogleBusinessAPI {
         };
       }
 
-      const result = (await response.json()) as any;
+      const result = (await response.json()) as unknown;
 
       return {
         success: true,

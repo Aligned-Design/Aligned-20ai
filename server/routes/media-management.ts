@@ -89,7 +89,7 @@ router.post('/upload', upload.array('files', 20), async (req: Request, res: Resp
           file.mimetype,
           brandId,
           tenantId,
-          category as any,
+          category as unknown,
           (progress) => {
             // Emit progress via SSE if needed
             console.log(`Upload progress: ${progress.percentComplete}% - ${progress.currentFile}`);
@@ -150,7 +150,7 @@ router.get('/list', async (req: Request, res: Response) => {
     }
 
     const { assets, total } = await mediaService.listAssets(brandId as string, {
-      category: category as any,
+      category: category as unknown,
       search,
       tags,
       limit,

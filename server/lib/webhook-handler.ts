@@ -137,7 +137,7 @@ export class WebhookHandler {
    * Deliver/process a webhook event
    * Simulates actual delivery. In production, this would invoke the real handler
    */
-  private async deliverEvent(eventId: string, event: any): Promise<boolean> {
+  private async deliverEvent(eventId: string, event: unknown): Promise<boolean> {
     try {
       // Log the attempt
       const attemptNumber = (event?.attempt_count || 0) + 1;
@@ -239,7 +239,7 @@ export class WebhookHandler {
             updated_at: event.updated_at,
             delivered_at: event.delivered_at || undefined,
           };
-          const shouldRetry = shouldRetryWebhook(eventData as any);
+          const shouldRetry = shouldRetryWebhook(eventData as unknown);
           if (!shouldRetry) {
             continue;
           }

@@ -183,7 +183,7 @@ export class EscalationScheduler {
     escalated_to_user_id?: string;
   }): Promise<void> {
     // Get approval details if present
-    let approval: any = null;
+    let approval: unknown = null;
     if (escalation.approval_id) {
       approval = await postApprovals.getById(escalation.approval_id);
       if (!approval) {
@@ -226,25 +226,25 @@ export class EscalationScheduler {
     // Send notification
     if (
       escalation.notification_type === "email" ||
-      (rule && (rule as any).send_email)
+      (rule && (rule as unknown).send_email)
     ) {
       await this.sendEmailNotification(
-        escalation as any,
-        approval as any,
-        rule as any,
+        escalation as unknown,
+        approval as unknown,
+        rule as unknown,
         clientSettingsData,
       );
     }
 
     if (
       escalation.notification_type === "slack" ||
-      ((rule as any).send_slack && escalation.notification_type !== "email")
+      ((rule as unknown).send_slack && escalation.notification_type !== "email")
     ) {
       await this.sendSlackNotification(
-        escalation as any,
-        approval as any,
-        rule as any,
-      ).catch((err: any) => {
+        escalation as unknown,
+        approval as unknown,
+        rule as unknown,
+      ).catch((err: unknown) => {
         console.warn(
           `[Escalation Scheduler] Failed to send Slack notification: ${err?.message || err}`,
         );
@@ -266,7 +266,7 @@ export class EscalationScheduler {
     },
     approval: { post_id?: string; status?: string; created_at?: string },
     rule: { trigger_hours?: number },
-    clientSettingsData: any,
+    clientSettingsData: unknown,
   ): Promise<void> {
     const recipient = escalation.escalated_to_user_id;
     if (!recipient) {
@@ -323,7 +323,7 @@ Please review and take action at your earliest convenience.
    */
   private shouldSendNotification(
     escalationLevel: string,
-    clientSettings: any,
+    clientSettings: unknown,
   ): boolean {
     if (!clientSettings) {
       // Default: send if no preferences found

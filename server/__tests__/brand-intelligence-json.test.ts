@@ -221,8 +221,8 @@ describe('Brand Intelligence API - JSON Responses', () => {
       for (const testCase of testCases) {
         const methodRequest = request[testCase.method as 'get' | 'post'](testCase.path);
 
-        if ((testCase as any).body) {
-          methodRequest.send((testCase as any).body);
+        if ((testCase as unknown).body) {
+          methodRequest.send((testCase as unknown).body);
         }
 
         const response = await methodRequest.expect(testCase.expectedStatus);

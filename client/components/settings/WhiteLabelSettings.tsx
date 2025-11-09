@@ -4,9 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { Upload, Eye, Save, RotateCcw, Palette, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWhiteLabel } from "@/hooks/useWhiteLabel";
@@ -99,7 +97,7 @@ export function WhiteLabelSettings({
     });
   };
 
-  const updateLocalConfig = (section: keyof WhiteLabelConfig, updates: any) => {
+  const updateLocalConfig = (section: keyof WhiteLabelConfig, updates: unknown) => {
     setLocalConfig((prev) => {
       const currentSection = prev[section] || {};
       return {

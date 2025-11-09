@@ -5,7 +5,7 @@ import { AppError } from '../lib/error-middleware';
 import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
 
 // Helper function to map database record to API response
-function mapWhiteLabelRecord(record: any): WhiteLabelConfig {
+function mapWhiteLabelRecord(record: unknown): WhiteLabelConfig {
   return {
     id: record.id,
     agencyId: record.agency_id,
@@ -27,7 +27,7 @@ function mapWhiteLabelRecord(record: any): WhiteLabelConfig {
 export const getWhiteLabelConfig: RequestHandler = async (req, res, next) => {
   try {
     // Get agencyId from path parameter or authentication context
-    const agencyId = (req.params.agencyId || (req as any).agencyId || (req as any).user?.agencyId);
+    const agencyId = (req.params.agencyId || (req as unknown).agencyId || (req as unknown).user?.agencyId);
 
     if (!agencyId) {
       throw new AppError(
@@ -83,7 +83,7 @@ export const updateWhiteLabelConfig: RequestHandler = async (req, res, next) => 
   try {
     const { config: updates, previewMode }: WhiteLabelRequest = req.body;
     // Get agencyId from path parameter or authentication context
-    const agencyId = (req.params.agencyId || (req as any).agencyId || (req as any).user?.agencyId);
+    const agencyId = (req.params.agencyId || (req as unknown).agencyId || (req as unknown).user?.agencyId);
 
     if (!agencyId) {
       throw new AppError(
@@ -116,7 +116,7 @@ export const updateWhiteLabelConfig: RequestHandler = async (req, res, next) => 
     }
 
     // Update and save to database
-    const updatedRecord = await whiteLabelDB.updateWhiteLabelConfig(agencyId, updates as any);
+    const updatedRecord = await whiteLabelDB.updateWhiteLabelConfig(agencyId, updates as unknown);
     const config = mapWhiteLabelRecord(updatedRecord);
 
     const response: WhiteLabelResponse = {

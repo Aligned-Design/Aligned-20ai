@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { BrandIntelligence } from "@shared/brand-intelligence";
 
 interface UseBrandIntelligenceReturn {
@@ -25,7 +25,7 @@ interface ApiErrorResponse {
  * @param response Fetch response object
  * @returns Parsed JSON data or throws descriptive error
  */
-async function safeJsonParse(response: any): Promise<unknown> {
+async function safeJsonParse(response: unknown): Promise<unknown> {
   // Helper to read content-type from Headers-like or plain object
   const getContentType = () => {
     try {
@@ -37,7 +37,7 @@ async function safeJsonParse(response: any): Promise<unknown> {
           return response.headers["content-type"];
         }
       }
-    } catch (e) {
+    } catch (_e) {
       // ignore
     }
     return "";
@@ -70,7 +70,7 @@ async function safeJsonParse(response: any): Promise<unknown> {
         const preview = bodyText.slice(0, 500).replace(/\s+/g, " ");
         try {
           return JSON.parse(bodyText);
-        } catch (parseErr) {
+        } catch (_parseErr) {
           throw new Error(
             `Failed to parse JSON: ${parseErr instanceof Error ? parseErr.message : "unknown error"}. Body preview: ${preview}`,
           );
@@ -160,8 +160,8 @@ export function useBrandIntelligence(
       const respContentType =
         response &&
         response.headers &&
-        typeof (response.headers as any).get === "function"
-          ? (response.headers as any).get("content-type") || ""
+        typeof (response.headers as unknown).get === "function"
+          ? (response.headers as unknown).get("content-type") || ""
           : "";
       console.debug(
         "[Brand Intelligence] fetch response status:",
@@ -176,12 +176,12 @@ export function useBrandIntelligence(
         let errorData: unknown;
         try {
           errorData = await safeJsonParse(response);
-        } catch (parseErr) {
+        } catch (_parseErr) {
           // If JSON parsing fails, attempt to read text body for debugging and include URL
           let bodyPreview = "";
           try {
             bodyPreview = await response.text();
-          } catch (e) {
+          } catch (_e) {
             bodyPreview = "<unable to read response body>";
           }
           const preview = bodyPreview.slice(0, 500).replace(/\s+/g, " ");
@@ -220,7 +220,7 @@ export function useBrandIntelligence(
 
       // Comprehensive error logging for debugging — ensure objects are stringified to avoid `[object Object]`
       try {
-        const serializedError = (function stringifySafe(value: any) {
+        const serializedError = (function stringifySafe(value: unknown) {
           try {
             return JSON.stringify(value, (_k, v) => {
               // Convert functions to their names, handle Error objects
@@ -231,7 +231,7 @@ export function useBrandIntelligence(
                 return `[Function: ${v.name || "anonymous"}]`;
               return v;
             });
-          } catch (e) {
+          } catch (_e) {
             return String(value);
           }
         })(err);
@@ -251,8 +251,8 @@ export function useBrandIntelligence(
       }
 
       // Log to telemetry/monitoring service if available
-      if (typeof window !== "undefined" && (window as any).__telemetry?.error) {
-        (window as any).__telemetry.error("brand_intelligence_fetch_failed", {
+      if (typeof window !== "undefined" && (window as unknown).__telemetry?.error) {
+        (window as unknown).__telemetry.error("brand_intelligence_fetch_failed", {
           message: errorMessage,
           brandId,
           timestamp: new Date().toISOString(),
@@ -279,7 +279,7 @@ export function useBrandIntelligence(
           let errorData: unknown;
           try {
             errorData = await safeJsonParse(response);
-          } catch (parseErr) {
+          } catch (_parseErr) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
           }
           const apiError = errorData as ApiErrorResponse;
@@ -296,7 +296,7 @@ export function useBrandIntelligence(
         setError(errorMessage);
 
         try {
-          const serializedError = (function stringifySafe(value: any) {
+          const serializedError = (function stringifySafe(value: unknown) {
             try {
               return JSON.stringify(value, (_k, v) => {
                 if (v instanceof Error) {
@@ -330,9 +330,9 @@ export function useBrandIntelligence(
 
         if (
           typeof window !== "undefined" &&
-          (window as any).__telemetry?.error
+          (window as unknown).__telemetry?.error
         ) {
-          (window as any).__telemetry.error(
+          (window as unknown).__telemetry.error(
             "brand_intelligence_feedback_failed",
             {
               message: errorMessage,

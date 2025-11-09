@@ -382,7 +382,7 @@ export class MediaDBService {
     }
 
     const totalUsedBytes = (usageData || []).reduce(
-      (sum, asset: any) => sum + (asset.file_size || 0),
+      (sum, asset: unknown) => sum + (asset.file_size || 0),
       0
     );
 

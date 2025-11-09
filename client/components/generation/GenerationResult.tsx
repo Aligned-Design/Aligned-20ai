@@ -440,7 +440,7 @@ export function GenerationResult({
                   {expandedIssue === "platform" && (
                     <ul className="ml-6 space-y-2 mt-2">
                       {linterResult.platform_violations.map(
-                        (violation: any, idx: number) => (
+                        (violation: unknown, idx: number) => (
                           <li key={idx} className="text-sm text-orange-700">
                             <p className="font-medium">
                               {violation.platform}: {violation.issue}

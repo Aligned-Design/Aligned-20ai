@@ -19,7 +19,7 @@ export function MediaBrowser({
   brandId,
   onSelectAsset,
   selectedAssets = [],
-  multiSelect = false,
+  _multiSelect = false,
   className,
 }: MediaBrowserProps) {
   const [assets, setAssets] = useState<MediaAsset[]>([]);

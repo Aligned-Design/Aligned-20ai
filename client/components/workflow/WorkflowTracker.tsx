@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { Progress } from "@/components/ui/progress";
 import {
   CheckCircle,
@@ -11,13 +11,12 @@ import {
   User,
   MessageSquare,
   Calendar,
-  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WorkflowStepInstance, WorkflowAction } from "@shared/workflow";
 
 interface WorkflowTrackerProps {
-  workflow: any; // workflow may come from external source; validate at runtime
+  workflow: unknown; // workflow may come from external source; validate at runtime
   canTakeAction: boolean;
   onAction: (action: WorkflowAction) => void;
   className?: string;
@@ -31,12 +30,12 @@ export function WorkflowTracker({
 }: WorkflowTrackerProps) {
   const steps = Array.isArray(workflow?.steps) ? workflow.steps : [];
   const completedSteps = steps.filter(
-    (step: any) => step?.status === "completed",
+    (step: unknown) => step?.status === "completed",
   ).length;
   const totalSteps = steps.length || 1;
   const progress = (completedSteps / totalSteps) * 100;
 
-  const getStepStatusIcon = (status: WorkflowStepInstance["status"]) => {
+  const _getStepStatusIcon = (status: WorkflowStepInstance["status"]) => {
     switch (status) {
       case "completed":
         return <CheckCircle className="h-5 w-5 text-green-500" />;
@@ -49,7 +48,7 @@ export function WorkflowTracker({
     }
   };
 
-  const getStepStatusColor = (status: WorkflowStepInstance["status"]) => {
+  const _getStepStatusColor = (status: WorkflowStepInstance["status"]) => {
     switch (status) {
       case "completed":
         return "bg-green-100 text-green-800 border-green-200";
@@ -156,7 +155,7 @@ function WorkflowStepCard({
   canTakeAction,
   onAction,
 }: WorkflowStepCardProps) {
-  const getStepStatusIcon = (status: WorkflowStepInstance["status"]) => {
+  const _getStepStatusIcon = (status: WorkflowStepInstance["status"]) => {
     switch (status) {
       case "completed":
         return <CheckCircle className="h-5 w-5 text-green-500" />;
@@ -169,7 +168,7 @@ function WorkflowStepCard({
     }
   };
 
-  const getStepStatusColor = (status: WorkflowStepInstance["status"]) => {
+  const _getStepStatusColor = (status: WorkflowStepInstance["status"]) => {
     switch (status) {
       case "completed":
         return "bg-green-100 text-green-800 border-green-200";

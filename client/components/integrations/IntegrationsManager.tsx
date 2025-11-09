@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
+import { _Input } from "@/components/ui/input";  // unused
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -19,7 +19,6 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  ExternalLink,
   Trash2,
   Activity,
   Zap,
@@ -385,7 +384,7 @@ function IntegrationSettings({
             <Label>Sync Frequency</Label>
             <Select
               value={settings.syncFrequency}
-              onValueChange={(value: any) =>
+              onValueChange={(value: unknown) =>
                 setSettings((prev) => ({ ...prev, syncFrequency: value }))
               }
             >
@@ -404,7 +403,7 @@ function IntegrationSettings({
             <Label>Sync Direction</Label>
             <Select
               value={settings.syncDirection}
-              onValueChange={(value: any) =>
+              onValueChange={(value: unknown) =>
                 setSettings((prev) => ({ ...prev, syncDirection: value }))
               }
             >

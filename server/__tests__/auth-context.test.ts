@@ -21,7 +21,7 @@ describe("Auth Context", () => {
         },
         params: {},
         query: {},
-      } as any as Request;
+      } as unknown as Request;
 
       const context = extractAuthContext(req);
 
@@ -37,7 +37,7 @@ describe("Auth Context", () => {
         },
         params: {},
         query: {},
-      } as any as Request;
+      } as unknown as Request;
 
       const context = extractAuthContext(req);
 
@@ -52,7 +52,7 @@ describe("Auth Context", () => {
         },
         params: { brandId: "brand_456" },
         query: {},
-      } as any as Request;
+      } as unknown as Request;
 
       const context = extractAuthContext(req);
 
@@ -67,7 +67,7 @@ describe("Auth Context", () => {
         },
         params: {},
         query: { brandId: "brand_456" },
-      } as any as Request;
+      } as unknown as Request;
 
       const context = extractAuthContext(req);
 
@@ -83,7 +83,7 @@ describe("Auth Context", () => {
         },
         params: {},
         query: {},
-      } as any as Request;
+      } as unknown as Request;
 
       const context = extractAuthContext(req);
 
@@ -99,7 +99,7 @@ describe("Auth Context", () => {
         },
         params: {},
         query: {},
-      } as any as Request;
+      } as unknown as Request;
 
       const context = extractAuthContext(req);
 
@@ -115,7 +115,7 @@ describe("Auth Context", () => {
         },
         params: {},
         query: {},
-      } as any as Request;
+      } as unknown as Request;
 
       const context = extractAuthContext(req);
 
@@ -127,7 +127,7 @@ describe("Auth Context", () => {
         get: () => null,
         params: {},
         query: {},
-      } as any as Request;
+      } as unknown as Request;
 
       const context = extractAuthContext(req);
 
@@ -142,7 +142,7 @@ describe("Auth Context", () => {
         },
         params: {},
         query: {},
-      } as any as Request;
+      } as unknown as Request;
 
       const context = extractAuthContext(req);
 

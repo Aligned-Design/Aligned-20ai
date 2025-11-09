@@ -437,7 +437,7 @@ describe('PHASE 6: Media Management System', () => {
           'image/jpeg',
           testBrandId,
           testTenantId,
-          '' as any
+          '' as unknown
         );
       } catch (error) {
         expect(error).toBeDefined();

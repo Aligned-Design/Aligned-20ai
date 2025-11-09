@@ -27,12 +27,12 @@ export interface PublishingJobDB {
   status?: string;
   scheduled_at?: string | null;
   published_at?: string | null;
-  content?: any;
-  validation_results?: any[];
+  content?: unknown;
+  validation_results?: unknown[];
   retry_count?: number;
   max_retries?: number;
   last_error?: string | null;
-  last_error_details?: any;
+  last_error_details?: unknown;
   created_at?: string;
   updated_at?: string;
 }
@@ -48,8 +48,8 @@ export interface MediaAssetRowDB {
   file_size: number;
   hash?: string | null;
   thumbnail_url?: string | null;
-  metadata?: Record<string, any> | null;
-  variants?: any[] | null;
+  metadata?: Record<string, unknown> | null;
+  variants?: unknown[] | null;
   used_in?: string[] | null;
   usage_count?: number | null;
   created_at?: string;

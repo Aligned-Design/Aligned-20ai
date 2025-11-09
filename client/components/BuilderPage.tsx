@@ -2,7 +2,7 @@ import { BuilderComponent, useIsPreviewing } from "@builder.io/react";
 
 interface BuilderPageProps {
   model: string;
-  content?: any;
+  content?: unknown;
 }
 
 export function BuilderPage({ model, content }: BuilderPageProps) {

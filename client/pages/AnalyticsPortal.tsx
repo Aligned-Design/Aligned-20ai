@@ -24,10 +24,7 @@ import {
   Download,
   MessageSquare,
   ThumbsUp,
-  ThumbsDown,
   BarChart3,
-  Users,
-  Calendar,
   ExternalLink,
   RefreshCw,
   Plus,
@@ -367,7 +364,7 @@ export default function AnalyticsPortal({
               <CardContent>
                 <div className="space-y-4">
                   {(data.charts?.topContent ?? []).map(
-                    (content: any, index: number) => (
+                    (content: unknown, index: number) => (
                       <div
                         key={content.id || index}
                         className="flex items-center justify-between p-4 border rounded-lg"
@@ -444,7 +441,7 @@ export default function AnalyticsPortal({
 function MetricCard({
   title,
   current,
-  previous,
+  _previous: previous,
   change,
   icon,
   color,
@@ -504,7 +501,7 @@ function MetricCard({
 
 function ContentPerformanceView({
   data,
-  onFeedback,
+  _onFeedback: onFeedback,
 }: {
   data: AnalyticsPortalData;
   onFeedback: (contentId?: string) => void;

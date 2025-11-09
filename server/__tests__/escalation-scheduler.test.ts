@@ -170,7 +170,7 @@ describe('Escalation Scheduler', () => {
     });
 
     it('should handle unknown escalation levels gracefully', () => {
-      const label = getEscalationLevelLabel('custom_level' as any);
+      const label = getEscalationLevelLabel('custom_level' as unknown);
       expect(label).toBe('custom_level');
     });
   });
@@ -270,7 +270,7 @@ describe('Escalation Scheduler', () => {
   describe('Error Handling', () => {
     it('should handle invalid escalation level gracefully', () => {
       expect(() => {
-        getEscalationLevelLabel('invalid_level' as any);
+        getEscalationLevelLabel('invalid_level' as unknown);
       }).not.toThrow();
     });
 

@@ -251,7 +251,7 @@ export default function NewDashboard() {
     },
   ];
 
-  const insights: any[] = [
+  const insights: unknown[] = [
     {
       id: "1",
       title: "Try Reels Thu 3–5 PM",

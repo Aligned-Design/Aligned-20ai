@@ -521,7 +521,7 @@ export class PublishingQueue {
   private async handleJobFailure(
     jobId: string,
     error: string,
-    errorDetails?: any,
+    errorDetails?: unknown,
   ): Promise<void> {
     const job = this.jobs.get(jobId);
     if (!job) return;
@@ -572,7 +572,7 @@ export class PublishingQueue {
 
     // Persist to database
     try {
-      await publishingDBService.updateJobStatus(jobId, update.status as any);
+      await publishingDBService.updateJobStatus(jobId, update.status as unknown);
     } catch (error) {
       console.error(`Failed to update job status in database: ${error}`);
     }

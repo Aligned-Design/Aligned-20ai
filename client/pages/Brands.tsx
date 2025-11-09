@@ -26,7 +26,7 @@ import { useNavigate } from "react-router-dom";
 import { useBrand } from "@/contexts/BrandContext";
 
 export default function Brands() {
-  const { brands, refreshBrands, setCurrentBrand, loading } = useBrand();
+  const { brands, refreshBrands, setCurrentBrand: _setCurrentBrand, loading } = useBrand();
   const { user } = useAuth();
   const { toast } = useToast();
   const _navigate = useNavigate();

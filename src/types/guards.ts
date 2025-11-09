@@ -1,10 +1,4 @@
 import { z } from "zod";
-import { z } from "zod";
-import type {
-  PlatformConnectionRecordDB,
-  MediaAssetRowDB,
-  PublishingJobDB,
-} from "./db";
 
 export const PlatformConnectionRecordSchema = z.object({
   id: z.string(),

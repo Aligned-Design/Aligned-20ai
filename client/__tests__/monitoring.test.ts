@@ -162,14 +162,14 @@ describe('Monitoring & Error Tracking', () => {
 
     it('should handle missing performance API gracefully', () => {
       const originalPerformance = window.performance;
-      (window as any).performance = undefined;
+      (window as unknown).performance = undefined;
 
       expect(() => {
         markPerformanceStart('test');
         markPerformanceEnd('test');
       }).not.toThrow();
 
-      (window as any).performance = originalPerformance;
+      (window as unknown).performance = originalPerformance;
     });
   });
 
@@ -182,13 +182,13 @@ describe('Monitoring & Error Tracking', () => {
 
     it('should handle missing performance API', () => {
       const originalPerformance = window.performance;
-      (window as any).performance = undefined;
+      (window as unknown).performance = undefined;
 
       expect(() => {
         reportMetricsToSentry();
       }).not.toThrow();
 
-      (window as any).performance = originalPerformance;
+      (window as unknown).performance = originalPerformance;
     });
   });
 });

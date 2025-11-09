@@ -11,7 +11,7 @@ export interface AnalyticsMetrics {
   followers?: number;
   engagementRate?: number;
   impressions?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface AnalyticsMetricRecord {
@@ -22,7 +22,7 @@ export interface AnalyticsMetricRecord {
   post_id?: string;
   date: string;
   metrics: AnalyticsMetrics;
-  metadata: any;
+  metadata: unknown;
   created_at: string;
   updated_at: string;
 }
@@ -40,7 +40,7 @@ export interface SyncLogRecord {
   completed_at?: string;
   duration_ms?: number;
   error_message?: string;
-  error_details?: any;
+  error_details?: unknown;
   created_at: string;
 }
 
@@ -183,7 +183,7 @@ export class AnalyticsDBService {
     // Find top platform by engagement
     let maxEngagement = 0;
     Object.entries(summary.platformBreakdown).forEach(
-      ([platform, data]: [string, any]) => {
+      ([platform, data]: [string, unknown]) => {
         if (data.engagement > maxEngagement) {
           maxEngagement = data.engagement;
           summary.topPlatform = platform;
@@ -273,7 +273,7 @@ export class AnalyticsDBService {
     itemsFailed: number,
     startTime: Date,
     endTime?: Date,
-    error?: { message: string; details: any },
+    error?: { message: string; details: unknown },
   ): Promise<SyncLogRecord> {
     const { data, error: dbError } = await supabase
       .from("analytics_sync_logs")
@@ -328,7 +328,7 @@ export class AnalyticsDBService {
     target: number,
     deadline: Date,
     notes?: string,
-  ): Promise<any> {
+  ): Promise<unknown> {
     const { data, error } = await supabase
       .from("analytics_goals")
       .upsert(
@@ -353,7 +353,7 @@ export class AnalyticsDBService {
   /**
    * Get goals for a brand
    */
-  async getGoals(brandId: string): Promise<any[]> {
+  async getGoals(brandId: string): Promise<unknown[]> {
     const { data, error } = await supabase
       .from("analytics_goals")
       .select("*")
@@ -371,7 +371,7 @@ export class AnalyticsDBService {
     goalId: string,
     current: number,
     status?: string,
-  ): Promise<any> {
+  ): Promise<unknown> {
     const { data, error } = await supabase
       .from("analytics_goals")
       .update({
@@ -398,7 +398,7 @@ export class AnalyticsDBService {
     feedback: "accepted" | "rejected" | "implemented",
     previousWeight: number,
     newWeight: number,
-  ): Promise<any> {
+  ): Promise<unknown> {
     const { data, error } = await supabase
       .from("advisor_feedback")
       .insert({
@@ -430,7 +430,7 @@ export class AnalyticsDBService {
     if (error) throw new Error(`Failed to fetch weights: ${error.message}`);
 
     const weights: Record<string, number> = {};
-    (data || []).forEach((row: any) => {
+    (data || []).forEach((row: unknown) => {
       const key = `${row.category}_${row.type}`;
       weights[key] = row.new_weight;
     });

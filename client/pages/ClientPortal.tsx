@@ -73,7 +73,7 @@ export default function ClientPortal() {
       const response = await fetch("/api/client/dashboard");
       if (response.ok) {
         const data = await response.json();
-        setDashboardData(data as any);
+        setDashboardData(data as unknown);
       }
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
@@ -679,7 +679,7 @@ function ApprovalsSection({
 }
 
 function UploadsSection() {
-  const [uploads, setUploads] = useState<any[]>([]);
+  const [uploads, setUploads] = useState<unknown[]>([]);
   const [_uploading, setUploading] = useState(false);
 
   const handleFileUpload = async (files: FileList) => {
@@ -1267,7 +1267,7 @@ function ShareLinkDialog({
   );
 }
 
-function UploadedAssetCard({ upload }: { upload: any }) {
+function UploadedAssetCard({ upload }: { upload: unknown }) {
   return (
     <Card>
       <CardContent className="p-4">

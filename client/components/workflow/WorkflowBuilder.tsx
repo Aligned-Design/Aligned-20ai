@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -16,13 +15,6 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Plus,
   Trash2,
-  ArrowRight,
-  Settings,
-  Users,
-  Clock,
-  AlertCircle,
-  CheckCircle,
-  Move,
   Save,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -308,7 +300,7 @@ function WorkflowStepCard({
   step,
   index,
   isSelected,
-  onSelect,
+  _onSelect: onSelect,
   onUpdate,
   onRemove,
   onMove,

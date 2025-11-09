@@ -204,7 +204,7 @@ function generateContentPerformance(
   ];
 }
 
-function calculateNextScheduled(schedule: any): string {
+function calculateNextScheduled(schedule: unknown): string {
   const now = new Date();
   if (schedule.frequency === "daily") {
     return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();

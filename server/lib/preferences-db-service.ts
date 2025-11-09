@@ -243,7 +243,7 @@ export class PreferencesDBService {
       );
     }
 
-    return (data || []).map((item: any) => ({
+    return (data || []).map((item: unknown) => ({
       brandId: item.brand_id,
       preferences: {
         ...DEFAULT_PREFERENCES,
@@ -260,7 +260,7 @@ export class PreferencesDBService {
     brandId: string
   ): Promise<Record<string, unknown>> {
     const prefs = await this.getPreferences(userId, brandId);
-    return (prefs as any).notifications || DEFAULT_PREFERENCES.notifications;
+    return (prefs as unknown).notifications || DEFAULT_PREFERENCES.notifications;
   }
 
   /**
@@ -274,7 +274,7 @@ export class PreferencesDBService {
     const updated = await this.updatePreferences(userId, brandId, {
       notifications: notificationPrefs,
     });
-    return (updated as any).notifications || {};
+    return (updated as unknown).notifications || {};
   }
 
   /**
@@ -326,7 +326,7 @@ export class PreferencesDBService {
    * Get nested value from object using dot notation
    */
   private getNestedValue(obj: Record<string, unknown>, path: string): unknown {
-    return path.split(".").reduce((current: any, prop) => {
+    return path.split(".").reduce((current: unknown, prop) => {
       return current?.[prop];
     }, obj);
   }

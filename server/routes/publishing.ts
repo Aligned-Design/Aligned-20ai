@@ -92,7 +92,7 @@ export const handleOAuthCallback: RequestHandler = async (req, res) => {
     const { brandId } = tokenData;
 
     // ✅ SECURE: Require authentication context
-    const authContext = (req as any).auth;
+    const authContext = (req as unknown).auth;
     if (!authContext || !authContext.userId) {
       const errorMsg =
         "Authentication required to complete OAuth authorization";
@@ -148,7 +148,7 @@ export const getConnections: RequestHandler = async (req, res) => {
     const { brandId } = req.params;
 
     // Fetch connections from database
-    const connections: any[] = await connectionsDB.getBrandConnections(brandId);
+    const connections: unknown[] = await connectionsDB.getBrandConnections(brandId);
 
     // Transform to ConnectionStatus format
     const connectionStatuses: ConnectionStatus[] = connections.map((conn) => ({
@@ -213,8 +213,8 @@ export const publishContent: RequestHandler = async (req, res) => {
       validateOnly,
     } = PublishContentSchema.parse(req.body);
 
-    const tenantId = (req as any).user?.tenantId || "tenant-123";
-    const userId = (req as any).user?.id;
+    const tenantId = (req as unknown).user?.tenantId || "tenant-123";
+    const userId = (req as unknown).user?.id;
 
     // Convert content string to PostContent object
     const content: PostContent = { text: contentText };
@@ -322,7 +322,7 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
       limit,
       offset,
     );
-    const jobsAny: any[] = (jobs as any) || [];
+    const jobsAny: unknown[] = (jobs as unknown) || [];
 
     // Filter by platform if specified
     let filteredJobs = jobsAny;
@@ -333,23 +333,23 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
     }
 
     // Filter by brand
-    filteredJobs = filteredJobs.filter((job: any) => job.brand_id === brandId);
+    filteredJobs = filteredJobs.filter((job: unknown) => job.brand_id === brandId);
 
     // Transform database records to PublishingJob format
-    const publishingJobs: PublishingJob[] = filteredJobs.map((job: any) => ({
+    const publishingJobs: PublishingJob[] = filteredJobs.map((job: unknown) => ({
       id: job.id,
       brandId: job.brand_id,
       tenantId: job.tenant_id,
       postId: job.id,
       platform: (job.platforms?.[0] || "instagram") as Platform,
       connectionId: `${job.platforms?.[0]}-${job.brand_id}`,
-      status: job.status as any,
+      status: job.status as unknown,
       scheduledAt: job.scheduled_at,
       publishedAt: job.published_at,
       platformPostId: undefined,
       platformUrl: undefined,
       content: job.content,
-      validationResults: (job.validation_results as any[]) || [],
+      validationResults: (job.validation_results as unknown[]) || [],
       retryCount: job.retry_count || 0,
       maxRetries: job.max_retries || 3,
       lastError: job.last_error,
@@ -558,7 +558,7 @@ export const refreshToken: RequestHandler = async (req, res) => {
       accountName: connection.account_name || "",
       accessToken: connection.access_token,
       refreshToken: connection.refresh_token,
-      status: connection.status as any,
+      status: connection.status as unknown,
       permissions: connection.permissions || [],
       metadata: connection.metadata,
       createdAt: connection.created_at,
@@ -650,7 +650,7 @@ export const publishBlogPost: RequestHandler = async (req, res) => {
     );
 
     const result = await IntegrationService.publishBlogPost(
-      platform as any,
+      platform as unknown,
       connection.metadata || {},
       {
         title,
@@ -742,7 +742,7 @@ export const publishEmailCampaign: RequestHandler = async (req, res) => {
     );
 
     const result = await IntegrationService.publishEmailCampaign(
-      platform as any,
+      platform as unknown,
       connection.metadata || {},
       {
         title,

@@ -71,7 +71,7 @@ export default function Settings() {
       ...preferences,
       [section]:
         typeof currentValue === "object" && currentValue !== null
-          ? { ...(currentValue as any), ...updates }
+          ? { ...(currentValue as unknown), ...updates }
           : updates,
     };
 

@@ -57,10 +57,10 @@ describe("OAuth CSRF Security", () => {
 
   describe("CSRF State Validation", () => {
     it("should reject missing state parameter", () => {
-      const req = { query: {} } as any as Request;
+      const req = { query: {} } as unknown as Request;
       const res = {
         status: () => ({ json: () => {} }),
-      } as any as Response;
+      } as unknown as Response;
 
       let error: unknown;
       try {
@@ -76,16 +76,16 @@ describe("OAuth CSRF Security", () => {
       const shortState = "a".repeat(32);
 
       expect(() => {
-        const req = { query: { state: shortState } } as any as Request;
-        const res = {} as any as Response;
+        const req = { query: { state: shortState } } as unknown as Request;
+        const res = {} as unknown as Response;
         validateOAuthState(req, res, () => {});
       }).toThrow();
     });
 
     it("should accept valid 64-character hex state", () => {
       const validState = "a".repeat(64);
-      const req = { query: { state: validState } } as any as Request;
-      const res = {} as any as Response;
+      const req = { query: { state: validState } } as unknown as Request;
+      const res = {} as unknown as Response;
 
       let nextCalled = false;
       validateOAuthState(req, res, () => {
@@ -99,16 +99,16 @@ describe("OAuth CSRF Security", () => {
       // This should pass - valid hex characters
       const validHex = "a".repeat(64);
       expect(() => {
-        const req = { query: { state: validHex } } as any as Request;
-        const res = {} as any as Response;
+        const req = { query: { state: validHex } } as unknown as Request;
+        const res = {} as unknown as Response;
         validateOAuthState(req, res, () => {});
       }).not.toThrow();
 
       // This should fail - invalid characters (spaces)
       const invalidState = "a".repeat(60) + "    ";
       expect(() => {
-        const req = { query: { state: invalidState } } as any as Request;
-        const res = {} as any as Response;
+        const req = { query: { state: invalidState } } as unknown as Request;
+        const res = {} as unknown as Response;
         validateOAuthState(req, res, () => {});
       }).toThrow();
     });
@@ -121,8 +121,8 @@ describe("OAuth CSRF Security", () => {
 
       // This should now fail because colons are not valid characters anymore
       expect(() => {
-        const req = { query: { state: oldCompoundState } } as any as Request;
-        const res = {} as any as Response;
+        const req = { query: { state: oldCompoundState } } as unknown as Request;
+        const res = {} as unknown as Response;
         validateOAuthState(req, res, () => {});
       }).toThrow();
     });
@@ -131,8 +131,8 @@ describe("OAuth CSRF Security", () => {
       const maliciousState = "a".repeat(60) + "'; DROP TABLE users; --";
 
       expect(() => {
-        const req = { query: { state: maliciousState } } as any as Request;
-        const res = {} as any as Response;
+        const req = { query: { state: maliciousState } } as unknown as Request;
+        const res = {} as unknown as Response;
         validateOAuthState(req, res, () => {});
       }).toThrow();
     });
@@ -141,16 +141,16 @@ describe("OAuth CSRF Security", () => {
       const xssState = "a".repeat(50) + "<script>alert('xss')</script>";
 
       expect(() => {
-        const req = { query: { state: xssState } } as any as Request;
-        const res = {} as any as Response;
+        const req = { query: { state: xssState } } as unknown as Request;
+        const res = {} as unknown as Response;
         validateOAuthState(req, res, () => {});
       }).toThrow();
     });
 
     it("should attach validated state to request for downstream handlers", () => {
       const state = "a".repeat(64);
-      const req = { query: { state } } as any as Request;
-      const res = {} as any as Response;
+      const req = { query: { state } } as unknown as Request;
+      const res = {} as unknown as Response;
 
       validateOAuthState(req, res, () => {});
 
@@ -163,8 +163,8 @@ describe("OAuth CSRF Security", () => {
     it("should not include branded information in state token", () => {
       // State token should be pure 64-character hex, no brandId appended
       const state = "a".repeat(64);
-      const req = { query: { state } } as any as Request;
-      const res = {} as any as Response;
+      const req = { query: { state } } as unknown as Request;
+      const res = {} as unknown as Response;
 
       validateOAuthState(req, res, () => {});
 
@@ -179,8 +179,8 @@ describe("OAuth CSRF Security", () => {
     it("should not expose brandId in OAuth state parameter", () => {
       // OAuth state should be just the token, not token:brandId
       const validSecureState = "a".repeat(64);
-      const req = { query: { state: validSecureState } } as any as Request;
-      const res = {} as any as Response;
+      const req = { query: { state: validSecureState } } as unknown as Request;
+      const res = {} as unknown as Response;
 
       // This should succeed with just the token
       let nextCalled = false;
@@ -197,8 +197,8 @@ describe("OAuth CSRF Security", () => {
       // This is tested at the oauth-state-cache level
       // CSRF middleware ensures state exists and is valid format
       const state = "a".repeat(64);
-      const req = { query: { state } } as any as Request;
-      const res = {} as any as Response;
+      const req = { query: { state } } as unknown as Request;
+      const res = {} as unknown as Response;
 
       // First validation should succeed
       let firstCall = false;
@@ -222,8 +222,8 @@ describe("OAuth CSRF Security", () => {
     it("should prevent cross-site request forgery by requiring valid state", () => {
       // Attacker without valid state should fail
       const maliciousState = ""; // Empty
-      const req = { query: { state: maliciousState } } as any as Request;
-      const res = {} as any as Response;
+      const req = { query: { state: maliciousState } } as unknown as Request;
+      const res = {} as unknown as Response;
 
       expect(() => {
         validateOAuthState(req, res, () => {});
@@ -235,8 +235,8 @@ describe("OAuth CSRF Security", () => {
       const weakState = "weak" + "a".repeat(50);
 
       expect(() => {
-        const req = { query: { state: weakState } } as any as Request;
-        const res = {} as any as Response;
+        const req = { query: { state: weakState } } as unknown as Request;
+        const res = {} as unknown as Response;
         validateOAuthState(req, res, () => {});
       }).toThrow();
     });
@@ -244,8 +244,8 @@ describe("OAuth CSRF Security", () => {
     it("should require state in callback to match generated state", () => {
       // This is the core CSRF prevention: state must be in cache
       const state = "a".repeat(64);
-      const req = { query: { state } } as any as Request;
-      const res = {} as any as Response;
+      const req = { query: { state } } as unknown as Request;
+      const res = {} as unknown as Response;
 
       // CSRF middleware validates format, cache validates it exists
       let validated = false;
@@ -260,13 +260,13 @@ describe("OAuth CSRF Security", () => {
 
   describe("Error Handling", () => {
     it("should provide clear error message when state is missing", () => {
-      const req = { query: {} } as any as Request;
-      const res = {} as any as Response;
+      const req = { query: {} } as unknown as Request;
+      const res = {} as unknown as Response;
 
       let errorMessage = "";
       try {
         validateOAuthState(req, res, () => {});
-      } catch (e: any) {
+      } catch (e: unknown) {
         errorMessage = e.message;
       }
 
@@ -275,13 +275,13 @@ describe("OAuth CSRF Security", () => {
 
     it("should provide clear error message when state format is invalid", () => {
       const invalidState = "x".repeat(20);
-      const req = { query: { state: invalidState } } as any as Request;
-      const res = {} as any as Response;
+      const req = { query: { state: invalidState } } as unknown as Request;
+      const res = {} as unknown as Response;
 
       let errorMessage = "";
       try {
         validateOAuthState(req, res, () => {});
-      } catch (e: any) {
+      } catch (e: unknown) {
         errorMessage = e.message;
       }
 

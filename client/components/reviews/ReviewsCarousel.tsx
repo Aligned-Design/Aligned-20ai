@@ -73,7 +73,6 @@ export default function ReviewsCarousel() {
       el.removeEventListener("mouseover", stopAutoScroll);
       el.removeEventListener("mouseout", startAutoScroll);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -71,9 +71,9 @@ export default function BrandSnapshot() {
     );
   }
 
-  const brandKit = (brand.brand_kit as any) || {};
-  const __voiceSummary = (brand.voice_summary as any) || {};
-  const __visualSummary = (brand.visual_summary as any) || {};
+  const brandKit = (brand.brand_kit as unknown) || {};
+  const __voiceSummary = (brand.voice_summary as unknown) || {};
+  const __visualSummary = (brand.visual_summary as unknown) || {};
 
   return (
     <div className="min-h-screen bg-[var(--surface-1)]">

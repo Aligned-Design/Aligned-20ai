@@ -262,7 +262,7 @@ export default function ClientSettings() {
                         ...settings,
                         emailPreferences: {
                           ...settings.emailPreferences,
-                          reminderFrequency: value as any,
+                          reminderFrequency: value as unknown,
                         },
                       })
                     }
@@ -440,7 +440,7 @@ export default function ClientSettings() {
                 onValueChange={(value) =>
                   setSettings({
                     ...settings,
-                    language: value as any,
+                    language: value as unknown,
                   })
                 }
               >

@@ -243,7 +243,7 @@ export class IntegrationService {
 
   private static async createWPPost(
     client: WordPressClient,
-    post: any
+    post: unknown
   ): Promise<number> {
     const created = await client.createPost(post);
     return created.id!;

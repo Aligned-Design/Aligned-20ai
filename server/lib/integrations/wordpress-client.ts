@@ -53,7 +53,7 @@ export class WordPressClient {
   private async request<T>(
     endpoint: string,
     method: string = "GET",
-    body?: any,
+    body?: unknown,
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 

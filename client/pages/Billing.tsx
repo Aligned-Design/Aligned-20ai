@@ -6,9 +6,6 @@ import { Progress } from "@/components/ui/progress";
 import {
   CreditCard,
   Download,
-  Calendar,
-  CheckCircle,
-  AlertTriangle,
   ArrowUpRight,
 } from "lucide-react";
 

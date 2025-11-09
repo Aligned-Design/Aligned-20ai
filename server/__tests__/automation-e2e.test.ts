@@ -642,11 +642,11 @@ describe("Automation Pipeline E2E Tests", () => {
   describe("Error Recovery", () => {
     it("should gracefully handle and log unexpected errors", async () => {
       const request = createMockAutomationRequest({
-        contentVariant: "happy_path" as any, // Valid variant
+        contentVariant: "happy_path" as unknown, // Valid variant
       });
 
       // Modify request to trigger error
-      const invalidRequest = { ...request, postId: null as any };
+      const invalidRequest = { ...request, postId: null as unknown };
 
       try {
         await pipeline.executeAutomation(invalidRequest);

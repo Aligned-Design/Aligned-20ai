@@ -27,7 +27,7 @@ interface WebhookEventAttempt {
   created_at: string;
 }
 
-interface WebhookEventStatus {
+interface _WebhookEventStatus {
   event_id: string;
   status: string;
   attempt_count: number;
@@ -352,7 +352,7 @@ export const getWebhookStatus: RequestHandler = async (req, res) => {
       );
     }
 
-    const eventStatus = (await webhookHandler.getEventStatus(eventId)) as any;
+    const eventStatus = (await webhookHandler.getEventStatus(eventId)) as unknown;
     if (!eventStatus) {
       throw new AppError(
         ErrorCode.NOT_FOUND,
@@ -386,7 +386,7 @@ export const getWebhookStatus: RequestHandler = async (req, res) => {
         deliveredAt: eventStatus.delivered_at,
         lastError: eventStatus.last_error,
       },
-      attempts: (eventStatus.attempts as any[]).map((a: any) => ({
+      attempts: (eventStatus.attempts as unknown[]).map((a: unknown) => ({
         attemptNumber: a.attempt_number,
         status: a.status,
         error: a.error,
@@ -455,7 +455,7 @@ export const getWebhookLogs: RequestHandler = async (req, res) => {
 
     res.json({
       success: true,
-      events: (events as any[]).map((e: any) => ({
+      events: (events as unknown[]).map((e: unknown) => ({
         id: e.id,
         provider: e.provider,
         eventType: e.event_type,
@@ -508,7 +508,7 @@ export const retryWebhookEvent: RequestHandler = async (req, res) => {
     }
 
     // Get event
-    const event = (await webhookHandler.getEventStatus(eventId)) as any;
+    const event = (await webhookHandler.getEventStatus(eventId)) as unknown;
     if (!event) {
       throw new AppError(
         ErrorCode.NOT_FOUND,

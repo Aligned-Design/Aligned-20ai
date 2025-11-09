@@ -161,7 +161,7 @@ export async function calculateEnhancedBFS(
 function calculateEnhancedToneAlignment(
   toneClassification: ToneClassificationResult | undefined,
   toneTarget: ToneTarget | undefined,
-  brandKit: any,
+  brandKit: unknown,
 ): number {
   if (!toneClassification) {
     // Fallback to keyword matching if ML fails
@@ -228,7 +228,7 @@ function calculateToneAlignmentMatch(
 /**
  * Fallback keyword-based tone alignment
  */
-function calculateKeywordToneAlignment(brandKit: any): number {
+function calculateKeywordToneAlignment(brandKit: unknown): number {
   const toneKeywords: string[] = (brandKit && brandKit.tone_keywords) || [];
   const personality: string[] = (brandKit && brandKit.brandPersonality) || [];
 
@@ -243,7 +243,7 @@ function calculateKeywordToneAlignment(brandKit: any): number {
 /**
  * Terminology match scoring
  */
-function calculateTerminologyMatch(content: any, brandKit: any): number {
+function calculateTerminologyMatch(content: unknown, brandKit: unknown): number {
   const preferredTerms: string[] =
     brandKit && brandKit.commonPhrases
       ? (brandKit.commonPhrases as string).split(",")
@@ -265,7 +265,7 @@ function calculateTerminologyMatch(content: any, brandKit: any): number {
 /**
  * Compliance scoring
  */
-function calculateCompliance(content: any, brandKit: any): number {
+function calculateCompliance(content: unknown, brandKit: unknown): number {
   const contentLower = `${content?.body || ""}`.toLowerCase();
   const bannedPhrases: string[] = (brandKit && brandKit.banned_phrases) || [];
 
@@ -291,7 +291,7 @@ function calculateCompliance(content: any, brandKit: any): number {
 /**
  * CTA fit scoring
  */
-function calculateCTAFit(content: any): number {
+function calculateCTAFit(content: unknown): number {
   if (!content?.cta || content.cta.length === 0) {
     return 0.2; // Poor score if no CTA
   }
@@ -318,7 +318,7 @@ function calculateCTAFit(content: any): number {
 /**
  * Platform fit scoring
  */
-function calculatePlatformFit(content: any): number {
+function calculatePlatformFit(content: unknown): number {
   const platform = (content?.platform || "").toLowerCase();
 
   // Platform-specific length checks

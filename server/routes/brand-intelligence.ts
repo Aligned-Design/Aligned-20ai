@@ -1,4 +1,4 @@
-import { RequestHandler, Response } from "express";
+import { RequestHandler } from "express";
 import { BrandIntelligence } from "@shared/brand-intelligence";
 import { AppError } from "../lib/error-middleware";
 import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
@@ -344,7 +344,7 @@ export const submitRecommendationFeedback: RequestHandler = async (
   } catch (error) {
     console.error("[Brand Intelligence Feedback] Error:", {
       message: error instanceof Error ? error.message : "Unknown error",
-      recommendationId: (req.body as any)?.recommendationId,
+      recommendationId: (req.body as unknown)?.recommendationId,
       timestamp: new Date().toISOString(),
     });
 

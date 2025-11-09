@@ -17,8 +17,8 @@ const USE_SENDGRID =
 const NODE_ENV = process.env.NODE_ENV || "development";
 
 // Nodemailer test account (for development)
-let testAccount: any = null;
-let transporter: any = null;
+let testAccount: unknown = null;
+let transporter: unknown = null;
 
 /**
  * Initialize email service based on environment and provider
@@ -91,7 +91,7 @@ export async function sendEmail(
   const RETRY_DELAY_MS = 1000;
 
   try {
-    let result: any;
+    let result: unknown;
 
     if (USE_SENDGRID) {
       result = await sendViaSegndGrid(options);
@@ -248,7 +248,7 @@ export async function checkEmailServiceHealth(): Promise<{
     } else {
       // Verify Nodemailer connection
       if (transporter) {
-        await (transporter as any).verify();
+        await (transporter as unknown).verify();
         return {
           healthy: true,
           provider: "nodemailer",

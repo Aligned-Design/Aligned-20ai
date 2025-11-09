@@ -127,7 +127,7 @@ class MediaService {
     if (error || !data) return 0;
 
     return data.reduce(
-      (sum: number, row: any) =>
+      (sum: number, row: unknown) =>
         sum + (typeof row.file_size === "number" ? row.file_size : 0),
       0,
     );
@@ -239,7 +239,7 @@ class MediaService {
 
       const metadataObj =
         metadata && typeof metadata === "object"
-          ? (metadata as Record<string, any>)
+          ? (metadata as Record<string, unknown>)
           : {};
 
       // 5. AI Auto-tagging
@@ -375,7 +375,7 @@ class MediaService {
         if (!error) {
           const resizedMetadata = await sharp(resized).metadata();
           variants.push({
-            size: sizeName as any,
+            size: sizeName as unknown,
             width: resizedMetadata.width || dimensions.width,
             height: resizedMetadata.height || dimensions.height,
             path: variantPath,
@@ -750,7 +750,7 @@ class MediaService {
 
     return {
       total,
-      byCategory: byCategory as any,
+      byCategory: byCategory as unknown,
       assetCount: data?.length || 0,
       percentUsed: (total / limit) * 100,
       limit,
@@ -795,7 +795,7 @@ class MediaService {
   /**
    * Map database row to MediaAsset
    */
-  private mapAssetRow(row: any): MediaAsset {
+  private mapAssetRow(row: unknown): MediaAsset {
     const meta =
       row && row.metadata && typeof row.metadata === "object"
         ? row.metadata

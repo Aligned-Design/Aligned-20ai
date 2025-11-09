@@ -7,7 +7,7 @@ interface JobStatusUpdate {
   progress?: number;
   currentPlatform?: string;
   error?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   timestamp: string;
 }
 
@@ -79,7 +79,7 @@ export function useRealtimeJob(
       console.log(`Successfully subscribed to job ${data.jobId}`);
     });
 
-    socket.on("error", (err: any) => {
+    socket.on("error", (err: unknown) => {
       const error = new Error(
         typeof err === "string" ? err : err?.message || "WebSocket error"
       );

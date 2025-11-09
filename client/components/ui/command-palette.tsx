@@ -15,8 +15,6 @@ import {
   FolderOpen,
   BarChart3,
   Plus,
-  Search,
-  Settings,
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';

@@ -584,7 +584,7 @@ export class ClientPortalDBService {
       );
     }
 
-    return (data || []).map((item: any) => ({
+    return (data || []).map((item: unknown) => ({
       id: item.id,
       filename: item.filename,
       mimeType: item.mime_type,

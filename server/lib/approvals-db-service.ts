@@ -421,7 +421,7 @@ export class ApprovalsDBService {
       );
     }
 
-    return (data || []).map((item: any) => ({
+    return (data || []).map((item: unknown) => ({
       id: item.id,
       action: item.action,
       userId: item.user_id,

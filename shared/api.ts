@@ -43,9 +43,7 @@ export interface BFSCalculateRequest {
   brand_id: string;
 }
 
-export interface BFSCalculateResponse extends BrandFidelityScore {
-  // Extends the base BFS with no additional fields
-}
+export type BFSCalculateResponse = BrandFidelityScore;
 
 export interface ReviewQueueResponse {
   queue: Array<{
@@ -70,7 +68,7 @@ export interface ReviewActionResponse {
   error?: string;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;

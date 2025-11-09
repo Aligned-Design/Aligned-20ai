@@ -3,7 +3,7 @@ import { builder } from "@builder.io/react";
 // Use import.meta.env for browser (Vite). Fallback to process.env for server-side.
 const BUILDER_PUBLIC_KEY =
   (typeof window !== "undefined" &&
-    (import.meta as any).env?.VITE_BUILDER_PUBLIC_KEY) ||
+    (import.meta as unknown).env?.VITE_BUILDER_PUBLIC_KEY) ||
   (typeof process !== "undefined" &&
     process.env &&
     process.env.VITE_BUILDER_PUBLIC_KEY) ||

@@ -11,7 +11,7 @@ import { auditLogs as dbAuditLogs } from "./dbClient";
 /**
  * Helper to convert database record to AuditLog format
  */
-function dbRecordToAuditLog(record: any): AuditLog {
+function dbRecordToAuditLog(record: unknown): AuditLog {
   return {
     id: record.id,
     brandId: record.brand_id,

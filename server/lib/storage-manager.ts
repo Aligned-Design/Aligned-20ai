@@ -105,9 +105,9 @@ export async function deleteAssetWithVariants(
 }
 
 export async function checkDuplicate(
-  bucketName: string,
-  hash: string,
-  brandId: string
+  _bucketName: string,
+  _hash: string,
+  _brandId: string
 ): Promise<MediaAsset | null> {
   // In a real implementation, this would query a database
   // For now, return null (no duplicate found)

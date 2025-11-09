@@ -3,9 +3,6 @@ import { Integration, SyncEvent, WebhookEvent, IntegrationType } from "@shared/i
 import {
   GetIntegrationsQuerySchema,
   CreateIntegrationBodySchema,
-  UpdateIntegrationBodySchema,
-  PlatformSchema,
-  BrandIdSchema,
 } from "../lib/validation-schemas";
 import { validateQuery, validateBody, validateRequest } from "../lib/validation-middleware";
 import { integrationsDB } from "../lib/integrations-db-service";
@@ -15,7 +12,7 @@ import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 const router = Router();
 
 // Helper function to map database record to API response
-function mapConnectionRecord(record: any): Integration {
+function mapConnectionRecord(record: unknown): Integration {
   return {
     id: record.id,
     type: record.provider as IntegrationType,
@@ -39,7 +36,7 @@ function mapConnectionRecord(record: any): Integration {
 router.get(
   "/",
   validateQuery(GetIntegrationsQuerySchema),
-  (async (req, res, next) => {
+  async (req, res, next) => {
     try {
       const { brandId } = req.query as { brandId: string };
 
@@ -59,11 +56,10 @@ router.get(
     } catch (error) {
       next(error);
     }
-  }) as RequestHandler
-);
+  }) as RequestHandler;
 
 // Get available integration templates
-router.get("/templates", (async (req, res, next) => {
+router.get("/templates", async (req, res, next) => {
   try {
     const templates = [
       {
@@ -151,13 +147,13 @@ router.get("/templates", (async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}) as RequestHandler);
+}) as RequestHandler;
 
 // Start OAuth flow
 router.post(
   "/oauth/start",
   validateBody(CreateIntegrationBodySchema),
-  (async (req, res, next) => {
+  async (req, res, next) => {
     try {
       const { type, brandId } = req.body as {
         type: IntegrationType;
@@ -180,11 +176,10 @@ router.post(
     } catch (error) {
       next(error);
     }
-  }) as RequestHandler
-);
+  }) as RequestHandler;
 
 // Complete OAuth flow
-router.post("/oauth/callback", (async (req, res, next) => {
+router.post("/oauth/callback", async (req, res, next) => {
   try {
     const { type, code, state, brandId } = req.body;
 
@@ -203,7 +198,7 @@ router.post("/oauth/callback", (async (req, res, next) => {
     // Create connection in database
     const connectionRecord = await integrationsDB.createConnection(
       brandId,
-      type as any,
+      type as unknown,
       credentials.accessToken,
       {
         accountUsername: `${type} Account`,
@@ -220,10 +215,10 @@ router.post("/oauth/callback", (async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}) as RequestHandler);
+}) as RequestHandler;
 
 // Trigger manual sync
-router.post("/:integrationId/sync", (async (req, res, next) => {
+router.post("/:integrationId/sync", async (req, res, next) => {
   try {
     const { integrationId } = req.params;
     const { type } = req.body;
@@ -238,16 +233,16 @@ router.post("/:integrationId/sync", (async (req, res, next) => {
     }
 
     // TODO: Fetch integration from database and trigger sync
-    const syncEvent = await triggerSync({ id: integrationId } as any, type);
+    const syncEvent = await triggerSync({ id: integrationId } as unknown, type);
 
     res.json({ success: true, syncEvent });
   } catch (error) {
     next(error);
   }
-}) as RequestHandler);
+}) as RequestHandler;
 
 // Update integration settings
-router.put("/:integrationId", (async (req, res, next) => {
+router.put("/:integrationId", async (req, res, next) => {
   try {
     const { integrationId } = req.params;
     const updates = req.body;
@@ -271,10 +266,10 @@ router.put("/:integrationId", (async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}) as RequestHandler);
+}) as RequestHandler;
 
 // Delete integration
-router.delete("/:integrationId", (async (req, res, next) => {
+router.delete("/:integrationId", async (req, res, next) => {
   try {
     const { integrationId } = req.params;
 
@@ -294,10 +289,10 @@ router.delete("/:integrationId", (async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}) as RequestHandler);
+}) as RequestHandler;
 
 // Get sync events
-router.get("/:integrationId/sync-events", (async (req, res, next) => {
+router.get("/:integrationId/sync-events", async (req, res, next) => {
   try {
     const { __integrationId } = req.params;
     const { __limit = '50', __offset = '0' } = req.query;
@@ -313,10 +308,10 @@ router.get("/:integrationId/sync-events", (async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}) as RequestHandler);
+}) as RequestHandler;
 
 // Webhook handlers
-router.post("/webhooks/:type", (async (req, res, next) => {
+router.post("/webhooks/:type", async (req, res, next) => {
   try {
     const { type } = req.params;
     const payload = req.body;
@@ -353,7 +348,7 @@ router.post("/webhooks/:type", (async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}) as RequestHandler);
+}) as RequestHandler;
 
 // Helper functions
 function generateOAuthUrl(type: IntegrationType, brandId: string, redirectUrl?: string): string {
@@ -408,7 +403,7 @@ async function triggerSync(integration: Integration, syncType: string): Promise<
   return {
     id: `sync_${Date.now()}`,
     integrationId: integration.id,
-    type: syncType as any,
+    type: syncType as unknown,
     action: 'sync',
     sourceId: integration.id,
     data: {},

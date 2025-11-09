@@ -7,7 +7,7 @@
 
 export type FieldSource = "user" | "crawler" | "import";
 
-export interface TrackedField<T = any> {
+export interface TrackedField<T = unknown> {
   value: T;
   source: FieldSource;
   last_updated_at: string;

@@ -12,7 +12,6 @@
  */
 
 import { Router } from "express";
-import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 import { AppError } from "../lib/error-middleware";
 import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
@@ -49,7 +48,7 @@ router.post("/generate/doc", async (req, res) => {
       input,
       safety_mode = "safe",
       __idempotency_key,
-    } = req.body as any;
+    } = req.body as unknown;
     const docInput = input as DocInput;
 
     if (!brand_id || !input) {
@@ -629,7 +628,7 @@ router.get("/", (req, res) => {
 // Helper functions for content generation
 async function generateDocContent(
   input: DocInput,
-  brandKit: any,
+  brandKit: unknown,
   _safetyConfig: BrandSafetyConfig,
 ): Promise<DocOutput> {
   const template = await loadPromptTemplate("doc", "v1.0", "en");
@@ -703,7 +702,7 @@ async function generateDocContent(
 
 async function generateDesignContent(
   input: DesignInput,
-  brandKit: any,
+  brandKit: unknown,
 ): Promise<DesignOutput> {
   const template = await loadPromptTemplate("design", "v1.0", "en");
 

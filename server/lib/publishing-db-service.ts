@@ -220,10 +220,10 @@ export class PublishingDBService {
       platformPostUrl?: string;
       errorCode?: string;
       errorMessage?: string;
-      errorDetails?: any;
-      contentSnapshot?: any;
-      requestMetadata?: any;
-      responseMetadata?: any;
+      errorDetails?: unknown;
+      contentSnapshot?: unknown;
+      requestMetadata?: unknown;
+      responseMetadata?: unknown;
     },
   ): Promise<PublishingLogRecord> {
     const { data, error } = await supabase
@@ -300,7 +300,7 @@ export class PublishingDBService {
     itemsFailed: number,
     startedAt: Date,
     completedAt?: Date,
-    error?: { message: string; details: any },
+    error?: { message: string; details: unknown },
   ): Promise<void> {
     const { error: dbError } = await supabase
       .from("platform_sync_logs")
@@ -345,8 +345,8 @@ export class PublishingDBService {
       throw new Error(`Failed to fetch platform stats: ${error.message}`);
 
     // Aggregate stats by platform and status
-    const stats: Record<string, any> = {};
-    (data as any[]).forEach((log) => {
+    const stats: Record<string, unknown> = {};
+    (data as unknown[]).forEach((log) => {
       if (!stats[log.platform]) {
         stats[log.platform] = {
           total: 0,

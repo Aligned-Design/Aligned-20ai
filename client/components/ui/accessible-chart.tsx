@@ -12,7 +12,7 @@ import {
 } from "recharts";
 
 interface AccessibleChartProps {
-  data: Record<string, any>[];
+  data: Record<string, unknown>[];
   title: string;
   description?: string;
   type: "line" | "bar";
