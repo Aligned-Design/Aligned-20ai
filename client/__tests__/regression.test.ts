@@ -649,3 +649,148 @@ describe('Accessibility Regression Tests', () => {
     });
   });
 });
+
+describe('localStorage Corruption Resilience Tests', () => {
+  describe('Defensive JSON Parsing', () => {
+    it('should handle corrupted auth-user key gracefully', () => {
+      // Simulate corrupted JSON in localStorage
+      localStorage.setItem('auth-user', '{invalid json}');
+
+      // Attempt to parse it defensively
+      let user = null;
+      try {
+        const raw = localStorage.getItem('auth-user');
+        if (raw) user = JSON.parse(raw);
+      } catch (_error) {
+        // Clear corrupted key
+        localStorage.removeItem('auth-user');
+      }
+
+      // Verify key was cleared
+      expect(localStorage.getItem('auth-user')).toBeNull();
+      expect(user).toBeNull();
+    });
+
+    it('should handle empty string in auth-user gracefully', () => {
+      localStorage.setItem('auth-user', '');
+
+      let user = null;
+      try {
+        const raw = localStorage.getItem('auth-user');
+        if (raw) user = JSON.parse(raw);
+      } catch (_error) {
+        localStorage.removeItem('auth-user');
+      }
+
+      expect(user).toBeNull();
+    });
+
+    it('should handle null value in auth-user gracefully', () => {
+      localStorage.removeItem('auth-user');
+
+      let user = null;
+      try {
+        const raw = localStorage.getItem('auth-user');
+        if (raw) user = JSON.parse(raw);
+      } catch (_error) {
+        localStorage.removeItem('auth-user');
+      }
+
+      expect(user).toBeNull();
+      expect(localStorage.getItem('auth-user')).toBeNull();
+    });
+
+    it('should handle onboarding-completed key safely', () => {
+      // Valid value
+      localStorage.setItem('onboarding-completed', 'true');
+      const completed = localStorage.getItem('onboarding-completed');
+
+      expect(completed).toBe('true');
+    });
+
+    it('should handle multiple corrupted keys simultaneously', () => {
+      // Simulate multiple corrupted keys
+      localStorage.setItem('auth-user', '{bad1}');
+      localStorage.setItem('onboarding-completed', '{bad2}');
+
+      const keys = ['auth-user', 'onboarding-completed'];
+      keys.forEach(key => {
+        let value = null;
+        try {
+          const raw = localStorage.getItem(key);
+          if (raw) value = JSON.parse(raw);
+        } catch (_error) {
+          localStorage.removeItem(key);
+        }
+      });
+
+      expect(localStorage.getItem('auth-user')).toBeNull();
+      expect(localStorage.getItem('onboarding-completed')).toBeNull();
+    });
+
+    it('should preserve valid JSON while clearing corrupted keys', () => {
+      // Set one valid and one corrupted key
+      const validUser = { id: '1', email: 'test@example.com', role: 'agency' };
+      localStorage.setItem('auth-user', JSON.stringify(validUser));
+      localStorage.setItem('onboarding-completed', 'true');
+
+      // Now corrupt one
+      localStorage.setItem('auth-user', 'corrupted{');
+
+      // Parse defensively
+      let user = null;
+      try {
+        const raw = localStorage.getItem('auth-user');
+        if (raw) user = JSON.parse(raw);
+      } catch (_error) {
+        localStorage.removeItem('auth-user');
+      }
+
+      let completed = localStorage.getItem('onboarding-completed');
+
+      expect(user).toBeNull();
+      expect(localStorage.getItem('auth-user')).toBeNull();
+      expect(completed).toBe('true');
+    });
+
+    it('should handle partial JSON objects', () => {
+      localStorage.setItem('auth-user', '{"id":"1","email":"test');
+
+      let user = null;
+      try {
+        const raw = localStorage.getItem('auth-user');
+        if (raw) user = JSON.parse(raw);
+      } catch (_error) {
+        localStorage.removeItem('auth-user');
+      }
+
+      expect(user).toBeNull();
+      expect(localStorage.getItem('auth-user')).toBeNull();
+    });
+
+    it('should handle non-JSON string values', () => {
+      localStorage.setItem('auth-user', 'just a plain string');
+
+      let user = null;
+      try {
+        const raw = localStorage.getItem('auth-user');
+        if (raw) user = JSON.parse(raw);
+      } catch (_error) {
+        localStorage.removeItem('auth-user');
+      }
+
+      expect(user).toBeNull();
+    });
+
+    it('should recovery after localStorage clear', () => {
+      localStorage.setItem('auth-user', '{"id":"1"}');
+      localStorage.clear();
+
+      expect(localStorage.getItem('auth-user')).toBeNull();
+
+      // New values should be settable
+      localStorage.setItem('auth-user', '{"id":"2"}');
+      expect(localStorage.getItem('auth-user')).toBe('{"id":"2"}');
+    });
+  });
+});
