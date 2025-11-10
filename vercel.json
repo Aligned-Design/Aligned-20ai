@@ -1,13 +1,5 @@
 {
   "buildCommand": "pnpm run build",
   "installCommand": "pnpm install",
-  "framework": "vite",
-  "outputDirectory": "dist",
-  "functions": {
-    "api/[...all].ts": {
-      "runtime": "nodejs20.x",
-      "memory": 3008,
-      "maxDuration": 60
-    }
-  }
+  "framework": "vite"
 }
