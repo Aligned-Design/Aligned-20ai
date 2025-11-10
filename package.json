@@ -18,7 +18,8 @@
     "start": "node dist/server/node-build.mjs",
     "test": "vitest --run",
     "format.fix": "prettier --write .",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "validate:env": "tsx server/utils/validate-env.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",
