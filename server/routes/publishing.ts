@@ -650,7 +650,7 @@ export const publishBlogPost: RequestHandler = async (req, res) => {
     );
 
     const result = await IntegrationService.publishBlogPost(
-      platform as string,
+      platform as any,
       (connection.metadata || {}) as any,
       {
         title,
@@ -742,7 +742,7 @@ export const publishEmailCampaign: RequestHandler = async (req, res) => {
     );
 
     const result = await IntegrationService.publishEmailCampaign(
-      platform as string,
+      platform as any,
       (connection.metadata || {}) as any,
       {
         title,
