@@ -1,5 +1,8 @@
 {
   "buildCommand": "npx --yes vite build",
-  "installCommand": "npm install",
-  "framework": "vite"
+  "installCommand": "npm ci --legacy-peer-deps",
+  "framework": "vite",
+  "env": {
+    "npm_config_production": "false"
+  }
 }
