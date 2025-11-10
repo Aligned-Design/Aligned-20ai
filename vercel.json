@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm run build && cp -r dist/spa/* dist/ && rm -rf dist/spa dist/server",
+  "buildCommand": "pnpm run build",
   "installCommand": "pnpm install",
   "framework": "vite",
   "outputDirectory": "dist",
