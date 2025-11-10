@@ -1,16 +1,13 @@
 {
-  "buildCommand": "pnpm run build",
+  "buildCommand": "pnpm run build && cp -r dist/spa/* dist/ && rm -rf dist/spa dist/server",
   "installCommand": "pnpm install",
   "framework": "vite",
-  "outputDirectory": "dist/spa",
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "/api/[...all].ts"
-    },
-    {
-      "source": "/:path*",
-      "destination": "/index.html"
+  "outputDirectory": "dist",
+  "functions": {
+    "api/[...all].ts": {
+      "runtime": "nodejs20.x",
+      "memory": 3008,
+      "maxDuration": 60
     }
-  ]
+  }
 }
