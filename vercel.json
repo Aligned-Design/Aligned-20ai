@@ -1,5 +1,17 @@
 {
-  "buildCommand": "npm run build",
-  "installCommand": "npm install --legacy-peer-deps --include=dev",
-  "framework": "vite"
+  "buildCommand": "pnpm run build",
+  "installCommand": "pnpm install",
+  "framework": "vite",
+  "outputDirectory": "dist",
+  "publicPath": "spa",
+  "routes": [
+    {
+      "src": "/api/?(.*)",
+      "dest": "/api/[...all].ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/spa/index.html"
+    }
+  ]
 }
