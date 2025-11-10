@@ -1,35 +1,39 @@
-import { defineConfig } from "vite";
+import { defineConfig, Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import { resolve } from "path";
-import { fileURLToPath } from "url";
+import path from "path";
+import { createServer } from "./server";
 
-const __dirname = resolve(fileURLToPath(import.meta.url), "..");
-
-export default defineConfig({
-  plugins: [react()],
-  root: "code/client",
-  publicDir: "../../public",
-  build: {
-    outDir: "../../dist",
-    emptyOutDir: true,
-  },
+// https://vitejs.dev/config/
+export default defineConfig(({ mode }) => ({
   server: {
+    host: "::",
     port: 8080,
-    strictPort: true,
-    proxy: {
-      // Proxy API requests to the local backend server running on port 3001
-      "/api": {
-        target: "http://localhost:3001",
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, "/api"),
-      },
+    fs: {
+      allow: ["./client", "./shared"],
+      deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
     },
   },
+  build: {
+    outDir: "dist/spa",
+  },
+  plugins: [react(), expressPlugin()],
   resolve: {
     alias: {
-      "@": resolve(__dirname, "../client"),
-      "@shared": resolve(__dirname, "../../shared"),
+      "@": path.resolve(__dirname, "./client"),
+      "@shared": path.resolve(__dirname, "./shared"),
     },
   },
-});
+}));
+
+function expressPlugin(): Plugin {
+  return {
+    name: "express-plugin",
+    apply: "serve", // Only apply during development (serve mode)
+    configureServer(server) {
+      const app = createServer();
+
+      // Add Express app as middleware to Vite dev server
+      server.middlewares.use(app);
+    },
+  };
+}

@@ -1,827 +1,344 @@
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
-import {
-  Settings as SettingsIcon,
-  User,
-  Bot,
-  Bell,
-  Users,
-  Zap,
-  Shield,
-  Palette,
-  Save,
-  RotateCcw,
-  HelpCircle,
-  ChevronRight,
-  AlertTriangle,
-} from "lucide-react";
-import { UserPreferences, PreferenceValidation } from "@shared/preferences";
+import { MainLayout } from "@/components/layout/MainLayout";
+import { useWorkspace } from "@/contexts/WorkspaceContext";
+import { useState } from "react";
+import { Mail, Plus, Trash2, Copy, Check } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Settings() {
-  const [preferences, setPreferences] = useState<UserPreferences | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState("general");
-  const [unsavedChanges, setUnsavedChanges] = useState(false);
-  const [validation, setValidation] = useState<PreferenceValidation | null>(
-    null,
-  );
+  const { currentWorkspace, updateWorkspace, addMember, updateMember, removeMember } = useWorkspace();
+  const { toast } = useToast();
 
-  useEffect(() => {
-    loadPreferences();
-  }, []);
+  const [activeTab, setActiveTab] = useState<"workspace" | "members" | "integrations" | "billing">("workspace");
+  const [showInviteForm, setShowInviteForm] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<"Admin" | "Manager" | "Contributor" | "Viewer">("Contributor");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  const loadPreferences = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch("/api/preferences");
-      if (response.ok) {
-        const data = await response.json();
-        setPreferences(data);
-      }
-    } catch (error) {
-      console.error("Failed to load preferences:", error);
-    } finally {
-      setLoading(false);
-    }
+  if (!currentWorkspace) {
+    return null;
+  }
+
+  const handleWorkspaceUpdate = (field: string, value: any) => {
+    updateWorkspace(currentWorkspace.id, { [field]: value });
+    toast({
+      title: "Updated",
+      description: `${field} has been updated`,
+    });
   };
 
-  const updatePreference = async (
-    section: keyof UserPreferences,
-    updates: Record<string, unknown>,
-  ) => {
-    if (!preferences) return;
+  const handleInvite = () => {
+    if (!inviteEmail.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter an email address",
+      });
+      return;
+    }
 
-    const currentValue = preferences[section];
-    const newPreferences = {
-      ...preferences,
-      [section]:
-        typeof currentValue === "object" && currentValue !== null
-          ? { ...(currentValue as unknown), ...updates }
-          : updates,
+    const newMember = {
+      id: `u-${Date.now()}`,
+      name: inviteEmail.split("@")[0],
+      email: inviteEmail,
+      role: inviteRole,
+      avatar: "👤",
     };
 
-    setPreferences(newPreferences);
-    setUnsavedChanges(true);
-
-    // Validate changes
-    try {
-      const validation = await validatePreferences(section, updates);
-      setValidation(validation);
-    } catch (error) {
-      console.error("Validation failed:", error);
-    }
-  };
-
-  const validatePreferences = async (
-    section: string,
-    updates: Record<string, unknown>,
-  ): Promise<PreferenceValidation> => {
-    const response = await fetch("/api/preferences/validate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ section, updates }),
+    addMember(currentWorkspace.id, newMember);
+    toast({
+      title: "Invitation sent",
+      description: `${inviteEmail} has been invited as ${inviteRole}`,
     });
-    return response.json();
+
+    setInviteEmail("");
+    setInviteRole("Contributor");
+    setShowInviteForm(false);
   };
 
-  const savePreferences = async () => {
-    if (!preferences || !unsavedChanges) return;
-
-    try {
-      setSaving(true);
-      const response = await fetch("/api/preferences", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(preferences),
-      });
-
-      if (response.ok) {
-        setUnsavedChanges(false);
-        setValidation(null);
-        // Show success message
-      }
-    } catch (error) {
-      console.error("Failed to save preferences:", error);
-    } finally {
-      setSaving(false);
-    }
+  const handleRemoveMember = (memberId: string) => {
+    removeMember(currentWorkspace.id, memberId);
+    toast({
+      title: "Member removed",
+      description: "The user has been removed from this workspace",
+    });
   };
 
-  const resetToDefaults = async () => {
-    try {
-      const response = await fetch("/api/preferences/reset", {
-        method: "POST",
-      });
-      if (response.ok) {
-        await loadPreferences();
-        setUnsavedChanges(false);
-      }
-    } catch (error) {
-      console.error("Failed to reset preferences:", error);
-    }
+  const handleCopyId = () => {
+    navigator.clipboard.writeText(currentWorkspace.id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  if (!preferences) {
-    return <div>Failed to load preferences</div>;
-  }
-
   return (
-    <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-gray-600">
-            Customize your experience and AI behavior
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {unsavedChanges && (
-            <Badge
-              variant="secondary"
-              className="bg-yellow-100 text-yellow-800"
-            >
-              Unsaved changes
-            </Badge>
-          )}
-
-          <Button variant="outline" onClick={resetToDefaults}>
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Reset to Defaults
-          </Button>
-
-          <Button
-            onClick={savePreferences}
-            disabled={!unsavedChanges || saving}
-            className="gap-2"
-          >
-            <Save className="h-4 w-4" />
-            {saving ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
-      </div>
-
-      {/* Validation Alerts */}
-      {validation && !validation.valid && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
+    <MainLayout>
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50/30 via-white to-blue-50/20">
+        {/* Header */}
+        <div className="sticky top-16 z-40 bg-white/80 backdrop-blur-xl border-b border-white/60">
+          <div className="p-4 sm:p-6 md:p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="text-3xl">{currentWorkspace.logo || "🏢"}</span>
               <div>
-                <h4 className="font-medium text-red-900 mb-2">
-                  Please fix the following issues:
-                </h4>
-                <ul className="space-y-1">
-                  {validation.errors.map((error, index) => (
-                    <li key={index} className="text-sm text-red-800">
-                      • {error.message}
-                    </li>
-                  ))}
-                </ul>
+                <h1 className="text-3xl font-black text-slate-900">{currentWorkspace.name} Settings</h1>
+                <p className="text-sm text-slate-600 mt-1">Manage your workspace configuration and team</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
 
-      {/* Settings Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="general" className="gap-2">
-            <User className="h-4 w-4" />
-            General
-          </TabsTrigger>
-          <TabsTrigger value="ai" className="gap-2">
-            <Bot className="h-4 w-4" />
-            AI & Content
-          </TabsTrigger>
-          <TabsTrigger value="publishing" className="gap-2">
-            <Zap className="h-4 w-4" />
-            Publishing
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2">
-            <Bell className="h-4 w-4" />
-            Notifications
-          </TabsTrigger>
-          <TabsTrigger value="team" className="gap-2">
-            <Users className="h-4 w-4" />
-            Team
-          </TabsTrigger>
-          <TabsTrigger value="advanced" className="gap-2">
-            <Shield className="h-4 w-4" />
-            Advanced
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="general" className="space-y-6">
-          <GeneralSettings
-            preferences={preferences}
-            onUpdate={(updates) => updatePreference("interface", updates)}
-          />
-        </TabsContent>
-
-        <TabsContent value="ai" className="space-y-6">
-          <AIContentSettings
-            preferences={preferences}
-            onUpdate={(updates) => updatePreference("aiSettings", updates)}
-          />
-        </TabsContent>
-
-        <TabsContent value="publishing" className="space-y-6">
-          <PublishingSettings
-            preferences={preferences}
-            onUpdate={(updates) => updatePreference("publishing", updates)}
-          />
-        </TabsContent>
-
-        <TabsContent value="notifications" className="space-y-6">
-          <NotificationSettings
-            preferences={preferences}
-            onUpdate={(updates) => updatePreference("notifications", updates)}
-          />
-        </TabsContent>
-
-        <TabsContent value="team" className="space-y-6">
-          <TeamSettings
-            preferences={preferences}
-            onUpdate={(updates) => updatePreference("teamSettings", updates)}
-          />
-        </TabsContent>
-
-        <TabsContent value="advanced" className="space-y-6">
-          <AdvancedSettings
-            preferences={preferences}
-            onUpdate={(updates) => updatePreference("advanced", updates)}
-          />
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-}
-
-function GeneralSettings({
-  preferences,
-  onUpdate,
-}: {
-  preferences: UserPreferences;
-  onUpdate: (updates: Record<string, unknown>) => void;
-}) {
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Palette className="h-5 w-5" />
-            Interface & Display
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label>Theme</Label>
-              <Select
-                value={preferences.interface.theme}
-                onValueChange={(value) => onUpdate({ theme: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="light">Light</SelectItem>
-                  <SelectItem value="dark">Dark</SelectItem>
-                  <SelectItem value="auto">Auto (System)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label>Language</Label>
-              <Select
-                value={preferences.interface.language}
-                onValueChange={(value) => onUpdate({ language: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="es">Spanish</SelectItem>
-                  <SelectItem value="fr">French</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <Label>Compact Mode</Label>
-              <p className="text-sm text-gray-600">
-                Show more content in less space
-              </p>
-            </div>
-            <Switch
-              checked={preferences.interface.compactMode}
-              onCheckedChange={(checked) => onUpdate({ compactMode: checked })}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <Label>Show Advanced Options</Label>
-              <p className="text-sm text-gray-600">
-                Display power-user features
-              </p>
-            </div>
-            <Switch
-              checked={preferences.interface.showAdvancedOptions}
-              onCheckedChange={(checked) =>
-                onUpdate({ showAdvancedOptions: checked })
-              }
-            />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function AIContentSettings({
-  preferences,
-  onUpdate,
-}: {
-  preferences: UserPreferences;
-  onUpdate: (updates: Record<string, unknown>) => void;
-}) {
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bot className="h-5 w-5" />
-            AI Behavior & Brand Voice
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <Label>Default Tone</Label>
-            <Select
-              value={preferences.aiSettings.defaultTone}
-              onValueChange={(value) => onUpdate({ defaultTone: value })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="professional">Professional</SelectItem>
-                <SelectItem value="casual">Casual</SelectItem>
-                <SelectItem value="friendly">Friendly</SelectItem>
-                <SelectItem value="authoritative">Authoritative</SelectItem>
-                <SelectItem value="playful">Playful</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label>Creativity Level</Label>
-            <p className="text-sm text-gray-600 mb-3">
-              How creative should AI be with content generation?
-            </p>
-            <div className="space-y-3">
-              <Slider
-                value={[
-                  getCreativityValue(preferences.aiSettings.creativityLevel),
-                ]}
-                onValueChange={(value) =>
-                  onUpdate({ creativityLevel: getCreativityLevel(value[0]) })
-                }
-                max={3}
-                step={1}
-                className="w-full"
-              />
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>Conservative</span>
-                <span>Balanced</span>
-                <span>Creative</span>
-                <span>Experimental</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <Label>Strict Brand Mode</Label>
-              <p className="text-sm text-gray-600">
-                Enforce strict adherence to brand guidelines
-              </p>
-            </div>
-            <Switch
-              checked={preferences.aiSettings.strictBrandMode}
-              onCheckedChange={(checked) =>
-                onUpdate({ strictBrandMode: checked })
-              }
-            />
-          </div>
-
-          <div>
-            <Label>Brand Voice Personality</Label>
-            <Textarea
-              value={preferences.aiSettings.brandVoice.personality.join(", ")}
-              onChange={(e) =>
-                onUpdate({
-                  brandVoice: {
-                    ...preferences.aiSettings.brandVoice,
-                    personality: e.target.value.split(",").map((s) => s.trim()),
-                  },
-                })
-              }
-              placeholder="e.g., energetic, trustworthy, innovative"
-            />
-          </div>
-
-          <div>
-            <Label>Words to Avoid</Label>
-            <Textarea
-              value={preferences.aiSettings.brandVoice.avoidWords.join(", ")}
-              onChange={(e) =>
-                onUpdate({
-                  brandVoice: {
-                    ...preferences.aiSettings.brandVoice,
-                    avoidWords: e.target.value.split(",").map((s) => s.trim()),
-                  },
-                })
-              }
-              placeholder="e.g., cheap, discount, basic"
-            />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function PublishingSettings({
-  preferences,
-  onUpdate,
-}: {
-  preferences: UserPreferences;
-  onUpdate: (updates: Record<string, unknown>) => void;
-}) {
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Auto-Approval Rules</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label>Enable Auto-Approval</Label>
-              <p className="text-sm text-gray-600">
-                Automatically approve content that meets criteria
-              </p>
-            </div>
-            <Switch
-              checked={preferences.publishing.autoApproval.enabled}
-              onCheckedChange={(checked) =>
-                onUpdate({
-                  autoApproval: {
-                    ...preferences.publishing.autoApproval,
-                    enabled: checked,
-                  },
-                })
-              }
-            />
-          </div>
-
-          {preferences.publishing.autoApproval.enabled && (
-            <>
-              <div>
-                <Label>Minimum Brand Fit Score (%)</Label>
-                <Slider
-                  value={[
-                    preferences.publishing.autoApproval.rules.minBrandFitScore,
-                  ]}
-                  onValueChange={(value) =>
-                    onUpdate({
-                      autoApproval: {
-                        ...preferences.publishing.autoApproval,
-                        rules: {
-                          ...preferences.publishing.autoApproval.rules,
-                          minBrandFitScore: value[0],
-                        },
-                      },
-                    })
-                  }
-                  max={100}
-                  step={5}
-                  className="w-full"
-                />
-                <p className="text-sm text-gray-600 mt-1">
-                  Current:{" "}
-                  {preferences.publishing.autoApproval.rules.minBrandFitScore}%
-                </p>
-              </div>
-
-              <div>
-                <Label>Auto-Publish Score (%)</Label>
-                <Slider
-                  value={[
-                    preferences.publishing.autoApproval.rules.autoPublishScore,
-                  ]}
-                  onValueChange={(value) =>
-                    onUpdate({
-                      autoApproval: {
-                        ...preferences.publishing.autoApproval,
-                        rules: {
-                          ...preferences.publishing.autoApproval.rules,
-                          autoPublishScore: value[0],
-                        },
-                      },
-                    })
-                  }
-                  max={100}
-                  step={5}
-                  className="w-full"
-                />
-                <p className="text-sm text-gray-600 mt-1">
-                  Current:{" "}
-                  {preferences.publishing.autoApproval.rules.autoPublishScore}%
-                </p>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function NotificationSettings({
-  preferences,
-  onUpdate,
-}: {
-  preferences: UserPreferences;
-  onUpdate: (updates: Record<string, unknown>) => void;
-}) {
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Email Notifications</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label>Enable Email Notifications</Label>
-            <Switch
-              checked={preferences.notifications.email.enabled}
-              onCheckedChange={(checked) =>
-                onUpdate({
-                  email: {
-                    ...preferences.notifications.email,
-                    enabled: checked,
-                  },
-                })
-              }
-            />
-          </div>
-
-          {preferences.notifications.email.enabled && (
-            <>
-              <div>
-                <Label>Frequency</Label>
-                <Select
-                  value={preferences.notifications.email.frequency}
-                  onValueChange={(value) =>
-                    onUpdate({
-                      email: {
-                        ...preferences.notifications.email,
-                        frequency: value,
-                      },
-                    })
-                  }
+            {/* Tabs */}
+            <div className="flex gap-2 flex-wrap border-b border-slate-200">
+              {(["workspace", "members", "integrations", "billing"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-3 font-bold text-sm transition-all border-b-2 ${
+                    activeTab === tab
+                      ? "border-indigo-600 text-indigo-600"
+                      : "border-transparent text-slate-600 hover:text-slate-900"
+                  }`}
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="immediate">Immediate</SelectItem>
-                    <SelectItem value="hourly">Hourly</SelectItem>
-                    <SelectItem value="daily">Daily</SelectItem>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                  </SelectContent>
-                </Select>
+                  {tab === "workspace"
+                    ? "Workspace"
+                    : tab === "members"
+                    ? "Members & Permissions"
+                    : tab === "integrations"
+                    ? "Integrations"
+                    : "Billing"}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 sm:p-6 md:p-8">
+          {/* WORKSPACE TAB */}
+          {activeTab === "workspace" && (
+            <div className="max-w-2xl space-y-6">
+              {/* Workspace ID */}
+              <div className="bg-white/50 backdrop-blur-xl rounded-xl border border-white/60 p-6">
+                <h2 className="text-lg font-black text-slate-900 mb-4">Workspace ID</h2>
+                <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                  <code className="text-xs font-mono text-slate-600 flex-1">{currentWorkspace.id}</code>
+                  <button
+                    onClick={handleCopyId}
+                    className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
+                  >
+                    {copied ? (
+                      <Check className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <Copy className="w-4 h-4 text-slate-600" />
+                    )}
+                  </button>
+                </div>
               </div>
 
-              <div className="space-y-3">
-                <Label>Notification Types</Label>
-                {Object.entries(preferences.notifications.email.types).map(
-                  ([type, enabled]) => (
-                    <div
-                      key={type}
-                      className="flex items-center justify-between"
-                    >
-                      <span className="text-sm capitalize">
-                        {type.replace(/([A-Z])/g, " $1")}
-                      </span>
-                      <Switch
-                        checked={enabled}
-                        onCheckedChange={(checked) =>
-                          onUpdate({
-                            email: {
-                              ...preferences.notifications.email,
-                              types: {
-                                ...preferences.notifications.email.types,
-                                [type]: checked,
-                              },
-                            },
-                          })
-                        }
-                      />
+              {/* Workspace Name */}
+              <div className="bg-white/50 backdrop-blur-xl rounded-xl border border-white/60 p-6">
+                <h2 className="text-lg font-black text-slate-900 mb-4">Workspace Name</h2>
+                <input
+                  type="text"
+                  value={currentWorkspace.name}
+                  onChange={(e) => handleWorkspaceUpdate("name", e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+                />
+              </div>
+
+              {/* Industry */}
+              <div className="bg-white/50 backdrop-blur-xl rounded-xl border border-white/60 p-6">
+                <h2 className="text-lg font-black text-slate-900 mb-4">Industry</h2>
+                <input
+                  type="text"
+                  value={currentWorkspace.industry || ""}
+                  onChange={(e) => handleWorkspaceUpdate("industry", e.target.value)}
+                  placeholder="e.g., Events & Entertainment"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+                />
+              </div>
+
+              {/* Timezone */}
+              <div className="bg-white/50 backdrop-blur-xl rounded-xl border border-white/60 p-6">
+                <h2 className="text-lg font-black text-slate-900 mb-4">Timezone</h2>
+                <input
+                  type="text"
+                  value={currentWorkspace.timezone || "America/New_York"}
+                  onChange={(e) => handleWorkspaceUpdate("timezone", e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+                />
+              </div>
+
+              {/* Danger Zone */}
+              <div className="bg-red-50/50 backdrop-blur-xl rounded-xl border border-red-200 p-6">
+                <h2 className="text-lg font-black text-red-900 mb-4">⚠️ Danger Zone</h2>
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Delete Workspace
+                </button>
+                {showDeleteConfirm && (
+                  <div className="mt-4 p-4 bg-red-100 border border-red-300 rounded-lg">
+                    <p className="text-red-900 font-bold mb-3">
+                      Are you sure? This action cannot be undone.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setShowDeleteConfirm(false)}
+                        className="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowDeleteConfirm(false);
+                          toast({
+                            title: "Workspace deleted",
+                            description: "The workspace has been deleted",
+                          });
+                        }}
+                        className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors"
+                      >
+                        Confirm Delete
+                      </button>
                     </div>
-                  ),
+                  </div>
                 )}
               </div>
-            </>
+            </div>
           )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
 
-function TeamSettings({
-  preferences,
-  onUpdate,
-}: {
-  preferences: UserPreferences;
-  onUpdate: (updates: Record<string, unknown>) => void;
-}) {
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Permissions & Workflow</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label>Role</Label>
-            <Select
-              value={preferences.teamSettings.role}
-              onValueChange={(value) => onUpdate({ role: value })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="admin">Administrator</SelectItem>
-                <SelectItem value="manager">Manager</SelectItem>
-                <SelectItem value="creator">Content Creator</SelectItem>
-                <SelectItem value="viewer">Viewer</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-3">
-            <Label>Permissions</Label>
-            {Object.entries(preferences.teamSettings.permissions).map(
-              ([permission, enabled]) => (
-                <div
-                  key={permission}
-                  className="flex items-center justify-between"
-                >
-                  <span className="text-sm">
-                    {formatPermissionName(permission)}
-                  </span>
-                  <Switch
-                    checked={enabled}
-                    onCheckedChange={(checked) =>
-                      onUpdate({
-                        permissions: {
-                          ...preferences.teamSettings.permissions,
-                          [permission]: checked,
-                        },
-                      })
-                    }
-                  />
+          {/* MEMBERS TAB */}
+          {activeTab === "members" && (
+            <div className="max-w-3xl space-y-6">
+              {/* Members List */}
+              <div className="bg-white/50 backdrop-blur-xl rounded-xl border border-white/60 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-black text-slate-900">Team Members ({currentWorkspace.members.length})</h2>
+                  {!showInviteForm && (
+                    <button
+                      onClick={() => setShowInviteForm(true)}
+                      className="flex items-center gap-2 px-4 py-2 bg-lime-400 text-indigo-950 font-bold rounded-lg hover:bg-lime-500 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Invite
+                    </button>
+                  )}
                 </div>
-              ),
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
 
-function AdvancedSettings({
-  preferences,
-  onUpdate,
-}: {
-  preferences: UserPreferences;
-  onUpdate: (updates: Record<string, unknown>) => void;
-}) {
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Experimental Features
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
-            {preferences.advanced?.experimental?.betaFeatures?.map(
-              (feature: string) => (
-                <div
-                  key={feature}
-                  className="flex items-center justify-between"
-                >
-                  <div>
-                    <span className="text-sm font-medium">{feature}</span>
-                    <Badge variant="secondary" className="ml-2">
-                      Beta
-                    </Badge>
+                {showInviteForm && (
+                  <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Email *</label>
+                    <input
+                      type="email"
+                      value={inviteEmail}
+                      onChange={(e) => setInviteEmail(e.target.value)}
+                      placeholder="user@example.com"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-3"
+                    />
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Role *</label>
+                    <select
+                      value={inviteRole}
+                      onChange={(e) => setInviteRole(e.target.value as any)}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-3"
+                    >
+                      <option value="Viewer">Viewer (Read-only)</option>
+                      <option value="Contributor">Contributor (Upload & draft)</option>
+                      <option value="Manager">Manager (Edit & approve)</option>
+                      <option value="Admin">Admin (Full access)</option>
+                    </select>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setShowInviteForm(false)}
+                        className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleInvite}
+                        className="flex-1 px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700"
+                      >
+                        Send Invite
+                      </button>
+                    </div>
                   </div>
-                  <Switch defaultChecked />
+                )}
+
+                <div className="space-y-3">
+                  {currentWorkspace.members.map((member) => (
+                    <div
+                      key={member.id}
+                      className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-lg"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{member.avatar || "👤"}</span>
+                        <div>
+                          <p className="font-bold text-slate-900">{member.name}</p>
+                          <p className="text-xs text-slate-600">{member.email}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={member.role}
+                          onChange={(e) =>
+                            updateMember(currentWorkspace.id, member.id, {
+                              role: e.target.value as any,
+                            })
+                          }
+                          className="px-3 py-1 text-sm border border-slate-300 rounded-lg font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        >
+                          <option value="Viewer">Viewer</option>
+                          <option value="Contributor">Contributor</option>
+                          <option value="Manager">Manager</option>
+                          <option value="Admin">Admin</option>
+                        </select>
+                        <button
+                          onClick={() => handleRemoveMember(member.id)}
+                          className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ),
-            )}
-          </div>
+              </div>
+            </div>
+          )}
 
-          <div>
-            <Label>AI Model Version</Label>
-            <Select
-              value={
-                preferences.advanced?.experimental?.aiModelVersion || "stable"
-              }
-              onValueChange={(value) =>
-                onUpdate({
-                  experimental: {
-                    ...(preferences.advanced?.experimental || {}),
-                    aiModelVersion: value,
-                  },
-                })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="stable">Stable (Recommended)</SelectItem>
-                <SelectItem value="latest">Latest</SelectItem>
-                <SelectItem value="experimental">Experimental</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          {/* INTEGRATIONS TAB */}
+          {activeTab === "integrations" && (
+            <div className="max-w-3xl space-y-6">
+              <div className="text-sm text-slate-600 mb-6">
+                <p>Connect your favorite tools and platforms to your workspace.</p>
+              </div>
+
+              {["Google Business", "Meta Platforms", "LinkedIn", "Slack", "Zapier", "Notion"].map((integration) => (
+                <div key={integration} className="bg-white/50 backdrop-blur-xl rounded-xl border border-white/60 p-6 flex items-center justify-between">
+                  <div>
+                    <h3 className="font-black text-slate-900">{integration}</h3>
+                    <p className="text-sm text-slate-600 mt-1">Not connected</p>
+                  </div>
+                  <button className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors">
+                    Connect
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* BILLING TAB */}
+          {activeTab === "billing" && (
+            <div className="max-w-3xl">
+              <div className="bg-white/50 backdrop-blur-xl rounded-xl border border-white/60 p-6 text-center">
+                <div className="text-4xl mb-4">💳</div>
+                <h2 className="text-xl font-black text-slate-900 mb-2">Billing</h2>
+                <p className="text-slate-600 mb-6">Billing management will be available in a future release.</p>
+                <p className="text-sm text-slate-500">
+                  Currently, billing is managed at the agency level. Contact your administrator for payment details.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </MainLayout>
   );
-}
-
-// Helper functions
-function getCreativityValue(level: string): number {
-  const map = { conservative: 0, balanced: 1, creative: 2, experimental: 3 };
-  return map[level as keyof typeof map] || 1;
-}
-
-function getCreativityLevel(value: number): string {
-  const levels = ["conservative", "balanced", "creative", "experimental"];
-  return levels[value] || "balanced";
-}
-
-function formatPermissionName(permission: string): string {
-  return permission
-    .replace(/([A-Z])/g, " $1")
-    .replace(/^./, (str) => str.toUpperCase())
-    .replace("Can ", "");
 }

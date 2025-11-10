@@ -1,469 +1,342 @@
-import { useState, useEffect } from "react";
-import { useBrand } from "@/contexts/BrandContext";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { EmptyState } from "@/components/ui/empty-state";
-import { DashboardSkeleton } from "@/components/ui/skeletons";
-import { HelpTooltip } from "@/components/ui/help-tooltip";
-import {
-  Star,
-  MessageSquare,
-  ThumbsUp,
-  ThumbsDown,
-  Send,
-  Sparkles,
-  Filter,
-} from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/lib/supabase";
-import {
-  PlatformReview,
-  ReviewSentiment,
-  PLATFORM_CONFIGS,
-} from "@/types/integrations";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { useWorkspace } from "@/contexts/WorkspaceContext";
+import { MainLayout } from "@/components/layout/MainLayout";
+import { ReviewCard } from "@/components/dashboard/ReviewCard";
+import { ReviewAdvisor } from "@/components/dashboard/ReviewAdvisor";
+import { Review, ReviewSource, MOCK_BRAND_GUIDE, MOCK_AUTO_REPLY_SETTINGS } from "@/types/review";
+import { Star, Settings, Filter, MessageCircle } from "lucide-react";
+import { useState } from "react";
+
+// Mock review data combining Google and Facebook reviews
+const MOCK_REVIEWS: Review[] = [
+  {
+    id: "review-1",
+    source: "google",
+    authorName: "Sarah Johnson",
+    rating: 5,
+    text: "Absolutely fantastic service! The team was responsive, professional, and delivered exactly what we needed. Highly recommend for anyone looking to streamline their social media strategy.",
+    sentiment: "positive",
+    replyStatus: "replied",
+    createdDate: "2024-11-07",
+    repliedDate: "2024-11-07",
+    replyText: "Thank you so much for the wonderful review, Sarah! We're thrilled to have helped you streamline your social media strategy.",
+    brandId: "brand-1",
+  },
+  {
+    id: "review-2",
+    source: "facebook",
+    authorName: "Michael Chen",
+    rating: 4,
+    text: "Great platform overall. Very intuitive and helpful. Would love to see more analytics features.",
+    sentiment: "positive",
+    replyStatus: "needs-reply",
+    createdDate: "2024-11-06",
+    brandId: "brand-1",
+  },
+  {
+    id: "review-3",
+    source: "google",
+    authorName: "Emma Wilson",
+    rating: 1,
+    text: "Disappointed with the service. Customer support was slow to respond and the platform crashed during our biggest campaign.",
+    sentiment: "negative",
+    replyStatus: "flagged",
+    createdDate: "2024-11-05",
+    brandId: "brand-1",
+    flaggedReason: "Urgent - service complaint",
+  },
+  {
+    id: "review-4",
+    source: "facebook",
+    authorName: "David Martinez",
+    rating: 5,
+    text: "Perfect solution for managing multiple brand accounts! The analytics dashboard is incredible and the AI insights are spot-on.",
+    sentiment: "positive",
+    replyStatus: "replied",
+    createdDate: "2024-11-04",
+    repliedDate: "2024-11-04",
+    replyText: "Thank you, David! We're so glad you're loving the analytics dashboard and AI insights. Your success is our success!",
+    brandId: "brand-1",
+  },
+  {
+    id: "review-5",
+    source: "google",
+    authorName: "Jessica Lee",
+    rating: 3,
+    text: "Decent platform but the pricing feels a bit high compared to competitors. The reporting features are solid though.",
+    sentiment: "neutral",
+    replyStatus: "needs-reply",
+    createdDate: "2024-11-03",
+    brandId: "brand-1",
+  },
+  {
+    id: "review-6",
+    source: "facebook",
+    authorName: "Robert Taylor",
+    rating: 2,
+    text: "Had some issues with the integration. Once I figured it out it was better, but the onboarding could be improved.",
+    sentiment: "negative",
+    replyStatus: "needs-reply",
+    createdDate: "2024-11-02",
+    brandId: "brand-1",
+  },
+  {
+    id: "review-7",
+    source: "google",
+    authorName: "Lisa Anderson",
+    rating: 5,
+    text: "Outstanding experience from start to finish. The team is incredibly helpful and the platform saves us hours every week. Worth every penny!",
+    sentiment: "positive",
+    replyStatus: "needs-reply",
+    createdDate: "2024-11-01",
+    brandId: "brand-1",
+  },
+];
 
 export default function Reviews() {
-  const { currentBrand, loading: brandLoading } = useBrand();
-  const { toast } = useToast();
-  const [reviews, setReviews] = useState<PlatformReview[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [filterSentiment, setFilterSentiment] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<string>("newest");
+  const { currentWorkspace } = useWorkspace();
+  const [reviews, setReviews] = useState<Review[]>(MOCK_REVIEWS);
+  const [filterSource, setFilterSource] = useState<ReviewSource | "all">("all");
+  const [filterSentiment, setFilterSentiment] = useState<"all" | "positive" | "neutral" | "negative">("all");
+  const [showAutoReplySettings, setShowAutoReplySettings] = useState(false);
+  const [autoReplySettings, setAutoReplySettings] = useState(MOCK_AUTO_REPLY_SETTINGS);
 
-  useEffect(() => {
-    if (currentBrand?.id) {
-      loadReviews();
-    }
-  }, [currentBrand?.id]);
-
-  const loadReviews = async () => {
-    if (!currentBrand?.id) return;
-
-    try {
-      const { data, error } = await supabase
-        .from("platform_reviews")
-        .select("*")
-        .eq("brand_id", currentBrand.id)
-        .order("review_date", { ascending: false });
-
-      if (error) throw error;
-      setReviews(data || []);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      toast({
-        title: "Error loading reviews",
-        description: message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRespond = async (reviewId: string, responseText: string) => {
-    try {
-      const { error } = await supabase
-        .from("platform_reviews")
-        .update({
-          response_text: responseText,
-          responded_at: new Date().toISOString(),
-          status: "answered",
-        })
-        .eq("id", reviewId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Response Sent",
-        description: "Your response has been posted",
-      });
-      loadReviews();
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      toast({
-        title: "Error",
-        description: message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  if (brandLoading || loading) {
-    return <DashboardSkeleton />;
-  }
-
-  if (!currentBrand) {
-    return (
-      <div className="flex h-full items-center justify-center p-8">
-        <EmptyState
-          icon={MessageSquare}
-          title="No brand selected"
-          description="Select a brand to manage reviews"
-        />
-      </div>
-    );
-  }
-
-  const filteredReviews = reviews.filter((review) => {
-    if (filterStatus !== "all" && review.status !== filterStatus) return false;
-    if (filterSentiment !== "all" && review.sentiment !== filterSentiment)
-      return false;
-    return true;
+  // Filter reviews
+  const filteredReviews = reviews.filter((r) => {
+    const sourceMatch = filterSource === "all" || r.source === filterSource;
+    const sentimentMatch = filterSentiment === "all" || r.sentiment === filterSentiment;
+    return sourceMatch && sentimentMatch;
   });
 
-  const sortedReviews = [...filteredReviews].sort((a, b) => {
-    switch (sortBy) {
-      case "newest":
-        return (
-          new Date(b.review_date).getTime() - new Date(a.review_date).getTime()
-        );
-      case "oldest":
-        return (
-          new Date(a.review_date).getTime() - new Date(b.review_date).getTime()
-        );
-      case "highest":
-        return b.rating - a.rating;
-      case "lowest":
-        return a.rating - b.rating;
-      default:
-        return 0;
-    }
-  });
-
+  // Calculate stats
   const stats = {
     total: reviews.length,
-    unanswered: reviews.filter((r) => r.status === "unanswered").length,
-    average:
-      reviews.length > 0
-        ? (
-            reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-          ).toFixed(1)
-        : "0.0",
     positive: reviews.filter((r) => r.sentiment === "positive").length,
+    neutral: reviews.filter((r) => r.sentiment === "neutral").length,
     negative: reviews.filter((r) => r.sentiment === "negative").length,
+    needsReply: reviews.filter((r) => r.replyStatus === "needs-reply").length,
+    avgRating: (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1),
+  };
+
+  const handleReply = (reviewId: string) => {
+    console.log("Reply to review:", reviewId);
+  };
+
+  const handleFlag = (reviewId: string) => {
+    setReviews(
+      reviews.map((r) =>
+        r.id === reviewId ? { ...r, replyStatus: "flagged" as const } : r
+      )
+    );
+  };
+
+  const handleGenerateReplies = () => {
+    alert("Generating AI-suggested replies for all flagged and negative reviews...");
   };
 
   return (
-    <div className="p-10 space-y-10">
-      <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <h1 className="text-4xl font-semibold tracking-tight">Reviews</h1>
-          <HelpTooltip content="Manage and respond to reviews from Facebook and Google Business Profile in one centralized dashboard." />
-        </div>
-        <p className="text-muted-foreground text-lg">
-          Reputation management for {currentBrand.name}
-        </p>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Total Reviews"
-          value={stats.total.toString()}
-          icon={<MessageSquare className="h-5 w-5" />}
-        />
-        <StatCard
-          title="Unanswered"
-          value={stats.unanswered.toString()}
-          icon={<Star className="h-5 w-5" />}
-          variant="warning"
-        />
-        <StatCard
-          title="Average Rating"
-          value={stats.average}
-          icon={<Star className="h-5 w-5" />}
-          variant="success"
-        />
-        <StatCard
-          title="Sentiment"
-          value={`${stats.positive} / ${stats.negative}`}
-          subtitle="Positive / Negative"
-          icon={<ThumbsUp className="h-5 w-5" />}
-        />
-      </div>
-
-      <div className="flex items-center gap-3 flex-wrap">
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="unanswered">Unanswered</SelectItem>
-            <SelectItem value="answered">Answered</SelectItem>
-            <SelectItem value="flagged">Flagged</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select value={filterSentiment} onValueChange={setFilterSentiment}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by sentiment" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Sentiment</SelectItem>
-            <SelectItem value="positive">Positive</SelectItem>
-            <SelectItem value="neutral">Neutral</SelectItem>
-            <SelectItem value="negative">Negative</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="newest">Newest First</SelectItem>
-            <SelectItem value="oldest">Oldest First</SelectItem>
-            <SelectItem value="highest">Highest Rating</SelectItem>
-            <SelectItem value="lowest">Lowest Rating</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-4">
-        {sortedReviews.length === 0 ? (
-          <EmptyState
-            icon={MessageSquare}
-            title="No reviews found"
-            description="Reviews from your connected platforms will appear here"
-          />
-        ) : (
-          sortedReviews.map((review) => (
-            <ReviewCard
-              key={review.id}
-              review={review}
-              onRespond={(text) => handleRespond(review.id, text)}
-            />
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
-
-function StatCard({
-  title,
-  value,
-  subtitle,
-  icon,
-  variant = "default",
-}: {
-  title: string;
-  value: string;
-  subtitle?: string;
-  icon: React.ReactNode;
-  variant?: "default" | "success" | "warning";
-}) {
-  const variantColors = {
-    default: "text-muted-foreground",
-    success: "text-mint",
-    warning: "text-coral",
-  };
-
-  return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-muted-foreground">
-            {title}
-          </span>
-          <div className={cn("transition-colors", variantColors[variant])}>
-            {icon}
+    <MainLayout>
+      <div className="min-h-screen bg-gradient-to-b from-indigo-50/30 via-white to-blue-50/20">
+        <div className="p-4 sm:p-6 md:p-8">
+          {/* Page Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-2">Reviews</h1>
+            <p className="text-slate-600 text-xs sm:text-sm font-medium">
+              {currentWorkspace?.logo} {currentWorkspace?.name} — Centralized reputation management and review analysis
+            </p>
           </div>
-        </div>
-        <div className="text-3xl font-semibold tracking-tight">{value}</div>
-        {subtitle && (
-          <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
 
-function ReviewCard({
-  review,
-  onRespond,
-}: {
-  review: PlatformReview;
-  onRespond: (text: string) => void;
-}) {
-  const [responseText, setResponseText] = useState("");
-  const [showResponseDialog, setShowResponseDialog] = useState(false);
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-8">
+            <div className="bg-white/50 backdrop-blur-xl rounded-lg p-3 border border-white/60">
+              <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Total</p>
+              <p className="text-2xl font-black text-slate-900">{stats.total}</p>
+            </div>
+            <div className="bg-green-50/50 backdrop-blur-xl rounded-lg p-3 border border-green-200/50">
+              <p className="text-xs font-bold text-green-700 uppercase tracking-wider mb-1">Positive</p>
+              <p className="text-2xl font-black text-green-900">{stats.positive}</p>
+            </div>
+            <div className="bg-slate-50/50 backdrop-blur-xl rounded-lg p-3 border border-slate-200/50">
+              <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Neutral</p>
+              <p className="text-2xl font-black text-slate-900">{stats.neutral}</p>
+            </div>
+            <div className="bg-red-50/50 backdrop-blur-xl rounded-lg p-3 border border-red-200/50">
+              <p className="text-xs font-bold text-red-700 uppercase tracking-wider mb-1">Negative</p>
+              <p className="text-2xl font-black text-red-900">{stats.negative}</p>
+            </div>
+            <div className="bg-amber-50/50 backdrop-blur-xl rounded-lg p-3 border border-amber-200/50">
+              <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Needs Reply</p>
+              <p className="text-2xl font-black text-amber-900">{stats.needsReply}</p>
+            </div>
+            <div className="bg-blue-50/50 backdrop-blur-xl rounded-lg p-3 border border-blue-200/50">
+              <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1">Avg Rating</p>
+              <p className="text-2xl font-black text-blue-900 flex items-center gap-1">
+                {stats.avgRating}
+                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+              </p>
+            </div>
+          </div>
 
-  const platform = PLATFORM_CONFIGS[review.provider];
-  const sentimentColors: Record<ReviewSentiment, string> = {
-    positive: "bg-mint/10 text-mint border-mint/20",
-    neutral: "bg-azure/10 text-azure border-azure/20",
-    negative: "bg-coral/10 text-coral border-coral/20",
-  };
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            {/* Left Column - Reviews Feed */}
+            <div className="lg:col-span-2 space-y-4">
+              {/* Filters */}
+              <div className="bg-white/50 backdrop-blur-xl rounded-lg p-4 border border-white/60 space-y-3">
+                <h3 className="font-black text-slate-900 flex items-center gap-2">
+                  <Filter className="w-4 h-4" />
+                  Filter Reviews
+                </h3>
 
-  const handleSubmitResponse = () => {
-    if (responseText.trim()) {
-      onRespond(responseText);
-      setResponseText("");
-      setShowResponseDialog(false);
-    }
-  };
-
-  const handleGenerateAI = () => {
-    const aiResponse = `Thank you for your ${review.rating}-star review! We appreciate your feedback and are glad you had a ${review.rating >= 4 ? "positive" : "valuable"} experience with ${review.reviewer_name}.`;
-    setResponseText(aiResponse);
-  };
-
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3 flex-1">
-            <Avatar>
-              <AvatarImage src={review.reviewer_avatar_url} />
-              <AvatarFallback>
-                {review.reviewer_name?.[0]?.toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap mb-1">
-                <p className="font-medium">{review.reviewer_name}</p>
-                <Badge variant="outline" className="gap-1">
-                  <span>{platform?.icon}</span>
-                  {platform?.name}
-                </Badge>
-                {review.sentiment && (
-                  <Badge
-                    className={cn("border", sentimentColors[review.sentiment])}
-                  >
-                    {review.sentiment}
-                  </Badge>
-                )}
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className={cn(
-                        "h-4 w-4",
-                        i < review.rating
-                          ? "fill-coral text-coral"
-                          : "text-muted-foreground/30",
-                      )}
-                    />
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {(["all", "google", "facebook"] as const).map((source) => (
+                    <button
+                      key={source}
+                      onClick={() => setFilterSource(source)}
+                      className={`px-3 py-2 rounded-lg border-2 font-bold text-xs transition-all ${
+                        filterSource === source
+                          ? "border-indigo-500 bg-indigo-50 text-indigo-700"
+                          : "border-slate-200 text-slate-600 hover:border-slate-300"
+                      }`}
+                    >
+                      {source === "all" ? "All Sources" : source.charAt(0).toUpperCase() + source.slice(1)}
+                    </button>
                   ))}
                 </div>
-                <span className="text-sm text-muted-foreground">
-                  {new Date(review.review_date).toLocaleDateString()}
-                </span>
-              </div>
-            </div>
-          </div>
-          <Badge
-            variant={review.status === "unanswered" ? "destructive" : "default"}
-          >
-            {review.status}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-sm leading-relaxed">{review.review_text}</p>
 
-        {review.response_text ? (
-          <div className="rounded-lg bg-accent/5 border border-border/50 p-4 space-y-2">
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary">Your Response</Badge>
-              <span className="text-xs text-muted-foreground">
-                {review.responded_at &&
-                  new Date(review.responded_at).toLocaleDateString()}
-              </span>
-            </div>
-            <p className="text-sm leading-relaxed">{review.response_text}</p>
-          </div>
-        ) : (
-          <Dialog
-            open={showResponseDialog}
-            onOpenChange={setShowResponseDialog}
-          >
-            <DialogTrigger asChild>
-              <Button variant="outline" className="w-full">
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Respond to Review
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Respond to {review.reviewer_name}</DialogTitle>
-                <DialogDescription>
-                  Write a thoughtful response to this {review.rating}-star
-                  review
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="rounded-lg bg-accent/5 border border-border/50 p-4">
-                  <p className="text-sm">{review.review_text}</p>
-                </div>
-                <div className="space-y-2">
-                  <Textarea
-                    placeholder="Write your response..."
-                    className="min-h-[150px]"
-                    value={responseText}
-                    onChange={(e) => setResponseText(e.target.value)}
-                  />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2"
-                    onClick={handleGenerateAI}
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    Generate AI Response
-                  </Button>
-                </div>
-                <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => setShowResponseDialog(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    className="flex-1"
-                    onClick={handleSubmitResponse}
-                    disabled={!responseText.trim()}
-                  >
-                    <Send className="h-4 w-4 mr-2" />
-                    Send Response
-                  </Button>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  {(["all", "positive", "neutral", "negative"] as const).map((sentiment) => (
+                    <button
+                      key={sentiment}
+                      onClick={() => setFilterSentiment(sentiment)}
+                      className={`px-3 py-2 rounded-lg border-2 font-bold text-xs transition-all ${
+                        filterSentiment === sentiment
+                          ? "border-lime-400 bg-lime-50 text-lime-700"
+                          : "border-slate-200 text-slate-600 hover:border-slate-300"
+                      }`}
+                    >
+                      {sentiment === "all" ? "All" : sentiment.charAt(0).toUpperCase() + sentiment.slice(1)}
+                    </button>
+                  ))}
                 </div>
               </div>
-            </DialogContent>
-          </Dialog>
-        )}
-      </CardContent>
-    </Card>
+
+              {/* Reviews List */}
+              <div className="space-y-3">
+                {filteredReviews.length > 0 ? (
+                  filteredReviews.map((review) => (
+                    <ReviewCard
+                      key={review.id}
+                      review={review}
+                      onReply={handleReply}
+                      onFlag={handleFlag}
+                    />
+                  ))
+                ) : (
+                  <div className="bg-white/50 backdrop-blur-xl rounded-lg p-12 text-center border border-white/60">
+                    <MessageCircle className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                    <p className="text-slate-600 font-medium">No reviews match your filters</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Column - Advisor & Settings */}
+            <div className="space-y-4">
+              {/* Review Advisor */}
+              <ReviewAdvisor reviews={reviews} onGenerateReplies={handleGenerateReplies} />
+
+              {/* Auto Reply Settings */}
+              <div className="bg-white/50 backdrop-blur-xl rounded-xl p-5 border border-white/60 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-black text-slate-900 flex items-center gap-2">
+                    <Settings className="w-4 h-4" />
+                    Auto-Reply
+                  </h3>
+                  <button
+                    onClick={() => setShowAutoReplySettings(!showAutoReplySettings)}
+                    className="text-xs font-bold text-indigo-600 hover:text-indigo-700"
+                  >
+                    {showAutoReplySettings ? "Hide" : "Edit"}
+                  </button>
+                </div>
+
+                {/* Toggle */}
+                <button
+                  onClick={() =>
+                    setAutoReplySettings({ ...autoReplySettings, enableAutoReply: !autoReplySettings.enableAutoReply })
+                  }
+                  className={`w-full p-3 rounded-lg border-2 font-bold text-sm transition-all ${
+                    autoReplySettings.enableAutoReply
+                      ? "border-green-500 bg-green-50 text-green-700"
+                      : "border-slate-200 text-slate-600 hover:border-slate-300"
+                  }`}
+                >
+                  {autoReplySettings.enableAutoReply ? "✓ Auto-Reply Enabled" : "Auto-Reply Disabled"}
+                </button>
+
+                {/* Settings Panel */}
+                {showAutoReplySettings && (
+                  <div className="space-y-3 pt-3 border-t border-slate-200">
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-2">5-Star Response Template</label>
+                      <textarea
+                        value={autoReplySettings.replyRules.fiveStars || ""}
+                        onChange={(e) =>
+                          setAutoReplySettings({
+                            ...autoReplySettings,
+                            replyRules: { ...autoReplySettings.replyRules, fiveStars: e.target.value },
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        rows={2}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-2">1-Star Response Template</label>
+                      <textarea
+                        value={autoReplySettings.replyRules.oneStar || ""}
+                        onChange={(e) =>
+                          setAutoReplySettings({
+                            ...autoReplySettings,
+                            replyRules: { ...autoReplySettings.replyRules, oneStar: e.target.value },
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        rows={2}
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      <label className="flex items-center gap-2 text-xs font-medium text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={autoReplySettings.includeFollowUpLinks}
+                          onChange={(e) =>
+                            setAutoReplySettings({
+                              ...autoReplySettings,
+                              includeFollowUpLinks: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 rounded"
+                        />
+                        Include Follow-up Links
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {/* Info */}
+                <p className="text-xs text-slate-600 font-medium italic">
+                  {autoReplySettings.enableAutoReply
+                    ? "Auto-replies are enabled. We'll respond to 5-star and 4-star reviews automatically."
+                    : "Manual replies only. You'll handle each response personally."}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </MainLayout>
   );
 }

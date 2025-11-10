@@ -1,246 +1,61 @@
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MainLayout } from "@/components/layout/MainLayout";
+import { GoodNews } from "@/components/dashboard/GoodNews";
+import { CalendarAccordion } from "@/components/dashboard/CalendarAccordion";
+import { InsightsFeed } from "@/components/dashboard/InsightsFeed";
+import { AnalyticsPanel } from "@/components/dashboard/AnalyticsPanel";
+import { FirstVisitTooltip } from "@/components/dashboard/FirstVisitTooltip";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  LayoutDashboard,
-  TrendingUp,
-  Users,
-  Calendar,
-  Plus,
-  BarChart3,
-  Clock,
-  CheckCircle,
-  AlertTriangle,
-} from "lucide-react";
-import { AdvisorInsightsTile } from "@/components/insights/AdvisorInsightsTile";
-
-interface DashboardData {
-  metrics: {
-    totalBrands: number;
-    activeContent: number;
-    pendingApprovals: number;
-    scheduledPosts: number;
-  };
-  recentActivity: Array<{
-    id: string;
-    type: "content_created" | "content_approved" | "content_published";
-    title: string;
-    brand: string;
-    timestamp: string;
-  }>;
-  upcomingTasks: Array<{
-    id: string;
-    title: string;
-    dueDate: string;
-    priority: "high" | "medium" | "low";
-  }>;
-}
+import { useWorkspace } from "@/contexts/WorkspaceContext";
 
 export default function Dashboard() {
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
-
-  const loadDashboardData = async () => {
-    try {
-      // Mock data - replace with actual API call
-      const mockData: DashboardData = {
-        metrics: {
-          totalBrands: 8,
-          activeContent: 24,
-          pendingApprovals: 5,
-          scheduledPosts: 12,
-        },
-        recentActivity: [
-          {
-            id: "1",
-            type: "content_created",
-            title: "Summer Campaign Post",
-            brand: "Nike",
-            timestamp: new Date().toISOString(),
-          },
-          {
-            id: "2",
-            type: "content_approved",
-            title: "Product Launch Video",
-            brand: "Apple",
-            timestamp: new Date(Date.now() - 3600000).toISOString(),
-          },
-        ],
-        upcomingTasks: [
-          {
-            id: "1",
-            title: "Review Q4 Campaign Strategy",
-            dueDate: new Date(Date.now() + 86400000).toISOString(),
-            priority: "high",
-          },
-        ],
-      };
-      setData(mockData);
-    } catch (error) {
-      console.error("Failed to load dashboard data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="p-6 space-y-6">
-        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-32 bg-gray-200 rounded-lg animate-pulse"
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!data) return <div>Failed to load dashboard</div>;
+  const { currentWorkspace } = useWorkspace();
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Create Content
-        </Button>
-      </div>
-
-      {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <MetricCard
-          title="Total Brands"
-          value={data.metrics.totalBrands}
-          icon={<LayoutDashboard className="h-6 w-6" />}
-          color="blue"
-        />
-        <MetricCard
-          title="Active Content"
-          value={data.metrics.activeContent}
-          icon={<BarChart3 className="h-6 w-6" />}
-          color="green"
-        />
-        <MetricCard
-          title="Pending Approvals"
-          value={data.metrics.pendingApprovals}
-          icon={<Clock className="h-6 w-6" />}
-          color="yellow"
-        />
-        <MetricCard
-          title="Scheduled Posts"
-          value={data.metrics.scheduledPosts}
-          icon={<Calendar className="h-6 w-6" />}
-          color="purple"
-        />
-      </div>
-
-      {/* AI Insights Section */}
-      <div className="mt-8">
-        <AdvisorInsightsTile maxInsights={6} />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {data.recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="h-4 w-4 text-blue-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{activity.title}</p>
-                    <p className="text-sm text-gray-600">{activity.brand}</p>
-                  </div>
-                  <span className="text-xs text-gray-500">
-                    {new Date(activity.timestamp).toLocaleTimeString()}
-                  </span>
-                </div>
-              ))}
+    <MainLayout>
+      <FirstVisitTooltip page="dashboard">
+        <div className="min-h-screen bg-gradient-to-b from-indigo-50/30 via-white to-blue-50/20">
+          <div className="p-4 sm:p-6 md:p-8">
+          {/* Page Header */}
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4 sm:mb-6 pb-4 border-b border-slate-200">
+            <div className="min-w-0">
+              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-1 sm:mb-2">Dashboard</h1>
+              <p className="text-slate-600 text-xs sm:text-sm font-medium">
+                {currentWorkspace?.logo} {currentWorkspace?.name} — Your daily command center
+              </p>
             </div>
-          </CardContent>
-        </Card>
+            <Button className="bg-lime-400 hover:bg-lime-300 text-indigo-950 font-black gap-2 shadow-lg shadow-lime-400/30 hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 whitespace-nowrap flex-shrink-0">
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">New Content</span>
+              <span className="sm:hidden">New</span>
+            </Button>
+          </div>
 
-        {/* Upcoming Tasks */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Tasks</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {data.upcomingTasks.map((task) => (
-                <div key={task.id} className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                    <AlertTriangle className="h-4 w-4 text-orange-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{task.title}</p>
-                    <p className="text-sm text-gray-600">
-                      Due {new Date(task.dueDate).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <Badge
-                    variant={
-                      task.priority === "high" ? "destructive" : "secondary"
-                    }
-                  >
-                    {task.priority}
-                  </Badge>
-                </div>
-              ))}
+          {/* ZONE 1: STRATEGIC OVERVIEW - "Today's Pulse" */}
+          <div className="mb-10 sm:mb-14">
+            <GoodNews />
+          </div>
+
+          {/* ZONE 2: OPERATIONAL WORKFLOW - Two Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-14">
+            {/* Left: Calendar Accordion (2/3 width) */}
+            <div className="lg:col-span-2">
+              <CalendarAccordion />
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-}
 
-function MetricCard({
-  title,
-  value,
-  icon,
-  color,
-}: {
-  title: string;
-  value: number;
-  icon: React.ReactNode;
-  color: "blue" | "green" | "yellow" | "purple";
-}) {
-  const colorClasses = {
-    blue: "text-blue-600 bg-blue-100",
-    green: "text-green-600 bg-green-100",
-    yellow: "text-yellow-600 bg-yellow-100",
-    purple: "text-purple-600 bg-purple-100",
-  };
+            {/* Right: Insights Feed (1/3 width, sticky on desktop) */}
+            <div className="lg:sticky lg:top-20 lg:h-fit">
+              <InsightsFeed />
+            </div>
+          </div>
 
-  return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
+          {/* ZONE 3: INTELLIGENCE & DATA */}
           <div>
-            <p className="text-sm font-medium text-gray-600">{title}</p>
-            <p className="text-3xl font-bold text-gray-900">{value}</p>
+            <AnalyticsPanel />
           </div>
-          <div className={`p-3 rounded-full ${colorClasses[color]}`}>
-            {icon}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </FirstVisitTooltip>
+    </MainLayout>
   );
 }
