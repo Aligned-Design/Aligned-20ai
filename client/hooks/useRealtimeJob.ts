@@ -16,6 +16,13 @@ interface UseRealtimeJobOptions {
   fallbackPollingInterval?: number; // milliseconds, 0 to disable polling fallback
 }
 
+export interface UseRealtimeJobReturn {
+  status: JobStatusUpdate | null;
+  connected: boolean;
+  error: Error | null;
+  isPolling: boolean;
+}
+
 /**
  * Hook for real-time job status updates via WebSocket
  * Falls back to polling if WebSocket unavailable
@@ -23,7 +30,7 @@ interface UseRealtimeJobOptions {
 export function useRealtimeJob(
   jobId: string,
   options: UseRealtimeJobOptions = {}
-) {
+): UseRealtimeJobReturn {
   const { enabled = true, fallbackPollingInterval = 5000 } = options;
 
   const [status, setStatus] = useState<JobStatusUpdate | null>(null);

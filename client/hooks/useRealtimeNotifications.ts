@@ -29,6 +29,17 @@ interface UseRealtimeNotificationsOptions {
   maxNotifications?: number; // Keep last N notifications in memory
 }
 
+export interface UseRealtimeNotificationsReturn {
+  notifications: Notification[];
+  unreadCount: number;
+  connected: boolean;
+  isPolling: boolean;
+  error: Error | null;
+  markAsRead: (notificationId: string) => void;
+  clearAll: () => void;
+  removeNotification: (notificationId: string) => void;
+}
+
 /**
  * Hook for real-time user notifications via WebSocket
  * Falls back to polling if WebSocket unavailable
@@ -36,7 +47,7 @@ interface UseRealtimeNotificationsOptions {
 export function useRealtimeNotifications(
   userId: string,
   options: UseRealtimeNotificationsOptions = {}
-) {
+): UseRealtimeNotificationsReturn {
   const {
     enabled = true,
     fallbackPollingInterval = 5000,

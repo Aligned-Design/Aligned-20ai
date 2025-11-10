@@ -26,6 +26,15 @@ interface UseRealtimeAnalyticsOptions {
   fallbackPollingInterval?: number; // milliseconds, 0 to disable polling fallback
 }
 
+export interface UseRealtimeAnalyticsReturn {
+  events: AnalyticsEvent[];
+  currentProgress: AnalyticsSyncProgress | null;
+  connected: boolean;
+  isPolling: boolean;
+  error: Error | null;
+  clearEvents: () => void;
+}
+
 /**
  * Hook for real-time analytics sync progress via WebSocket
  * Falls back to polling if WebSocket unavailable
@@ -33,7 +42,7 @@ interface UseRealtimeAnalyticsOptions {
 export function useRealtimeAnalytics(
   brandId: string,
   options: UseRealtimeAnalyticsOptions = {}
-) {
+): UseRealtimeAnalyticsReturn {
   const { enabled = true, fallbackPollingInterval = 5000 } = options;
 
   const [events, setEvents] = useState<AnalyticsEvent[]>([]);
