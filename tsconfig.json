@@ -17,15 +17,15 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
 
-    
+
     "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitAny": false,
     "noFallthroughCasesInSwitch": false,
     "strictNullChecks": false,
+    "types": ["vitest/globals"],
 
-    
     "baseUrl": ".",
     "paths": {
       "@/*": ["./client/*"],
