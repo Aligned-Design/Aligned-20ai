@@ -7,10 +7,10 @@ const __dirname = resolve(fileURLToPath(import.meta.url), "..");
 
 export default defineConfig({
   plugins: [react()],
-  root: "client",
-  publicDir: "../public",
+  root: "code/client",
+  publicDir: "../../public",
   build: {
-    outDir: "../dist",
+    outDir: "../../dist",
     emptyOutDir: true,
   },
   server: {
@@ -28,8 +28,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": resolve(__dirname, "client"),
-      "@shared": resolve(__dirname, "shared"),
+      "@": resolve(__dirname, "../client"),
+      "@shared": resolve(__dirname, "../../shared"),
     },
   },
 });
