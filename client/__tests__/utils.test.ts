@@ -138,16 +138,16 @@ describe('Number Utilities', () => {
 });
 
 describe('Array Utilities', () => {
-  const chunk = (arr: unknown[], size: number) => {
-    const result = [];
+  const chunk = <T,>(arr: T[], size: number): T[][] => {
+    const result: T[][] = [];
     for (let i = 0; i < arr.length; i += size) {
       result.push(arr.slice(i, i + size));
     }
     return result;
   };
 
-  const unique = (arr: unknown[]) => [...new Set(arr)];
-  const flatten = (arr: unknown[]): unknown[] => arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flatten(val) : val), []);
+  const unique = <T,>(arr: T[]): T[] => [...new Set(arr)];
+  const flatten = (arr: unknown[]): unknown[] => arr.reduce<unknown[]>((acc, val) => acc.concat(Array.isArray(val) ? flatten(val) : val), []);
 
   describe('chunk', () => {
     it('should chunk array into specified size', () => {
@@ -205,21 +205,21 @@ describe('Array Utilities', () => {
 });
 
 describe('Object Utilities', () => {
-  const pick = (obj: unknown, keys: string[]) => {
-    const result: unknown = {};
+  const pick = <T extends Record<string, unknown>>(obj: T, keys: string[]): Partial<T> => {
+    const result: Partial<T> = {};
     keys.forEach(key => {
-      if (key in obj) result[key] = obj[key];
+      if (key in obj) result[key as keyof T] = obj[key as keyof T];
     });
     return result;
   };
 
-  const omit = (obj: unknown, keys: string[]) => {
+  const omit = <T extends Record<string, unknown>>(obj: T, keys: string[]): Partial<T> => {
     const result = { ...obj };
-    keys.forEach(key => delete result[key]);
+    keys.forEach(key => delete result[key as keyof T]);
     return result;
   };
 
-  const merge = (obj1: unknown, obj2: unknown) => ({ ...obj1, ...obj2 });
+  const merge = <T extends Record<string, unknown>, U extends Record<string, unknown>>(obj1: T, obj2: U): T & U => ({ ...obj1, ...obj2 });
 
   describe('pick', () => {
     it('should pick specified keys from object', () => {

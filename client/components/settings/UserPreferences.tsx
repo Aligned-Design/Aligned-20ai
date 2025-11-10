@@ -307,8 +307,11 @@ export function UserPreferencesComponent({
 
 interface BasicPreferencesTabProps {
   preferences: BasicPreferences;
+  _preferences?: BasicPreferences;
   onSave: (updates: Partial<BasicPreferences>) => void;
+  _onSave?: (updates: Partial<BasicPreferences>) => void;
   saving: boolean;
+  _saving?: boolean;
 }
 
 function BasicPreferencesTab({
@@ -617,8 +620,11 @@ function BasicPreferencesTab({
 
 interface AdvancedPreferencesTabProps {
   preferences: AdvancedPreferences;
+  _preferences?: AdvancedPreferences;
   onSave: (updates: Partial<AdvancedPreferences>) => void;
+  _onSave?: (updates: Partial<AdvancedPreferences>) => void;
   saving: boolean;
+  _saving?: boolean;
 }
 
 function AdvancedPreferencesTab({
@@ -654,8 +660,11 @@ function AdvancedPreferencesTab({
 
 interface AgencyOverridesTabProps {
   overrides?: AgencyOverrides;
+  _overrides?: AgencyOverrides;
   onSave: (updates: Partial<AgencyOverrides>) => void;
+  _onSave?: (updates: Partial<AgencyOverrides>) => void;
   saving: boolean;
+  _saving?: boolean;
 }
 
 function AgencyOverridesTab({

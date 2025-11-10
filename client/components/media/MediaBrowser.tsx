@@ -12,6 +12,7 @@ interface MediaBrowserProps {
   onSelectAsset?: (asset: MediaAsset) => void;
   selectedAssets?: string[];
   multiSelect?: boolean;
+  _multiSelect?: boolean;
   className?: string;
 }
 

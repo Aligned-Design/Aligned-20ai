@@ -22,6 +22,19 @@ import { lintContent, autoFixContent } from "../agents/content-linter";
 
 // Use shared supabase client from server/lib/supabase.ts
 
+// Brand Kit interface for database records
+interface BrandKitRecord {
+  brandName?: string;
+  toneKeywords?: string[];
+  brandPersonality?: string[];
+  writingStyle?: string;
+  commonPhrases?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  accentColor?: string;
+  fontFamily?: string;
+}
+
 export interface PipelineRequest {
   brand_id: string;
   content_type: "post" | "story" | "carousel" | "reel";
@@ -115,12 +128,15 @@ export async function runGenerationPipeline(
       }
     }
 
+    // Type the brandKit record properly
+    const typedBrandKit = brandKit as BrandKitRecord;
+
     // Step 2: Doc Agent
     const docStart = Date.now();
     const docInput: DocInput = {
       topic:
         request.topic || advisorOutput?.topics[0]?.title || "Share an update",
-      tone: request.tone || brandKit.toneKeywords?.[0] || "professional",
+      tone: request.tone || typedBrandKit.toneKeywords?.[0] || "professional",
       platform: request.platform,
       format:
         request.content_type === "story"
@@ -136,7 +152,7 @@ export async function runGenerationPipeline(
       advisor_context: advisorOutput,
     };
 
-    const docOutput = await runDocStep(docInput, brandKit, brandSafety);
+    const docOutput = await runDocStep(docInput, typedBrandKit, brandSafety);
     logs.push({
       step: "doc",
       duration_ms: Date.now() - docStart,
@@ -149,16 +165,16 @@ export async function runGenerationPipeline(
       aspect_ratio: getAspectRatio(request.platform, request.content_type),
       theme: docOutput.post_theme,
       brand_colors: [
-        brandKit.primaryColor,
-        brandKit.secondaryColor,
-        brandKit.accentColor,
+        typedBrandKit.primaryColor,
+        typedBrandKit.secondaryColor,
+        typedBrandKit.accentColor,
       ].filter(Boolean),
       tone: docOutput.tone_used,
       headline: docOutput.headline,
       doc_context: docOutput,
     };
 
-    const designOutput = await runDesignStep(designInput, brandKit);
+    const designOutput = await runDesignStep(designInput, typedBrandKit);
     logs.push({
       step: "design",
       duration_ms: Date.now() - designStart,
@@ -255,7 +271,7 @@ async function runAdvisorStep(brand_id: string): Promise<AdvisorOutput> {
  */
 async function runDocStep(
   input: DocInput,
-  brandKit: unknown,
+  brandKit: BrandKitRecord,
   safetyConfig: BrandSafetyConfig,
 ): Promise<DocOutput> {
   const MAX_ATTEMPTS = 3;
@@ -311,11 +327,11 @@ async function runDocStep(
       {
         tone_keywords: brandKit.toneKeywords || [],
         brandPersonality: brandKit.brandPersonality || [],
-        writingStyle: brandKit.writingStyle,
-        commonPhrases: brandKit.commonPhrases,
-        required_disclaimers: safetyConfig.required_disclaimers,
-        required_hashtags: safetyConfig.required_hashtags,
-        banned_phrases: safetyConfig.banned_phrases,
+        writingStyle: brandKit.writingStyle || "professional",
+        commonPhrases: brandKit.commonPhrases || "",
+        required_disclaimers: safetyConfig.required_disclaimers || [],
+        required_hashtags: safetyConfig.required_hashtags || [],
+        banned_phrases: safetyConfig.banned_phrases || [],
       },
     );
 
@@ -384,7 +400,7 @@ async function runDocStep(
  */
 async function runDesignStep(
   input: DesignInput,
-  brandKit: unknown,
+  brandKit: BrandKitRecord,
 ): Promise<DesignOutput> {
   const template = await loadPromptTemplate("design", "v1.0", "en");
 

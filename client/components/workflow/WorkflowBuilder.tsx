@@ -16,6 +16,7 @@ import {
   Plus,
   Trash2,
   Save,
+  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -289,6 +290,7 @@ interface WorkflowStepCardProps {
   index: number;
   isSelected: boolean;
   onSelect: () => void;
+  _onSelect?: () => void;
   onUpdate: (updates: Partial<WorkflowStep>) => void;
   onRemove: () => void;
   onMove: (direction: "up" | "down") => void;

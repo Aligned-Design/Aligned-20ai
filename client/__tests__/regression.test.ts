@@ -94,7 +94,7 @@ describe('Data Persistence Regression Tests', () => {
 
     it('should not lose unsaved changes on navigation', () => {
       const draftContent = 'Unsaved content';
-      const __confirmed = window.confirm('You have unsaved changes. Leave anyway?');
+      const _confirmed = window.confirm('You have unsaved changes. Leave anyway?');
 
       expect(draftContent).toBeTruthy();
     });
@@ -328,7 +328,7 @@ describe('API and Network Regression Tests', () => {
     });
 
     it('should handle null responses', () => {
-      const response: unknown = null;
+      const response: { data?: unknown[] } | null = null;
       const data = response?.data || [];
 
       expect(Array.isArray(data)).toBe(true);
@@ -343,7 +343,7 @@ describe('API and Network Regression Tests', () => {
 
     it('should handle malformed JSON', () => {
       const json = 'invalid json';
-      let parsed;
+      let parsed: unknown = null;
       try {
         parsed = JSON.parse(json);
       } catch (_e) {
@@ -555,8 +555,8 @@ describe('Performance Regression Tests', () => {
     });
 
     it('should release DOM references', () => {
-      let element = document.createElement('div');
-      element = null as unknown;
+      let element: HTMLDivElement | null = document.createElement('div');
+      element = null;
 
       expect(element).toBeNull();
     });

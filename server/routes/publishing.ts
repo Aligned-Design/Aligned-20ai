@@ -337,25 +337,25 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
 
     // Transform database records to PublishingJob format
     const publishingJobs: PublishingJob[] = filteredJobs.map((job: unknown) => ({
-      id: job.id,
-      brandId: job.brand_id,
-      tenantId: job.tenant_id,
-      postId: job.id,
-      platform: (job.platforms?.[0] || "instagram") as Platform,
-      connectionId: `${job.platforms?.[0]}-${job.brand_id}`,
-      status: job.status as unknown,
-      scheduledAt: job.scheduled_at,
-      publishedAt: job.published_at,
+      id: (job as any).id,
+      brandId: (job as any).brand_id,
+      tenantId: (job as any).tenant_id,
+      postId: (job as any).id,
+      platform: ((job as any).platforms?.[0] || "instagram") as Platform,
+      connectionId: `${(job as any).platforms?.[0]}-${(job as any).brand_id}`,
+      status: (job as any).status || "pending",
+      scheduledAt: (job as any).scheduled_at,
+      publishedAt: (job as any).published_at,
       platformPostId: undefined,
       platformUrl: undefined,
-      content: job.content,
-      validationResults: (job.validation_results as unknown[]) || [],
-      retryCount: job.retry_count || 0,
-      maxRetries: job.max_retries || 3,
-      lastError: job.last_error,
-      errorDetails: job.last_error_details,
-      createdAt: job.created_at,
-      updatedAt: job.updated_at,
+      content: (job as any).content,
+      validationResults: ((job as any).validation_results as unknown[]) || [],
+      retryCount: (job as any).retry_count || 0,
+      maxRetries: (job as any).max_retries || 3,
+      lastError: (job as any).last_error,
+      errorDetails: (job as any).last_error_details,
+      createdAt: (job as any).created_at,
+      updatedAt: (job as any).updated_at,
     }));
 
     res.json({
@@ -558,9 +558,9 @@ export const refreshToken: RequestHandler = async (req, res) => {
       accountName: connection.account_name || "",
       accessToken: connection.access_token,
       refreshToken: connection.refresh_token,
-      status: connection.status as unknown,
-      permissions: connection.permissions || [],
-      metadata: connection.metadata,
+      status: (connection.status || "connected") as "error" | "connected" | "disconnected" | "expired",
+      permissions: (connection.permissions || []) as any,
+      metadata: (connection.metadata || {}) as any,
       createdAt: connection.created_at,
       updatedAt: connection.updated_at,
     });
@@ -650,8 +650,8 @@ export const publishBlogPost: RequestHandler = async (req, res) => {
     );
 
     const result = await IntegrationService.publishBlogPost(
-      platform as unknown,
-      connection.metadata || {},
+      platform as string,
+      (connection.metadata || {}) as any,
       {
         title,
         content,
@@ -742,8 +742,8 @@ export const publishEmailCampaign: RequestHandler = async (req, res) => {
     );
 
     const result = await IntegrationService.publishEmailCampaign(
-      platform as unknown,
-      connection.metadata || {},
+      platform as string,
+      (connection.metadata || {}) as any,
       {
         title,
         subject,

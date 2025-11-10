@@ -24,7 +24,8 @@ export const generateContent: RequestHandler = async (req, res) => {
       );
     }
 
-    const { prompt, agentType, provider } = req.body as unknown;
+    const requestBody = req.body as AIGenerationRequest;
+    const { prompt, agentType, provider } = requestBody;
 
     if (!prompt || !agentType) {
       throw new AppError(

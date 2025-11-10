@@ -362,8 +362,30 @@ export const getWebhookStatus: RequestHandler = async (req, res) => {
       );
     }
 
+    const typedStatus = eventStatus as {
+      id?: string;
+      brand_id?: string;
+      provider?: string;
+      event_type?: string;
+      status?: string;
+      attempt_count?: number;
+      max_attempts?: number;
+      created_at?: string;
+      updated_at?: string;
+      delivered_at?: string;
+      last_error?: string;
+      attempts?: Array<{
+        attempt_number?: number;
+        status?: string;
+        error?: string;
+        response_code?: number;
+        backoff_ms?: number;
+        created_at?: string;
+      }>;
+    };
+
     // Verify brand ownership
-    if (eventStatus.brand_id !== brandId) {
+    if (typedStatus.brand_id !== brandId) {
       throw new AppError(
         ErrorCode.FORBIDDEN,
         "Unauthorized",
@@ -375,18 +397,18 @@ export const getWebhookStatus: RequestHandler = async (req, res) => {
     res.json({
       success: true,
       event: {
-        id: eventStatus.id,
-        provider: eventStatus.provider,
-        eventType: eventStatus.event_type,
-        status: eventStatus.status,
-        attemptCount: eventStatus.attempt_count,
-        maxAttempts: eventStatus.max_attempts,
-        createdAt: eventStatus.created_at,
-        updatedAt: eventStatus.updated_at,
-        deliveredAt: eventStatus.delivered_at,
-        lastError: eventStatus.last_error,
+        id: typedStatus.id,
+        provider: typedStatus.provider,
+        eventType: typedStatus.event_type,
+        status: typedStatus.status,
+        attemptCount: typedStatus.attempt_count,
+        maxAttempts: typedStatus.max_attempts,
+        createdAt: typedStatus.created_at,
+        updatedAt: typedStatus.updated_at,
+        deliveredAt: typedStatus.delivered_at,
+        lastError: typedStatus.last_error,
       },
-      attempts: (eventStatus.attempts as unknown[]).map((a: unknown) => ({
+      attempts: (typedStatus.attempts || []).map((a) => ({
         attemptNumber: a.attempt_number,
         status: a.status,
         error: a.error,
@@ -455,7 +477,18 @@ export const getWebhookLogs: RequestHandler = async (req, res) => {
 
     res.json({
       success: true,
-      events: (events as unknown[]).map((e: unknown) => ({
+      events: (events as Array<{
+        id?: string;
+        provider?: string;
+        event_type?: string;
+        status?: string;
+        attempt_count?: number;
+        max_attempts?: number;
+        created_at?: string;
+        updated_at?: string;
+        delivered_at?: string;
+        last_error?: string;
+      }>).map((e) => ({
         id: e.id,
         provider: e.provider,
         eventType: e.event_type,
@@ -508,7 +541,11 @@ export const retryWebhookEvent: RequestHandler = async (req, res) => {
     }
 
     // Get event
-    const event = (await webhookHandler.getEventStatus(eventId)) as unknown;
+    const event = (await webhookHandler.getEventStatus(eventId)) as {
+      brand_id?: string;
+      provider?: string;
+      event_type?: string;
+    } | unknown;
     if (!event) {
       throw new AppError(
         ErrorCode.NOT_FOUND,
@@ -519,7 +556,8 @@ export const retryWebhookEvent: RequestHandler = async (req, res) => {
     }
 
     // Verify brand ownership
-    if (event.brand_id !== brandId) {
+    const typedEvent = event as { brand_id?: string };
+    if (typedEvent.brand_id !== brandId) {
       throw new AppError(
         ErrorCode.FORBIDDEN,
         "Unauthorized",
@@ -536,8 +574,8 @@ export const retryWebhookEvent: RequestHandler = async (req, res) => {
       userEmail || "system",
       "WEBHOOK_RETRY_TRIGGERED",
       {
-        provider: event.provider,
-        eventType: event.event_type,
+        provider: (event as any).provider,
+        eventType: (event as any).event_type,
       },
     );
 

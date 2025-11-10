@@ -16,7 +16,15 @@ import { cn } from "@/lib/utils";
 import { WorkflowStepInstance, WorkflowAction } from "@shared/workflow";
 
 interface WorkflowTrackerProps {
-  workflow: unknown; // workflow may come from external source; validate at runtime
+  workflow: {
+    steps?: unknown[];
+    status?: string;
+    metadata?: {
+      priority?: string;
+      deadline?: string;
+      tags?: string[];
+    };
+  };
   canTakeAction: boolean;
   onAction: (action: WorkflowAction) => void;
   className?: string;

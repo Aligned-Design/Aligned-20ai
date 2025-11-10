@@ -4,6 +4,7 @@ import type { AssetUploadResponse } from "@shared/api";
 
 interface AssetUploaderProps {
   brandId: string;
+  _brandId?: string;
   category: "logo" | "font" | "image" | "document";
   onUpload: (files: File[]) => Promise<AssetUploadResponse[]>;
   accept?: string;

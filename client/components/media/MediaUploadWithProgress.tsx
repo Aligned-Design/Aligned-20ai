@@ -117,7 +117,7 @@ export function MediaUploadWithProgress({
       setFiles((prev) =>
         prev.map((uf) => {
           const uploadedAsset = data.assets?.find(
-            (a: unknown) => a.filename === uf.file.name,
+            (a: { filename?: string }) => a.filename === uf.file.name,
           );
           if (uploadedAsset) {
             return {
@@ -128,7 +128,7 @@ export function MediaUploadWithProgress({
             };
           }
 
-          const error = data.errors?.find((e: unknown) => e.file === uf.file.name);
+          const error = data.errors?.find((e: { file?: string; error?: string }) => e.file === uf.file.name);
           if (error) {
             return {
               ...uf,

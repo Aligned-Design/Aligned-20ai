@@ -1,33 +1,63 @@
-import { RequestHandler } from 'express';
+import { RequestHandler, Request } from 'express';
 import { WhiteLabelConfig, WhiteLabelRequest, WhiteLabelResponse } from '@shared/branding';
 import { whiteLabelDB } from '../lib/white-label-db-service';
 import { AppError } from '../lib/error-middleware';
 import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
 
+// Extended request interface with user context
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id?: string;
+    agencyId?: string;
+    brandId?: string;
+    email?: string;
+  };
+  agencyId?: string;
+  userId?: string;
+}
+
 // Helper function to map database record to API response
 function mapWhiteLabelRecord(record: unknown): WhiteLabelConfig {
+  // Type assertion with proper typing
+  const typedRecord = record as {
+    id: string;
+    agency_id: string;
+    is_active: boolean;
+    domain?: string;
+    metadata?: {
+      branding?: Record<string, unknown>;
+      colors?: Record<string, unknown>;
+      footer?: Record<string, unknown>;
+      email?: Record<string, unknown>;
+      features?: Record<string, unknown>;
+    };
+    created_at: string;
+    updated_at: string;
+  };
+
   return {
-    id: record.id,
-    agencyId: record.agency_id,
-    isActive: record.is_active,
-    branding: record.metadata?.branding || {},
-    colors: record.metadata?.colors || {},
+    id: typedRecord.id,
+    agencyId: typedRecord.agency_id,
+    isActive: typedRecord.is_active,
+    branding: (typedRecord.metadata?.branding || {}) as WhiteLabelConfig['branding'],
+    colors: (typedRecord.metadata?.colors || {}) as WhiteLabelConfig['colors'],
     domain: {
-      custom: record.domain || '',
+      custom: typedRecord.domain || '',
       isPrimary: true
     },
-    footer: record.metadata?.footer || {},
-    email: record.metadata?.email || {},
-    features: record.metadata?.features || {},
-    createdAt: record.created_at,
-    updatedAt: record.updated_at
+    footer: (typedRecord.metadata?.footer || {}) as WhiteLabelConfig['footer'],
+    email: (typedRecord.metadata?.email || {}) as WhiteLabelConfig['email'],
+    features: (typedRecord.metadata?.features || {}) as WhiteLabelConfig['features'],
+    createdAt: typedRecord.created_at,
+    updatedAt: typedRecord.updated_at
   };
 }
 
 export const getWhiteLabelConfig: RequestHandler = async (req, res, next) => {
   try {
     // Get agencyId from path parameter or authentication context
-    const agencyId = (req.params.agencyId || (req as unknown).agencyId || (req as unknown).user?.agencyId);
+    const authReq = req as AuthenticatedRequest;
+    const agencyId = (req.params.agencyId || authReq.agencyId || authReq.user?.agencyId);
 
     if (!agencyId) {
       throw new AppError(
@@ -83,7 +113,8 @@ export const updateWhiteLabelConfig: RequestHandler = async (req, res, next) => 
   try {
     const { config: updates, previewMode }: WhiteLabelRequest = req.body;
     // Get agencyId from path parameter or authentication context
-    const agencyId = (req.params.agencyId || (req as unknown).agencyId || (req as unknown).user?.agencyId);
+    const authReq = req as AuthenticatedRequest;
+    const agencyId = (req.params.agencyId || authReq.agencyId || authReq.user?.agencyId);
 
     if (!agencyId) {
       throw new AppError(

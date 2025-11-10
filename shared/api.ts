@@ -26,6 +26,8 @@ export interface AIGenerationRequest {
   includeHashtags?: boolean;
   tone?: string;
   brandContext?: string;
+  agentType?: "doc" | "design" | "advisor";
+  provider?: "openai" | "claude";
 }
 
 export interface AIGenerationResponse {
@@ -33,6 +35,8 @@ export interface AIGenerationResponse {
   variations?: string[];
   hashtags?: string[];
   estimatedEngagement?: number;
+  provider?: "openai" | "claude";
+  agentType?: "doc" | "design" | "advisor";
 }
 
 export interface AIProviderStatus {
@@ -46,14 +50,19 @@ export interface AIProviderStatus {
 // ============================================================================
 
 export interface AgentGenerateRequest {
-  prompt: string;
+  prompt?: string;
   agentType?: string;
   context?: Record<string, unknown>;
+  brand_id?: string;
+  input?: Record<string, unknown>;
 }
 
 export interface AgentGenerateResponse {
-  id: string;
-  result: string;
+  success: boolean;
+  id?: string;
+  result?: string;
+  output?: unknown;
+  error?: string;
   metadata?: Record<string, unknown>;
   executionTime?: number;
 }
@@ -63,20 +72,33 @@ export interface AgentGenerateResponse {
 // ============================================================================
 
 export interface AssetUploadResponse {
-  id: string;
-  url: string;
-  filename: string;
-  size: number;
-  mimeType: string;
-  uploadedAt: string;
+  success: boolean;
+  asset?: {
+    id: string;
+    url: string;
+    filename: string;
+    size: number;
+    mimeType: string;
+    uploadedAt: string;
+  };
+  id?: string;
+  url?: string;
+  filename?: string;
+  size?: number;
+  mimeType?: string;
+  uploadedAt?: string;
 }
 
 export interface BrandIntakeRequest {
   brandName: string;
   description?: string;
   industry?: string;
-  targetAudience?: string;
+  companySize?: string;
+  website?: string;
   websiteUrl?: string;
+  targetAudience?: string;
+  missionStatement?: string;
+  valueProposition?: string;
   socialLinks?: Record<string, string>;
 }
 
@@ -112,11 +134,16 @@ export interface CalendarEvent {
   platform?: string;
   status?: 'draft' | 'scheduled' | 'published' | 'failed';
   contentId?: string;
+  scheduledAt?: string;
+  brandId?: string;
 }
 
 export interface CalendarFilter {
   platform?: string;
+  platforms?: string[];
   status?: string;
+  statuses?: string[];
+  brands?: string[];
   dateRange?: {
     start: string;
     end: string;
@@ -126,6 +153,7 @@ export interface CalendarFilter {
 export interface PostModel {
   id: string;
   content: string;
+  caption?: string;
   platform: string;
   status: 'draft' | 'scheduled' | 'published' | 'failed';
   scheduledAt?: string;
@@ -133,10 +161,18 @@ export interface PostModel {
   mediaIds?: string[];
   hashtags?: string[];
   mentions?: string[];
+  complianceScore?: number;
+  linterResults?: {
+    errors: string[];
+    warnings?: string[];
+    passed?: boolean;
+  };
+  brandId?: string;
 }
 
 export interface PostUpdateRequest {
   content?: string;
+  caption?: string;
   platform?: string;
   status?: 'draft' | 'scheduled' | 'published';
   scheduledAt?: string;

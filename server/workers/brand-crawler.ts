@@ -9,7 +9,7 @@
  */
 
 import { chromium, Browser, Page } from "playwright";
-import Vibrant from "node-vibrant";
+import { Vibrant } from "node-vibrant/node";
 import robotsParser from "robots-parser";
 import OpenAI from "openai";
 import crypto from "crypto";
@@ -475,10 +475,10 @@ function generateBrandKitFallback(
   const allText = results.map((r) => r.bodyText).join(" ");
 
   // Simple keyword extraction (top words by frequency)
-  const words = allText.toLowerCase().match(/\b[a-z]{4,}\b/g) || [];
+  const words: string[] = allText.toLowerCase().match(/\b[a-z]{4,}\b/g) || [];
 
-  const wordFreq = words.reduce(
-    (acc, word) => {
+  const wordFreq: Record<string, number> = words.reduce(
+    (acc: Record<string, number>, word: string) => {
       acc[word] = (acc[word] || 0) + 1;
       return acc;
     },
@@ -498,7 +498,7 @@ function generateBrandKitFallback(
   ]);
   const keywords = Object.entries(wordFreq)
     .filter(([word]) => !stopWords.has(word))
-    .sort((a, b) => b[1] - a[1])
+    .sort((a: [string, number], b: [string, number]) => b[1] - a[1])
     .slice(0, 5)
     .map(([word]) => word);
 
@@ -561,7 +561,14 @@ async function createEmbeddings(
     const embedding = response.data[0].embedding;
 
     // Store in Supabase with pgvector
-    await supabase.from("brand_embeddings").upsert({
+    // Type assertion for supabase parameter
+    const supabaseClient = supabase as typeof supabase & {
+      from: (table: string) => {
+        upsert: (data: Record<string, unknown>) => Promise<{ error?: Error }>;
+      };
+    };
+
+    await supabaseClient.from("brand_embeddings").upsert({
       brand_id: brandId,
       embedding,
       content: contextText,

@@ -17,6 +17,7 @@
     "build:server": "vite build --config vite.config.server.ts",
     "start": "node dist/server/node-build.mjs",
     "test": "vitest --run",
+    "test:ci": "vitest --run",
     "format.fix": "prettier --write .",
     "typecheck": "tsc",
     "validate:env": "tsx server/utils/validate-env.ts",

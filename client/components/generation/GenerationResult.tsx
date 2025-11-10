@@ -65,7 +65,7 @@ export function GenerationResult({
     return "bg-red-50";
   };
 
-  const __hasComplianceIssues =
+  const _hasComplianceIssues =
     linterResult &&
     (!linterResult.passed ||
       linterResult.pii_detected?.length > 0 ||
@@ -73,7 +73,7 @@ export function GenerationResult({
       linterResult.banned_claims_found?.length > 0 ||
       linterResult.platform_violations?.length > 0);
 
-  const __hasBFSIssues = bfsScore && !bfsScore.passed;
+  const _hasBFSIssues = bfsScore && !bfsScore.passed;
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -440,7 +440,7 @@ export function GenerationResult({
                   {expandedIssue === "platform" && (
                     <ul className="ml-6 space-y-2 mt-2">
                       {linterResult.platform_violations.map(
-                        (violation: unknown, idx: number) => (
+                        (violation: { platform?: string; issue?: string; current?: number; limit?: number; suggestion?: string }, idx: number) => (
                           <li key={idx} className="text-sm text-orange-700">
                             <p className="font-medium">
                               {violation.platform}: {violation.issue}

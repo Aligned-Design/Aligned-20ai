@@ -97,9 +97,9 @@ export function WhiteLabelSettings({
     });
   };
 
-  const updateLocalConfig = (section: keyof WhiteLabelConfig, updates: unknown) => {
+  const updateLocalConfig = (section: keyof WhiteLabelConfig, updates: Record<string, unknown>) => {
     setLocalConfig((prev) => {
-      const currentSection = prev[section] || {};
+      const currentSection = (prev[section] as Record<string, unknown>) || {};
       return {
         ...prev,
         [section]: {

@@ -49,7 +49,7 @@ export function AccessibleChart({
   }, [data, dataKey]);
 
   const Chart = type === "line" ? LineChart : BarChart;
-  const DataComponent =
+  const DataComponent: React.ReactNode =
     type === "line" ? (
       <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} />
     ) : (
@@ -102,8 +102,8 @@ export function AccessibleChart({
           <tbody>
             {data.map((item, index) => (
               <tr key={index}>
-                <td>{item[xAxisKey]}</td>
-                <td>{item[dataKey]}</td>
+                <td>{String(item[xAxisKey])}</td>
+                <td>{String(item[dataKey])}</td>
               </tr>
             ))}
           </tbody>

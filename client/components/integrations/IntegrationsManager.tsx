@@ -384,8 +384,8 @@ function IntegrationSettings({
             <Label>Sync Frequency</Label>
             <Select
               value={settings.syncFrequency}
-              onValueChange={(value: unknown) =>
-                setSettings((prev) => ({ ...prev, syncFrequency: value }))
+              onValueChange={(value: string) =>
+                setSettings((prev) => ({ ...prev, syncFrequency: value as "realtime" | "hourly" | "daily" }))
               }
             >
               <SelectTrigger>
@@ -403,8 +403,8 @@ function IntegrationSettings({
             <Label>Sync Direction</Label>
             <Select
               value={settings.syncDirection}
-              onValueChange={(value: unknown) =>
-                setSettings((prev) => ({ ...prev, syncDirection: value }))
+              onValueChange={(value: string) =>
+                setSettings((prev) => ({ ...prev, syncDirection: value as "inbound" | "outbound" | "bidirectional" }))
               }
             >
               <SelectTrigger>
