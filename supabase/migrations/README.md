@@ -1,228 +1,155 @@
-# Supabase Migrations
+# Supabase Database Migrations
 
-This directory contains all database migrations for the Aligned AI platform. Migrations are SQL scripts that define the database schema and are executed in order to set up and maintain the database structure.
+This directory contains versioned SQL migrations that define the complete database schema for the Aligned AI platform.
 
-## Migration Naming Convention
+## Migration Files
 
-Migrations follow the naming pattern: `YYYYMMDD_description_here.sql`
-
-Example: `20250108_create_client_settings_table.sql`
-
-This ensures migrations are executed in chronological order.
-
-## Core Tables
-
-### 1. client_settings
-**File:** `20250108_create_client_settings_table.sql`
-
-**Purpose:** Manages client email preferences, notification settings, and account preferences.
-
-**Key Fields:**
-- `client_id` (VARCHAR): Unique identifier for the client
-- `brand_id` (VARCHAR): Brand/tenant identifier for multi-tenancy
-- `email_preferences` (JSONB): Nested email notification preferences
-- `timezone` (VARCHAR): Client's timezone setting
-- `language` (VARCHAR): Client's language preference
-- `unsubscribe_token` (VARCHAR): Token for unsubscribe links
-- `unsubscribed_from_all` (BOOLEAN): Whether client unsubscribed from all emails
-- `unsubscribed_types` (TEXT[]): Array of notification types user unsubscribed from
-
-**Features:**
-- Multi-tenant isolation via brand_id
-- Unique constraint on (client_id, brand_id) combination
-- Automatic updated_at timestamp management
-- Row-level security policies for data isolation
-- Full-text search indexes on common query fields
-
-**Email Preferences Structure:**
-```json
-{
-  "approvalsNeeded": true,
-  "approvalReminders": true,
-  "publishFailures": true,
-  "publishSuccess": false,
-  "weeklyDigest": false,
-  "dailyDigest": false,
-  "reminderFrequency": "24h",
-  "digestFrequency": "weekly",
-  "maxEmailsPerDay": 20
-}
-```
-
-## Existing Tables
-
-The following tables are referenced by the application but may already exist in your Supabase project:
-
-### Database Services Tables
-
-**Media Management:**
-- `media_assets` - Media files and metadata
-- `media_storage_quota` - Storage quota tracking per brand
-
-**Integrations:**
-- `platform_connections` - OAuth and platform integration connections
-- `integration_sync_events` - Sync event tracking
-
-**User Preferences:**
-- `user_preferences` - User settings per brand
-
-**Branding:**
-- `white_label_configs` - Agency branding configurations
-
-**Approvals & Workflow:**
-- `approval_requests` - Approval workflow requests
-- `post_approvals` - Post approval status
-- `workflow_templates` - Approval workflow templates
-- `workflow_instances` - Active workflow instances
-- `workflow_notifications` - Workflow notifications
-
-**Content & Comments:**
-- `content` - Main content records
-- `content_comments` - Comments on content
-- `client_media` - Client-uploaded media
-
-**Analytics & Audit:**
-- `brand_analytics` - Brand metrics and analytics
-- `audit_logs` - Audit trail for all operations
+| # | File | Purpose | 
+|---|------|---------|
+| 001 | `001_auth_and_users.sql` | Authentication & user profiles |
+| 002 | `002_brands_and_agencies.sql` | Multi-tenant brand structure |
+| 003 | `003_content_and_posts.sql` | Content management |
+| 004 | `004_analytics_and_metrics.sql` | Analytics tracking |
+| 005 | `005_integrations.sql` | Platform integrations |
+| 006 | `006_approvals_and_workflows.sql` | Approval workflows |
+| 007 | `007_client_portal_and_audit.sql` | Client portal & audit |
+| 008 | `008_indexes_and_views.sql` | Performance optimization |
 
 ## Applying Migrations
 
 ### Supabase Dashboard
+1. Navigate to SQL Editor
+2. Copy and paste each migration file in order
+3. Execute the SQL script
 
-1. Go to your Supabase project
-2. Navigate to SQL Editor
-3. Copy and paste the migration SQL
-4. Execute the query
-5. Verify the table was created successfully
-
-### Using Supabase CLI
-
+### Supabase CLI
 ```bash
-# Create a new migration
-supabase migration new create_client_settings_table
-
-# Apply all pending migrations
+supabase link --project-ref your-project-ref
 supabase db push
-
-# Pull latest schema from remote
-supabase db pull
 ```
 
-### Manual PostgreSQL Connection
-
+### Local Development
 ```bash
-# Connect to your Supabase PostgreSQL database
-psql "postgresql://[user]:[password]@[host]:[port]/[database]"
-
-# Execute the migration file
-\i 20250108_create_client_settings_table.sql
+supabase start
+supabase db reset
 ```
 
-## Migration Checklist
-
-Before deploying a new migration:
-
-- [ ] Migration has chronological naming (YYYYMMDD)
-- [ ] SQL is properly formatted and commented
-- [ ] Indexes created for performance
-- [ ] Row-level security (RLS) policies defined
-- [ ] Update triggers set for timestamp columns
-- [ ] Foreign keys properly defined
-- [ ] Constraints added for data integrity
-- [ ] Table comments document purpose
-- [ ] Column comments explain complex fields
-
-## Rollback Strategy
-
-Supabase doesn't support automatic rollbacks, but you can:
-
-1. **Drop table** (if needed):
-```sql
-DROP TABLE IF EXISTS public.client_settings;
+### Using psql
+```bash
+psql "postgresql://[user]:[password]@[host]:5432/[database]" -f 001_auth_and_users.sql
+# Repeat for each migration in order
 ```
 
-2. **Drop and recreate**:
-```sql
-DROP TABLE IF EXISTS public.client_settings CASCADE;
--- Re-run the migration
-```
+## Database Architecture
 
-3. **Data preservation**:
-```sql
--- Backup data before migrations
-CREATE TABLE client_settings_backup AS SELECT * FROM client_settings;
+### Multi-Tenancy
+- **Brands**: Agencies or sub-brands (self-referential)
+- **Brand Members**: Role-based access control
+- **Row Level Security**: Brand isolation enforced at database level
 
--- Restore if needed
-TRUNCATE client_settings;
-INSERT INTO client_settings SELECT * FROM client_settings_backup;
-```
+### Key Tables
 
-## Performance Considerations
+**Authentication**
+- user_profiles, user_preferences
 
-All migrations include:
-- **Indexes** on frequently queried columns
-- **Unique constraints** to prevent duplicates
-- **Check constraints** to enforce data validity
-- **Composite indexes** for multi-column queries
-- **JSONB** for flexible nested structures
+**Multi-Tenant**
+- brands, brand_members, brand_assets, white_label_configs
 
-## Security Considerations
+**Content**
+- content, posts, post_approvals
 
-All tables include:
-- **Row-level security (RLS)** for multi-tenancy
-- **Brand isolation** via brand_id field
-- **Timestamp tracking** (created_at, updated_at)
-- **Audit logging** for compliance
-- **User attribution** (last_modified_by)
+**Analytics**
+- analytics_data, analytics_metrics, sync_events, analytics_sync_logs
 
-## Testing Migrations
+**Integrations**
+- platform_connections, integration_events, webhook_logs
 
-After applying a migration:
+**Workflows**
+- approval_requests, approval_threads, workflow_templates, workflow_instances
 
-```sql
--- Test table exists
-SELECT EXISTS (
-  SELECT FROM information_schema.tables
-  WHERE table_schema = 'public'
-  AND table_name = 'client_settings'
-);
+**Client Portal**
+- client_settings, client_comments, client_media, audit_logs, notifications
 
--- Test indexes
-SELECT * FROM pg_indexes WHERE tablename = 'client_settings';
+## Role-Based Access Control
 
--- Test RLS policies
-SELECT * FROM pg_policies WHERE tablename = 'client_settings';
+| Role | Permissions |
+|------|-------------|
+| Owner | All + manage members |
+| Admin | Create, edit, approve, integrate |
+| Editor | Create, edit, request approval |
+| Viewer | Read only |
 
--- Test data insertion
-INSERT INTO client_settings (client_id, brand_id)
-VALUES ('test-client', 'test-brand');
+## Performance Features
 
--- Verify automatic timestamp
-SELECT created_at, updated_at FROM client_settings
-WHERE client_id = 'test-client';
+### Composite Indexes
+Optimized for common query patterns on:
+- Content filtering by brand/status/date
+- Analytics queries by brand/date/platform
+- Brand member lookups by role
+
+### Useful Views
+- v_brand_analytics_summary
+- v_pending_approvals
+- v_content_publishing_status
+- v_user_activity
+- v_sync_health
+- v_workflow_completion_rate
+- v_client_portal_activity
+- mv_daily_analytics_summary (materialized)
+
+### Automatic Triggers
+All tables update `updated_at` timestamp automatically.
+
+## Security
+
+### Row Level Security (RLS)
+All tables enforce RLS policies that:
+- Check user membership in brand via brand_members table
+- Restrict data access to brands user is member of
+- Enforce role-based permissions
+
+### Token Management
+Platform connections securely store:
+- OAuth access tokens
+- Optional refresh tokens
+- Token expiration tracking
+
+## Backup & Recovery
+
+### Automated Backups
+Enable in Supabase Dashboard → Project Settings → Database
+
+### Manual Backup
+```bash
+pg_dump "postgresql://[user]:[password]@[host]:5432/[database]" > backup.sql
 ```
 
 ## Troubleshooting
 
-**"Table already exists" error:**
-- Migration includes `IF NOT EXISTS` clause
-- Safe to re-run without errors
+### RLS Policy Errors
+- Verify user is authenticated (auth.uid() returns value)
+- Check user has brand_members entry
+- Test policy in SQL editor
 
-**"Column type mismatch" error:**
-- Check existing schema for type compatibility
-- May need to add/modify columns separately
+### Foreign Key Constraint Error
+- Ensure migrations applied in order
+- Verify all referenced tables exist
 
-**"RLS policy conflicts" error:**
-- Drop existing policies before re-creating
-- Ensure policy names are unique
+### Performance Issues
+- Run ANALYZE to update statistics
+- Check index usage with EXPLAIN ANALYZE
+- Refresh materialized views if stale
 
-**Performance issues after migration:**
-- Verify all indexes were created
-- Run `ANALYZE` to update table statistics
-- Check query plans with `EXPLAIN ANALYZE`
+## Adding New Migrations
 
-## Resources
+1. Create file: `0XX_description.sql`
+2. Include RLS policies
+3. Add indexes
+4. Test with `supabase db reset`
+5. Update this README
 
-- [Supabase Migrations Documentation](https://supabase.com/docs/guides/migrations)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/current/)
-- [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security)
+## Related Documentation
+
+- Supabase: https://supabase.com/docs
+- PostgreSQL: https://www.postgresql.org/docs/
+- Row Level Security: https://supabase.com/docs/guides/auth/row-level-security
