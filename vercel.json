@@ -2,16 +2,15 @@
   "buildCommand": "pnpm run build",
   "installCommand": "pnpm install",
   "framework": "vite",
-  "outputDirectory": "dist",
-  "publicPath": "spa",
-  "routes": [
+  "outputDirectory": "dist/spa",
+  "rewrites": [
     {
-      "src": "/api/?(.*)",
-      "dest": "/api/[...all].ts"
+      "source": "/api/:path*",
+      "destination": "/api/[...all].ts"
     },
     {
-      "src": "/(.*)",
-      "dest": "/spa/index.html"
+      "source": "/:path*",
+      "destination": "/index.html"
     }
   ]
 }
