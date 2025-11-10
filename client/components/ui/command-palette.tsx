@@ -23,7 +23,7 @@ import { useBrand } from '@/contexts/BrandContext';
 export default function CommandPalette() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { logout } = useAuth();
   const { brands, setCurrentBrand } = useBrand();
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -108,7 +108,10 @@ export default function CommandPalette() {
       {
         icon: LogOut,
         label: 'Sign Out',
-        onSelect: () => runCommand(() => signOut().then(() => navigate('/login'))),
+        onSelect: () => runCommand(() => {
+          logout();
+          navigate('/login');
+        }),
       },
     ],
   });

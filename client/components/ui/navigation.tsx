@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { _cn } from '@/lib/utils';  // unused
 import { Button } from './button';
 
 interface NavItem {
