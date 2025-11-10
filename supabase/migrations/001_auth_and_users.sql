@@ -35,9 +35,9 @@ CREATE TABLE IF NOT EXISTS user_preferences (
 );
 
 -- Indexes for performance
-CREATE INDEX idx_user_profiles_email ON user_profiles(email);
-CREATE INDEX idx_user_profiles_created_at ON user_profiles(created_at);
-CREATE INDEX idx_user_preferences_user_id ON user_preferences(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_email ON user_profiles(email);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_created_at ON user_profiles(created_at);
+CREATE INDEX IF NOT EXISTS idx_user_preferences_user_id ON user_preferences(user_id);
 
 -- Trigger to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at()
@@ -66,7 +66,7 @@ ALTER TABLE user_preferences ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can read own profile"
   ON user_profiles
   FOR SELECT
-  USING (auth.uid()::text = id::text OR role = 'admin');
+  USING (auth.uid()::text = id::text);
 
 -- Users can update their own profile
 CREATE POLICY "Users can update own profile"

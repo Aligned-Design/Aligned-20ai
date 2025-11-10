@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS client_settings (
 CREATE TABLE IF NOT EXISTS client_comments (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   content_id UUID NOT NULL REFERENCES content(id) ON DELETE CASCADE,
-  client_id UUID NOT NULL REFERENCES user_profiles(id) ON DELETE SET NULL,
+  client_id UUID NOT NULL REFERENCES user_profiles(id) ON DELETE CASCADE,
   comment TEXT NOT NULL,
   attachment_urls TEXT[] DEFAULT ARRAY[]::TEXT[],
   is_resolved BOOLEAN DEFAULT FALSE,
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS client_comments (
 CREATE TABLE IF NOT EXISTS client_media (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   brand_id UUID NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
-  client_id UUID NOT NULL REFERENCES user_profiles(id) ON DELETE SET NULL,
+  client_id UUID NOT NULL REFERENCES user_profiles(id) ON DELETE CASCADE,
   filename VARCHAR(500) NOT NULL,
   file_size BIGINT NOT NULL,
   mime_type VARCHAR(100),
@@ -92,39 +92,54 @@ CREATE TABLE IF NOT EXISTS notifications (
 );
 
 -- Indexes
-CREATE INDEX idx_client_settings_brand_id ON client_settings(brand_id);
-CREATE INDEX idx_client_settings_client_id ON client_settings(client_id);
-CREATE INDEX idx_client_comments_content_id ON client_comments(content_id);
-CREATE INDEX idx_client_comments_client_id ON client_comments(client_id);
-CREATE INDEX idx_client_comments_is_resolved ON client_comments(is_resolved);
-CREATE INDEX idx_client_media_brand_id ON client_media(brand_id);
-CREATE INDEX idx_client_media_client_id ON client_media(client_id);
-CREATE INDEX idx_client_media_status ON client_media(status);
-CREATE INDEX idx_audit_logs_brand_id ON audit_logs(brand_id);
-CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id);
-CREATE INDEX idx_audit_logs_action ON audit_logs(action);
-CREATE INDEX idx_audit_logs_resource ON audit_logs(resource_type, resource_id);
-CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at);
-CREATE INDEX idx_notifications_user_id ON notifications(user_id);
-CREATE INDEX idx_notifications_brand_id ON notifications(brand_id);
-CREATE INDEX idx_notifications_is_read ON notifications(is_read);
-CREATE INDEX idx_notifications_created_at ON notifications(created_at);
+CREATE INDEX IF NOT EXISTS idx_client_settings_brand_id ON client_settings(brand_id);
+CREATE INDEX IF NOT EXISTS idx_client_settings_client_id ON client_settings(client_id);
+CREATE INDEX IF NOT EXISTS idx_client_comments_content_id ON client_comments(content_id);
+CREATE INDEX IF NOT EXISTS idx_client_comments_client_id ON client_comments(client_id);
+CREATE INDEX IF NOT EXISTS idx_client_comments_is_resolved ON client_comments(is_resolved);
+CREATE INDEX IF NOT EXISTS idx_client_media_brand_id ON client_media(brand_id);
+CREATE INDEX IF NOT EXISTS idx_client_media_client_id ON client_media(client_id);
+CREATE INDEX IF NOT EXISTS idx_client_media_status ON client_media(status);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_brand_id ON audit_logs(brand_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_resource ON audit_logs(resource_type, resource_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_brand_id ON notifications(brand_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_is_read ON notifications(is_read);
+CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created_at);
 
 -- Triggers
-CREATE TRIGGER update_client_settings_updated_at
-BEFORE UPDATE ON client_settings
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at();
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.triggers WHERE trigger_name = 'update_client_settings_updated_at') THEN
+    CREATE TRIGGER update_client_settings_updated_at
+    BEFORE UPDATE ON client_settings
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at();
+  END IF;
+END $$;
 
-CREATE TRIGGER update_client_comments_updated_at
-BEFORE UPDATE ON client_comments
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at();
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.triggers WHERE trigger_name = 'update_client_comments_updated_at') THEN
+    CREATE TRIGGER update_client_comments_updated_at
+    BEFORE UPDATE ON client_comments
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at();
+  END IF;
+END $$;
 
-CREATE TRIGGER update_notification_preferences_updated_at
-BEFORE UPDATE ON notification_preferences
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at();
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.triggers WHERE trigger_name = 'update_notification_preferences_updated_at') THEN
+    CREATE TRIGGER update_notification_preferences_updated_at
+    BEFORE UPDATE ON notification_preferences
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at();
+  END IF;
+END $$;
 
 -- Function to clean up expired notifications
 CREATE OR REPLACE FUNCTION clean_expired_notifications()

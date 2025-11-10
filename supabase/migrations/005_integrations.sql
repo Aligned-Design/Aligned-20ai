@@ -49,23 +49,28 @@ CREATE TABLE IF NOT EXISTS webhook_logs (
 );
 
 -- Indexes
-CREATE INDEX idx_platform_connections_brand_id ON platform_connections(brand_id);
-CREATE INDEX idx_platform_connections_platform ON platform_connections(platform);
-CREATE INDEX idx_platform_connections_is_active ON platform_connections(is_active);
-CREATE INDEX idx_platform_connections_updated_at ON platform_connections(updated_at);
-CREATE INDEX idx_integration_events_brand_id ON integration_events(brand_id);
-CREATE INDEX idx_integration_events_connection_id ON integration_events(connection_id);
-CREATE INDEX idx_integration_events_event_type ON integration_events(event_type);
-CREATE INDEX idx_integration_events_created_at ON integration_events(created_at);
-CREATE INDEX idx_webhook_logs_brand_id ON webhook_logs(brand_id);
-CREATE INDEX idx_webhook_logs_platform ON webhook_logs(platform);
-CREATE INDEX idx_webhook_logs_created_at ON webhook_logs(created_at);
+CREATE INDEX IF NOT EXISTS idx_platform_connections_brand_id ON platform_connections(brand_id);
+CREATE INDEX IF NOT EXISTS idx_platform_connections_platform ON platform_connections(platform);
+CREATE INDEX IF NOT EXISTS idx_platform_connections_is_active ON platform_connections(is_active);
+CREATE INDEX IF NOT EXISTS idx_platform_connections_updated_at ON platform_connections(updated_at);
+CREATE INDEX IF NOT EXISTS idx_integration_events_brand_id ON integration_events(brand_id);
+CREATE INDEX IF NOT EXISTS idx_integration_events_connection_id ON integration_events(connection_id);
+CREATE INDEX IF NOT EXISTS idx_integration_events_event_type ON integration_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_integration_events_created_at ON integration_events(created_at);
+CREATE INDEX IF NOT EXISTS idx_webhook_logs_brand_id ON webhook_logs(brand_id);
+CREATE INDEX IF NOT EXISTS idx_webhook_logs_platform ON webhook_logs(platform);
+CREATE INDEX IF NOT EXISTS idx_webhook_logs_created_at ON webhook_logs(created_at);
 
 -- Trigger to track token update time
-CREATE TRIGGER update_platform_connections_updated_at
-BEFORE UPDATE ON platform_connections
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at();
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.triggers WHERE trigger_name = 'update_platform_connections_updated_at') THEN
+    CREATE TRIGGER update_platform_connections_updated_at
+    BEFORE UPDATE ON platform_connections
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at();
+  END IF;
+END $$;
 
 -- Function to check token expiration and schedule refresh
 CREATE OR REPLACE FUNCTION check_token_expiration()
