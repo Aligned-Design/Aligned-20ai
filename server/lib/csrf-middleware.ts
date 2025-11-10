@@ -76,7 +76,7 @@ export function validateOAuthState(
   const rawStateToken = extractRawStateToken(state);
 
   // Attach validated state to request for downstream handlers
-  (_req as unknown).validatedState = {
+  (req as unknown).validatedState = {
     fullState: state,
     rawToken: rawStateToken,
     parts: [rawStateToken], // Now always single element since no colons allowed
