@@ -32,6 +32,17 @@ export default defineConfig({
         // External dependencies that should not be bundled
         "express",
         "cors",
+        "@anthropic-ai/sdk",
+        "@sendgrid/mail",
+        "@supabase/supabase-js",
+        "multer",
+        "nodemailer",
+        "openai",
+        "sharp",
+        "socket.io",
+        "uuid",
+        "zod",
+        "dotenv",
       ],
       output: {
         format: "es",
@@ -43,7 +54,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./client"),
+      "@": path.resolve(__dirname, "./src"),
       "@shared": path.resolve(__dirname, "./shared"),
     },
   },
