@@ -57,6 +57,5 @@ Thumbs.db
 tmp/
 temp/
 
-# Package manager locks (keeping npm only per your preference)
+# Package manager locks (pnpm-lock.yaml is tracked for CI builds)
 yarn.lock
-pnpm-lock.yaml
