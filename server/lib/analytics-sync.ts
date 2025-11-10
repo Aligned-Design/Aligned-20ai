@@ -5,6 +5,17 @@ import {
   broadcastAnalyticsSyncCompleted,
   broadcastInsightsGenerated,
 } from "./event-broadcaster";
+import {
+  InstagramMediaResponse,
+  InstagramAccountInsightsResponse,
+  FacebookPostsResponse,
+  LinkedInPostsResponse,
+  TwitterTweetsResponse,
+  TikTokVideosResponse,
+  GoogleBusinessInsightsResponse,
+  PinterestPinsResponse,
+  YouTubePlaylistItemsResponse,
+} from "../types/platform-apis";
 
 interface SyncConfig {
   platform: Platform;
@@ -354,7 +365,7 @@ export class AnalyticsSync {
         throw new Error(`Instagram API error: ${postsResponse.statusText}`);
       }
 
-      const postsData: unknown = await postsResponse.json();
+      const postsData: InstagramMediaResponse = await postsResponse.json();
       return postsData.data || [];
     } catch (error) {
       console.error("Instagram date-range fetch error:", error);
@@ -379,7 +390,7 @@ export class AnalyticsSync {
         throw new Error(`Facebook API error: ${postsResponse.statusText}`);
       }
 
-      const postsData: unknown = await postsResponse.json();
+      const postsData: FacebookPostsResponse = await postsResponse.json();
       return postsData.data || [];
     } catch (error) {
       console.error("Facebook date-range fetch error:", error);
@@ -410,9 +421,9 @@ export class AnalyticsSync {
         throw new Error(`LinkedIn API error: ${postsResponse.statusText}`);
       }
 
-      const postsData: unknown = await postsResponse.json();
+      const postsData: LinkedInPostsResponse = await postsResponse.json();
       // Filter posts by date range
-      return (postsData.elements || []).filter((post: unknown) => {
+      return (postsData.elements || []).filter((post) => {
         const postTime = post.createdTime || 0;
         return postTime >= startMs && postTime <= endMs;
       });
@@ -444,7 +455,7 @@ export class AnalyticsSync {
         throw new Error(`Twitter API error: ${tweetsResponse.statusText}`);
       }
 
-      const tweetsData: unknown = await tweetsResponse.json();
+      const tweetsData: TwitterTweetsResponse = await tweetsResponse.json();
       return tweetsData.data || [];
     } catch (error) {
       console.error("Twitter date-range fetch error:", error);
@@ -490,8 +501,8 @@ export class AnalyticsSync {
         throw new Error(`TikTok API error: ${videosResponse.statusText}`);
       }
 
-      const videosData: unknown = await videosResponse.json();
-      return videosData.data || [];
+      const videosData: TikTokVideosResponse = await videosResponse.json();
+      return videosData.data?.videos || [];
     } catch (error) {
       console.error("TikTok date-range fetch error:", error);
       return [];
@@ -536,7 +547,7 @@ export class AnalyticsSync {
         );
       }
 
-      const insightsData: unknown = await insightsResponse.json();
+      const insightsData: GoogleBusinessInsightsResponse = await insightsResponse.json();
       return insightsData.locationInsights || [];
     } catch (error) {
       console.error("Google Business date-range fetch error:", error);
@@ -558,9 +569,9 @@ export class AnalyticsSync {
         throw new Error(`Pinterest API error: ${pinsResponse.statusText}`);
       }
 
-      const pinsData: unknown = await pinsResponse.json();
+      const pinsData: PinterestPinsResponse = await pinsResponse.json();
       // Filter by date range
-      return (pinsData.data || []).filter((pin: unknown) => {
+      return (pinsData.data || []).filter((pin) => {
         const pinTime = new Date(pin.created_at).getTime();
         return pinTime >= startDate.getTime() && pinTime <= endDate.getTime();
       });
@@ -584,7 +595,7 @@ export class AnalyticsSync {
         throw new Error(`YouTube API error: ${videosResponse.statusText}`);
       }
 
-      const videosData: unknown = await videosResponse.json();
+      const videosData: YouTubePlaylistItemsResponse = await videosResponse.json();
       return videosData.items || [];
     } catch (error) {
       console.error("YouTube date-range fetch error:", error);
@@ -612,14 +623,14 @@ export class AnalyticsSync {
         throw new Error(`Instagram API error: ${postsResponse.statusText}`);
       }
 
-      const postsData: unknown = await postsResponse.json();
+      const postsData: InstagramMediaResponse = await postsResponse.json();
 
       // Fetch account insights
       const accountResponse = await fetch(
         `https://graph.instagram.com/${config.accountId}/insights?metric=reach,impressions,profile_views&period=day&since=${sinceDate}&access_token=${config.accessToken}`,
       );
 
-      const accountData: unknown = accountResponse.ok
+      const accountData: InstagramAccountInsightsResponse = accountResponse.ok
         ? await accountResponse.json()
         : { data: [] };
 
@@ -649,14 +660,14 @@ export class AnalyticsSync {
         throw new Error(`Facebook API error: ${postsResponse.statusText}`);
       }
 
-      const postsData: unknown = await postsResponse.json();
+      const postsData: FacebookPostsResponse = await postsResponse.json();
 
       // Fetch page insights
       const pageInsightsResponse = await fetch(
         `https://graph.facebook.com/v18.0/${config.accountId}/insights?metric=page_views,page_engaged_users,page_fans&period=day&since=${sinceDate}&access_token=${config.accessToken}`,
       );
 
-      const pageInsightsData: unknown = pageInsightsResponse.ok
+      const pageInsightsData: FacebookPostsResponse = pageInsightsResponse.ok
         ? await pageInsightsResponse.json()
         : { data: [] };
 
@@ -692,7 +703,7 @@ export class AnalyticsSync {
         throw new Error(`LinkedIn API error: ${postsResponse.statusText}`);
       }
 
-      const postsData: unknown = await postsResponse.json();
+      const postsData: LinkedInPostsResponse = await postsResponse.json();
 
       // Fetch organization insights
       const insightsResponse = await fetch(
@@ -705,7 +716,7 @@ export class AnalyticsSync {
         },
       );
 
-      const insightsData = insightsResponse.ok
+      const insightsData: LinkedInPostsResponse = insightsResponse.ok
         ? await insightsResponse.json()
         : { elements: [] };
 
@@ -740,7 +751,7 @@ export class AnalyticsSync {
         throw new Error(`Twitter API error: ${tweetsResponse.statusText}`);
       }
 
-      const tweetsData: unknown = await tweetsResponse.json();
+      const tweetsData: TwitterTweetsResponse = await tweetsResponse.json();
       return tweetsData.data || [];
     } catch (error) {
       console.error("Twitter fetch error:", error);
@@ -780,8 +791,8 @@ export class AnalyticsSync {
         throw new Error(`TikTok API error: ${videosResponse.statusText}`);
       }
 
-      const videosData: unknown = await videosResponse.json();
-      return videosData.data || [];
+      const videosData: TikTokVideosResponse = await videosResponse.json();
+      return videosData.data?.videos || [];
     } catch (error) {
       console.error("TikTok fetch error:", error);
       return [];
@@ -834,7 +845,7 @@ export class AnalyticsSync {
         );
       }
 
-      const insightsData: unknown = await insightsResponse.json();
+      const insightsData: GoogleBusinessInsightsResponse = await insightsResponse.json();
       return insightsData.locationInsights || [];
     } catch (error) {
       console.error("Google Business fetch error:", error);
@@ -856,7 +867,7 @@ export class AnalyticsSync {
         throw new Error(`Pinterest API error: ${pinsResponse.statusText}`);
       }
 
-      const pinsData: unknown = await pinsResponse.json();
+      const pinsData: PinterestPinsResponse = await pinsResponse.json();
       return pinsData.data || [];
     } catch (error) {
       console.error("Pinterest fetch error:", error);
@@ -878,18 +889,18 @@ export class AnalyticsSync {
         throw new Error(`YouTube API error: ${videosResponse.statusText}`);
       }
 
-      const videosData: unknown = await videosResponse.json();
+      const videosData: YouTubePlaylistItemsResponse = await videosResponse.json();
 
       // Fetch analytics report
       const analyticsResponse = await fetch(
         `https://youtubeanalytics.googleapis.com/v2/reports?ids=channel=${config.accountId}&start-date=2024-01-01&end-date=2024-12-31&metrics=views,estimatedMinutesWatched,likes,comments,shares&access_token=${config.accessToken}`,
       );
 
-      const analyticsData: unknown = analyticsResponse.ok
+      const analyticsData: YouTubePlaylistItemsResponse = analyticsResponse.ok
         ? await analyticsResponse.json()
-        : { rows: [] };
+        : { items: [] };
 
-      return [...(videosData.items || []), ...(analyticsData.rows || [])];
+      return [...(videosData.items || []), ...(analyticsData.items || [])];
     } catch (error) {
       console.error("YouTube fetch error:", error);
       return [];
