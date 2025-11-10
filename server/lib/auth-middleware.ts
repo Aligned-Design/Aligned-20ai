@@ -129,8 +129,8 @@ export function requireBrandAccessMiddleware(
   _res: Response,
   next: NextFunction
 ): void {
-  const targetBrandId = (req.params.brandId as string) ||
-    (req.query.brandId as string) || req.auth?.brandId;
+  const targetBrandId = ((req as any).params.brandId as string) ||
+    ((req as any).query.brandId as string) || req.auth?.brandId;
 
   if (!targetBrandId) {
     throw new AppError(

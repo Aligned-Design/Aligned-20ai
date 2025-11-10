@@ -46,7 +46,7 @@ export const getPreferences: RequestHandler = async (req, res, next) => {
       preferences: (preferences || {}) as unknown as UserPreferences,
     };
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     next(error);
   }
@@ -97,7 +97,7 @@ export const updatePreferences: RequestHandler = async (req, res, next) => {
       preferences: (updatedPreferences || {}) as unknown as UserPreferences,
     };
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     next(error);
   }
@@ -138,7 +138,7 @@ export const exportPreferences: RequestHandler = async (req, res, next) => {
       "Content-Disposition",
       `attachment; filename=preferences-${brandId}-${new Date().toISOString().split('T')[0]}.json`,
     );
-    res.json(exportData);
+    (res as any).json(exportData);
   } catch (error) {
     next(error);
   }

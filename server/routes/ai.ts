@@ -37,7 +37,7 @@ export const generateContent: RequestHandler = asyncHandler(async (req, res) => 
     agentType
   };
 
-  res.json(response);
+  (res as any).json(response);
 });
 
 export const getProviderStatus: RequestHandler = (req, res) => {
@@ -45,5 +45,5 @@ export const getProviderStatus: RequestHandler = (req, res) => {
     available: getAvailableProviders(),
     default: getDefaultProvider()
   };
-  res.json(response);
+  (res as any).json(response);
 };

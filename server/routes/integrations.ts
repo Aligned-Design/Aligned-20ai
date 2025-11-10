@@ -52,7 +52,7 @@ router.get(
       // Fetch connections from database
       const connections = await integrationsDB.getBrandConnections(brandId);
       const integrations = connections.map(mapConnectionRecord);
-      res.json(integrations);
+      (res as any).json(integrations);
     } catch (error) {
       next(error);
     }
@@ -143,7 +143,7 @@ router.get("/templates", async (req, res, next) => {
       }
     ];
 
-    res.json(templates);
+    (res as any).json(templates);
   } catch (error) {
     next(error);
   }
@@ -172,7 +172,7 @@ router.post(
       // Generate OAuth URL based on integration type
       const authUrl = generateOAuthUrl(type, brandId);
 
-      res.json({ authUrl });
+      (res as any).json({ authUrl });
     } catch (error) {
       next(error);
     }
@@ -211,7 +211,7 @@ router.post("/oauth/callback", async (req, res, next) => {
     const integration = mapConnectionRecord(connectionRecord);
     await initiateSync(integration);
 
-    res.json({ success: true, integration });
+    (res as any).json({ success: true, integration });
   } catch (error) {
     next(error);
   }
@@ -235,7 +235,7 @@ router.post("/:integrationId/sync", async (req, res, next) => {
     // TODO: Fetch integration from database and trigger sync
     const syncEvent = await triggerSync({ id: integrationId } as unknown, type);
 
-    res.json({ success: true, syncEvent });
+    (res as any).json({ success: true, syncEvent });
   } catch (error) {
     next(error);
   }
@@ -262,7 +262,7 @@ router.put("/:integrationId", async (req, res, next) => {
       updates
     );
 
-    res.json({ success: true, integration: mapConnectionRecord(connectionRecord) });
+    (res as any).json({ success: true, integration: mapConnectionRecord(connectionRecord) });
   } catch (error) {
     next(error);
   }
@@ -285,7 +285,7 @@ router.delete("/:integrationId", async (req, res, next) => {
     // Disconnect and revoke tokens
     await integrationsDB.disconnectPlatform(integrationId);
 
-    res.json({ success: true });
+    (res as any).json({ success: true });
   } catch (error) {
     next(error);
   }
@@ -300,7 +300,7 @@ router.get("/:integrationId/sync-events", async (req, res, next) => {
     // TODO: Fetch from database
     const syncEvents: SyncEvent[] = [];
 
-    res.json({
+    (res as any).json({
       events: syncEvents,
       total: syncEvents.length,
       hasMore: false
@@ -344,7 +344,7 @@ router.post("/webhooks/:type", async (req, res, next) => {
     // Queue for processing
     await processWebhookEvent(event);
 
-    res.json({ success: true });
+    (res as any).json({ success: true });
   } catch (error) {
     next(error);
   }

@@ -48,7 +48,7 @@ router.post("/generate/doc", async (req, res) => {
       input,
       safety_mode = "safe",
       __idempotency_key,
-    } = req.body as unknown;
+    } = req.body as any;
     const docInput = input as DocInput;
 
     if (!brand_id || !input) {
@@ -268,7 +268,7 @@ router.post("/generate/doc", async (req, res) => {
       log_id: logData?.id || "",
     };
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     console.error("Doc generation error:", error);
     throw new AppError(
@@ -352,7 +352,7 @@ router.post("/generate/design", async (req, res) => {
       log_id: logData?.id || "",
     };
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     console.error("Design generation error:", error);
     throw new AppError(
@@ -392,7 +392,7 @@ router.post("/generate/advisor", async (req, res) => {
       .single();
 
     if (!cacheError && cachedOutput) {
-      return res.json({
+      return (res as any).json({
         success: true,
         output: cachedOutput.output,
         needs_review: false,
@@ -451,7 +451,7 @@ router.post("/generate/advisor", async (req, res) => {
       log_id: logData?.id || cacheData?.id || "",
     };
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     console.error("Advisor generation error:", error);
     throw new AppError(
@@ -496,7 +496,7 @@ router.post("/bfs/calculate", async (req, res) => {
       commonPhrases: brandKit?.commonPhrases,
     });
 
-    res.json(bfs);
+    (res as any).json(bfs);
   } catch (error) {
     console.error("BFS calculation error:", error);
     throw new AppError(
@@ -531,7 +531,7 @@ router.get("/review/queue/:brandId", async (req, res) => {
       throw error;
     }
 
-    res.json({ queue: reviewQueue || [] });
+    (res as any).json({ queue: reviewQueue || [] });
   } catch (error) {
     console.error("Review queue error:", error);
     throw new AppError(
@@ -567,7 +567,7 @@ router.post("/review/approve/:logId", async (req, res) => {
       throw error;
     }
 
-    res.json({ success: true });
+    (res as any).json({ success: true });
   } catch (error) {
     console.error("Approval error:", error);
     throw new AppError(
@@ -603,7 +603,7 @@ router.post("/review/reject/:logId", async (req, res) => {
       throw error;
     }
 
-    res.json({ success: true });
+    (res as any).json({ success: true });
   } catch (error) {
     console.error("Rejection error:", error);
     throw new AppError(
@@ -622,7 +622,7 @@ router.post("/review/reject/:logId", async (req, res) => {
  * Get available agents
  */
 router.get("/", (req, res) => {
-  res.json({ agents: [] });
+  (res as any).json({ agents: [] });
 });
 
 // Helper functions for content generation
@@ -634,9 +634,9 @@ async function generateDocContent(
   const template = await loadPromptTemplate("doc", "v1.0", "en");
 
   const prompt = template
-    .replace(/\{\{brand_name\}\}/g, brandKit.brandName || "Your Brand")
-    .replace(/\{\{tone_keywords\}\}/g, (brandKit.toneKeywords || []).join(", "))
-    .replace(/\{\{writing_style\}\}/g, brandKit.writingStyle || "professional")
+    .replace(/\{\{brand_name\}\}/g, (brandKit as any).brandName || "Your Brand")
+    .replace(/\{\{tone_keywords\}\}/g, ((brandKit as any).toneKeywords || []).join(", "))
+    .replace(/\{\{writing_style\}\}/g, (brandKit as any).writingStyle || "professional")
     .replace(/\{\{topic\}\}/g, input.topic)
     .replace(/\{\{platform\}\}/g, input.platform)
     .replace(/\{\{format\}\}/g, input.format)
@@ -709,8 +709,8 @@ async function generateDesignContent(
   const prompt = template
     .replace(
       /\{\{brand_colors\}\}/g,
-      brandKit.primaryColor
-        ? [brandKit.primaryColor, brandKit.secondaryColor, brandKit.accentColor]
+      (brandKit as any).primaryColor
+        ? [(brandKit as any).primaryColor, (brandKit as any).secondaryColor, (brandKit as any).accentColor]
             .filter(Boolean)
             .join(", ")
         : "#8B5CF6",
@@ -730,8 +730,8 @@ async function generateDesignContent(
       template_ref: `${input.theme}-template`,
       alt_text: `${input.theme} content template`,
       visual_elements: ["Text overlay", "Brand colors", "Logo placement"],
-      color_palette_used: [brandKit.primaryColor || "#8B5CF6"],
-      font_suggestions: [brandKit.fontFamily || "Inter"],
+      color_palette_used: [(brandKit as any).primaryColor || "#8B5CF6"],
+      font_suggestions: [(brandKit as any).fontFamily || "Inter"],
     };
   }
 

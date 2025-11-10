@@ -102,7 +102,7 @@ router.post("/crawl/start", async (req, res) => {
       }
     });
 
-    res.json({ job_id, status: "pending" });
+    (res as any).json({ job_id, status: "pending" });
   } catch (error) {
     console.error("[Crawler] Start crawl error:", error);
     throw new AppError(
@@ -259,7 +259,7 @@ router.get("/crawl/result/:jobId", async (req, res) => {
       );
     }
 
-    res.json(job);
+    (res as any).json(job);
   } catch (error) {
     console.error("[Crawler] Get crawl result error:", error);
     throw new AppError(
@@ -358,7 +358,7 @@ router.post("/brand-kit/apply", async (req, res) => {
     // Save history
     await saveHistory(brand_id, history);
 
-    res.json({ success: true, applied: changes.length });
+    (res as any).json({ success: true, applied: changes.length });
   } catch (error) {
     console.error("[Crawler] Apply brand kit error:", error);
     throw new AppError(
@@ -403,7 +403,7 @@ router.get("/brand-kit/history/:brandId", async (req, res) => {
       ? (data as unknown[]).filter((entry: unknown) => entry.field === field)
       : data;
 
-    res.json({ history });
+    (res as any).json({ history });
   } catch (error) {
     console.error("[Crawler] Get history error:", error);
     throw new AppError(
@@ -489,7 +489,7 @@ router.post("/brand-kit/revert", async (req, res) => {
       );
     }
 
-    res.json({ success: true, field, value: historyEntry.old_value });
+    (res as any).json({ success: true, field, value: historyEntry.old_value });
   } catch (error) {
     console.error("[Crawler] Revert field error:", error);
     throw new AppError(

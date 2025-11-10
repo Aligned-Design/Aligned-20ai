@@ -144,7 +144,7 @@ export const handleZapierWebhook: RequestHandler = async (req, res) => {
       idempotencyKey,
     });
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     console.error("[Zapier Webhook] Error:", error);
     throw new AppError(
@@ -205,7 +205,7 @@ export const handleMakeWebhook: RequestHandler = async (req, res) => {
       idempotencyKey,
     });
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     console.error("[Make Webhook] Error:", error);
     throw new AppError(
@@ -239,7 +239,7 @@ export const handleSlackWebhook: RequestHandler = async (req, res) => {
 
     // Handle Slack URL verification challenge
     if (body.type === "url_verification") {
-      return res.json({ challenge: body.challenge });
+      return (res as any).json({ challenge: body.challenge });
     }
 
     // Handle Slack event
@@ -255,9 +255,9 @@ export const handleSlackWebhook: RequestHandler = async (req, res) => {
         idempotencyKey,
       });
 
-      res.json(response);
+      (res as any).json(response);
     } else {
-      res.json({ ok: true });
+      (res as any).json({ ok: true });
     }
   } catch (error) {
     console.error("[Slack Webhook] Error:", error);
@@ -316,7 +316,7 @@ export const handleHubSpotWebhook: RequestHandler = async (req, res) => {
       responses.push(response);
     }
 
-    res.json({
+    (res as any).json({
       success: true,
       processed: responses.length,
       results: responses,
@@ -394,7 +394,7 @@ export const getWebhookStatus: RequestHandler = async (req, res) => {
       );
     }
 
-    res.json({
+    (res as any).json({
       success: true,
       event: {
         id: typedStatus.id,
@@ -475,7 +475,7 @@ export const getWebhookLogs: RequestHandler = async (req, res) => {
       offset: query.offset,
     });
 
-    res.json({
+    (res as any).json({
       success: true,
       events: (events as Array<{
         id?: string;
@@ -579,7 +579,7 @@ export const retryWebhookEvent: RequestHandler = async (req, res) => {
       },
     );
 
-    res.json({
+    (res as any).json({
       success: true,
       message: "Webhook retry triggered",
       eventId,

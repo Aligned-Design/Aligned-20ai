@@ -130,7 +130,7 @@ export const bulkApproveOrReject: RequestHandler = async (req, res) => {
       result.success = false;
     }
 
-    res.json({
+    (res as any).json({
       ...result,
       message: result.success
         ? `Successfully ${action}d ${result.approved + result.rejected} of ${postIds.length} posts`
@@ -184,7 +184,7 @@ export const getApprovalStatus: RequestHandler = async (req, res) => {
     }
 
     // Convert to camelCase response format
-    res.json({
+    (res as any).json({
       success: true,
       approval: {
         id: approval.id,
@@ -274,7 +274,7 @@ export const getBatchApprovalStatus: RequestHandler = async (req, res) => {
       })
     );
 
-    res.json({
+    (res as any).json({
       success: true,
       approvals,
     });
@@ -333,7 +333,7 @@ export const lockPostsAfterApproval: RequestHandler = async (req, res) => {
       // Continue even if locking fails - this is non-critical
     }
 
-    res.json({
+    (res as any).json({
       success: true,
       message: `Successfully locked ${postIds.length} posts`,
       lockedCount: postIds.length,

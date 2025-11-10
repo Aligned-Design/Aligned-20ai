@@ -11,12 +11,12 @@ const router = Router();
  */
 router.get('/ai/snapshot', (req: Request, res: Response) => {
   try {
-    const agentType = req.query.agentType as 'doc' | 'design' | 'advisor' | undefined;
-    const hoursBack = req.query.hoursBack ? parseInt(req.query.hoursBack as string) : 24;
+    const agentType = (req as any).query.agentType as 'doc' | 'design' | 'advisor' | undefined;
+    const hoursBack = (req as any).query.hoursBack ? parseInt((req as any).query.hoursBack as string) : 24;
 
     const snapshot = aiMetricsService.getSnapshot(agentType, hoursBack);
 
-    res.json({
+    (res as any).json({
       success: true,
       data: snapshot
     });
@@ -39,11 +39,11 @@ router.get('/ai/snapshot', (req: Request, res: Response) => {
  */
 router.get('/ai/alerts', (req: Request, res: Response) => {
   try {
-    const hoursBack = req.query.hoursBack ? parseInt(req.query.hoursBack as string) : 1;
+    const hoursBack = (req as any).query.hoursBack ? parseInt((req as any).query.hoursBack as string) : 1;
 
     const alerts = aiMetricsService.getAlerts(hoursBack);
 
-    res.json({
+    (res as any).json({
       success: true,
       data: {
         alertCount: alerts.length,
@@ -70,12 +70,12 @@ router.get('/ai/alerts', (req: Request, res: Response) => {
  */
 router.get('/ai/detailed', (req: Request, res: Response) => {
   try {
-    const agentType = req.query.agentType as 'doc' | 'design' | 'advisor' | undefined;
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+    const agentType = (req as any).query.agentType as 'doc' | 'design' | 'advisor' | undefined;
+    const limit = (req as any).query.limit ? parseInt((req as any).query.limit as string) : 100;
 
     const metrics = aiMetricsService.getDetailedMetrics(agentType, limit);
 
-    res.json({
+    (res as any).json({
       success: true,
       data: {
         count: metrics.length,
@@ -105,7 +105,7 @@ router.get('/ai/summary', (req: Request, res: Response) => {
     const last1h = aiMetricsService.getSnapshot(undefined, 1);
     const last24h = aiMetricsService.getSnapshot(undefined, 24);
 
-    res.json({
+    (res as any).json({
       success: true,
       data: {
         current: last1h,

@@ -98,7 +98,7 @@ export const getClientSettings: RequestHandler = async (req, res) => {
 
     const apiSettings = dbRecordToClientSettings(settings);
 
-    res.json({
+    (res as any).json({
       success: true,
       settings: apiSettings,
     });
@@ -209,7 +209,7 @@ export const updateClientSettings: RequestHandler = async (req, res) => {
       },
     );
 
-    res.json({
+    (res as any).json({
       success: true,
       settings: apiSettings,
       message: "Settings updated successfully",
@@ -284,7 +284,7 @@ export const updateEmailPreferences: RequestHandler = async (req, res) => {
       },
     );
 
-    res.json({
+    (res as any).json({
       success: true,
       settings: apiSettings,
     });
@@ -341,7 +341,7 @@ export const generateUnsubscribeLink: RequestHandler = async (req, res) => {
     // In production, this would be a full URL with client domain
     const unsubscribeUrl = `${process.env.CLIENT_URL || "http://localhost:5173"}/unsubscribe?token=${unsubscribeToken}`;
 
-    res.json({
+    (res as any).json({
       success: true,
       unsubscribeUrl,
       token: unsubscribeToken,
@@ -426,7 +426,7 @@ export const unsubscribeFromEmails: RequestHandler = async (req, res) => {
     );
     const apiSettings = dbRecordToClientSettings(updatedSettings);
 
-    res.json({
+    (res as any).json({
       success: true,
       message: fromType
         ? `Unsubscribed from ${fromType}`
@@ -489,7 +489,7 @@ export const resubscribeToEmails: RequestHandler = async (req, res) => {
     });
     const apiSettings = dbRecordToClientSettings(updatedSettings);
 
-    res.json({
+    (res as any).json({
       success: true,
       message: notificationType
         ? `Resubscribed to ${notificationType}`
@@ -530,7 +530,7 @@ export const verifyUnsubscribeToken: RequestHandler = async (req, res) => {
     const settings = await dbClientSettings.findByUnsubscribeToken(token);
 
     if (settings) {
-      return res.json({
+      return (res as any).json({
         valid: true,
         clientId: settings.client_id,
         unsubscribedTypes: settings.unsubscribed_types,
@@ -538,7 +538,7 @@ export const verifyUnsubscribeToken: RequestHandler = async (req, res) => {
       });
     }
 
-    res.json({
+    (res as any).json({
       valid: false,
     });
   } catch (error) {

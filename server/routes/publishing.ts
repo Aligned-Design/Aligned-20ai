@@ -39,7 +39,7 @@ export const initiateOAuth: RequestHandler = async (req, res) => {
 
     const oauthFlow = generateOAuthUrl(platform, brandId);
 
-    res.json(oauthFlow);
+    (res as any).json(oauthFlow);
   } catch (error) {
     if (error instanceof AppError) {
       throw error;
@@ -161,7 +161,7 @@ export const getConnections: RequestHandler = async (req, res) => {
       needsReauth: conn.status === "expired" || conn.status === "revoked",
     }));
 
-    res.json(connectionStatuses);
+    (res as any).json(connectionStatuses);
   } catch (error) {
     if (error instanceof AppError) {
       throw error;
@@ -185,7 +185,7 @@ export const disconnectPlatform: RequestHandler = async (req, res) => {
     // Disconnect in database
     await connectionsDB.disconnectPlatform(brandId, platform as Platform);
 
-    res.json({ success: true });
+    (res as any).json({ success: true });
   } catch (error) {
     if (error instanceof AppError) {
       throw error;
@@ -290,7 +290,7 @@ export const publishContent: RequestHandler = async (req, res) => {
       errors: errors.length > 0 ? errors : undefined,
     };
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     if (error instanceof AppError) {
       throw error;
@@ -358,7 +358,7 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
       updatedAt: (job as any).updated_at,
     }));
 
-    res.json({
+    (res as any).json({
       jobs: publishingJobs,
       total,
       limit,
@@ -387,7 +387,7 @@ export const retryJob: RequestHandler = async (req, res) => {
     const success = await publishingQueue.retryJob(jobId);
 
     if (success) {
-      res.json({ success: true });
+      (res as any).json({ success: true });
     } else {
       throw new AppError(
         ErrorCode.INTERNAL_ERROR,
@@ -419,7 +419,7 @@ export const cancelJob: RequestHandler = async (req, res) => {
     const success = await publishingQueue.cancelJob(jobId);
 
     if (success) {
-      res.json({ success: true });
+      (res as any).json({ success: true });
     } else {
       throw new AppError(
         ErrorCode.INTERNAL_ERROR,
@@ -469,7 +469,7 @@ export const verifyConnection: RequestHandler = async (req, res) => {
       const now = new Date();
 
       if (expiresAt <= now) {
-        return res.status(200).json({
+        return (res as any).status(200).json({
           verified: false,
           error: "Token expired",
           tokenExpiresAt: connection.token_expires_at,
@@ -480,7 +480,7 @@ export const verifyConnection: RequestHandler = async (req, res) => {
 
     // Check connection status
     if (connection.status !== "connected") {
-      return res.status(200).json({
+      return (res as any).status(200).json({
         verified: false,
         error: `Connection status: ${connection.status}`,
         connectionStatus: connection.status,
@@ -497,7 +497,7 @@ export const verifyConnection: RequestHandler = async (req, res) => {
 
       // For now, just verify the connection object is valid
       // In production, you might make a simple test API call
-      return res.json({
+      return (res as any).json({
         verified: true,
         platform,
         accountName: connection.account_name,
@@ -507,7 +507,7 @@ export const verifyConnection: RequestHandler = async (req, res) => {
         status: connection.status,
       });
     } catch (error) {
-      return res.status(200).json({
+      return (res as any).status(200).json({
         verified: false,
         error: "Failed to verify connection",
         details: error instanceof Error ? error.message : "Unknown error",
@@ -575,7 +575,7 @@ export const refreshToken: RequestHandler = async (req, res) => {
         : undefined,
     );
 
-    res.json({ success: true });
+    (res as any).json({ success: true });
   } catch (error) {
     if (error instanceof AppError) {
       throw error;
@@ -663,7 +663,7 @@ export const publishBlogPost: RequestHandler = async (req, res) => {
       },
     );
 
-    res.json({
+    (res as any).json({
       success: true,
       message: `Blog post published to ${platform}${scheduledFor ? " (scheduled)" : ""}`,
       result,
@@ -755,7 +755,7 @@ export const publishEmailCampaign: RequestHandler = async (req, res) => {
       },
     );
 
-    res.json({
+    (res as any).json({
       success: true,
       message: `Email campaign published to ${platform}${scheduledFor ? " (scheduled)" : ""}`,
       result,

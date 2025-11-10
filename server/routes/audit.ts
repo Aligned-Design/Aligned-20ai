@@ -84,7 +84,7 @@ export const getAuditLogs: RequestHandler = async (req, res) => {
 
     const { logs, total, hasMore } = await queryAuditLogs(query);
 
-    res.json({
+    (res as any).json({
       success: true,
       logs,
       pagination: {
@@ -136,7 +136,7 @@ export const getPostAuditLog: RequestHandler = async (req, res) => {
 
     const logs = await getPostAuditTrail(brandId, postId);
 
-    res.json({
+    (res as any).json({
       success: true,
       postId,
       logs,
@@ -175,7 +175,7 @@ export const getAuditStats: RequestHandler = async (req, res) => {
 
     const stats = await getAuditStatistics(brandId, startDate, endDate);
 
-    res.json({
+    (res as any).json({
       success: true,
       stats,
       period: {
@@ -252,7 +252,7 @@ export const exportAuditLogsHandler: RequestHandler = async (req, res) => {
         'Content-Disposition',
         `attachment; filename="audit-logs-${brandId}-${Date.now()}.json"`
       );
-      res.json({
+      (res as any).json({
         exported: new Date().toISOString(),
         brandId,
         period: { startDate, endDate },
@@ -309,7 +309,7 @@ export const searchAuditLogs: RequestHandler = async (req, res) => {
       filtered = logs.filter((log) => log.actorEmail.toLowerCase().includes(actorEmail.toLowerCase()));
     }
 
-    res.json({
+    (res as any).json({
       success: true,
       logs: filtered,
       pagination: {
@@ -358,7 +358,7 @@ export const getAuditActions: RequestHandler = async (req, res) => {
       'EMAIL_PREFERENCES_UPDATED',
     ];
 
-    res.json({
+    (res as any).json({
       success: true,
       actions,
     });

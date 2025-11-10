@@ -6,7 +6,7 @@ import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 export const getAnalytics: RequestHandler = async (req, res) => {
   try {
     const { brandId } = req.params;
-    const days = parseInt(req.query.days as string) || 30;
+    const days = parseInt((req as any).query.days as string) || 30;
 
     // Get summary metrics from database
     const summary = await analyticsDB.getMetricsSummary(brandId, days);
@@ -73,7 +73,7 @@ export const getAnalytics: RequestHandler = async (req, res) => {
       },
     };
 
-    res.json(analytics);
+    (res as any).json(analytics);
   } catch (error) {
     console.error("Failed to fetch analytics:", error);
     throw new AppError(
@@ -148,7 +148,7 @@ export const getInsights: RequestHandler = async (req, res) => {
       userFeedback: [],
     });
 
-    res.json({ insights, totalCount: insights.length });
+    (res as any).json({ insights, totalCount: insights.length });
   } catch (error) {
     console.error("Failed to fetch insights:", error);
     throw new AppError(
@@ -165,7 +165,7 @@ export const getInsights: RequestHandler = async (req, res) => {
 export const getForecast: RequestHandler = async (req, res) => {
   try {
     const { brandId } = req.params;
-    const period = (req.query.period as string) || "next_month";
+    const period = ((req as any).query.period as string) || "next_month";
     const { advisorEngine } = await import("../lib/advisor-engine");
 
     // Get current metrics
@@ -197,7 +197,7 @@ export const getForecast: RequestHandler = async (req, res) => {
       period,
     );
 
-    res.json(forecast);
+    (res as any).json(forecast);
   } catch (error) {
     console.error("Failed to generate forecast:", error);
     throw new AppError(
@@ -222,7 +222,7 @@ export const processVoiceQuery: RequestHandler = async (req, res) => {
         "Check platform performance",
       ],
     };
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     console.error("Failed to process voice query:", error);
     throw new AppError(
@@ -271,7 +271,7 @@ export const provideFeedback: RequestHandler = async (req, res) => {
       newWeight,
     );
 
-    res.json({
+    (res as any).json({
       message: "Feedback recorded and weights updated",
       previousWeight,
       newWeight,
@@ -316,7 +316,7 @@ export const getGoals: RequestHandler = async (req, res) => {
       }),
     );
 
-    res.json({ goals: goalsWithProgress });
+    (res as any).json({ goals: goalsWithProgress });
   } catch (error) {
     console.error("Failed to fetch goals:", error);
     throw new AppError(
@@ -352,7 +352,7 @@ export const createGoal: RequestHandler = async (req, res) => {
       notes,
     );
 
-    res.status(201).json(newGoal);
+    (res as any).status(201).json(newGoal);
   } catch (error) {
     console.error("Failed to create goal:", error);
     throw new AppError(
@@ -384,7 +384,7 @@ export const syncPlatformData: RequestHandler = async (req, res) => {
     ]);
 
     const endTime = new Date();
-    res.json({
+    (res as any).json({
       message: `Synced data from ${platform}`,
       status: "success",
       duration: endTime.getTime() - startTime.getTime(),
@@ -421,7 +421,7 @@ export const addOfflineMetric: RequestHandler = async (req, res) => {
       undefined,
     );
 
-    res.json({ message: "Offline metric added", metric, value, date });
+    (res as any).json({ message: "Offline metric added", metric, value, date });
   } catch (error) {
     console.error("Failed to add offline metric:", error);
     throw new AppError(
@@ -466,7 +466,7 @@ export const getEngagementHeatmap: RequestHandler = async (req, res) => {
       }
     });
 
-    res.json({
+    (res as any).json({
       data: heatmapData,
       peak: { hour: peakHour, engagement: maxEngagement },
     });
@@ -553,7 +553,7 @@ export const getAlerts: RequestHandler = async (req, res) => {
         severity: i.impact === "high" ? "high" : "medium",
       }));
 
-    res.json({ alerts });
+    (res as any).json({ alerts });
   } catch (error) {
     console.error("Failed to fetch alerts:", error);
     throw new AppError(
@@ -570,7 +570,7 @@ export const getAlerts: RequestHandler = async (req, res) => {
 export const acknowledgeAlert: RequestHandler = async (req, res) => {
   try {
     const { alertId } = req.params;
-    res.json({
+    (res as any).json({
       alertId,
       acknowledged: true,
       acknowledgedAt: new Date().toISOString(),

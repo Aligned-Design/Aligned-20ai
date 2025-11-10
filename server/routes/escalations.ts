@@ -77,7 +77,7 @@ router.get("/rules", async (req: AuthRequest, res: Response) => {
 
     const rules = await escalationRules.getByBrand(brandId, true);
 
-    res.json({
+    (res as any).json({
       success: true,
       data: rules,
       count: rules.length,
@@ -113,7 +113,7 @@ router.get("/rules/:ruleId", async (req: AuthRequest, res: Response) => {
       );
     }
 
-    res.json({
+    (res as any).json({
       success: true,
       data: rule,
     });
@@ -165,7 +165,7 @@ router.post("/rules", async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.status(201).json({
+    (res as any).status(201).json({
       success: true,
       data: rule,
     });
@@ -241,7 +241,7 @@ router.put("/rules/:ruleId", async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json({
+    (res as any).json({
       success: true,
       data: updatedRule,
     });
@@ -311,13 +311,13 @@ router.delete("/rules/:ruleId", async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json({
+    (res as any).json({
       success: true,
       message: "Escalation rule deleted",
     });
   } catch (error) {
     console.error("[Escalation Routes] DELETE /rules/:ruleId error:", error);
-    res.status(500).json({
+    (res as any).status(500).json({
       error: "Failed to delete escalation rule",
       message: error instanceof Error ? error.message : "Unknown error",
     });
@@ -343,7 +343,7 @@ router.get("/events", async (req: AuthRequest, res: Response) => {
       offset: parseInt(offset as string) || 0,
     });
 
-    res.json({
+    (res as any).json({
       success: true,
       data: events,
       pagination: {
@@ -358,7 +358,7 @@ router.get("/events", async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error("[Escalation Routes] GET /events error:", error);
-    res.status(500).json({
+    (res as any).status(500).json({
       error: "Failed to fetch escalation events",
       message: error instanceof Error ? error.message : "Unknown error",
     });
@@ -383,13 +383,13 @@ router.get("/events/:eventId", async (req: AuthRequest, res: Response) => {
     );
     }
 
-    res.json({
+    (res as any).json({
       success: true,
       data: event,
     });
   } catch (error) {
     console.error("[Escalation Routes] GET /events/:eventId error:", error);
-    res.status(500).json({
+    (res as any).status(500).json({
       error: "Failed to fetch escalation event",
       message: error instanceof Error ? error.message : "Unknown error",
     });
@@ -464,20 +464,20 @@ router.post("/events", async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.status(201).json({
+    (res as any).status(201).json({
       success: true,
       data: event,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({
+      return (res as any).status(400).json({
         error: "Invalid request",
         details: error.errors,
       });
     }
 
     console.error("[Escalation Routes] POST /events error:", error);
-    res.status(500).json({
+    (res as any).status(500).json({
       error: "Failed to create escalation event",
       message: error instanceof Error ? error.message : "Unknown error",
     });
@@ -529,7 +529,7 @@ router.put("/events/:eventId", async (req: AuthRequest, res: Response) => {
         },
       });
 
-      return res.json({
+      return (res as any).json({
         success: true,
         data: event,
       });
@@ -537,20 +537,20 @@ router.put("/events/:eventId", async (req: AuthRequest, res: Response) => {
 
     // For other updates, we'd update the event directly
     // This is a simplified version
-    res.json({
+    (res as any).json({
       success: true,
       data: existingEvent,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({
+      return (res as any).status(400).json({
         error: "Invalid request",
         details: error.errors,
       });
     }
 
     console.error("[Escalation Routes] PUT /events/:eventId error:", error);
-    res.status(500).json({
+    (res as any).status(500).json({
       error: "Failed to update escalation event",
       message: error instanceof Error ? error.message : "Unknown error",
     });

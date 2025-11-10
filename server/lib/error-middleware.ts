@@ -89,7 +89,7 @@ export function errorHandler(
       },
     };
 
-    res.status(err.statusCode).json(errorResponse);
+    (res as any).status(err.statusCode).json(errorResponse);
     return;
   }
 
@@ -113,7 +113,7 @@ export function errorHandler(
       },
     };
 
-    res.status(HTTP_STATUS.UNPROCESSABLE_ENTITY).json(response);
+    (res as any).status(HTTP_STATUS.UNPROCESSABLE_ENTITY).json(response);
     return;
   }
 
@@ -149,7 +149,7 @@ export function errorHandler(
     },
   };
 
-  res.status(statusCode).json(errorResponse);
+  (res as any).status(statusCode).json(errorResponse);
 }
 
 /**

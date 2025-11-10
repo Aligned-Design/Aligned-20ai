@@ -73,8 +73,8 @@ function extractBrandId(
 ): string | undefined {
   // Priority: explicit param > query > header > additional
   return (
-    (req.params.brandId as string | undefined) ||
-    (req.query.brandId as string | undefined) ||
+    ((req as any).params.brandId as string | undefined) ||
+    ((req as any).query.brandId as string | undefined) ||
     (req.get("X-Brand-ID") as string | undefined) ||
     additionalBrandId
   );

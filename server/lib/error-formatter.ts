@@ -41,7 +41,7 @@ class ErrorFormatter {
       ...(path && { path }),
     };
 
-    res.status(statusCode).json(response);
+    (res as any).status(statusCode).json(response);
   }
 
   /**

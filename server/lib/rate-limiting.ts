@@ -119,8 +119,8 @@ export function createRateLimiter(
 
     if (rateLimitStore.tryConsume(key, tokensPerRequest, config)) {
       // Add rate limit headers
-      res.set("X-RateLimit-Limit", config.tokensPerInterval.toString());
-      res.set(
+      (res as any).set("X-RateLimit-Limit", config.tokensPerInterval.toString());
+      (res as any).set(
         "X-RateLimit-Remaining",
         Math.floor(rateLimitStore.getBucket(key).tokens).toString()
       );
@@ -130,8 +130,8 @@ export function createRateLimiter(
       const retryAfter = Math.ceil(
         config.intervalMs / config.tokensPerInterval / 1000
       );
-      res.set("Retry-After", retryAfter.toString());
-      res.status(429).json({
+      (res as any).set("Retry-After", retryAfter.toString());
+      (res as any).status(429).json({
         error: {
           code: "RATE_LIMIT_EXCEEDED",
           message: "Rate limit exceeded. Please try again later",
@@ -164,7 +164,7 @@ export const oauthRateLimiters = {
    * Rate limiter for OAuth callback (5 attempts per minute per state)
    */
   callback: (req: Request, res: Response, next: NextFunction): void => {
-    const state = (req.query.state as string) || "unknown";
+    const state = ((req as any).query.state as string) || "unknown";
     const key = `oauth-callback:${state}`;
 
     const config: RateLimiterConfig = {
@@ -174,16 +174,16 @@ export const oauthRateLimiters = {
     };
 
     if (rateLimitStore.tryConsume(key, 1, config)) {
-      res.set("X-RateLimit-Limit", "5");
-      res.set(
+      (res as any).set("X-RateLimit-Limit", "5");
+      (res as any).set(
         "X-RateLimit-Remaining",
         Math.floor(rateLimitStore.getBucket(key).tokens).toString()
       );
       next();
     } else {
       const retryAfter = 12; // 60s / 5 requests
-      res.set("Retry-After", retryAfter.toString());
-      res.status(429).json({
+      (res as any).set("Retry-After", retryAfter.toString());
+      (res as any).status(429).json({
         error: {
           code: "RATE_LIMIT_EXCEEDED",
           message: "Too many callback attempts. Please try again later",

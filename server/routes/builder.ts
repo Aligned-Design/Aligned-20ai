@@ -24,7 +24,7 @@ export const generateContent: RequestHandler = asyncHandler(async (req, res) => 
 
   const result = await generateBuilderContent({ prompt, agentType: contentType, provider });
 
-  res.json({
+  (res as any).json({
     success: true,
     data: result
   });
@@ -51,5 +51,5 @@ export const builderWebhook: RequestHandler = asyncHandler(async (req, res) => {
       console.log('Unknown webhook type:', type);
   }
 
-  res.json({ success: true });
+  (res as any).json({ success: true });
 });

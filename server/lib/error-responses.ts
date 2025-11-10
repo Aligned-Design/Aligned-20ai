@@ -147,7 +147,7 @@ export function sendErrorResponse(
   suggestion?: string
 ): void {
   const errorResponse = createErrorResponse(code, message, severity, details, suggestion);
-  res.status(statusCode).json(errorResponse);
+  (res as any).status(statusCode).json(errorResponse);
 }
 
 /**
@@ -159,7 +159,7 @@ export function sendValidationErrorResponse(
   details?: Record<string, unknown>
 ): void {
   const errorResponse = createValidationErrorResponse(fieldErrors, details);
-  res.status(HTTP_STATUS.UNPROCESSABLE_ENTITY).json(errorResponse);
+  (res as any).status(HTTP_STATUS.UNPROCESSABLE_ENTITY).json(errorResponse);
 }
 
 /**

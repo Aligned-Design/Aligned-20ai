@@ -120,7 +120,7 @@ export const bulkApproveContent: RequestHandler = async (req, res, next) => {
       });
     }
 
-    res.json(results);
+    (res as any).json(results);
   } catch (error) {
     next(error);
   }
@@ -183,7 +183,7 @@ export const approveSingleContent: RequestHandler = async (req, res, next) => {
       req.headers['user-agent']
     );
 
-    res.json({
+    (res as any).json({
       success: true,
       postId,
       status: 'approved',
@@ -265,7 +265,7 @@ export const rejectContent: RequestHandler = async (req, res, next) => {
       req.headers['user-agent']
     );
 
-    res.json({
+    (res as any).json({
       success: true,
       postId,
       status: 'rejected',
@@ -308,7 +308,7 @@ export const getApprovalHistory: RequestHandler = async (req, res, next) => {
     // Get approval history from database
     const auditTrail = await approvalsDB.getApprovalHistory(postId, brandId);
 
-    res.json({
+    (res as any).json({
       postId,
       history: auditTrail,
       totalActions: auditTrail.length,
@@ -366,7 +366,7 @@ export const requestApproval: RequestHandler = async (req, res, next) => {
       req.headers['user-agent']
     );
 
-    res.json({
+    (res as any).json({
       success: true,
       postId,
       requestedBy: userEmail,
@@ -386,9 +386,9 @@ export const requestApproval: RequestHandler = async (req, res, next) => {
 export const getPendingApprovals: RequestHandler = async (req, res, next) => {
   try {
     const userId = ((req as any)).user?.id || ((req as any)).userId;
-    const brandId = ((req as any)).user?.brandId || req.query.brandId;
-    const limit = parseInt(req.query.limit as string) || 50;
-    const offset = parseInt(req.query.offset as string) || 0;
+    const brandId = ((req as any)).user?.brandId || (req as any).query.brandId;
+    const limit = parseInt((req as any).query.limit as string) || 50;
+    const offset = parseInt((req as any).query.offset as string) || 0;
 
     if (!userId) {
       throw new AppError(
@@ -418,7 +418,7 @@ export const getPendingApprovals: RequestHandler = async (req, res, next) => {
       createdAt: approval.created_at,
     }));
 
-    res.json({
+    (res as any).json({
       pending,
       total,
       hasMore: offset + pending.length < total,
@@ -494,7 +494,7 @@ export const sendApprovalReminder: RequestHandler = async (req, res, next) => {
       }
     );
 
-    res.json({
+    (res as any).json({
       success: true,
       messageId: sendResult.messageId,
       sentTo: clientEmail,

@@ -38,7 +38,7 @@ export const getWorkflowTemplates: RequestHandler = async (req, res, next) => {
 
     // Fetch templates from database
     const templates = await workflowDB.getWorkflowTemplates(targetBrandId);
-    res.json(templates);
+    (res as any).json(templates);
   } catch (error) {
     next(error);
   }
@@ -82,7 +82,7 @@ export const createWorkflowTemplate: RequestHandler = async (req, res, next) => 
     // Create template in database
     const createdTemplate = await workflowDB.createWorkflowTemplate(userBrandId, dbTemplate as any);
 
-    res.json({ success: true, template: createdTemplate });
+    (res as any).json({ success: true, template: createdTemplate });
   } catch (error) {
     next(error);
   }
@@ -119,7 +119,7 @@ export const startWorkflow: RequestHandler = async (req, res, next) => {
       deadline
     );
 
-    res.json({ success: true, workflow: workflowInstance });
+    (res as any).json({ success: true, workflow: workflowInstance });
   } catch (error) {
     next(error);
   }
@@ -163,7 +163,7 @@ export const processWorkflowAction: RequestHandler = async (req, res, next) => {
       action.metadata || {}
     );
 
-    res.json({ success: true, workflow: updatedWorkflow });
+    (res as any).json({ success: true, workflow: updatedWorkflow });
   } catch (error) {
     next(error);
   }
@@ -177,7 +177,7 @@ export const getWorkflowNotifications: RequestHandler = async (req, res, next) =
   try {
     const authReq = req as AuthenticatedRequest;
     const userId = authReq.user?.id || authReq.userId;
-    const unreadOnly = req.query.unreadOnly === 'true';
+    const unreadOnly = (req as any).query.unreadOnly === 'true';
 
     if (!userId) {
       throw new AppError(
@@ -203,7 +203,7 @@ export const getWorkflowNotifications: RequestHandler = async (req, res, next) =
       createdAt: notif.created_at,
     }));
 
-    res.json({
+    (res as any).json({
       notifications: mappedNotifications,
       total: mappedNotifications.length,
       unread: mappedNotifications.filter((n) => !n.readAt).length,
@@ -233,7 +233,7 @@ export const markNotificationRead: RequestHandler = async (req, res, next) => {
     // Mark as read via database
     await workflowDB.markNotificationRead(notificationId);
 
-    res.json({ success: true });
+    (res as any).json({ success: true });
   } catch (error) {
     next(error);
   }
@@ -260,7 +260,7 @@ export const cancelWorkflow: RequestHandler = async (req, res, next) => {
     // Cancel via database
     await workflowDB.cancelWorkflow(workflowId, reason);
 
-    res.json({ success: true });
+    (res as any).json({ success: true });
   } catch (error) {
     next(error);
   }
@@ -295,7 +295,7 @@ export const getWorkflow: RequestHandler = async (req, res, next) => {
       );
     }
 
-    res.json(workflow);
+    (res as any).json(workflow);
   } catch (error) {
     next(error);
   }
@@ -321,7 +321,7 @@ export const getWorkflowsForContent: RequestHandler = async (req, res, next) => 
     // Fetch workflows from database
     const workflows = await workflowDB.getWorkflowInstancesForContent(contentId);
 
-    res.json({
+    (res as any).json({
       contentId,
       workflows,
       total: workflows.length,

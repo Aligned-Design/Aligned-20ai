@@ -57,7 +57,7 @@ export const getWhiteLabelConfig: RequestHandler = async (req, res, next) => {
   try {
     // Get agencyId from path parameter or authentication context
     const authReq = req as AuthenticatedRequest;
-    const agencyId = (req.params.agencyId || authReq.agencyId || authReq.user?.agencyId);
+    const agencyId = ((req as any).params.agencyId || authReq.agencyId || authReq.user?.agencyId);
 
     if (!agencyId) {
       throw new AppError(
@@ -76,7 +76,7 @@ export const getWhiteLabelConfig: RequestHandler = async (req, res, next) => {
       config: configRecord ? mapWhiteLabelRecord(configRecord) : getDefaultConfig(agencyId)
     };
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     next(error);
   }
@@ -103,7 +103,7 @@ export const getConfigByDomain: RequestHandler = async (req, res, next) => {
       config: configRecord ? mapWhiteLabelRecord(configRecord) : undefined
     };
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     next(error);
   }
@@ -114,7 +114,7 @@ export const updateWhiteLabelConfig: RequestHandler = async (req, res, next) => 
     const { config: updates, previewMode }: WhiteLabelRequest = req.body;
     // Get agencyId from path parameter or authentication context
     const authReq = req as AuthenticatedRequest;
-    const agencyId = (req.params.agencyId || authReq.agencyId || authReq.user?.agencyId);
+    const agencyId = ((req as any).params.agencyId || authReq.agencyId || authReq.user?.agencyId);
 
     if (!agencyId) {
       throw new AppError(
@@ -142,7 +142,7 @@ export const updateWhiteLabelConfig: RequestHandler = async (req, res, next) => 
         config: previewConfig,
         previewUrl: `https://preview.alignedai.com/${agencyId}`
       };
-      res.json(response);
+      (res as any).json(response);
       return;
     }
 
@@ -155,7 +155,7 @@ export const updateWhiteLabelConfig: RequestHandler = async (req, res, next) => 
       config
     };
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     next(error);
   }

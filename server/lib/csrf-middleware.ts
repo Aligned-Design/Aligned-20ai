@@ -42,11 +42,11 @@ function extractRawStateToken(state: string): string {
  * Must be applied to OAuth callback routes
  */
 export function validateOAuthState(
-  _req: Request,
+  req: Request,
   _res: Response,
   next: NextFunction
 ): void {
-  const state = _req.query.state as string | undefined;
+  const state = ((req as any).query.state as string) || undefined;
 
   // State parameter is required
   if (!state) {
@@ -91,8 +91,8 @@ export function validateOAuthState(
  * Checks that state hasn't expired (typically 10 minutes)
  */
 export function validateOAuthStateExpiration(maxAgeMs: number = 10 * 60 * 1000) {
-  return (_req: Request, _res: Response, next: NextFunction): void => {
-    const issuedAt = _req.query.iat as string | undefined;
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    const issuedAt = ((req as any).query.iat as string) || undefined;
 
     // If iat (issued at) is provided, validate it hasn't expired
     if (issuedAt) {
@@ -121,8 +121,8 @@ export function validateOAuthStateExpiration(maxAgeMs: number = 10 * 60 * 1000) 
  * Useful for enforcing branded state patterns
  */
 export function validateStatePattern(pattern: RegExp) {
-  return (_req: Request, _res: Response, next: NextFunction): void => {
-    const state = _req.query.state as string | undefined;
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    const state = ((req as any).query.state as string) || undefined;
 
     if (!state || !pattern.test(state)) {
       throw new AppError(

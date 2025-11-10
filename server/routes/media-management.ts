@@ -37,8 +37,8 @@ const upload = multer({
  */
 router.post('/upload', upload.array('files', 20), async (req: Request, res: Response) => {
   try {
-    const { brandId, category } = req.body;
-    const tenantId = req.query.tenantId as string;
+    const { brandId, category } = (req as any).body;
+    const tenantId = (req as any).query.tenantId as string;
 
     if (!brandId || !tenantId || !category) {
       throw new AppError(
@@ -49,7 +49,7 @@ router.post('/upload', upload.array('files', 20), async (req: Request, res: Resp
       );
     }
 
-    const files = req.files as Express.Multer.File[];
+    const files = (req as any).files as any[];
     if (!files || files.length === 0) {
       throw new AppError(
         ErrorCode.MISSING_REQUIRED_FIELD,
@@ -105,7 +105,7 @@ router.post('/upload', upload.array('files', 20), async (req: Request, res: Resp
       }
     }
 
-    res.json({
+    (res as any).json({
       success: errors.length === 0,
       uploadedCount: uploadedAssets.length,
       totalCount: files.length,
@@ -131,14 +131,14 @@ router.post('/upload', upload.array('files', 20), async (req: Request, res: Resp
  */
 router.get('/list', async (req: Request, res: Response) => {
   try {
-    const { brandId } = req.query;
-    const category = req.query.category as string | undefined;
-    const search = req.query.search as string | undefined;
-    const tags = req.query.tags ? (req.query.tags as string).split(',') : undefined;
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
-    const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
-    const sortBy = (req.query.sortBy as 'created' | 'name' | 'size' | 'usage') || 'created';
-    const sortOrder = (req.query.sortOrder as 'asc' | 'desc') || 'desc';
+    const { brandId } = (req as any).query;
+    const category = (req as any).query.category as string | undefined;
+    const search = (req as any).query.search as string | undefined;
+    const tags = (req as any).query.tags ? ((req as any).query.tags as string).split(',') : undefined;
+    const limit = (req as any).query.limit ? parseInt((req as any).query.limit as string) : 50;
+    const offset = (req as any).query.offset ? parseInt((req as any).query.offset as string) : 0;
+    const sortBy = ((req as any).query.sortBy as 'created' | 'name' | 'size' | 'usage') || 'created';
+    const sortOrder = ((req as any).query.sortOrder as 'asc' | 'desc') || 'desc';
 
     if (!brandId) {
       throw new AppError(
@@ -159,7 +159,7 @@ router.get('/list', async (req: Request, res: Response) => {
       sortOrder
     });
 
-    res.json({
+    (res as any).json({
       success: true,
       assets,
       pagination: {
@@ -188,8 +188,8 @@ router.get('/list', async (req: Request, res: Response) => {
  */
 router.get('/search', async (req: Request, res: Response) => {
   try {
-    const { brandId, q, tags } = req.query;
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+    const { brandId, q, tags } = (req as any).query;
+    const limit = (req as any).query.limit ? parseInt((req as any).query.limit as string) : 50;
 
     if (!brandId) {
       throw new AppError(
@@ -209,7 +209,7 @@ router.get('/search', async (req: Request, res: Response) => {
         limit
       );
 
-      return res.json({
+      return (res as any).json({
         success: true,
         assets: results,
         count: results.length
@@ -222,7 +222,7 @@ router.get('/search', async (req: Request, res: Response) => {
       limit
     });
 
-    res.json({
+    (res as any).json({
       success: true,
       assets,
       count: total
@@ -250,7 +250,7 @@ router.get('/storage/:brandId', async (req: Request, res: Response) => {
 
     const usage = await mediaService.getStorageUsage(brandId);
 
-    res.json({
+    (res as any).json({
       success: true,
       ...usage
     });
@@ -301,7 +301,7 @@ router.get('/:assetId', async (req: Request, res: Response) => {
       );
     }
 
-    res.json({
+    (res as any).json({
       success: true,
       asset: data[0]
     });
@@ -338,7 +338,7 @@ router.post('/:assetId/delete', async (req: Request, res: Response) => {
 
     await mediaService.deleteAsset(assetId, brandId);
 
-    res.json({
+    (res as any).json({
       success: true,
       message: 'Asset deleted successfully'
     });
@@ -375,7 +375,7 @@ router.post('/:assetId/track-usage', async (req: Request, res: Response) => {
 
     await mediaService.trackAssetUsage(assetId, usedIn, brandId);
 
-    res.json({
+    (res as any).json({
       success: true,
       message: 'Asset usage tracked'
     });
@@ -428,7 +428,7 @@ router.post('/bulk-delete', async (req: Request, res: Response) => {
       }
     }
 
-    res.json({
+    (res as any).json({
       success: results.failed === 0,
       ...results
     });
@@ -477,7 +477,7 @@ router.post('/organize', async (req: Request, res: Response) => {
       );
     }
 
-    res.json({
+    (res as any).json({
       success: true,
       message: `${assetIds.length} assets moved to ${newCategory}`,
       count: assetIds.length

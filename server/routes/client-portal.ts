@@ -66,7 +66,7 @@ export const getClientDashboard: RequestHandler = async (req, res, next) => {
       },
     };
 
-    res.json(dashboardData);
+    (res as any).json(dashboardData);
   } catch (error) {
     next(error);
   }
@@ -100,7 +100,7 @@ export const approveContent: RequestHandler = async (req, res, next) => {
       feedback
     );
 
-    res.json({
+    (res as any).json({
       success: true,
       contentId,
       approved: true,
@@ -149,7 +149,7 @@ export const rejectContent: RequestHandler = async (req, res, next) => {
       feedback.trim()
     );
 
-    res.json({
+    (res as any).json({
       success: true,
       contentId,
       approved: false,
@@ -192,7 +192,7 @@ export const addContentComment: RequestHandler = async (req, res, next) => {
       false
     );
 
-    res.json({
+    (res as any).json({
       success: true,
       comment: {
         id: comment.id,
@@ -242,7 +242,7 @@ export const getContentComments: RequestHandler = async (req, res, next) => {
       createdAt: comment.created_at,
     }));
 
-    res.json({
+    (res as any).json({
       contentId,
       comments: mappedComments,
       total: mappedComments.length,
@@ -281,7 +281,7 @@ export const uploadClientMedia: RequestHandler = async (req, res, next) => {
       path || `client-uploads/${brandId}/${clientId}/${filename}`
     );
 
-    res.json({
+    (res as any).json({
       success: true,
       message: 'File uploaded successfully',
       uploads: [
@@ -306,7 +306,7 @@ export const getClientMedia: RequestHandler = async (req, res, next) => {
   try {
     const brandId = (req as unknown).user?.brandId;
     const clientId = (req as unknown).user?.id || (req as unknown).userId;
-    const limit = parseInt(req.query.limit as string) || 50;
+    const limit = parseInt((req as any).query.limit as string) || 50;
 
     if (!brandId || !clientId) {
       throw new AppError(
@@ -320,7 +320,7 @@ export const getClientMedia: RequestHandler = async (req, res, next) => {
     // Fetch media uploads from database
     const uploads = await clientPortalDB.getClientMediaUploads(brandId, clientId, limit);
 
-    res.json({
+    (res as any).json({
       uploads,
       total: uploads.length,
     });
@@ -336,9 +336,9 @@ export const getClientMedia: RequestHandler = async (req, res, next) => {
 export const getPortalContent: RequestHandler = async (req, res, next) => {
   try {
     const brandId = (req as unknown).user?.brandId;
-    const status = req.query.status as unknown;
-    const limit = parseInt(req.query.limit as string) || 50;
-    const offset = parseInt(req.query.offset as string) || 0;
+    const status = (req as any).query.status as unknown;
+    const limit = parseInt((req as any).query.limit as string) || 50;
+    const offset = parseInt((req as any).query.offset as string) || 0;
 
     if (!brandId) {
       throw new AppError(
@@ -357,7 +357,7 @@ export const getPortalContent: RequestHandler = async (req, res, next) => {
       offset
     );
 
-    res.json({
+    (res as any).json({
       content,
       total,
       hasMore: offset + content.length < total,
@@ -410,7 +410,7 @@ export const getContentWithComments: RequestHandler = async (req, res, next) => 
       createdAt: comment.created_at,
     }));
 
-    res.json({
+    (res as any).json({
       content,
       comments: mappedComments,
       commentCount: mappedComments.length,

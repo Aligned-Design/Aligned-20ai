@@ -44,7 +44,7 @@ export const generateContent: RequestHandler = async (req, res) => {
       provider,
     });
 
-    res.json(result);
+    (res as any).json(result);
   } catch (error) {
     console.error("AI content generation failed:", error);
     if (error instanceof AppError) {
@@ -94,7 +94,7 @@ export const generateDesign: RequestHandler = async (req, res) => {
       provider,
     });
 
-    res.json(result);
+    (res as any).json(result);
   } catch (error) {
     console.error("AI design generation failed:", error);
     if (error instanceof AppError) {
@@ -115,7 +115,7 @@ export const getProviders: RequestHandler = (req, res) => {
   try {
     const providers = getAvailableProviders();
 
-    res.json({
+    (res as any).json({
       success: true,
       providers,
       default: providers[0] || null,

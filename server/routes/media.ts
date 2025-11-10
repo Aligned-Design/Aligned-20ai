@@ -154,7 +154,7 @@ export const uploadMedia: RequestHandler = async (req, res, next) => {
       uploadId: assetRecord.id,
     };
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     next(error);
   }
@@ -193,7 +193,7 @@ export const listMedia: RequestHandler = async (req, res, next) => {
       categories,
     };
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     next(error);
   }
@@ -234,7 +234,7 @@ export const getStorageUsage: RequestHandler = async (req, res, next) => {
       lastUpdated: new Date().toISOString(),
     };
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     next(error);
   }
@@ -257,7 +257,7 @@ export const getAssetUrl: RequestHandler = async (req, res, next) => {
     // Generate signed URL from database service
     const url = await mediaDB.generateSignedUrl(assetId, parseInt(expirationSeconds as string) || 3600);
 
-    res.json({ url });
+    (res as any).json({ url });
   } catch (error) {
     next(error);
   }
@@ -288,7 +288,7 @@ export const checkDuplicateAsset: RequestHandler = async (req, res, next) => {
       similarity: existingAssetRecord ? 1.0 : 0,
     };
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     next(error);
   }
@@ -337,7 +337,7 @@ export const generateSEOMetadataRoute: RequestHandler = async (req, res, next) =
       optimizedMetadata: asset.metadata || {},
     };
 
-    res.json(response);
+    (res as any).json(response);
   } catch (error) {
     next(error);
   }
@@ -376,7 +376,7 @@ export const trackAssetUsage: RequestHandler = async (req, res, next) => {
 
     // Update would be done here if mediaDB had updateMediaAsset method
     // For now, just validate the request succeeded
-    res.json({ success: true });
+    (res as any).json({ success: true });
   } catch (error) {
     next(error);
   }

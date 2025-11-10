@@ -271,15 +271,15 @@ export const getBrandIntelligence: RequestHandler = async (req, res) => {
     };
 
     // Return success response with proper headers
-    res.set({
+    (res as any).set({
       "Content-Type": "application/json; charset=utf-8",
       "Cache-Control": "no-cache, no-store, must-revalidate",
     });
-    return res.status(200).json(intelligence);
+    return (res as any).status(200).json(intelligence);
   } catch (error) {
     console.error("[Brand Intelligence API] Error:", {
       message: error instanceof Error ? error.message : "Unknown error",
-      brandId: req.params.brandId,
+      brandId: (req as any).params.brandId,
       timestamp: new Date().toISOString(),
     });
 
@@ -332,11 +332,11 @@ export const submitRecommendationFeedback: RequestHandler = async (
     // TODO: Use feedback to improve future recommendations
     // const feedbackId = await storeFeedback({ recommendationId, action, timestamp: new Date() });
 
-    res.set({
+    (res as any).set({
       "Content-Type": "application/json; charset=utf-8",
       "Cache-Control": "no-cache, no-store, must-revalidate",
     });
-    return res.status(200).json({
+    return (res as any).status(200).json({
       success: true,
       message: "Feedback recorded successfully",
       timestamp: new Date().toISOString(),
