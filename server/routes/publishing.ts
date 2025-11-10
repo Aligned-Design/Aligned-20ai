@@ -11,6 +11,7 @@ import {
   validatePostContent,
   validateScheduleTime,
 } from "../lib/platform-validators";
+import { canAccessBrand } from "../lib/auth-context";
 import {
   generateOAuthUrl,
   exchangeCodeForToken,
@@ -102,7 +103,6 @@ export const handleOAuthCallback: RequestHandler = async (req, res) => {
     }
 
     // ✅ SECURE: Validate user has access to this brand
-    const { canAccessBrand } = await import("../lib/auth-context");
     if (!canAccessBrand(authContext, brandId)) {
       const errorMsg = "You do not have permission to access this brand";
       return res.redirect(

@@ -56,7 +56,7 @@ export function WorkflowTracker({
     }
   };
 
-  const _getStepStatusColor = (status: WorkflowStepInstance["status"]) => {
+  const getStepStatusColor = (status: WorkflowStepInstance["status"]) => {
     switch (status) {
       case "completed":
         return "bg-green-100 text-green-800 border-green-200";
@@ -176,7 +176,7 @@ function WorkflowStepCard({
     }
   };
 
-  const _getStepStatusColor = (status: WorkflowStepInstance["status"]) => {
+  const getStepStatusColor = (status: WorkflowStepInstance["status"]) => {
     switch (status) {
       case "completed":
         return "bg-green-100 text-green-800 border-green-200";

@@ -70,7 +70,7 @@ async function safeJsonParse(response: unknown): Promise<unknown> {
         const preview = bodyText.slice(0, 500).replace(/\s+/g, " ");
         try {
           return JSON.parse(bodyText);
-        } catch (_parseErr) {
+        } catch (parseErr) {
           throw new Error(
             `Failed to parse JSON: ${parseErr instanceof Error ? parseErr.message : "unknown error"}. Body preview: ${preview}`,
           );

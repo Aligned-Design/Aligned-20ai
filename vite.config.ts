@@ -14,6 +14,32 @@ export default defineConfig({
   },
   build: {
     outDir: "dist/spa",
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          // Vendor code splitting strategy
+          if (id.includes("node_modules")) {
+            if (id.includes("react") && id.includes("react-dom|react-router")) {
+              return "vendor-react";
+            }
+            if (id.includes("@radix-ui")) {
+              return "vendor-ui";
+            }
+            if (id.includes("three") || id.includes("@react-three")) {
+              return "vendor-graphics";
+            }
+            if (id.includes("@tanstack/react-query") || id.includes("recharts")) {
+              return "vendor-data";
+            }
+            if (id.includes("react-hook-form") || id.includes("zod")) {
+              return "vendor-form";
+            }
+            return "vendor-other";
+          }
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
   },
   plugins: [react()],
   resolve: {
