@@ -113,22 +113,47 @@ describe("WebSocket Server", () => {
 
   describe("Namespace: /jobs", () => {
     it("should allow subscription to specific job", async () => {
-      const port = 3001;
-      httpServer.listen(port);
+      return new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error("Test timeout"));
+        }, 5000);
 
-      const client = ioClient(`http://localhost:${port}/jobs`, {
-        reconnection: false,
-      });
+        const server = createHTTPServer();
+        const wsIo = initializeWebSocketServer(server);
 
-      return new Promise<void>((resolve) => {
-        client.on("subscribed", (data) => {
-          expect(data.jobId).toBe("job-123");
-          client.disconnect();
-          resolve();
-        });
+        server.listen(0, () => {
+          const port = (server.address() as any).port;
+          const client = ioClient(`http://localhost:${port}/jobs`, {
+            reconnection: false,
+          });
 
-        client.on("connect", () => {
-          client.emit("subscribe-job", "job-123");
+          client.on("subscribed", (data) => {
+            try {
+              expect(data.jobId).toBe("job-123");
+              clearTimeout(timeout);
+              client.disconnect();
+              wsIo.close();
+              server.close();
+              resolve();
+            } catch (err) {
+              clearTimeout(timeout);
+              client.disconnect();
+              wsIo.close();
+              server.close();
+              reject(err);
+            }
+          });
+
+          client.on("connect", () => {
+            client.emit("subscribe-job", "job-123");
+          });
+
+          client.on("error", (err) => {
+            clearTimeout(timeout);
+            wsIo.close();
+            server.close();
+            reject(err);
+          });
         });
       });
     });
@@ -136,22 +161,47 @@ describe("WebSocket Server", () => {
 
   describe("Namespace: /analytics", () => {
     it("should allow subscription to brand analytics", async () => {
-      const port = 3002;
-      httpServer.listen(port);
+      return new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error("Test timeout"));
+        }, 5000);
 
-      const client = ioClient(`http://localhost:${port}/analytics`, {
-        reconnection: false,
-      });
+        const server = createHTTPServer();
+        const wsIo = initializeWebSocketServer(server);
 
-      return new Promise<void>((resolve) => {
-        client.on("subscribed", (data) => {
-          expect(data.brandId).toBe("brand-123");
-          client.disconnect();
-          resolve();
-        });
+        server.listen(0, () => {
+          const port = (server.address() as any).port;
+          const client = ioClient(`http://localhost:${port}/analytics`, {
+            reconnection: false,
+          });
 
-        client.on("connect", () => {
-          client.emit("subscribe-brand", "brand-123");
+          client.on("subscribed", (data) => {
+            try {
+              expect(data.brandId).toBe("brand-123");
+              clearTimeout(timeout);
+              client.disconnect();
+              wsIo.close();
+              server.close();
+              resolve();
+            } catch (err) {
+              clearTimeout(timeout);
+              client.disconnect();
+              wsIo.close();
+              server.close();
+              reject(err);
+            }
+          });
+
+          client.on("connect", () => {
+            client.emit("subscribe-brand", "brand-123");
+          });
+
+          client.on("error", (err) => {
+            clearTimeout(timeout);
+            wsIo.close();
+            server.close();
+            reject(err);
+          });
         });
       });
     });

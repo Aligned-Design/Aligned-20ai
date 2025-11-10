@@ -29,12 +29,12 @@ async function safeJsonParse(response: unknown): Promise<unknown> {
   // Helper to read content-type from Headers-like or plain object
   const getContentType = () => {
     try {
-      if (response && response.headers) {
-        if (typeof response.headers.get === "function") {
-          return response.headers.get("content-type") || "";
+      if (response && ((response as any).headers)) {
+        if (typeof ((response as any).headers).get === "function") {
+          return ((response as any).headers).get("content-type") || "";
         }
-        if (typeof response.headers["content-type"] === "string") {
-          return response.headers["content-type"];
+        if (typeof ((response as any).headers)["content-type"] === "string") {
+          return ((response as any).headers)["content-type"];
         }
       }
     } catch (_e) {
@@ -159,9 +159,9 @@ export function useBrandIntelligence(
       // Log response diagnostics for debugging
       const respContentType =
         response &&
-        response.headers &&
-        typeof (response.headers as unknown).get === "function"
-          ? (response.headers as unknown).get("content-type") || ""
+        ((response as any).headers) &&
+        typeof (((response as any).headers) as unknown).get === "function"
+          ? (((response as any).headers) as unknown).get("content-type") || ""
           : "";
       console.debug(
         "[Brand Intelligence] fetch response status:",

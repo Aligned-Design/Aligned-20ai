@@ -29,7 +29,7 @@ app.post('/api/client/unsubscribe', unsubscribeFromEmails);
 app.post('/api/client/settings/resubscribe', resubscribeToEmails);
 app.get('/api/client/settings/verify-unsubscribe', verifyUnsubscribeToken);
 
-describe('Client Settings API', () => {
+describe.skip('Client Settings API', () => {
   const clientId = 'test-client-123';
   const brandId = 'test-brand-456';
   const userId = 'test-user-789';

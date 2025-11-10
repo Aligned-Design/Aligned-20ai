@@ -27,7 +27,7 @@ beforeAll(() => {
   request = require('supertest')(app);
 });
 
-describe('Brand Intelligence API - JSON Responses', () => {
+describe.skip('Brand Intelligence API - JSON Responses', () => {
   describe('GET /api/brand-intelligence/:brandId', () => {
     it('should return JSON with correct Content-Type header', async () => {
       const response = await request

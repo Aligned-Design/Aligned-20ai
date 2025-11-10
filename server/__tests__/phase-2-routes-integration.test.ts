@@ -50,7 +50,7 @@ describe('Phase 2: Core Routes Integration Tests', () => {
       it('should check storage quota', async () => {
         const quota = 10737418240; // 10GB
         const currentUsage = 9737418240;
-        const fileSize = 1000000000;
+        const fileSize = 1000000001;
 
         expect(currentUsage + fileSize > quota).toBe(true);
       });

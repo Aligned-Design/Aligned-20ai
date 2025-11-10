@@ -912,24 +912,28 @@ export class AnalyticsSync {
     platform: Platform,
     rawData: unknown[],
   ): AnalyticsMetric[] {
-    return rawData.map((item, index) => ({
-      id: `${platform}_${brandId}_${Date.now()}_${index}`,
-      brandId,
-      platform,
-      postId: item.id || undefined,
-      date:
-        item.timestamp?.split("T")[0] || new Date().toISOString().split("T")[0],
-      metrics: this.extractMetrics(platform, item),
-      metadata: this.extractMetadata(platform, item),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }));
+    return rawData.map((item, index) => {
+      const itemAny = item as any;
+      return {
+        id: `${platform}_${brandId}_${Date.now()}_${index}`,
+        brandId,
+        platform,
+        postId: itemAny.id || undefined,
+        date:
+          itemAny.timestamp?.split("T")[0] || new Date().toISOString().split("T")[0],
+        metrics: this.extractMetrics(platform, item),
+        metadata: this.extractMetadata(platform, item),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+    });
   }
 
   private extractMetrics(
     platform: Platform,
     item: unknown,
   ): AnalyticsMetric["metrics"] {
+    const itemAny = item as any;
     const base = {
       reach: 0,
       impressions: 0,
@@ -949,20 +953,20 @@ export class AnalyticsSync {
         return {
           ...base,
           reach:
-            item.insights?.data?.find((i: unknown) => i.name === "reach")
+            itemAny.insights?.data?.find((i: unknown) => (i as any).name === "reach")
               ?.values?.[0]?.value || 0,
           impressions:
-            item.insights?.data?.find((i: unknown) => i.name === "impressions")
+            itemAny.insights?.data?.find((i: unknown) => (i as any).name === "impressions")
               ?.values?.[0]?.value || 0,
           engagement:
-            item.insights?.data?.find((i: unknown) => i.name === "engagement")
+            itemAny.insights?.data?.find((i: unknown) => (i as any).name === "engagement")
               ?.values?.[0]?.value || 0,
-          likes: item.like_count || 0,
-          comments: item.comments_count || 0,
+          likes: itemAny.like_count || 0,
+          comments: itemAny.comments_count || 0,
           engagementRate:
-            item.like_count && item.insights
-              ? ((item.like_count + item.comments_count) /
-                  (item.insights.data.find((i: unknown) => i.name === "reach")
+            itemAny.like_count && itemAny.insights
+              ? ((itemAny.like_count + itemAny.comments_count) /
+                  (itemAny.insights.data.find((i: unknown) => (i as any).name === "reach")
                     ?.values?.[0]?.value || 1)) *
                 100
               : 0,
@@ -977,7 +981,7 @@ export class AnalyticsSync {
     platform: Platform,
     item: unknown,
   ): AnalyticsMetric["metadata"] {
-    const it = item || {};
+    const it = (item || {}) as any;
     return {
       postType: this.mapPostType(platform, it.media_type || it.type),
       hashtags: this.extractHashtags(it.caption || it.text || ""),
@@ -1072,7 +1076,7 @@ export class AnalyticsSync {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;
-      const errorCode = (error as unknown)?.code || undefined;
+      const errorCode = (error as any)?.code || undefined;
 
       const { error: dbError } = await supabase
         .from("analytics_sync_logs")
@@ -1114,7 +1118,7 @@ export class AnalyticsSync {
   private scrubbePII(metadata: unknown): unknown {
     if (!metadata) return metadata;
 
-    const scrubbedData: unknown = { ...(metadata || {}) };
+    const scrubbedData = { ...(metadata as any || {}) } as any;
 
     // Patterns for common PII
     const patterns = {

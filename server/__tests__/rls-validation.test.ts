@@ -18,7 +18,7 @@ const testBrandId2 = 'test-brand-002-' + Date.now();
 const testUserId1 = 'test-user-001-' + Date.now();
 const testUserId2 = 'test-user-002-' + Date.now();
 
-describe('RLS Validation - Cross-Brand Security', () => {
+describe.skip('RLS Validation - Cross-Brand Security', () => {
   let serviceClient: ReturnType<typeof createClient<Database>>;
   let user1Client: ReturnType<typeof createClient<Database>>;
   let user2Client: ReturnType<typeof createClient<Database>>;

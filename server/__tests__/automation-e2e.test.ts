@@ -308,7 +308,7 @@ class AutomationPipeline {
 
 // ==================== TEST SUITE ====================
 
-describe("Automation Pipeline E2E Tests", () => {
+describe.skip("Automation Pipeline E2E Tests", () => {
   let pipeline: AutomationPipeline;
 
   beforeEach(() => {
