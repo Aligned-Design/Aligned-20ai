@@ -29,6 +29,12 @@ import { parseBrandKit } from "../../src/types/guards";
 import { calculateBFS } from "../agents/brand-fidelity-scorer";
 import { lintContent, autoFixContent } from "../agents/content-linter";
 import { generateWithAI, loadPromptTemplate } from "../workers/ai-generation";
+import {
+  validateDocRequest,
+  validateDesignRequest,
+  validateAdvisorRequest,
+} from "../lib/validation-schemas";
+import { v4 as uuidv4 } from "uuid";
 
 const router = Router();
 
@@ -42,23 +48,17 @@ const MAX_REGENERATION_ATTEMPTS = 3;
  * Generate content with Doc Agent
  */
 router.post("/generate/doc", async (req, res) => {
+  const startTime = Date.now();
+  const requestId = uuidv4();
   try {
+    // Validate input with Zod schema
     const {
       brand_id,
       input,
       safety_mode = "safe",
       __idempotency_key,
-    } = req.body as any;
+    } = validateDocRequest(req.body);
     const docInput = input as DocInput;
-
-    if (!brand_id || !input) {
-      throw new AppError(
-        ErrorCode.MISSING_REQUIRED_FIELD,
-        "Missing required fields: brand_id, input",
-        HTTP_STATUS.BAD_REQUEST,
-        "warning"
-      );
-    }
 
     // Load brand safety config
     const { data: brandData, error: brandError } = await supabase
@@ -105,6 +105,10 @@ router.post("/generate/doc", async (req, res) => {
     let output: DocOutput | undefined;
     let blocked = false;
     let needsReview = false;
+    let tokens_in = 0;
+    let tokens_out = 0;
+    let provider_used = "";
+    let model_used = "";
 
     while (attempts < MAX_REGENERATION_ATTEMPTS && !output) {
       attempts++;
@@ -116,6 +120,14 @@ router.post("/generate/doc", async (req, res) => {
           parsedBrandKit,
           safetyConfig,
         );
+
+        // Capture token usage
+        if ((aiOutput as any).__tokens_in !== undefined) {
+          tokens_in = (aiOutput as any).__tokens_in;
+          tokens_out = (aiOutput as any).__tokens_out;
+          provider_used = (aiOutput as any).__provider || "";
+          model_used = (aiOutput as any).__model || "";
+        }
 
         // Calculate Brand Fidelity Score
         const bfs = await calculateBFS(
@@ -235,7 +247,13 @@ router.post("/generate/doc", async (req, res) => {
       approved: !needsReview && !blocked,
       revision: 0,
       timestamp: new Date().toISOString(),
-      duration_ms: 0, // TODO: Track actual duration
+      duration_ms: Date.now() - startTime,
+      tokens_in,
+      tokens_out,
+      provider: provider_used || "unknown",
+      model: model_used || "unknown",
+      regeneration_count: attempts - 1,
+      request_id: requestId,
       error: blocked
         ? "Content blocked by safety filters"
         : !output
@@ -271,12 +289,25 @@ router.post("/generate/doc", async (req, res) => {
     (res as any).json(response);
   } catch (error) {
     console.error("Doc generation error:", error);
+
+    // Handle validation errors
+    if (error instanceof Error && error.message.startsWith("Validation failed:")) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        error.message,
+        HTTP_STATUS.BAD_REQUEST,
+        "warning",
+        { requestId },
+        "Please check your request format and try again"
+      );
+    }
+
     throw new AppError(
       ErrorCode.INTERNAL_ERROR,
       error instanceof Error ? error.message : "Internal server error",
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       "error",
-      error instanceof Error ? { originalError: error.message } : undefined,
+      error instanceof Error ? { originalError: error.message, requestId } : { requestId },
       "Please try again later or contact support"
     );
   }
@@ -287,17 +318,11 @@ router.post("/generate/doc", async (req, res) => {
  * Generate visuals with Design Agent
  */
 router.post("/generate/design", async (req, res) => {
+  const startTime = Date.now();
+  const requestId = uuidv4();
   try {
-    const { brand_id, input } = req.body as GenerationRequest;
-
-    if (!brand_id || !input) {
-      throw new AppError(
-        ErrorCode.MISSING_REQUIRED_FIELD,
-        "Missing required fields: brand_id, input",
-        HTTP_STATUS.BAD_REQUEST,
-        "warning"
-      );
-    }
+    // Validate input with Zod schema
+    const { brand_id, input } = validateDesignRequest(req.body);
 
     // Load brand kit for visual context
     const { data: brandKit, error: brandKitError } = await supabase
@@ -320,6 +345,12 @@ router.post("/generate/design", async (req, res) => {
       parsedBrandKit,
     );
 
+    // Extract token usage from design output
+    const tokens_in = (output as any).__tokens_in || 0;
+    const tokens_out = (output as any).__tokens_out || 0;
+    const provider = (output as any).__provider || "unknown";
+    const model = (output as any).__model || "unknown";
+
     // Log the generation
     const logEntry = {
       brand_id,
@@ -331,7 +362,13 @@ router.post("/generate/design", async (req, res) => {
       approved: true, // Design output doesn't require BFS/linter checks
       revision: 0,
       timestamp: new Date().toISOString(),
-      duration_ms: 0,
+      duration_ms: Date.now() - startTime,
+      tokens_in,
+      tokens_out,
+      provider,
+      model,
+      regeneration_count: 0,
+      request_id: requestId,
     };
 
     const { data: logData, error: logError } = await supabase
@@ -355,12 +392,25 @@ router.post("/generate/design", async (req, res) => {
     (res as any).json(response);
   } catch (error) {
     console.error("Design generation error:", error);
+
+    // Handle validation errors
+    if (error instanceof Error && error.message.startsWith("Validation failed:")) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        error.message,
+        HTTP_STATUS.BAD_REQUEST,
+        "warning",
+        { requestId },
+        "Please check your request format and try again"
+      );
+    }
+
     throw new AppError(
       ErrorCode.INTERNAL_ERROR,
       error instanceof Error ? error.message : "Internal server error",
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       "error",
-      error instanceof Error ? { originalError: error.message } : undefined,
+      error instanceof Error ? { originalError: error.message, requestId } : { requestId },
       "Please try again later or contact support"
     );
   }
@@ -371,17 +421,11 @@ router.post("/generate/design", async (req, res) => {
  * Generate insights with Advisor Agent
  */
 router.post("/generate/advisor", async (req, res) => {
+  const startTime = Date.now();
+  const requestId = uuidv4();
   try {
-    const { brand_id } = req.body as GenerationRequest;
-
-    if (!brand_id) {
-      throw new AppError(
-        ErrorCode.MISSING_REQUIRED_FIELD,
-        "Missing required field: brand_id",
-        HTTP_STATUS.BAD_REQUEST,
-        "warning"
-      );
-    }
+    // Validate input with Zod schema
+    const { brand_id } = validateAdvisorRequest(req.body);
 
     // Check cache first
     const { data: cachedOutput, error: cacheError } = await supabase
@@ -423,6 +467,12 @@ router.post("/generate/advisor", async (req, res) => {
       console.error("Failed to cache advisor output:", cacheSaveError);
     }
 
+    // Extract token usage from advisor output
+    const tokens_in = (output as any).__tokens_in || 0;
+    const tokens_out = (output as any).__tokens_out || 0;
+    const provider = (output as any).__provider || "unknown";
+    const model = (output as any).__model || "unknown";
+
     // Log the generation
     const logEntry = {
       brand_id,
@@ -434,7 +484,13 @@ router.post("/generate/advisor", async (req, res) => {
       approved: true,
       revision: 0,
       timestamp: new Date().toISOString(),
-      duration_ms: 0,
+      duration_ms: Date.now() - startTime,
+      tokens_in,
+      tokens_out,
+      provider,
+      model,
+      regeneration_count: 0,
+      request_id: requestId,
     };
 
     const { data: logData, error: __logError } = await supabase
@@ -454,12 +510,25 @@ router.post("/generate/advisor", async (req, res) => {
     (res as any).json(response);
   } catch (error) {
     console.error("Advisor generation error:", error);
+
+    // Handle validation errors
+    if (error instanceof Error && error.message.startsWith("Validation failed:")) {
+      throw new AppError(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        error.message,
+        HTTP_STATUS.BAD_REQUEST,
+        "warning",
+        { requestId },
+        "Please check your request format and try again"
+      );
+    }
+
     throw new AppError(
       ErrorCode.INTERNAL_ERROR,
       error instanceof Error ? error.message : "Internal server error",
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       "error",
-      error instanceof Error ? { originalError: error.message } : undefined,
+      error instanceof Error ? { originalError: error.message, requestId } : { requestId },
       "Please try again later or contact support"
     );
   }
@@ -470,6 +539,7 @@ router.post("/generate/advisor", async (req, res) => {
  * Calculate Brand Fidelity Score for given content
  */
 router.post("/bfs/calculate", async (req, res) => {
+  const requestId = uuidv4();
   try {
     const { content, brand_id } = req.body;
 
@@ -642,7 +712,8 @@ async function generateDocContent(
     .replace(/\{\{format\}\}/g, input.format)
     .replace(/\{\{max_length\}\}/g, input.max_length?.toString() || "2200");
 
-  const aiResponse = await generateWithAI(prompt, "doc");
+  const aiGenOutput = await generateWithAI(prompt, "doc");
+  const aiResponse = aiGenOutput.content;
 
   // Parse AI response (assuming JSON format)
   let parsedOutput;
@@ -662,7 +733,7 @@ async function generateDocContent(
     };
   }
 
-  return {
+  const result = {
     headline: parsedOutput.headline || "",
     body: parsedOutput.body || aiResponse,
     cta: parsedOutput.cta || "Learn more",
@@ -697,7 +768,15 @@ async function generateDocContent(
       blocked: false,
       needs_human_review: false,
     },
-  };
+  } as any;
+
+  // Attach token usage information
+  result.__tokens_in = aiGenOutput.tokens_in;
+  result.__tokens_out = aiGenOutput.tokens_out;
+  result.__provider = aiGenOutput.provider;
+  result.__model = aiGenOutput.model;
+
+  return result;
 }
 
 async function generateDesignContent(
@@ -719,7 +798,8 @@ async function generateDesignContent(
     .replace(/\{\{aspect_ratio\}\}/g, input.aspect_ratio)
     .replace(/\{\{headline\}\}/g, input.headline || "");
 
-  const aiResponse = await generateWithAI(prompt, "design");
+  const aiGenOutput = await generateWithAI(prompt, "design");
+  const aiResponse = aiGenOutput.content;
 
   let parsedOutput;
   try {
@@ -735,7 +815,7 @@ async function generateDesignContent(
     };
   }
 
-  return {
+  const result = {
     cover_title: parsedOutput.cover_title || input.headline || "",
     template_ref: parsedOutput.template_ref || `${input.theme}-template`,
     alt_text: parsedOutput.alt_text || "",
@@ -743,7 +823,15 @@ async function generateDesignContent(
     visual_elements: parsedOutput.visual_elements || [],
     color_palette_used: parsedOutput.color_palette_used || [],
     font_suggestions: parsedOutput.font_suggestions || [],
-  };
+  } as any;
+
+  // Attach token usage information
+  result.__tokens_in = aiGenOutput.tokens_in;
+  result.__tokens_out = aiGenOutput.tokens_out;
+  result.__provider = aiGenOutput.provider;
+  result.__model = aiGenOutput.model;
+
+  return result;
 }
 
 async function generateAdvisorInsights(
@@ -769,7 +857,8 @@ async function generateAdvisorInsights(
       JSON.stringify(posts?.slice(0, 20) || []),
     );
 
-  const aiResponse = await generateWithAI(prompt, "advisor");
+  const aiGenOutput = await generateWithAI(prompt, "advisor");
+  const aiResponse = aiGenOutput.content;
 
   let parsedOutput;
   try {
@@ -791,7 +880,7 @@ async function generateAdvisorInsights(
     };
   }
 
-  return {
+  const result = {
     topics: parsedOutput.topics || [],
     best_times: parsedOutput.best_times || [],
     format_mix: parsedOutput.format_mix || {},
@@ -799,7 +888,15 @@ async function generateAdvisorInsights(
     keywords: parsedOutput.keywords || [],
     cached_at: new Date().toISOString(),
     valid_until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-  };
+  } as any;
+
+  // Attach token usage information
+  result.__tokens_in = aiGenOutput.tokens_in;
+  result.__tokens_out = aiGenOutput.tokens_out;
+  result.__provider = aiGenOutput.provider;
+  result.__model = aiGenOutput.model;
+
+  return result;
 }
 
 export default router;

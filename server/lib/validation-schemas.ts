@@ -1,280 +1,229 @@
 /**
- * Zod Validation Schemas
- * Centralized input validation schemas for all API endpoints
- * Ensures strict type checking and OWASP compliance
+ * Input Validation Schemas for Agent Endpoints
+ *
+ * Provides Zod schemas for all agent requests to ensure type safety,
+ * prevent injection attacks, and provide clear error messages.
  */
 
 import { z } from "zod";
 
 // ============================================================================
-// Common Base Schemas
+// BASE SCHEMAS (Shared)
 // ============================================================================
 
-/** UUID validation */
-export const UUIDSchema = z.string().uuid("Invalid UUID format");
+export const BrandIdSchema = z.string().uuid("Invalid brand_id format");
 
-/** Brand ID validation */
-export const BrandIdSchema = z
-  .string()
-  .min(1, "Brand ID is required")
-  .max(255, "Brand ID must be less than 255 characters")
-  .regex(/^[a-zA-Z0-9_-]+$/, "Brand ID can only contain alphanumeric, hyphen, and underscore");
-
-/** Platform validation */
 export const PlatformSchema = z.enum([
   "instagram",
   "facebook",
   "linkedin",
   "twitter",
-  "google_business",
+  "tiktok",
+  "email",
 ]);
 
-/** User ID validation */
-export const UserIdSchema = z
-  .string()
-  .min(1, "User ID is required")
-  .max(255, "User ID must be less than 255 characters");
+export const SafetyModeSchema = z
+  .enum(["safe", "bold", "edgy_opt_in"])
+  .default("safe");
 
-/** Email validation */
-export const EmailSchema = z
-  .string()
-  .email("Invalid email format")
-  .max(255, "Email must be less than 255 characters");
-
-/** URL validation */
-export const URLSchema = z
-  .string()
-  .url("Invalid URL format")
-  .max(2048, "URL must be less than 2048 characters");
-
-/** Pagination */
-export const PaginationSchema = z.object({
-  page: z.number().int().min(1, "Page must be >= 1").optional().default(1),
-  limit: z.number().int().min(1, "Limit must be >= 1").max(100, "Limit must be <= 100").optional().default(20),
-});
+export const RequestIdSchema = z.string().optional();
 
 // ============================================================================
-// Query Parameters
+// DOC AGENT (Copy/Writer) SCHEMAS
 // ============================================================================
 
-/** Get integrations query */
-export const GetIntegrationsQuerySchema = z.object({
-  brandId: BrandIdSchema,
-  type: PlatformSchema.optional(),
-  status: z.enum(["connected", "disconnected", "error"]).optional(),
-  ...PaginationSchema.shape,
-});
-
-/** Get content query */
-export const GetContentQuerySchema = z.object({
-  brandId: BrandIdSchema,
-  status: z.enum(["draft", "scheduled", "published", "archived"]).optional(),
-  startDate: z.string().datetime().optional(),
-  endDate: z.string().datetime().optional(),
-  ...PaginationSchema.shape,
-});
-
-/** Get approvals query */
-export const GetApprovalsQuerySchema = z.object({
-  brandId: BrandIdSchema,
-  status: z.enum(["pending", "approved", "rejected"]).optional(),
-  userId: UserIdSchema.optional(),
-  ...PaginationSchema.shape,
-});
-
-// ============================================================================
-// Body Schemas - OAuth & Integrations
-// ============================================================================
-
-/** OAuth initiate request */
-export const OAuthInitiateBodySchema = z.object({
+export const DocInputSchema = z.object({
+  topic: z
+    .string()
+    .min(1, "Topic cannot be empty")
+    .max(5000, "Topic too long (max 5000 chars)"),
+  tone: z
+    .string()
+    .min(1, "Tone must be specified")
+    .optional()
+    .default("professional"),
   platform: PlatformSchema,
-  brandId: BrandIdSchema,
-  redirectUrl: URLSchema.optional(),
+  format: z
+    .enum(["post", "carousel", "reel", "story", "image", "email"])
+    .default("post"),
+  max_length: z
+    .number()
+    .min(50, "Max length must be at least 50 chars")
+    .max(10000, "Max length cannot exceed 10000 chars")
+    .optional(),
+  include_cta: z.boolean().optional().default(true),
+  cta_type: z
+    .enum(["link", "comment", "dm", "bio", "email"])
+    .optional(),
+  additional_context: z.string().optional(),
 });
 
-/** OAuth callback request */
-export const OAuthCallbackBodySchema = z.object({
-  code: z.string().min(1, "Authorization code is required").max(4096),
-  state: z.string().min(32, "State token must be at least 32 characters"),
-  platform: PlatformSchema,
+export const DocGenerationRequestSchema = z.object({
+  brand_id: BrandIdSchema,
+  input: DocInputSchema,
+  safety_mode: SafetyModeSchema,
+  __idempotency_key: RequestIdSchema,
 });
 
-/** Create integration request */
-export const CreateIntegrationBodySchema = z.object({
-  brandId: BrandIdSchema,
-  type: PlatformSchema,
-  name: z.string().min(1, "Integration name is required").max(255),
-  credentials: z.record(z.string(), z.unknown()).optional(),
-  settings: z.object({
-    syncEnabled: z.boolean().optional().default(true),
-    syncFrequency: z.enum(["realtime", "hourly", "daily"]).optional(),
-    autoSync: z.boolean().optional().default(true),
-  }).optional(),
-});
-
-/** Update integration request */
-export const UpdateIntegrationBodySchema = z.object({
-  name: z.string().min(1, "Integration name is required").max(255).optional(),
-  settings: z.object({
-    syncEnabled: z.boolean().optional(),
-    syncFrequency: z.enum(["realtime", "hourly", "daily"]).optional(),
-    autoSync: z.boolean().optional(),
-  }).optional(),
-});
+export type DocGenerationRequest = z.infer<typeof DocGenerationRequestSchema>;
 
 // ============================================================================
-// Body Schemas - Content & Publishing
+// DESIGN AGENT (Creative/Visual Strategist) SCHEMAS
 // ============================================================================
 
-/** Create content request */
-export const CreateContentBodySchema = z.object({
-  brandId: BrandIdSchema,
-  title: z.string().min(1, "Title is required").max(255),
-  body: z.string().min(1, "Body is required").max(10000),
-  platforms: z.array(PlatformSchema).min(1, "At least one platform is required"),
-  scheduledAt: z.string().datetime().optional(),
-  mediaUrls: z.array(URLSchema).optional(),
+export const DesignInputSchema = z.object({
+  headline: z.string().max(200, "Headline too long").optional(),
+  theme: z
+    .enum([
+      "educational",
+      "testimonial",
+      "promotional",
+      "story",
+      "behind-the-scenes",
+    ])
+    .optional()
+    .default("educational"),
+  aspect_ratio: z
+    .enum([
+      "1080x1080",
+      "1080x1350",
+      "1080x1920",
+      "1200x627",
+      "1280x720",
+    ])
+    .optional(),
+  tone: z.string().optional(),
+  copy_reference: z.string().optional(),
 });
 
-/** Update content request */
-export const UpdateContentBodySchema = z.object({
-  title: z.string().min(1, "Title is required").max(255).optional(),
-  body: z.string().min(1, "Body is required").max(10000).optional(),
-  platforms: z.array(PlatformSchema).optional(),
-  status: z.enum(["draft", "scheduled", "published"]).optional(),
+export const DesignGenerationRequestSchema = z.object({
+  brand_id: BrandIdSchema,
+  input: DesignInputSchema,
+  safety_mode: SafetyModeSchema,
+  __idempotency_key: RequestIdSchema,
 });
 
-/** Publish content request */
-export const PublishContentBodySchema = z.object({
-  contentId: z.string().min(1, "Content ID is required"),
-  platforms: z.array(PlatformSchema).optional(),
-  scheduledFor: z.string().datetime().optional(),
-});
+export type DesignGenerationRequest = z.infer<
+  typeof DesignGenerationRequestSchema
+>;
 
 // ============================================================================
-// Body Schemas - Approvals
+// ADVISOR AGENT (Growth Partner) SCHEMAS
 // ============================================================================
 
-/** Create approval request */
-export const CreateApprovalBodySchema = z.object({
-  brandId: BrandIdSchema,
-  contentId: z.string().min(1, "Content ID is required"),
-  approverIds: z.array(UserIdSchema).min(1, "At least one approver is required"),
-  notes: z.string().max(1000).optional(),
-});
-
-/** Approve/Reject request */
-export const ApprovalDecisionBodySchema = z.object({
-  approvalId: z.string().min(1, "Approval ID is required"),
-  decision: z.enum(["approved", "rejected"]),
-  feedback: z.string().max(1000).optional(),
-});
-
-// ============================================================================
-// Body Schemas - Settings & Preferences
-// ============================================================================
-
-/** Update brand settings */
-export const UpdateBrandSettingsBodySchema = z.object({
-  brandId: BrandIdSchema,
-  name: z.string().min(1, "Brand name is required").max(255).optional(),
-  logo: URLSchema.optional(),
-  primaryColor: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid hex color").optional(),
-  timezone: z.string().optional(),
-});
-
-/** Update user preferences */
-export const UpdateUserPreferencesBodySchema = z.object({
-  userId: UserIdSchema,
-  notificationSettings: z.object({
-    emailNotifications: z.boolean().optional(),
-    slackNotifications: z.boolean().optional(),
-    pushNotifications: z.boolean().optional(),
-  }).optional(),
-  theme: z.enum(["light", "dark"]).optional(),
-  language: z.string().optional(),
-});
-
-// ============================================================================
-// Body Schemas - Webhooks
-// ============================================================================
-
-/** Register webhook request */
-export const RegisterWebhookBodySchema = z.object({
-  brandId: BrandIdSchema,
-  platform: PlatformSchema,
-  events: z.array(z.string()).min(1, "At least one event is required"),
-  url: URLSchema,
-  active: z.boolean().optional().default(true),
-});
-
-/** Update webhook request */
-export const UpdateWebhookBodySchema = z.object({
-  events: z.array(z.string()).optional(),
-  url: URLSchema.optional(),
-  active: z.boolean().optional(),
-});
-
-// ============================================================================
-// Body Schemas - Analytics
-// ============================================================================
-
-/** Get analytics request */
-export const GetAnalyticsQuerySchema = z.object({
-  brandId: BrandIdSchema,
+export const AdvisorGenerationRequestSchema = z.object({
+  brand_id: BrandIdSchema,
   platform: PlatformSchema.optional(),
-  startDate: z.string().datetime().optional(),
-  endDate: z.string().datetime().optional(),
-  metrics: z.array(z.string()).optional(),
+  date_range: z
+    .object({
+      start: z.string().datetime(),
+      end: z.string().datetime(),
+    })
+    .optional(),
+  __idempotency_key: RequestIdSchema,
 });
+
+export type AdvisorGenerationRequest = z.infer<
+  typeof AdvisorGenerationRequestSchema
+>;
 
 // ============================================================================
-// Body Schemas - Bulk Operations
+// BFS CALCULATION SCHEMAS
 // ============================================================================
 
-/** Bulk approve request */
-export const BulkApproveBodySchema = z.object({
-  approvalIds: z.array(z.string().min(1)).min(1, "At least one approval ID is required"),
-  feedback: z.string().max(1000).optional(),
-});
-
-/** Bulk publish request */
-export const BulkPublishBodySchema = z.object({
-  contentIds: z.array(z.string().min(1)).min(1, "At least one content ID is required"),
-  scheduledFor: z.string().datetime().optional(),
-});
-
-// ============================================================================
-// Path Parameters
-// ============================================================================
-
-/** ID path parameter */
-export const IdParamSchema = z.object({
-  id: z.string().min(1, "ID is required"),
-});
-
-/** Brand and ID path parameters */
-export const BrandAndIdParamSchema = z.object({
-  brandId: BrandIdSchema,
-  id: z.string().min(1, "ID is required"),
-});
-
-/** Platform path parameter */
-export const PlatformParamSchema = z.object({
+export const ContentForBFSSchema = z.object({
+  body: z.string().min(1, "Content body required"),
+  headline: z.string().optional(),
+  cta: z.string().optional(),
+  hashtags: z.array(z.string()).optional(),
   platform: PlatformSchema,
 });
 
+export const BFSCalculationRequestSchema = z.object({
+  brand_id: BrandIdSchema,
+  content: ContentForBFSSchema,
+});
+
+export type BFSCalculationRequest = z.infer<typeof BFSCalculationRequestSchema>;
+
 // ============================================================================
-// Export type helpers
+// APPROVAL/REVIEW SCHEMAS
 // ============================================================================
+
+export const ApprovalRequestSchema = z.object({
+  logId: z.string().uuid("Invalid log_id"),
+  reviewer_notes: z.string().optional(),
+});
+
+export const ReviewQueueFilterSchema = z.object({
+  brandId: z.string().uuid("Invalid brand_id"),
+  agent: z.enum(["doc", "design", "advisor"]).optional(),
+  limit: z.number().min(1).max(100).default(50),
+  offset: z.number().min(0).default(0),
+});
+
+// ============================================================================
+// HELPER FUNCTION: Validate Request Body
+// ============================================================================
+
+export function validateDocRequest(data: unknown): DocGenerationRequest {
+  return DocGenerationRequestSchema.parse(data);
+}
+
+export function validateDesignRequest(data: unknown): DesignGenerationRequest {
+  return DesignGenerationRequestSchema.parse(data);
+}
+
+export function validateAdvisorRequest(data: unknown): AdvisorGenerationRequest {
+  return AdvisorGenerationRequestSchema.parse(data);
+}
+
+export function validateBFSRequest(data: unknown): BFSCalculationRequest {
+  return BFSCalculationRequestSchema.parse(data);
+}
+
+// ============================================================================
+// INTEGRATIONS SCHEMAS
+// ============================================================================
+
+export const GetIntegrationsQuerySchema = z.object({
+  brandId: z.string().uuid("Invalid brand_id format"),
+});
+
+export const IntegrationTypeSchema = z.enum([
+  "instagram",
+  "facebook",
+  "tiktok",
+  "twitter",
+  "linkedin",
+  "threads",
+  "pinterest",
+]);
+
+export const CreateIntegrationBodySchema = z.object({
+  type: IntegrationTypeSchema,
+  brandId: z.string().uuid("Invalid brand_id format"),
+});
 
 export type GetIntegrationsQuery = z.infer<typeof GetIntegrationsQuerySchema>;
-export type OAuthInitiateBody = z.infer<typeof OAuthInitiateBodySchema>;
-export type OAuthCallbackBody = z.infer<typeof OAuthCallbackBodySchema>;
 export type CreateIntegrationBody = z.infer<typeof CreateIntegrationBodySchema>;
-export type CreateContentBody = z.infer<typeof CreateContentBodySchema>;
-export type CreateApprovalBody = z.infer<typeof CreateApprovalBodySchema>;
-export type UpdateBrandSettingsBody = z.infer<typeof UpdateBrandSettingsBodySchema>;
-export type UpdateUserPreferencesBody = z.infer<typeof UpdateUserPreferencesBodySchema>;
-export type RegisterWebhookBody = z.infer<typeof RegisterWebhookBodySchema>;
+
+/**
+ * Generic validation helper with error message formatting
+ */
+export function validateRequest<T>(schema: z.ZodSchema<T>, data: unknown): T {
+  try {
+    return schema.parse(data);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const messages = error.errors
+        .map((err) => {
+          const path = err.path.join(".");
+          return `${path}: ${err.message}`;
+        })
+        .join("; ");
+      throw new Error(`Validation failed: ${messages}`);
+    }
+    throw error;
+  }
+}
