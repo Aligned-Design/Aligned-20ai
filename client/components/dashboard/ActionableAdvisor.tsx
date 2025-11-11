@@ -1,6 +1,7 @@
 /**
  * ActionableAdvisor - Base component for Advisor panels with executable insights
  * Provides consistent insight rendering with action buttons
+ * WCAG 2.1 Level AA compliant with ARIA labels and keyboard navigation
  */
 
 import { Sparkles, ChevronRight, CheckCircle } from "lucide-react";
@@ -26,6 +27,7 @@ interface ActionableAdvisorProps {
   insights: AdvisorInsight[];
   onInsightExecuted?: (insightId: string) => void;
   emptyState?: React.ReactNode;
+  ariaLabelledBy?: string;
 }
 
 export function ActionableAdvisor({
@@ -34,9 +36,11 @@ export function ActionableAdvisor({
   insights,
   onInsightExecuted,
   emptyState,
+  ariaLabelledBy,
 }: ActionableAdvisorProps) {
   const [executing, setExecuting] = useState<string | null>(null);
   const [executed, setExecuted] = useState<Set<string>>(new Set());
+  const advisorId = `advisor-${title.replace(/\s+/g, "-").toLowerCase()}`;
 
   const handleAction = async (insight: AdvisorInsight) => {
     if (!insight.action) return;
@@ -96,9 +100,18 @@ export function ActionableAdvisor({
   };
 
   return (
-    <div className="bg-white/50 backdrop-blur-xl rounded-xl border border-indigo-200/50 p-6">
+    <section
+      id={advisorId}
+      className="bg-white/50 backdrop-blur-xl rounded-xl border border-indigo-200/50 p-6"
+      role="region"
+      aria-label={title}
+      aria-describedby={ariaLabelledBy}
+    >
       <div className="flex items-center gap-3 mb-4 pb-4 border-b border-indigo-200/40">
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-300/40 to-blue-300/30 backdrop-blur flex items-center justify-center border border-indigo-300/50">
+        <div
+          className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-300/40 to-blue-300/30 backdrop-blur flex items-center justify-center border border-indigo-300/50"
+          aria-hidden="true"
+        >
           <Sparkles className="w-5 h-5 text-indigo-600" />
         </div>
         <div>
@@ -148,6 +161,9 @@ export function ActionableAdvisor({
                   <button
                     onClick={() => handleAction(insight)}
                     disabled={isExecuting || wasExecuted}
+                    aria-busy={isExecuting}
+                    aria-label={`${insight.action.label} - ${insight.title}`}
+                    aria-describedby={`insight-${insight.id}-description`}
                     className={`mt-3 w-full flex items-center justify-between px-3 py-2 rounded text-xs font-bold transition-all ${
                       wasExecuted
                         ? "bg-white/50 text-slate-600 cursor-default"
@@ -168,6 +184,6 @@ export function ActionableAdvisor({
           })}
         </div>
       )}
-    </div>
+    </section>
   );
 }
