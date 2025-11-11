@@ -1,11 +1,30 @@
 import { AnalyticsInsight } from "@/types/analytics";
-import { Sparkles, AlertCircle, Lightbulb, TrendingUp, ArrowRight } from "lucide-react";
+import { Sparkles, AlertCircle, Lightbulb, TrendingUp, ArrowRight, CheckCircle } from "lucide-react";
+import { useState } from "react";
 
 interface AnalyticsAdvisorProps {
   insights: AnalyticsInsight[];
+  onInsightAction?: (insightId: string, action: string) => void | Promise<void>;
 }
 
-export function AnalyticsAdvisor({ insights }: AnalyticsAdvisorProps) {
+export function AnalyticsAdvisor({ insights, onInsightAction }: AnalyticsAdvisorProps) {
+  const [executing, setExecuting] = useState<string | null>(null);
+  const [executed, setExecuted] = useState<Set<string>>(new Set());
+
+  const handleInsightAction = async (insight: AnalyticsInsight) => {
+    setExecuting(insight.id);
+    try {
+      const result = onInsightAction?.(insight.id, insight.actionLabel || "");
+      if (result instanceof Promise) {
+        await result;
+      }
+      setExecuted((prev) => new Set([...prev, insight.id]));
+    } catch (error) {
+      console.error("Failed to execute insight action:", error);
+    } finally {
+      setExecuting(null);
+    }
+  };
   const getTypeStyles = (type: AnalyticsInsight["type"]) => {
     switch (type) {
       case "opportunity":
@@ -105,9 +124,27 @@ export function AnalyticsAdvisor({ insights }: AnalyticsAdvisorProps) {
                       <p className="text-xs text-slate-600 font-semibold">
                         {insight.metric}
                       </p>
-                      <button className={`text-xs font-bold ${typeStyles.iconColor} hover:underline flex items-center gap-1 transition-all hover:scale-105`}>
-                        {insight.actionLabel}
-                        <ArrowRight className="w-3 h-3" />
+                      <button
+                        onClick={() => handleInsightAction(insight)}
+                        disabled={executing === insight.id || executed.has(insight.id)}
+                        className={`text-xs font-bold ${typeStyles.iconColor} hover:underline flex items-center gap-1 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-default`}
+                      >
+                        {executed.has(insight.id) ? (
+                          <>
+                            Done
+                            <CheckCircle className="w-3 h-3" />
+                          </>
+                        ) : executing === insight.id ? (
+                          <>
+                            Acting...
+                            <div className="w-3 h-3 rounded-full border border-current border-t-transparent animate-spin" />
+                          </>
+                        ) : (
+                          <>
+                            {insight.actionLabel}
+                            <ArrowRight className="w-3 h-3" />
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>
