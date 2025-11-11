@@ -56,6 +56,8 @@ function ProtectedRoutes() {
   // If authenticated and completed onboarding, show protected routes
   return (
     <Routes>
+      {/* Onboarding Route - explicitly accessible at /onboarding */}
+      <Route path="/onboarding" element={<Onboarding />} />
       {/* Core Navigation */}
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/calendar" element={<Calendar />} />
