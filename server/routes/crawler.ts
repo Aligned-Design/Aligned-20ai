@@ -94,7 +94,7 @@ router.post("/crawl/start", async (req, res) => {
     // Start crawl in background (don't await)
     runCrawlJob(job_id, brand_id, url, brand.brand_kit || {}).catch((error) => {
       console.error(`Crawl job ${job_id} failed:`, error);
-      const job = crawlJobs.get(job_id);
+      const job = crawlJobs.get(job_id) as any;
       if (job) {
         job.status = "failed";
         job.error = error instanceof Error ? error.message : String(error);
@@ -123,9 +123,9 @@ async function runCrawlJob(
   job_id: string,
   brand_id: string,
   url: string,
-  currentBrandKit: unknown,
+  currentBrandKit: any,
 ) {
-  const job = crawlJobs.get(job_id);
+  const job = crawlJobs.get(job_id) as any;
   if (!job) return;
 
   job.status = "processing";
@@ -400,7 +400,7 @@ router.get("/brand-kit/history/:brandId", async (req, res) => {
 
     // Filter by field if specified
     const history = field
-      ? (data as unknown[]).filter((entry: unknown) => entry.field === field)
+      ? (data as any[]).filter((entry: any) => entry.field === field)
       : data;
 
     (res as any).json({ history });
@@ -532,10 +532,21 @@ async function saveHistory(brand_id: string, entries: FieldHistoryEntry[]) {
       .order("created_at", { ascending: false });
 
     if (allEntries && allEntries.length > 10) {
-      const toDelete = (allEntries as unknown[]).slice(10).map((e: unknown) => e.id);
+      const toDelete = (allEntries as any[]).slice(10).map((e: any) => e.id);
       await supabase.from("brand_kit_history").delete().in("id", toDelete);
     }
   }
+}
+
+/**
+ * Helper: Create tracked field for brand kit
+ */
+function createTrackedField(value: any, source: string): any {
+  return {
+    value,
+    source,
+    updatedAt: new Date().toISOString(),
+  };
 }
 
 export default router;

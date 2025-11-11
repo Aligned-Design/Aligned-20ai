@@ -148,7 +148,7 @@ router.post("/rules", async (req: AuthRequest, res: Response) => {
 
     // Create rule
     const rule = await escalationRules.create({
-      ...payload,
+      ...(payload as any),
       brand_id: brandId,
     });
 

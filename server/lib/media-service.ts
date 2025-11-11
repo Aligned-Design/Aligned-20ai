@@ -127,7 +127,7 @@ class MediaService {
     if (error || !data) return 0;
 
     return data.reduce(
-      (sum: number, row: unknown) =>
+      (sum: number, row: any) =>
         sum + (typeof row.file_size === "number" ? row.file_size : 0),
       0,
     );
@@ -271,8 +271,8 @@ class MediaService {
         hash,
         thumbnailPath: variants.find((v) => v.size === "thumbnail")?.path,
         metadata: {
-          width: metadataObj.width || 0,
-          height: metadataObj.height || 0,
+          width: (typeof metadataObj.width === 'number' ? metadataObj.width : 0),
+          height: (typeof metadataObj.height === 'number' ? metadataObj.height : 0),
           ...metadataObj,
           aiTags,
           usageCount: 0,
@@ -375,7 +375,7 @@ class MediaService {
         if (!error) {
           const resizedMetadata = await sharp(resized).metadata();
           variants.push({
-            size: sizeName as unknown,
+            size: sizeName as any,
             width: resizedMetadata.width || dimensions.width,
             height: resizedMetadata.height || dimensions.height,
             path: variantPath,
@@ -750,7 +750,7 @@ class MediaService {
 
     return {
       total,
-      byCategory: byCategory as unknown,
+      byCategory: byCategory as any,
       assetCount: data?.length || 0,
       percentUsed: (total / limit) * 100,
       limit,
@@ -795,7 +795,7 @@ class MediaService {
   /**
    * Map database row to MediaAsset
    */
-  private mapAssetRow(row: unknown): MediaAsset {
+  private mapAssetRow(row: any): MediaAsset {
     const meta =
       row && row.metadata && typeof row.metadata === "object"
         ? row.metadata

@@ -56,7 +56,7 @@ export function validateQuery(schema: ZodSchema) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const validated = await schema.parseAsync(req.query);
-      req.query = validated as unknown;
+      req.query = validated as any;
       next();
     } catch (error) {
       if (error instanceof ZodError) {
@@ -84,7 +84,7 @@ export function validateParams(schema: ZodSchema) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const validated = await schema.parseAsync(req.params);
-      req.params = validated as unknown;
+      req.params = validated as any;
       next();
     } catch (error) {
       if (error instanceof ZodError) {
@@ -138,7 +138,7 @@ export function validateRequest(validators: {
     if (validators.query) {
       try {
         const validated = await validators.query.parseAsync(req.query);
-        req.query = validated as unknown;
+        req.query = validated as any;
       } catch (error) {
         if (error instanceof ZodError) {
           errors.push(
@@ -156,7 +156,7 @@ export function validateRequest(validators: {
     if (validators.params) {
       try {
         const validated = await validators.params.parseAsync(req.params);
-        req.params = validated as unknown;
+        req.params = validated as any;
       } catch (error) {
         if (error instanceof ZodError) {
           errors.push(

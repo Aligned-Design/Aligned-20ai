@@ -115,11 +115,11 @@ export const getInsights: RequestHandler = async (req, res) => {
     const formattedCurrent = currentMetrics.map((m) => ({
       id: m.id,
       brandId: m.brand_id,
-      platform: m.platform as unknown,
+      platform: m.platform as any,
       postId: m.post_id,
       date: m.date,
-      metrics: m.metrics as unknown,
-      metadata: m.metadata,
+      metrics: m.metrics as any,
+      metadata: m.metadata as any,
       createdAt: m.created_at,
       updatedAt: m.updated_at,
     }));
@@ -127,11 +127,11 @@ export const getInsights: RequestHandler = async (req, res) => {
     const formattedHistorical = historicalMetrics.map((m) => ({
       id: m.id,
       brandId: m.brand_id,
-      platform: m.platform as unknown,
+      platform: m.platform as any,
       postId: m.post_id,
       date: m.date,
-      metrics: m.metrics as unknown,
-      metadata: m.metadata,
+      metrics: m.metrics as any,
+      metadata: m.metadata as any,
       createdAt: m.created_at,
       updatedAt: m.updated_at,
     }));
@@ -181,11 +181,11 @@ export const getForecast: RequestHandler = async (req, res) => {
     const formattedMetrics = metrics.map((m) => ({
       id: m.id,
       brandId: m.brand_id,
-      platform: m.platform as unknown,
+      platform: m.platform as any,
       postId: m.post_id,
       date: m.date,
-      metrics: m.metrics as unknown,
-      metadata: m.metadata,
+      metrics: m.metrics as any,
+      metadata: m.metadata as any,
       createdAt: m.created_at,
       updatedAt: m.updated_at,
     }));
@@ -299,7 +299,7 @@ export const getGoals: RequestHandler = async (req, res) => {
 
     // Add current progress for each goal
     const goalsWithProgress = await Promise.all(
-      goals.map(async (goal) => {
+      goals.map(async (goal: any) => {
         const stats = await analyticsDB.getPlatformStats(
           brandId,
           goal.metric,
@@ -376,7 +376,7 @@ export const syncPlatformData: RequestHandler = async (req, res) => {
     const startTime = new Date();
     await analyticsSync.performIncrementalSync(brandId, [
       {
-        platform: platform as unknown,
+        platform: platform as any,
         accessToken: "", // Would come from platform_connections table in real scenario
         accountId: "",
         lastSyncAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
@@ -511,11 +511,11 @@ export const getAlerts: RequestHandler = async (req, res) => {
     const formattedCurrent = currentMetrics.map((m) => ({
       id: m.id,
       brandId: m.brand_id,
-      platform: m.platform as unknown,
+      platform: m.platform as any,
       postId: m.post_id,
       date: m.date,
-      metrics: m.metrics as unknown,
-      metadata: m.metadata,
+      metrics: m.metrics as any,
+      metadata: m.metadata as any,
       createdAt: m.created_at,
       updatedAt: m.updated_at,
     }));
@@ -523,11 +523,11 @@ export const getAlerts: RequestHandler = async (req, res) => {
     const formattedHistorical = historicalMetrics.map((m) => ({
       id: m.id,
       brandId: m.brand_id,
-      platform: m.platform as unknown,
+      platform: m.platform as any,
       postId: m.post_id,
       date: m.date,
-      metrics: m.metrics as unknown,
-      metadata: m.metadata,
+      metrics: m.metrics as any,
+      metadata: m.metadata as any,
       createdAt: m.created_at,
       updatedAt: m.updated_at,
     }));

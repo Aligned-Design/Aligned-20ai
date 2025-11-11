@@ -790,7 +790,7 @@ export class AdvisorEngine {
     };
   }
 
-  private calculateTrends(_timeSeries: unknown) {
+  private calculateTrends(_timeSeries: any) {
     // Simple linear regression for trends
     return {
       reach: { slope: 10, confidence: 0.8 },
@@ -799,7 +799,7 @@ export class AdvisorEngine {
     };
   }
 
-  private detectSeasonality(_timeSeries: unknown) {
+  private detectSeasonality(_timeSeries: any) {
     // Simplified seasonality detection
     return {
       reach: 1.0,
@@ -825,13 +825,13 @@ export class AdvisorEngine {
     };
   }
 
-  private calculateOptimalPostCount(trends: unknown, daysAhead: number): number {
+  private calculateOptimalPostCount(trends: any, daysAhead: number): number {
     return Math.ceil(daysAhead / 3); // Every 3 days
   }
 
   private async generateForecastRecommendations(
     _metrics: AnalyticsMetric[],
-    _trends: unknown,
+    _trends: any,
   ) {
     return {
       bestDays: ["Tuesday", "Wednesday", "Thursday"],
@@ -843,14 +843,14 @@ export class AdvisorEngine {
         facebook: 25,
         linkedin: 20,
         twitter: 15,
-      } as unknown,
+      } as any,
     };
   }
 
   private generateScenario(
-    reach: unknown,
-    engagement: unknown,
-    followers: unknown,
+    reach: any,
+    engagement: any,
+    followers: any,
     multiplier: number,
     days: number,
   ) {
@@ -889,7 +889,7 @@ export class AdvisorEngine {
 
   private async generateInsightDescription(
     type: string,
-    data: unknown,
+    data: any,
   ): Promise<string> {
     // AI-generated descriptions would go here
     // For now, return template-based descriptions

@@ -12,7 +12,7 @@ import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 const router = Router();
 
 // Helper function to map database record to API response
-function mapConnectionRecord(record: unknown): Integration {
+function mapConnectionRecord(record: any): Integration {
   return {
     id: record.id,
     type: record.provider as IntegrationType,
@@ -198,7 +198,7 @@ router.post("/oauth/callback", async (req, res, next) => {
     // Create connection in database
     const connectionRecord = await integrationsDB.createConnection(
       brandId,
-      type as unknown,
+      type as any,
       credentials.accessToken,
       {
         accountUsername: `${type} Account`,
@@ -233,7 +233,7 @@ router.post("/:integrationId/sync", async (req, res, next) => {
     }
 
     // TODO: Fetch integration from database and trigger sync
-    const syncEvent = await triggerSync({ id: integrationId } as unknown, type);
+    const syncEvent = await triggerSync({ id: integrationId } as any, type);
 
     (res as any).json({ success: true, syncEvent });
   } catch (error) {
@@ -294,8 +294,8 @@ router.delete("/:integrationId", async (req, res, next) => {
 // Get sync events
 router.get("/:integrationId/sync-events", async (req, res, next) => {
   try {
-    const { __integrationId } = req.params;
-    const { __limit = '50', __offset = '0' } = req.query;
+    const { integrationId: _integrationId } = req.params;
+    const { limit: _limit = '50', offset: _offset = '0' } = req.query;
 
     // TODO: Fetch from database
     const syncEvents: SyncEvent[] = [];

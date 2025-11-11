@@ -183,7 +183,7 @@ export class AnalyticsDBService {
     // Find top platform by engagement
     let maxEngagement = 0;
     Object.entries(summary.platformBreakdown).forEach(
-      ([platform, data]: [string, unknown]) => {
+      ([platform, data]: [string, any]) => {
         if (data.engagement > maxEngagement) {
           maxEngagement = data.engagement;
           summary.topPlatform = platform;
@@ -430,7 +430,7 @@ export class AnalyticsDBService {
     if (error) throw new Error(`Failed to fetch weights: ${error.message}`);
 
     const weights: Record<string, number> = {};
-    (data || []).forEach((row: unknown) => {
+    (data || []).forEach((row: any) => {
       const key = `${row.category}_${row.type}`;
       weights[key] = row.new_weight;
     });
