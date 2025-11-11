@@ -516,7 +516,7 @@ async function testFullWorkflowIntegration(): Promise<{
     });
 
     const scheduleAction = await mockActionOptimizeSchedule(actionContext);
-    console.log(`   ✓ Step 5: Action invoked (${scheduleAction.result_data?.recommended_times?.length || 0} times)`);
+    console.log(`   ✓ Step 5: Action invoked (${(scheduleAction.result_data as any)?.recommended_times?.length || 0} times)`);
 
     // Step 6: Log action result
     logAdvisorActionResult(testBrandId, testRequestId, 156, {

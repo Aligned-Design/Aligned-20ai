@@ -35,12 +35,6 @@ export function logAdvisorReviewCreated(
     actionability_score: metadata.scores.actionability,
     platform_fit_score: metadata.scores.platform_fit,
     average_score: metadata.scores.average,
-    weighted_score: metadata.scores.weighted,
-    severity_level: metadata.severity_level,
-    content_id: metadata.content_id,
-    platform: metadata.platform,
-    has_reflection_question: metadata.has_reflection_question,
-    suggested_actions_count: metadata.suggested_actions_count,
     tokens_in: 0, // Would be populated if tracking AI token usage
     tokens_out: 0,
     provider: "claude",

@@ -98,19 +98,21 @@ function calculateClarity(advisor_output: Record<string, unknown>, content: stri
     "remove",
     "move",
   ];
+  const feedback = (advisor_output.feedback as string) || "";
   const specificCount = specificTerms.filter((term) =>
-    advisor_output.feedback?.toLowerCase().includes(term)
+    feedback.toLowerCase().includes(term)
   ).length;
   score += Math.min(specificCount, 3); // Max +3 for specificity
 
   // Check for structured insights (bullet points, numbered lists)
-  if (advisor_output.insights && advisor_output.insights.length > 2) {
+  const insights = (advisor_output.insights as unknown[]) || [];
+  if (insights.length > 2) {
     score += 1;
   }
 
   // Check for actionable verbs in feedback
   const actionVerbs = ["should", "must", "consider", "try", "could", "would"];
-  if (actionVerbs.some((verb) => advisor_output.feedback?.toLowerCase().includes(verb))) {
+  if (actionVerbs.some((verb) => feedback.toLowerCase().includes(verb))) {
     score += 1;
   }
 
@@ -135,9 +137,10 @@ function calculateBrandAlignment(
 
   // If brand kit available, check alignment with brand voice
   if (brand_kit) {
+    const voiceAttributes = (brand_kit.voice_attributes as Record<string, unknown>) || {};
     const voiceKeywords = [
-      brand_kit.voice_attributes?.tone,
-      brand_kit.voice_attributes?.style,
+      voiceAttributes.tone as string,
+      voiceAttributes.style as string,
     ].filter(Boolean);
 
     if (voiceKeywords.length > 0) {
@@ -149,9 +152,10 @@ function calculateBrandAlignment(
   }
 
   // Check for safety compliance mentions
-  if (advisor_output.feedback?.toLowerCase().includes("brand") ||
-      advisor_output.feedback?.toLowerCase().includes("safe") ||
-      advisor_output.feedback?.toLowerCase().includes("comply")) {
+  const feedback = (advisor_output.feedback as string) || "";
+  if (feedback.toLowerCase().includes("brand") ||
+      feedback.toLowerCase().includes("safe") ||
+      feedback.toLowerCase().includes("comply")) {
     score += 1.5;
   }
 
@@ -161,7 +165,8 @@ function calculateBrandAlignment(
   }
 
   // Quality of suggestions for brand consistency
-  if (advisor_output.insights && advisor_output.insights.length > 0) {
+  const insights = (advisor_output.insights as unknown[]) || [];
+  if (insights.length > 0) {
     score += 0.5;
   }
 
@@ -189,23 +194,24 @@ function calculateResonance(
     "story",
     "authentic",
   ];
+  const feedback = (advisor_output.feedback as string) || "";
   const engagementScore = engagementTerms.filter((term) =>
-    advisor_output.feedback?.toLowerCase().includes(term)
+    feedback.toLowerCase().includes(term)
   ).length;
   score += Math.min(engagementScore, 2); // Max +2 for engagement language
 
   // Platform-specific resonance
-  if (platform === "tiktok" && advisor_output.feedback?.toLowerCase().includes("trend")) {
+  if (platform === "tiktok" && feedback.toLowerCase().includes("trend")) {
     score += 1; // TikTok trending considerations
-  } else if (platform === "linkedin" && advisor_output.feedback?.toLowerCase().includes("professional")) {
+  } else if (platform === "linkedin" && feedback.toLowerCase().includes("professional")) {
     score += 1; // LinkedIn professional positioning
-  } else if (platform === "instagram" && advisor_output.feedback?.toLowerCase().includes("visual")) {
+  } else if (platform === "instagram" && feedback.toLowerCase().includes("visual")) {
     score += 1; // Instagram visual appeal
   }
 
   // Audience-focused recommendations
-  if (advisor_output.feedback?.toLowerCase().includes("audience") ||
-      advisor_output.feedback?.toLowerCase().includes("target")) {
+  if (feedback.toLowerCase().includes("audience") ||
+      feedback.toLowerCase().includes("target")) {
     score += 1.5;
   }
 
@@ -226,14 +232,16 @@ function calculateActionability(advisor_output: Record<string, unknown>): number
   let score = 5; // Base score
 
   // Check for specific action items
-  if (advisor_output.suggested_actions && advisor_output.suggested_actions.length > 0) {
-    score += Math.min(advisor_output.suggested_actions.length, 3); // Max +3 for action count
+  const suggestedActions = (advisor_output.suggested_actions as unknown[]) || [];
+  if (suggestedActions.length > 0) {
+    score += Math.min(suggestedActions.length, 3); // Max +3 for action count
   }
 
   // Check for measurable outcomes
   const measurableTerms = ["increase", "improve", "boost", "reduce", "%", "rate", "metric"];
+  const feedback = (advisor_output.feedback as string) || "";
   const measurableCount = measurableTerms.filter((term) =>
-    advisor_output.feedback?.toLowerCase().includes(term)
+    feedback.toLowerCase().includes(term)
   ).length;
   score += Math.min(measurableCount, 2); // Max +2 for measurable language
 
@@ -241,17 +249,17 @@ function calculateActionability(advisor_output: Record<string, unknown>): number
   const easyTerms = ["simple", "quick", "easy", "straightforward", "try"];
   const hardTerms = ["complex", "difficult", "requires", "major", "extensive"];
   const easyCount = easyTerms.filter((term) =>
-    advisor_output.feedback?.toLowerCase().includes(term)
+    feedback.toLowerCase().includes(term)
   ).length;
   const hardCount = hardTerms.filter((term) =>
-    advisor_output.feedback?.toLowerCase().includes(term)
+    feedback.toLowerCase().includes(term)
   ).length;
   score += easyCount - hardCount * 0.5;
 
   // Clear next steps
-  if (advisor_output.feedback?.toLowerCase().includes("next") ||
-      advisor_output.feedback?.toLowerCase().includes("then") ||
-      advisor_output.feedback?.toLowerCase().includes("after")) {
+  if (feedback.toLowerCase().includes("next") ||
+      feedback.toLowerCase().includes("then") ||
+      feedback.toLowerCase().includes("after")) {
     score += 1;
   }
 
@@ -286,20 +294,21 @@ function calculatePlatformFit(
   }
 
   // Check for platform-specific features mentioned
-  if (platform === "instagram" && advisor_output.feedback?.toLowerCase().includes("#")) {
+  const feedback = (advisor_output.feedback as string) || "";
+  if (platform === "instagram" && feedback.toLowerCase().includes("#")) {
     score += 1; // Hashtag usage
   }
-  if (platform === "linkedin" && advisor_output.feedback?.toLowerCase().includes("professional")) {
+  if (platform === "linkedin" && feedback.toLowerCase().includes("professional")) {
     score += 1; // Professional tone
   }
-  if (platform === "tiktok" && advisor_output.feedback?.toLowerCase().includes("trend")) {
+  if (platform === "tiktok" && feedback.toLowerCase().includes("trend")) {
     score += 1; // Trend alignment
   }
 
   // Timing/posting optimization
-  if (advisor_output.feedback?.toLowerCase().includes("time") ||
-      advisor_output.feedback?.toLowerCase().includes("schedule") ||
-      advisor_output.feedback?.toLowerCase().includes("post")) {
+  if (feedback.toLowerCase().includes("time") ||
+      feedback.toLowerCase().includes("schedule") ||
+      feedback.toLowerCase().includes("post")) {
     score += 1;
   }
 
