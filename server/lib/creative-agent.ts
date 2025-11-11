@@ -206,7 +206,7 @@ export class CreativeAgent {
     let layoutRecommendation = "Hero with body text and CTA";
     let componentList = ["Hero / Banner", "Text / Body", "Button / Primary"];
 
-    if (perf.visualPerformance && perf.visualPerformance.length > 0) {
+    if (perf && perf.visualPerformance && perf.visualPerformance.length > 0) {
       const topLayout = perf.visualPerformance[0];
       if (topLayout.attributeValue) {
         layoutRecommendation = `${topLayout.attributeValue} (based on ${topLayout.contentCount} high-performing posts)`;
@@ -364,14 +364,14 @@ export class CreativeAgent {
     }
 
     const perf = context.performanceLog;
-    if (perf.patterns.length > 0) {
+    if (perf && perf.patterns && perf.patterns.length > 0) {
       const strongPattern = perf.patterns.find((p) => p.strength === "strong");
       if (strongPattern) {
         insights.push(`Strong performance pattern: ${strongPattern.pattern}`);
       }
     }
 
-    if (perf.platformInsights && perf.platformInsights.length > 0) {
+    if (perf && perf.platformInsights && perf.platformInsights.length > 0) {
       insights.push(`Best performing visual style: ${perf.platformInsights[0].topVisualStyle}`);
     }
 
@@ -406,7 +406,7 @@ export class CreativeAgent {
     });
 
     const perf = context.performanceLog;
-    if (perf.recommendations && perf.recommendations.visualRecommendations.length > 0) {
+    if (perf && perf.recommendations && perf.recommendations.visualRecommendations && perf.recommendations.visualRecommendations.length > 0) {
       decisions.push({
         decision: `Followed visual recommendation: ${perf.recommendations.visualRecommendations[0]}`,
         rationale: "Data-driven approach based on historical performance metrics",
@@ -429,7 +429,7 @@ export class CreativeAgent {
     }
 
     const perf = context.performanceLog;
-    if (perf.alerts && perf.alerts.length > 0) {
+    if (perf && perf.alerts && perf.alerts.length > 0) {
       actions.push(`Address performance alert: ${perf.alerts[0].alert}`);
     }
 
