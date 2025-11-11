@@ -63,8 +63,8 @@ function ProtectedRoutes() {
       <Route path="/linked-accounts" element={<LinkedAccounts />} />
       {/* Settings */}
       <Route path="/settings" element={<Settings />} />
-      {/* Catch-all - redirect to dashboard */}
-      <Route path="*" element={<Dashboard />} />
+      {/* Catch-all - show 404 page */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
