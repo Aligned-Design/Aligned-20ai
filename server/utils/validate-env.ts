@@ -58,10 +58,19 @@ const validators: Record<string, EnvValidator> = {
   OPENAI_API_KEY: {
     name: "OpenAI API Key",
     required: false,
-    validate: (val) => ({
-      valid: val.startsWith("sk-"),
-      message: "Should start with 'sk-'",
-    }),
+    validate: (val) => {
+      // Check if accidentally set to Anthropic key
+      if (val.startsWith("sk-ant-") || val.startsWith("k-ant-")) {
+        return {
+          valid: false,
+          message: "ERROR: Set to Anthropic key! Use 'sk-' prefix for OpenAI or leave empty if not using OpenAI",
+        };
+      }
+      return {
+        valid: val.startsWith("sk-"),
+        message: "Should start with 'sk-' (OpenAI format) or leave empty if using Anthropic only",
+      };
+    },
   },
   ANTHROPIC_API_KEY: {
     name: "Anthropic API Key",
@@ -327,6 +336,104 @@ const validators: Record<string, EnvValidator> = {
     validate: (val) => ({
       valid: val.startsWith("http://") || val.startsWith("https://"),
       message: "Should be a valid HTTP(S) URL",
+    }),
+  },
+
+  // OAuth Credentials - CRITICAL for production
+  FACEBOOK_CLIENT_ID: {
+    name: "Facebook OAuth Client ID",
+    required: false,
+    validate: (val) => ({
+      valid: /^\d+$/.test(val),
+      message: "Should be a numeric app ID",
+    }),
+  },
+  FACEBOOK_CLIENT_SECRET: {
+    name: "Facebook OAuth Client Secret",
+    required: false,
+    validate: (val) => ({
+      valid: val.length > 20,
+      message: "Should be a valid secret string (>20 chars)",
+    }),
+  },
+  META_CLIENT_ID: {
+    name: "Meta OAuth Client ID",
+    required: false,
+    validate: (val) => ({
+      valid: /^\d+$/.test(val),
+      message: "Should be a numeric app ID",
+    }),
+  },
+  META_CLIENT_SECRET: {
+    name: "Meta OAuth Client Secret",
+    required: false,
+    validate: (val) => ({
+      valid: val.length > 20,
+      message: "Should be a valid secret string (>20 chars)",
+    }),
+  },
+  INSTAGRAM_CLIENT_ID: {
+    name: "Instagram OAuth Client ID",
+    required: false,
+    validate: (val) => ({
+      valid: /^\d+$/.test(val),
+      message: "Should be a numeric app ID",
+    }),
+  },
+  INSTAGRAM_CLIENT_SECRET: {
+    name: "Instagram OAuth Client Secret",
+    required: false,
+    validate: (val) => ({
+      valid: val.length > 20,
+      message: "Should be a valid secret string (>20 chars)",
+    }),
+  },
+  LINKEDIN_CLIENT_ID: {
+    name: "LinkedIn OAuth Client ID",
+    required: false,
+    validate: (val) => ({
+      valid: val.length > 10,
+      message: "Should be a valid client ID",
+    }),
+  },
+  LINKEDIN_CLIENT_SECRET: {
+    name: "LinkedIn OAuth Client Secret",
+    required: false,
+    validate: (val) => ({
+      valid: val.length > 20,
+      message: "Should be a valid secret string (>20 chars)",
+    }),
+  },
+  TWITTER_CLIENT_ID: {
+    name: "Twitter OAuth Client ID",
+    required: false,
+    validate: (val) => ({
+      valid: val.length > 10,
+      message: "Should be a valid client ID",
+    }),
+  },
+  TWITTER_CLIENT_SECRET: {
+    name: "Twitter OAuth Client Secret",
+    required: false,
+    validate: (val) => ({
+      valid: val.length > 20,
+      message: "Should be a valid secret string (>20 chars)",
+    }),
+  },
+  GOOGLE_CLIENT_ID: {
+    name: "Google OAuth Client ID",
+    required: false,
+    validate: (val) => ({
+      valid: val.includes(".apps.googleusercontent.com"),
+      message: "Should be a valid Google client ID (ends with .apps.googleusercontent.com)",
+    }),
+  },
+  GOOGLE_CLIENT_SECRET: {
+    name: "Google OAuth Client Secret",
+    required: false,
+    validate: (val) => ({
+      valid: val.length > 20,
+      message: "Should be a valid secret string (>20 chars)",
     }),
   },
 };

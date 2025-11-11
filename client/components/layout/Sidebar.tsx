@@ -37,7 +37,7 @@ const navGroups = [
       { icon: Zap, label: "Campaigns", href: "/campaigns" },
       { icon: BarChart3, label: "Analytics", href: "/analytics" },
       { icon: Star, label: "Reviews", href: "/reviews" },
-      { icon: DollarSign, label: "Paid Ads", href: "/paid-ads" },
+      { icon: DollarSign, label: "Paid Ads", href: "/paid-ads", beta: true },
       { icon: MapPin, label: "Events", href: "/events" },
     ],
   },
@@ -70,14 +70,20 @@ export function Sidebar() {
       <Link
         to={item.href}
         className={cn(
-          "flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium",
+          "flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium group relative",
           isActive
             ? "bg-lime-400 text-indigo-950 shadow-md shadow-lime-400/30"
             : "text-white/70 hover:text-white hover:bg-white/10"
         )}
+        title={item.beta ? "Beta feature - coming soon" : undefined}
       >
         <Icon className="w-5 h-5" />
-        <span>{item.label}</span>
+        <span className="flex-1">{item.label}</span>
+        {item.beta && (
+          <span className="px-2 py-0.5 bg-amber-400/20 text-amber-200 text-xs font-black rounded-full uppercase tracking-wide border border-amber-400/30 whitespace-nowrap">
+            Beta
+          </span>
+        )}
       </Link>
     );
   };

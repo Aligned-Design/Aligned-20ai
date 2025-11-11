@@ -1,6 +1,6 @@
 import { MainLayout } from "@/components/layout/MainLayout";
 import { ActionableAdvisor, AdvisorInsight } from "@/components/dashboard/ActionableAdvisor";
-import { Zap, AlertCircle, TrendingUp, DollarSign, Plus, RefreshCw } from "lucide-react";
+import { Zap, AlertCircle, TrendingUp, DollarSign, Plus, RefreshCw, Clock } from "lucide-react";
 import { useWorkspace } from "@/contexts/WorkspaceContext";
 import { useState, useEffect } from "react";
 import { usePaidAds } from "@/hooks/use-paid-ads";
@@ -118,13 +118,40 @@ export default function PaidAds() {
     <MainLayout>
       <div className="min-h-screen bg-gradient-to-b from-indigo-50/30 via-white to-blue-50/20">
         <div className="p-4 sm:p-6 md:p-8">
+          {/* BETA BANNER - Prominent "Coming Soon" Message */}
+          <div className="mb-8 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-lg flex items-start gap-3">
+            <Clock className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h2 className="font-black text-amber-900 text-lg">Paid Ads – Coming Soon</h2>
+              <p className="text-sm text-amber-800 mt-1">
+                This feature is currently in beta testing. Full campaign management across Meta, Google, and LinkedIn will be available in a future update.
+              </p>
+              <button
+                onClick={() => {
+                  toast({
+                    title: "Notify Me",
+                    description: "We'll let you know when Paid Ads launches!",
+                  });
+                }}
+                className="mt-3 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-lg transition-colors"
+              >
+                Notify Me When Live
+              </button>
+            </div>
+          </div>
+
           {/* Page Header */}
           <div className="mb-8 sm:mb-12">
-            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-1 sm:mb-2">
-              Paid Ads
-            </h1>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-3xl sm:text-4xl font-black text-slate-900">
+                Paid Ads
+              </h1>
+              <span className="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-black rounded-full uppercase tracking-wide">
+                Beta
+              </span>
+            </div>
             <p className="text-slate-600 text-xs sm:text-sm font-medium">
-              {currentWorkspace?.logo} {currentWorkspace?.name} — Manage and optimize campaigns across Meta, Google, and LinkedIn.
+              {currentWorkspace?.logo} {currentWorkspace?.name} — Preview: Manage and optimize campaigns across Meta, Google, and LinkedIn (coming soon).
             </p>
           </div>
 
@@ -186,15 +213,17 @@ export default function PaidAds() {
             <div className="lg:col-span-2">
               {campaigns.length === 0 ? (
                 <div className="bg-white/50 backdrop-blur-xl rounded-2xl p-12 border border-white/60 text-center">
-                  <div className="mb-4 text-4xl">📊</div>
-                  <h3 className="text-lg font-black text-slate-900 mb-2">No Campaigns Yet</h3>
+                  <div className="mb-4 text-4xl">🕐</div>
+                  <h3 className="text-lg font-black text-slate-900 mb-2">Paid Ads Coming Soon</h3>
                   <p className="text-slate-600 text-sm mb-6">
-                    {accounts.length > 0
-                      ? "Connect your ad account and create your first campaign"
-                      : "Connect Meta, Google, and LinkedIn accounts to manage campaigns"}
+                    Full campaign management and optimization features are currently in development. Check back soon!
                   </p>
-                  <button className="px-6 py-3 bg-lime-400 hover:bg-lime-500 text-indigo-950 font-bold rounded-lg transition-colors">
-                    Get Started
+                  <button
+                    disabled
+                    title="This feature is coming soon"
+                    className="px-6 py-3 bg-slate-200 text-slate-500 font-bold rounded-lg cursor-not-allowed opacity-60"
+                  >
+                    Coming Soon
                   </button>
                 </div>
               ) : (
