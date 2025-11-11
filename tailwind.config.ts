@@ -260,6 +260,104 @@ export default {
             "background-position": "0% 50%",
           },
         },
+        // Design system keyframes (from design-import)
+        "reflect-sweep": {
+          "0%": {
+            transform: "translateX(-100%)",
+          },
+          "100%": {
+            transform: "translateX(100%)",
+          },
+        },
+        "slide-up-collapse": {
+          "from": {
+            opacity: "1",
+            height: "auto",
+            transform: "translateY(0)",
+          },
+          "to": {
+            opacity: "0",
+            height: "0",
+            transform: "translateY(-10px)",
+          },
+        },
+        "scale-pulse": {
+          "0%": {
+            transform: "scale(1)",
+          },
+          "50%": {
+            transform: "scale(1.05)",
+          },
+          "100%": {
+            transform: "scale(1)",
+          },
+        },
+        "lift": {
+          "from": {
+            transform: "translateY(0)",
+            "box-shadow": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+          },
+          "to": {
+            transform: "translateY(-2px)",
+            "box-shadow": "0 8px 30px rgba(37, 37, 91, 0.06)",
+          },
+        },
+        "bounce": {
+          "0%, 100%": {
+            transform: "translateY(0)",
+          },
+          "25%": {
+            transform: "translateY(-8px)",
+          },
+          "50%": {
+            transform: "translateY(-4px)",
+          },
+          "75%": {
+            transform: "translateY(-6px)",
+          },
+        },
+        "pulse": {
+          "0%, 100%": {
+            opacity: "1",
+          },
+          "50%": {
+            opacity: "0.5",
+          },
+        },
+        "sparkline-draw": {
+          "from": {
+            "stroke-dashoffset": "1000",
+          },
+          "to": {
+            "stroke-dashoffset": "0",
+          },
+        },
+        "bar-reveal": {
+          "from": {
+            height: "0",
+            opacity: "0",
+          },
+          "to": {
+            height: "100%",
+            opacity: "1",
+          },
+        },
+        "rotate": {
+          "from": {
+            transform: "rotate(0deg)",
+          },
+          "to": {
+            transform: "rotate(360deg)",
+          },
+        },
+        "chevron-rotate": {
+          "from": {
+            transform: "rotate(0deg)",
+          },
+          "to": {
+            transform: "rotate(180deg)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -281,6 +379,17 @@ export default {
         "light-reflect": "light-reflect 3s ease-in-out infinite",
         "subtle-scale": "subtle-scale 2s ease-in-out infinite",
         "gradient-shift": "gradient-shift 8s ease-in-out infinite",
+        // Design system animations (from design-import)
+        "reflect-sweep": "reflect-sweep 3s linear infinite",
+        "slide-up-collapse": "slide-up-collapse 0.2s ease-out",
+        "scale-pulse": "scale-pulse 0.2s ease-out",
+        "lift": "lift 0.3s ease-out",
+        "bounce": "bounce 0.6s ease",
+        "pulse": "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "sparkline-draw": "sparkline-draw 0.4s ease-out forwards",
+        "bar-reveal": "bar-reveal 0.5s ease-out forwards",
+        "rotate": "rotate 1s linear infinite",
+        "chevron-rotate": "chevron-rotate 0.2s ease-out forwards",
       },
     },
   },
