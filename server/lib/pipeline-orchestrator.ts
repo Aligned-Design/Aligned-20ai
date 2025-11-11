@@ -24,6 +24,8 @@ import { CreativeAgent } from "./creative-agent";
 import type { ReviewScore } from "./advisor-review-scorer";
 import { calculateReviewScores, getSeverityLevel } from "./advisor-review-scorer";
 import { generateReflectionQuestion } from "./advisor-reflection-generator";
+import { PersistenceService } from "./persistence-service";
+import { PerformanceTrackingJob } from "./performance-tracking-job";
 
 /**
  * Pipeline Cycle - represents one complete Plan → Create → Review → Learn iteration
@@ -55,11 +57,15 @@ export class PipelineOrchestrator {
   private cycleId: string;
   private requestId: string;
   private cycle: PipelineCycle;
+  private persistenceService: PersistenceService;
+  private performanceTracker: PerformanceTrackingJob;
 
   constructor(brandId: string) {
     this.brandId = brandId;
     this.cycleId = `cycle_${Date.now()}`;
     this.requestId = uuidv4();
+    this.persistenceService = new PersistenceService({ enabled: false }); // Enable DB in production
+    this.performanceTracker = new PerformanceTrackingJob(brandId);
 
     this.cycle = {
       cycleId: this.cycleId,
@@ -163,6 +169,9 @@ export class PipelineOrchestrator {
         }
       }
 
+      // Persist StrategyBrief
+      await this.persistenceService.saveStrategyBrief(this.cycleId, strategy);
+
       this.cycle.strategy = strategy;
       this.cycle.status = "creating";
       this.cycle.metrics.planDurationMs = Date.now() - phaseStart;
@@ -259,6 +268,9 @@ export class PipelineOrchestrator {
         notes: `Generated ${designOutput.status} design with ${designOutput.mainConcept.componentList.length} components`,
       });
 
+      // Persist ContentPackage
+      await this.persistenceService.saveContentPackage(contentPackage.contentId, contentPackage);
+
       this.cycle.contentPackage = contentPackage;
       this.cycle.status = "reviewing";
       this.cycle.metrics.createDurationMs = Date.now() - phaseStart;
@@ -335,6 +347,9 @@ export class PipelineOrchestrator {
         question.category,
       ];
 
+      // Note: Keep in draft status until explicit approval (HITL safeguard)
+      // Content remains "draft" to enforce human approval requirement
+
       this.cycle.reviewScores = scores;
       this.cycle.status = "learning";
       this.cycle.metrics.reviewDurationMs = Date.now() - phaseStart;
@@ -357,24 +372,58 @@ export class PipelineOrchestrator {
   }
 
   /**
-   * Phase 4: Learn - Update BrandHistory and create trends
+   * Phase 4: Learn - Update BrandHistory, pull analytics, and create trends
    */
   async phase4_Learn(
     contentPackage: ContentPackage,
     scores: ReviewScore,
-    brandHistory: BrandHistory
-  ): Promise<{ updatedHistory: BrandHistory; cycle: PipelineCycle }> {
+    brandHistory: BrandHistory,
+    publishedContent?: any[]
+  ): Promise<{ updatedHistory: BrandHistory; performanceLog?: PerformanceLog; cycle: PipelineCycle }> {
     const phaseStart = Date.now();
     try {
       console.log(
         `[Orchestrator] Phase 4: Learn starting (cycleId: ${this.cycleId})`
       );
 
-      // Create history entry
+      let performanceLog: PerformanceLog | undefined;
+
+      // Step 1: Run analytics ingestion job if published content is available
+      if (publishedContent && publishedContent.length > 0) {
+        console.log(
+          `[Orchestrator] Pulling analytics for ${publishedContent.length} published items...`
+        );
+        try {
+          const { performanceLog: newLog, learnings: analyticsLearnings } =
+            await this.performanceTracker.executePollCycle(
+              publishedContent,
+              undefined // TODO: pass previous log here
+            );
+
+          performanceLog = newLog;
+
+          // Add analytics learnings to history
+          for (const learning of analyticsLearnings) {
+            brandHistory.entries.push(learning);
+          }
+
+          console.log(
+            `[Orchestrator] Analytics integrated: ${analyticsLearnings.length} insights added`
+          );
+        } catch (analyticsError) {
+          console.warn(
+            `[Orchestrator] Analytics job failed (non-blocking):`,
+            analyticsError
+          );
+          // Continue even if analytics fails
+        }
+      }
+
+      // Step 2: Create history entry for quality review
       const historyEntry: BrandHistoryEntry = {
         timestamp: new Date().toISOString(),
         agent: "advisor",
-        action: "content_reviewed",
+        action: "performance_insight",
         contentId: contentPackage.contentId,
         details: {
           description: `Reviewed content: ${contentPackage.copy.headline}`,
@@ -399,12 +448,12 @@ export class PipelineOrchestrator {
         ],
       };
 
-      // Add to history
+      // Step 3: Update history
       const updatedHistory = { ...brandHistory };
       updatedHistory.entries = [historyEntry, ...updatedHistory.entries];
       updatedHistory.lastUpdated = new Date().toISOString();
 
-      // Track success patterns
+      // Step 4: Track success patterns
       if (scores.weighted >= 7.5) {
         const pattern = {
           pattern: `High-quality content: clarity ${scores.clarity}, alignment ${scores.brand_alignment}`,
@@ -418,13 +467,28 @@ export class PipelineOrchestrator {
         ];
       }
 
-      // Log learning
+      // Step 5: Log all learning activities
       contentPackage.collaborationLog.push({
         agent: "advisor",
         action: "learnings_recorded",
         timestamp: new Date().toISOString(),
         notes: `Updated BrandHistory: ${historyEntry.action}, pattern tags: ${historyEntry.tags.join(", ")}`,
       });
+
+      // Step 6: Persist BrandHistory
+      await this.persistenceService.addBrandHistoryEntry(
+        this.brandId,
+        historyEntry
+      );
+
+      if (performanceLog) {
+        contentPackage.collaborationLog.push({
+          agent: "advisor",
+          action: "performance_log_updated",
+          timestamp: new Date().toISOString(),
+          notes: `Analytics processed: ${performanceLog.summary.totalContent} content items analyzed`,
+        });
+      }
 
       this.cycle.learnings = [historyEntry];
       this.cycle.status = "complete";
@@ -434,7 +498,7 @@ export class PipelineOrchestrator {
         `[Orchestrator] Phase 4: Learn complete (${this.cycle.metrics.learnDurationMs}ms)`
       );
 
-      return { updatedHistory, cycle: this.cycle };
+      return { updatedHistory, performanceLog, cycle: this.cycle };
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
       this.cycle.errors.push({
@@ -482,11 +546,29 @@ export class PipelineOrchestrator {
       // Phase 4: Learn
       const brandHistory =
         context.brandHistory || createBrandHistory({ brandId: this.brandId });
-      const { updatedHistory } = await this.phase4_Learn(
+      const { updatedHistory, performanceLog } = await this.phase4_Learn(
         contentPackage,
         scores,
-        brandHistory
+        brandHistory,
+        context.publishedContent as any[]
       );
+
+      // Persist final state
+      try {
+        await this.persistenceService.saveBrandHistory(
+          this.brandId,
+          updatedHistory
+        );
+        if (performanceLog) {
+          // Performance log would be persisted in production DB integration
+          console.log(
+            `[Orchestrator] Performance log ready for persistence: ${performanceLog.id}`
+          );
+        }
+      } catch (persistError) {
+        console.warn(`[Orchestrator] Failed to persist final state:`, persistError);
+        // Continue anyway - data is in memory
+      }
 
       // Final status
       console.log(`\n✅ Pipeline Cycle Complete`);

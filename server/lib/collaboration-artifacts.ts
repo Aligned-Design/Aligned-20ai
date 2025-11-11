@@ -431,6 +431,20 @@ export interface CollaborationContext {
   contentPackage: ContentPackage;
   brandHistory: BrandHistory;
   performanceLog: PerformanceLog;
+  publishedContent?: Array<{
+    contentId: string;
+    platform: "instagram" | "twitter" | "linkedin" | "email";
+    publishedAt: string;
+    headline: string;
+    body: string;
+    callToAction: string;
+    tone: string;
+    layout: string;
+    colorScheme: string;
+    motionType: "static" | "animated" | "video";
+    imageType: "photo" | "illustration" | "mixed" | "none";
+    hasEmoji: boolean;
+  }>;
 }
 
 /**
