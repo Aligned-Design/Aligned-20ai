@@ -78,22 +78,23 @@ function generateSEOMetadata(
 
 // Helper function to convert database record to API response format
 function mapAssetRecord(record: unknown): MediaAsset {
+  const r = record as any;
   return {
-    id: record.id,
-    filename: record.filename,
-    originalName: record.filename, // Use filename as originalName
-    category: record.category,
-    mimeType: record.mime_type,
-    size: record.file_size,
-    brandId: record.brand_id,
-    tenantId: record.tenant_id,
-    bucketPath: record.path,
-    createdAt: record.created_at,
-    updatedAt: record.updated_at,
-    hash: record.hash,
-    tags: record.metadata?.tags || [],
-    variants: record.variants,
-    metadata: record.metadata,
+    id: r.id,
+    filename: r.filename,
+    originalName: r.filename, // Use filename as originalName
+    category: r.category,
+    mimeType: r.mime_type,
+    size: r.file_size,
+    brandId: r.brand_id,
+    tenantId: r.tenant_id,
+    bucketPath: r.path,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+    hash: r.hash,
+    tags: r.metadata?.tags || [],
+    variants: r.variants,
+    metadata: r.metadata,
   };
 }
 
@@ -111,8 +112,9 @@ function getCategoryBreakdown(
   };
 
   for (const asset of assets) {
-    if (asset.category in breakdown) {
-      breakdown[asset.category]++;
+    const a = asset as any;
+    if (a.category in breakdown) {
+      breakdown[a.category]++;
     }
   }
 
@@ -143,7 +145,7 @@ export const uploadMedia: RequestHandler = async (req, res, next) => {
       fileSize,
       hash || "",
       "", // URL will be generated separately
-      category as unknown || "images",
+      ((category as string) || "images") as any,
       metadata,
       thumbnailUrl
     );

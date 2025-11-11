@@ -403,7 +403,7 @@ async function triggerSync(integration: Integration, syncType: string): Promise<
   return {
     id: `sync_${Date.now()}`,
     integrationId: integration.id,
-    type: syncType as unknown,
+    type: syncType as any,
     action: 'sync',
     sourceId: integration.id,
     data: {},

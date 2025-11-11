@@ -93,7 +93,7 @@ export const handleOAuthCallback: RequestHandler = async (req, res) => {
     const { brandId } = tokenData;
 
     // ✅ SECURE: Require authentication context
-    const authContext = (req as unknown).auth;
+    const authContext = (req as any).auth;
     if (!authContext || !authContext.userId) {
       const errorMsg =
         "Authentication required to complete OAuth authorization";
@@ -115,21 +115,22 @@ export const handleOAuthCallback: RequestHandler = async (req, res) => {
     const userId = authContext.userId;
 
     // Store connection in database
+    const accountInfo = tokenData.accountInfo as any;
     await connectionsDB.upsertConnection(
       brandId,
       tenantId,
       platform as Platform,
       tokenData.accessToken,
-      tokenData.accountInfo.id,
-      tokenData.accountInfo.name || tokenData.accountInfo.username,
-      tokenData.accountInfo.picture?.data?.url ||
-        tokenData.accountInfo.profile_image_url,
+      accountInfo.id,
+      accountInfo.name || accountInfo.username,
+      accountInfo.picture?.data?.url ||
+        accountInfo.profile_image_url,
       tokenData.refreshToken,
       tokenData.expiresIn
         ? new Date(Date.now() + tokenData.expiresIn * 1000)
         : undefined,
       [], // TODO: Extract permissions from token response
-      tokenData.accountInfo,
+      accountInfo,
       userId,
     );
 
@@ -148,10 +149,10 @@ export const getConnections: RequestHandler = async (req, res) => {
     const { brandId } = req.params;
 
     // Fetch connections from database
-    const connections: unknown[] = await connectionsDB.getBrandConnections(brandId);
+    const connections: any[] = await connectionsDB.getBrandConnections(brandId);
 
     // Transform to ConnectionStatus format
-    const connectionStatuses: ConnectionStatus[] = connections.map((conn) => ({
+    const connectionStatuses: ConnectionStatus[] = connections.map((conn: any) => ({
       platform: conn.platform as Platform,
       connected: conn.status === "connected",
       accountName: conn.account_name,
@@ -213,8 +214,8 @@ export const publishContent: RequestHandler = async (req, res) => {
       validateOnly,
     } = PublishContentSchema.parse(req.body);
 
-    const tenantId = (req as unknown).user?.tenantId || "tenant-123";
-    const userId = (req as unknown).user?.id;
+    const tenantId = (req as any).user?.tenantId || "tenant-123";
+    const userId = (req as any).user?.id;
 
     // Convert content string to PostContent object
     const content: PostContent = { text: contentText };
@@ -322,21 +323,21 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
       limit,
       offset,
     );
-    const jobsAny: unknown[] = (jobs as unknown) || [];
+    const jobsAny: any[] = (jobs as any) || [];
 
     // Filter by platform if specified
     let filteredJobs = jobsAny;
     if (platform && platform !== "all") {
-      filteredJobs = jobsAny.filter((job) =>
+      filteredJobs = jobsAny.filter((job: any) =>
         job.platforms?.includes(platform as string),
       );
     }
 
     // Filter by brand
-    filteredJobs = filteredJobs.filter((job: unknown) => job.brand_id === brandId);
+    filteredJobs = filteredJobs.filter((job: any) => job.brand_id === brandId);
 
     // Transform database records to PublishingJob format
-    const publishingJobs: PublishingJob[] = filteredJobs.map((job: unknown) => ({
+    const publishingJobs: PublishingJob[] = filteredJobs.map((job: any) => ({
       id: (job as any).id,
       brandId: (job as any).brand_id,
       tenantId: (job as any).tenant_id,
@@ -349,7 +350,7 @@ export const getPublishingJobs: RequestHandler = async (req, res) => {
       platformPostId: undefined,
       platformUrl: undefined,
       content: (job as any).content,
-      validationResults: ((job as any).validation_results as unknown[]) || [],
+      validationResults: ((job as any).validation_results as any[]) || [],
       retryCount: (job as any).retry_count || 0,
       maxRetries: (job as any).max_retries || 3,
       lastError: (job as any).last_error,

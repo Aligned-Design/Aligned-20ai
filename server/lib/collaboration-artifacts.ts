@@ -1,0 +1,457 @@
+/**
+ * Collaboration Artifacts
+ *
+ * Defines the contract structures for data sharing between Copy, Creative, and Advisor agents.
+ * - StrategyBrief: Brand positioning and voice
+ * - ContentPackage: Copy drafts and design inputs
+ * - BrandHistory: Past decisions and patterns
+ * - PerformanceLog: Analytics and success metrics
+ */
+
+/**
+ * StrategyBrief - Brand Positioning & Voice
+ *
+ * Loaded by Creative before generating designs to understand brand context.
+ */
+export interface StrategyBrief {
+  id: string;
+  brandId: string;
+  version: string;
+  updatedAt: string;
+
+  // Brand Positioning
+  positioning: {
+    tagline: string;
+    missionStatement: string;
+    targetAudience: {
+      demographics: string;
+      psychographics: string[];
+      painPoints: string[];
+      aspirations: string[];
+    };
+  };
+
+  // Brand Voice & Tone
+  voice: {
+    tone: "professional" | "casual" | "energetic" | "friendly" | "authoritative" | "mixed";
+    personality: string[];
+    keyMessages: string[];
+    avoidPhrases: string[];
+  };
+
+  // Visual Identity
+  visual: {
+    primaryColor: string;
+    secondaryColor: string;
+    accentColor: string;
+    fontPairing: {
+      heading: string;
+      body: string;
+    };
+    imagery: {
+      style: "photo" | "illustration" | "mixed" | "minimal";
+      subjects: string[];
+    };
+  };
+
+  // Competitive Context
+  competitive: {
+    differentiation: string[];
+    uniqueValueProposition: string;
+  };
+}
+
+/**
+ * ContentPackage - Copy Drafts & Design Inputs
+ *
+ * Written by Copy agent, consumed by Creative for layout/design decisions.
+ * Updated by Creative with design context.
+ */
+export interface ContentPackage {
+  id: string;
+  brandId: string;
+  contentId: string;
+  platform: string;
+  status: "draft" | "in_review" | "approved" | "published";
+
+  // Content from Copy Agent
+  copy: {
+    headline: string;
+    subheadline?: string;
+    body: string;
+    callToAction: string;
+    tone: string;
+    keywords: string[];
+    estimatedReadTime: number; // seconds
+  };
+
+  // Design Context (added by Creative)
+  designContext?: {
+    suggestedLayout: string;
+    componentPrecedence: string[]; // Which elements are visual priority
+    colorTheme: string;
+    motionConsiderations: string[];
+    accessibilityNotes: string[];
+  };
+
+  // Collaboration Notes
+  collaborationLog: Array<{
+    agent: "copy" | "creative" | "advisor";
+    action: string;
+    timestamp: string;
+    notes: string;
+  }>;
+
+  // Metadata
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  requestId: string;
+}
+
+/**
+ * BrandHistory - Design Patterns & Decisions
+ *
+ * Maintained by Creative to track visual evolution and decision rationale.
+ * Consulted before creating new designs to maintain consistency.
+ */
+export interface BrandHistoryEntry {
+  timestamp: string;
+  agent: "creative" | "copy" | "advisor";
+  action:
+    | "design_created"
+    | "design_updated"
+    | "pattern_identified"
+    | "constraint_added"
+    | "performance_insight";
+  contentId?: string;
+  details: {
+    description: string;
+    visualization?: {
+      colors: string[];
+      layout: string;
+      typography: string[];
+    };
+  };
+  rationale: string;
+  performance?: {
+    metric: string;
+    baseline: number;
+    result: number;
+    improvement: number; // percentage
+  };
+  tags: string[]; // "success_pattern", "design_fatigue", "accessibility_fix", etc.
+}
+
+export interface BrandHistory {
+  id: string;
+  brandId: string;
+  entries: BrandHistoryEntry[];
+  successPatterns: Array<{
+    pattern: string;
+    frequency: number;
+    avgPerformance: number;
+    examples: string[];
+  }>;
+  designFatigueAlerts: Array<{
+    component: string;
+    usage: number;
+    lastUsed: string;
+    recommendation: string;
+  }>;
+  constraints: Array<{
+    type: "color" | "typography" | "layout" | "animation";
+    rule: string;
+    addedAt: string;
+    rationale: string;
+  }>;
+  lastUpdated: string;
+}
+
+/**
+ * PerformanceLog - Analytics & Success Metrics
+ *
+ * Populated by Advisor with performance data.
+ * Consulted by Creative and Copy to inform data-driven decisions.
+ */
+export interface PerformanceMetrics {
+  metric: string;
+  value: number;
+  unit: string;
+  target?: number;
+  status: "excellent" | "good" | "fair" | "poor";
+}
+
+export interface ContentPerformance {
+  contentId: string;
+  platform: string;
+  publishedAt: string;
+  metrics: {
+    reach: PerformanceMetrics;
+    engagement: PerformanceMetrics;
+    clicks: PerformanceMetrics;
+    conversions?: PerformanceMetrics;
+    saveRate?: PerformanceMetrics;
+    shareRate?: PerformanceMetrics;
+  };
+  visualAttributes: {
+    layout: string;
+    colorScheme: string;
+    motionType: "static" | "animated" | "video";
+    imageType: "photo" | "illustration" | "mixed" | "none";
+  };
+  copyAttributes: {
+    tone: string;
+    length: number;
+    hasEmoji: boolean;
+    hasCallToAction: boolean;
+  };
+}
+
+export interface PerformanceLog {
+  id: string;
+  brandId: string;
+  period: {
+    start: string; // ISO date
+    end: string;
+  };
+
+  // Overall performance summary
+  summary: {
+    totalContent: number;
+    avgEngagement: number;
+    topPerformingMetric: string;
+    bottomPerformingMetric: string;
+  };
+
+  // Performance by visual attribute
+  visualPerformance: Array<{
+    attribute: string;
+    attributeValue: string;
+    avgMetrics: {
+      engagement: number;
+      reach: number;
+      clicks: number;
+    };
+    contentCount: number;
+  }>;
+
+  // Performance by copy attribute
+  copyPerformance: Array<{
+    attribute: string;
+    attributeValue: string;
+    avgMetrics: {
+      engagement: number;
+      reach: number;
+      clicks: number;
+    };
+    contentCount: number;
+  }>;
+
+  // Platform-specific insights
+  platformInsights: Array<{
+    platform: string;
+    topVisualStyle: string;
+    topCopyStyle: string;
+    optimalPostTime?: string;
+    recommendedFrequency?: string;
+    bestPerformingLayout?: string;
+  }>;
+
+  // Detailed content performance history
+  contentPerformance: ContentPerformance[];
+
+  // Recommendations for next content
+  recommendations: {
+    visualRecommendations: string[];
+    copyRecommendations: string[];
+    platformRecommendations: string[];
+  };
+
+  // Alerts and patterns
+  patterns: Array<{
+    pattern: string;
+    strength: "strong" | "moderate" | "weak";
+    example: string;
+    impact: string;
+  }>;
+
+  alerts: Array<{
+    alert: string;
+    severity: "critical" | "high" | "medium" | "low";
+    recommendation: string;
+  }>;
+
+  lastUpdated: string;
+}
+
+/**
+ * Create a new StrategyBrief
+ */
+export function createStrategyBrief(overrides?: Partial<StrategyBrief>): StrategyBrief {
+  return {
+    id: `sb_${Date.now()}`,
+    brandId: "",
+    version: "1.0.0",
+    updatedAt: new Date().toISOString(),
+    positioning: {
+      tagline: "",
+      missionStatement: "",
+      targetAudience: {
+        demographics: "",
+        psychographics: [],
+        painPoints: [],
+        aspirations: [],
+      },
+    },
+    voice: {
+      tone: "professional",
+      personality: [],
+      keyMessages: [],
+      avoidPhrases: [],
+    },
+    visual: {
+      primaryColor: "",
+      secondaryColor: "",
+      accentColor: "",
+      fontPairing: {
+        heading: "Poppins",
+        body: "Inter",
+      },
+      imagery: {
+        style: "photo",
+        subjects: [],
+      },
+    },
+    competitive: {
+      differentiation: [],
+      uniqueValueProposition: "",
+    },
+    ...overrides,
+  };
+}
+
+/**
+ * Create a new ContentPackage
+ */
+export function createContentPackage(overrides?: Partial<ContentPackage>): ContentPackage {
+  return {
+    id: `cp_${Date.now()}`,
+    brandId: "",
+    contentId: "",
+    platform: "instagram",
+    status: "draft",
+    copy: {
+      headline: "",
+      body: "",
+      callToAction: "",
+      tone: "professional",
+      keywords: [],
+      estimatedReadTime: 0,
+    },
+    collaborationLog: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: "copy-agent",
+    requestId: "",
+    ...overrides,
+  };
+}
+
+/**
+ * Create a new BrandHistory
+ */
+export function createBrandHistory(overrides?: Partial<BrandHistory>): BrandHistory {
+  return {
+    id: `bh_${Date.now()}`,
+    brandId: "",
+    entries: [],
+    successPatterns: [],
+    designFatigueAlerts: [],
+    constraints: [],
+    lastUpdated: new Date().toISOString(),
+    ...overrides,
+  };
+}
+
+/**
+ * Add entry to BrandHistory
+ */
+export function addBrandHistoryEntry(
+  history: BrandHistory,
+  entry: BrandHistoryEntry
+): BrandHistory {
+  return {
+    ...history,
+    entries: [entry, ...history.entries],
+    lastUpdated: new Date().toISOString(),
+  };
+}
+
+/**
+ * Create a new PerformanceLog
+ */
+export function createPerformanceLog(overrides?: Partial<PerformanceLog>): PerformanceLog {
+  return {
+    id: `pl_${Date.now()}`,
+    brandId: "",
+    period: {
+      start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      end: new Date().toISOString().split("T")[0],
+    },
+    summary: {
+      totalContent: 0,
+      avgEngagement: 0,
+      topPerformingMetric: "",
+      bottomPerformingMetric: "",
+    },
+    visualPerformance: [],
+    copyPerformance: [],
+    platformInsights: [],
+    contentPerformance: [],
+    recommendations: {
+      visualRecommendations: [],
+      copyRecommendations: [],
+      platformRecommendations: [],
+    },
+    patterns: [],
+    alerts: [],
+    lastUpdated: new Date().toISOString(),
+    ...overrides,
+  };
+}
+
+/**
+ * Collaboration Context - combined view of all artifacts
+ */
+export interface CollaborationContext {
+  brandId: string;
+  requestId: string;
+  strategyBrief: StrategyBrief;
+  contentPackage: ContentPackage;
+  brandHistory: BrandHistory;
+  performanceLog: PerformanceLog;
+}
+
+/**
+ * Create collaboration context
+ */
+export function createCollaborationContext(
+  brandId: string,
+  requestId: string,
+  overrides?: {
+    strategyBrief?: Partial<StrategyBrief>;
+    contentPackage?: Partial<ContentPackage>;
+    brandHistory?: Partial<BrandHistory>;
+    performanceLog?: Partial<PerformanceLog>;
+  }
+): CollaborationContext {
+  return {
+    brandId,
+    requestId,
+    strategyBrief: createStrategyBrief({ brandId, ...overrides?.strategyBrief }),
+    contentPackage: createContentPackage({ brandId, requestId, ...overrides?.contentPackage }),
+    brandHistory: createBrandHistory({ brandId, ...overrides?.brandHistory }),
+    performanceLog: createPerformanceLog({ brandId, ...overrides?.performanceLog }),
+  };
+}

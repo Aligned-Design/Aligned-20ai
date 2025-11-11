@@ -17,7 +17,7 @@ interface PreferencesResponse {
 export const getPreferences: RequestHandler = async (req, res, next) => {
   try {
     // Get userId from authentication context (from Issue #6)
-    const userId = (req as unknown).user?.id || (req as unknown).userId;
+    const userId = (req as any).user?.id || (req as any).userId;
     const { brandId } = req.query;
 
     if (!userId) {
@@ -55,7 +55,7 @@ export const getPreferences: RequestHandler = async (req, res, next) => {
 export const updatePreferences: RequestHandler = async (req, res, next) => {
   try {
     // Get userId from authentication context (from Issue #6)
-    const userId = (req as unknown).user?.id || (req as unknown).userId;
+    const userId = (req as any).user?.id || (req as any).userId;
     const { brandId, ...updateData } = req.body;
 
     if (!userId) {
@@ -106,7 +106,7 @@ export const updatePreferences: RequestHandler = async (req, res, next) => {
 export const exportPreferences: RequestHandler = async (req, res, next) => {
   try {
     // Get userId from authentication context (from Issue #6)
-    const userId = (req as unknown).user?.id || (req as unknown).userId;
+    const userId = (req as any).user?.id || (req as any).userId;
     const { brandId } = req.query;
 
     if (!userId) {

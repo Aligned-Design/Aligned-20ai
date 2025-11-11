@@ -20,8 +20,8 @@
     "test:ci": "vitest --run",
     "format.fix": "prettier --write .",
     "format": "prettier --check .",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx --ignore-path .gitignore",
-    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --ignore-path .gitignore --fix",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "typecheck": "tsc",
     "validate:env": "tsx server/utils/validate-env.ts",
     "verify:supabase": "tsx server/utils/verify-supabase-setup.ts"
