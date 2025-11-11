@@ -143,7 +143,50 @@ export function createServer() {
   const app = express();
 
   // Middleware
-  app.use(cors());
+  // ✅ SECURE: CORS restricted to production domain
+  // Development allows localhost, production allows configured domain only
+  const corsOptions = {
+    origin:
+      process.env.NODE_ENV === "production"
+        ? process.env.VITE_APP_URL
+        : [
+            "http://localhost:5173",
+            "http://localhost:8080",
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:8080",
+          ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    optionsSuccessStatus: 200,
+  };
+  app.use(cors(corsOptions));
+
+  // ✅ SECURE: Security headers
+  app.use((_req, res, next) => {
+    // Prevent clickjacking attacks
+    res.setHeader("X-Frame-Options", "DENY");
+    // Prevent MIME type sniffing
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    // Enable XSS protection in older browsers
+    res.setHeader("X-XSS-Protection", "1; mode=block");
+    // Prevent referrer leakage
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    // Content Security Policy
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src 'self'; script-src 'self' 'unsafe-inline' cdn.example.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;"
+    );
+    // HSTS (HTTP Strict Transport Security) - only for production
+    if (process.env.NODE_ENV === "production") {
+      res.setHeader(
+        "Strict-Transport-Security",
+        "max-age=31536000; includeSubDomains; preload"
+      );
+    }
+    next();
+  });
+
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
