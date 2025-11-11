@@ -25,6 +25,7 @@ import LinkedAccounts from "./pages/LinkedAccounts";
 import Settings from "./pages/Settings";
 import Reporting from "./pages/Reporting";
 import CreativeStudio from "./pages/CreativeStudio";
+import Approvals from "./pages/Approvals";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ function ProtectedRoutes() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/calendar" element={<Calendar />} />
       <Route path="/content-queue" element={<ContentQueue />} />
+      <Route path="/approvals" element={<Approvals />} />
       <Route path="/creative-studio" element={<CreativeStudio />} />
       {/* Strategy Navigation */}
       <Route path="/campaigns" element={<Campaigns />} />
