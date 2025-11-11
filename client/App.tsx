@@ -26,6 +26,13 @@ import Settings from "./pages/Settings";
 import Reporting from "./pages/Reporting";
 import CreativeStudio from "./pages/CreativeStudio";
 import Approvals from "./pages/Approvals";
+import ClientPortal from "./pages/ClientPortal";
+import BrandIntelligence from "./pages/BrandIntelligence";
+import ContentGenerator from "./pages/ContentGenerator";
+import ClientSettings from "./pages/ClientSettings";
+import Brands from "./pages/Brands";
+import BrandIntake from "./pages/BrandIntake";
+import BrandSnapshot from "./pages/BrandSnapshot";
 
 const queryClient = new QueryClient();
 
@@ -52,19 +59,26 @@ function ProtectedRoutes() {
       <Route path="/content-queue" element={<ContentQueue />} />
       <Route path="/approvals" element={<Approvals />} />
       <Route path="/creative-studio" element={<CreativeStudio />} />
+      <Route path="/content-generator" element={<ContentGenerator />} />
       {/* Strategy Navigation */}
       <Route path="/campaigns" element={<Campaigns />} />
+      <Route path="/brands" element={<Brands />} />
+      <Route path="/brand-intake" element={<BrandIntake />} />
       <Route path="/brand-guide" element={<BrandGuide />} />
+      <Route path="/brand-snapshot" element={<BrandSnapshot />} />
+      <Route path="/brand-intelligence" element={<BrandIntelligence />} />
       <Route path="/analytics" element={<Analytics />} />
       <Route path="/reporting" element={<Reporting />} />
       <Route path="/paid-ads" element={<PaidAds />} />
       {/* Assets Navigation */}
       <Route path="/library" element={<LibraryPage />} />
+      <Route path="/client-portal" element={<ClientPortal />} />
       <Route path="/events" element={<Events />} />
       <Route path="/reviews" element={<Reviews />} />
       <Route path="/linked-accounts" element={<LinkedAccounts />} />
       {/* Settings */}
       <Route path="/settings" element={<Settings />} />
+      <Route path="/client-settings" element={<ClientSettings />} />
       {/* Catch-all - show 404 page */}
       <Route path="*" element={<NotFound />} />
     </Routes>
