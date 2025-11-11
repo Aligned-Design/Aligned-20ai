@@ -33,6 +33,7 @@ import ClientSettings from "./pages/ClientSettings";
 import Brands from "./pages/Brands";
 import BrandIntake from "./pages/BrandIntake";
 import BrandSnapshot from "./pages/BrandSnapshot";
+import Billing from "./pages/Billing";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +80,7 @@ function ProtectedRoutes() {
       {/* Settings */}
       <Route path="/settings" element={<Settings />} />
       <Route path="/client-settings" element={<ClientSettings />} />
+      <Route path="/billing" element={<Billing />} />
       {/* Catch-all - show 404 page */}
       <Route path="*" element={<NotFound />} />
     </Routes>
