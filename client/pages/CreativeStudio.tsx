@@ -1249,6 +1249,35 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
           activeSection={activeDrawerSection}
         />
       )}
+
+      {/* Request Approval Modal */}
+      {showRequestApproval && state.design && (
+        <RequestApprovalModal
+          designName={state.design.name || "Untitled Design"}
+          onConfirm={handleRequestApproval}
+          onClose={() => setShowRequestApproval(false)}
+        />
+      )}
+
+      {/* Keyboard Shortcuts Panel */}
+      {showKeyboardShortcuts && (
+        <KeyboardShortcutsPanel
+          onClose={() => setShowKeyboardShortcuts(false)}
+        />
+      )}
+
+      {/* Mobile Toolbar (shows on mobile devices) */}
+      <div className="lg:hidden">
+        <MobileToolbar
+          onAddText={handleAddText}
+          onAddImage={handleAddImage}
+          onAddShape={() => handleAddShape("rectangle")}
+          onShowColors={() => setShowColorPicker(true)}
+          onShowLayers={() => {}}
+          onSave={handleSaveToLibrary}
+          onShare={() => setShowPlatformPreview(true)}
+        />
+      </div>
     </MainLayout>
   );
 }
