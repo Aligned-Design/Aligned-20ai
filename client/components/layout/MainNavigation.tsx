@@ -1,30 +1,12 @@
 /**
  * Main navigation component
- * Displays different nav items based on user role
+ * Dynamically renders navigation based on route visibility metadata and user permissions
  */
 
 import { useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useCan } from "@/lib/auth/useCan";
-
-const agencyNavItems = [
-  { label: "Dashboard", icon: "📊", path: "/dashboard" },
-  { label: "Creative Studio", icon: "✨", path: "/creative-studio" },
-  { label: "Content Queue", icon: "📝", path: "/content-queue" },
-  { label: "Approvals", icon: "✓", path: "/approvals" },
-  { label: "Campaigns", icon: "📢", path: "/campaigns" },
-  { label: "Analytics", icon: "📈", path: "/analytics" },
-  { label: "Calendar", icon: "📅", path: "/calendar" },
-  { label: "Brand Guide", icon: "🎨", path: "/brand-guide" },
-  { label: "Library", icon: "📚", path: "/library" },
-];
-
-const clientNavItems = [
-  { label: "Dashboard", icon: "📊", path: "/dashboard" },
-  { label: "Approvals", icon: "✓", path: "/approvals" },
-  { label: "Analytics", icon: "📈", path: "/analytics" },
-  { label: "Calendar", icon: "📅", path: "/calendar" },
-];
+import { getContextualNavItems } from "@/lib/navigation-helpers";
 
 interface MainNavigationProps {
   brandName?: string;
@@ -35,11 +17,15 @@ export function MainNavigation({
 }: MainNavigationProps) {
   const location = useLocation();
   const { user, role } = useAuth();
-
-  // Determine which nav items to show based on role
-  // BRAND_MANAGER+ see agency items, others see client items
+  const canCheck = useCan;
   const canManageBrand = useCan("brand:manage");
-  const navItems = canManageBrand ? agencyNavItems : clientNavItems;
+
+  // Get navigation items based on user context and permissions
+  const navItems = getContextualNavItems({
+    isAuthenticated: !!user,
+    isClient: role === 'CLIENT',
+    canCheck: (scope: string) => canCheck(scope),
+  });
 
   return (
     <nav className="flex flex-col h-full">
@@ -76,7 +62,7 @@ export function MainNavigation({
                 : "text-gray-700 hover:bg-gray-100"
             }`}
           >
-            <span className="text-lg">{item.icon}</span>
+            {item.icon && <span className="text-lg">{item.icon}</span>}
             {item.label}
           </Link>
         ))}
