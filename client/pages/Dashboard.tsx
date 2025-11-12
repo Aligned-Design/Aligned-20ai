@@ -16,21 +16,11 @@ import SmartDashboard from "@/components/analytics/SmartDashboard";
 import { DashboardShell, KpiCard } from "@/components/DashboardSystem";
 import { Sparkles, TrendingUp, MessageSquare } from "lucide-react";
 
+// ============================================================================
+// Unified Dashboard - Production Version
+// ============================================================================
+
 export default function Dashboard() {
-  const unifiedDashEnabled = isFeatureEnabled("unified_dash");
-
-  if (unifiedDashEnabled) {
-    return <UnifiedDashboard />;
-  }
-
-  return <LegacyDashboard />;
-}
-
-// ============================================================================
-// NEW: Unified Dashboard System Version
-// ============================================================================
-
-function UnifiedDashboard() {
   const navigate = useNavigate();
   const { user, role, logout } = useAuth();
   const canCreateContent = useCan("content:create");
