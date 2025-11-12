@@ -215,18 +215,18 @@ export function createServer() {
   // Register route routers
   app.use("/api/agents", agentsRouter);
   app.use("/api/ai-metrics", aiMetricsRouter);
-  app.use("/api/builder", builderRouter);
-  app.use("/api/crawler", crawlerRouter);
-  app.use("/api/escalations", escalationsRouter);
-  app.use("/api/integrations", integrationsRouter);
-  app.use("/api/media-management", mediaManagementRouter);
-  app.use("/api/publishing", publishingRouter);
-  app.use("/api/orchestration", orchestrationRouter);
+  // app.use("/api/builder", builderRouter);
+  // app.use("/api/crawler", crawlerRouter);
+  // app.use("/api/escalations", escalationsRouter);
+  // app.use("/api/integrations", integrationsRouter);
+  // app.use("/api/media-management", mediaManagementRouter);
+  // app.use("/api/publishing", publishingRouter);
+  // app.use("/api/orchestration", orchestrationRouter);
   app.use("/api/milestones", milestonesRouter);
-  app.use("/api/trial", trialRouter);
-  app.use("/api/billing", billingRouter);
-  app.use("/api/billing", billingReactivationRouter);
-  app.use("/api/webhooks/stripe", stripeWebhookRouter);
+  // app.use("/api/trial", trialRouter);
+  // app.use("/api/billing", billingRouter);
+  // app.use("/api/billing", billingReactivationRouter);
+  // app.use("/api/webhooks/stripe", stripeWebhookRouter);
 
   // Register individual route handlers with appropriate paths
 
