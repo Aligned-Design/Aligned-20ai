@@ -7,7 +7,7 @@
  * - Retrieving collaboration logs and learnings
  */
 
-import type { Router, Request, Response } from "express";
+import { Router, Request, Response } from "express";
 import { executePipelineCycle } from "../lib/pipeline-orchestrator";
 import type { CollaborationContext } from "../lib/collaboration-artifacts";
 import {
@@ -20,8 +20,7 @@ import {
  * Create and register orchestration routes
  */
 function createOrchestrationRouter(): Router {
-  const express = require("express");
-  const router = express.Router();
+  const router = Router();
 
   /**
    * POST /pipeline/execute
