@@ -40,6 +40,13 @@ import BrandIntake from "./pages/BrandIntake";
 import BrandSnapshot from "./pages/BrandSnapshot";
 import Billing from "./pages/Billing";
 import Pricing from "./pages/Pricing";
+import Features from "./pages/Features";
+import Integrations from "./pages/Integrations";
+import Help from "./pages/Help";
+import Contact from "./pages/Contact";
+import About from "./pages/About";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient();
 
@@ -104,8 +111,15 @@ function ProtectedRoutes() {
         }
       />
 
-      {/* Pricing page - accessible to everyone */}
+      {/* Public pages - accessible to everyone */}
       <Route path="/pricing" element={<Pricing />} />
+      <Route path="/features" element={<Features />} />
+      <Route path="/integrations" element={<Integrations />} />
+      <Route path="/help" element={<Help />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
 
       {/* Auth Routes - redirect to onboarding or show onboarding */}
       <Route
