@@ -8,6 +8,8 @@ import { useAuth } from "@/lib/auth";
 import { useCan } from "@/lib/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { isFeatureEnabled } from "@/lib/featureFlags";
+import { analytics } from "@/lib/analytics";
+import { useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import ActionButtonsHeader from "@/components/dashboard/ActionButtonsHeader";
 import DashboardWidgets from "@/components/dashboard/DashboardWidgets";
@@ -35,6 +37,14 @@ function UnifiedDashboard() {
   const { user, role, logout } = useAuth();
   const canCreateContent = useCan("content:create");
   const canManageBrand = useCan("brand:manage");
+
+  // Track dashboard view
+  useEffect(() => {
+    analytics.track("dash_view", {
+      dashboardId: "main",
+      userId: user?.id,
+    });
+  }, [user?.id]);
 
   return (
     <DashboardShell
