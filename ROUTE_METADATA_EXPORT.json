@@ -1,0 +1,234 @@
+[
+  {
+    "path": "/",
+    "visibility": "public",
+    "title": "Aligned AI - AI-Powered Content Creation for Agencies & Brands",
+    "description": "Transform your content workflow with AI. Aligned AI handles planning, writing, scheduling, and reporting so you can focus on what matters.",
+    "noindex": false
+  },
+  {
+    "path": "/about",
+    "visibility": "public",
+    "title": "About Aligned AI - Built by Marketers, for Marketers",
+    "description": "Learn about our mission to make content creation feel less like a grind and more like a superpower.",
+    "noindex": false
+  },
+  {
+    "path": "/features",
+    "visibility": "public",
+    "title": "Features - AI Content, Scheduling & Analytics | Aligned AI",
+    "description": "Explore AI content generation, smart scheduling, real-time analytics, collaboration tools, and more.",
+    "noindex": false
+  },
+  {
+    "path": "/integrations",
+    "visibility": "public",
+    "title": "Integrations - Connect All Your Channels | Aligned AI",
+    "description": "Integrate with Facebook, Instagram, LinkedIn, Twitter, TikTok, Google Business Profile, and more.",
+    "noindex": false
+  },
+  {
+    "path": "/help",
+    "visibility": "public",
+    "title": "Help Center - Support & FAQs | Aligned AI",
+    "description": "Find answers, explore resources, and get the most out of Aligned AI.",
+    "noindex": false
+  },
+  {
+    "path": "/contact",
+    "visibility": "public",
+    "title": "Contact Us - Get in Touch | Aligned AI",
+    "description": "Have questions? Want a demo? We're here to help you get Aligned.",
+    "noindex": false
+  },
+  {
+    "path": "/privacy",
+    "visibility": "public",
+    "title": "Privacy Policy | Aligned AI",
+    "description": "Learn how we protect and handle your data at Aligned AI.",
+    "noindex": false
+  },
+  {
+    "path": "/terms",
+    "visibility": "public",
+    "title": "Terms of Service | Aligned AI",
+    "description": "Read our terms of service and usage agreement.",
+    "noindex": false
+  },
+  {
+    "path": "/pricing",
+    "visibility": "public",
+    "title": "Pricing - Simple, Scalable Plans | Aligned AI",
+    "description": "Start at $199/mo per brand. Scale smarter with agency pricing. No hidden fees.",
+    "noindex": false
+  },
+  {
+    "path": "/onboarding",
+    "visibility": "user",
+    "title": "Onboarding - Get Started | Aligned AI",
+    "description": "Set up your workspace and brand profile.",
+    "noindex": true
+  },
+  {
+    "path": "/dashboard",
+    "visibility": "user",
+    "title": "Dashboard | Aligned AI",
+    "description": "Your content command center.",
+    "noindex": true
+  },
+  {
+    "path": "/calendar",
+    "visibility": "user",
+    "title": "Content Calendar | Aligned AI",
+    "description": "Plan and schedule your content.",
+    "noindex": true
+  },
+  {
+    "path": "/content-queue",
+    "visibility": "user",
+    "title": "Content Queue | Aligned AI",
+    "description": "Manage pending and scheduled posts.",
+    "noindex": true
+  },
+  {
+    "path": "/approvals",
+    "visibility": "user",
+    "title": "Approvals | Aligned AI",
+    "description": "Review and approve content.",
+    "noindex": true
+  },
+  {
+    "path": "/creative-studio",
+    "visibility": "user",
+    "title": "Creative Studio | Aligned AI",
+    "description": "Design and edit your content.",
+    "noindex": true
+  },
+  {
+    "path": "/content-generator",
+    "visibility": "user",
+    "title": "Content Generator | Aligned AI",
+    "description": "AI-powered content creation.",
+    "noindex": true
+  },
+  {
+    "path": "/campaigns",
+    "visibility": "user",
+    "title": "Campaigns | Aligned AI",
+    "description": "Manage your marketing campaigns.",
+    "noindex": true
+  },
+  {
+    "path": "/brands",
+    "visibility": "user",
+    "title": "Brands | Aligned AI",
+    "description": "Manage multiple brands.",
+    "noindex": true
+  },
+  {
+    "path": "/brand-intake",
+    "visibility": "user",
+    "title": "Brand Intake | Aligned AI",
+    "description": "Complete your brand profile.",
+    "noindex": true
+  },
+  {
+    "path": "/brand-guide",
+    "visibility": "user",
+    "title": "Brand Guide | Aligned AI",
+    "description": "Your brand voice and guidelines.",
+    "noindex": true
+  },
+  {
+    "path": "/brand-snapshot",
+    "visibility": "user",
+    "title": "Brand Snapshot | Aligned AI",
+    "description": "Brand overview and analysis.",
+    "noindex": true
+  },
+  {
+    "path": "/brand-intelligence",
+    "visibility": "user",
+    "title": "Brand Intelligence | Aligned AI",
+    "description": "AI positioning and brand score.",
+    "noindex": true
+  },
+  {
+    "path": "/analytics",
+    "visibility": "user",
+    "title": "Analytics | Aligned AI",
+    "description": "Performance insights and metrics.",
+    "noindex": true
+  },
+  {
+    "path": "/reporting",
+    "visibility": "user",
+    "title": "Reporting | Aligned AI",
+    "description": "Generate and export reports.",
+    "noindex": true
+  },
+  {
+    "path": "/paid-ads",
+    "visibility": "user",
+    "title": "Paid Ads | Aligned AI",
+    "description": "Manage your paid advertising.",
+    "noindex": true
+  },
+  {
+    "path": "/library",
+    "visibility": "user",
+    "title": "Media Library | Aligned AI",
+    "description": "Manage your assets and media.",
+    "noindex": true
+  },
+  {
+    "path": "/events",
+    "visibility": "user",
+    "title": "Events | Aligned AI",
+    "description": "Track content dates and events.",
+    "noindex": true
+  },
+  {
+    "path": "/reviews",
+    "visibility": "user",
+    "title": "Reviews | Aligned AI",
+    "description": "Manage customer reviews.",
+    "noindex": true
+  },
+  {
+    "path": "/linked-accounts",
+    "visibility": "user",
+    "title": "Linked Accounts | Aligned AI",
+    "description": "Connect your social media accounts.",
+    "noindex": true
+  },
+  {
+    "path": "/settings",
+    "visibility": "user",
+    "title": "Settings | Aligned AI",
+    "description": "Team, account, and preferences.",
+    "noindex": true
+  },
+  {
+    "path": "/client-settings",
+    "visibility": "user",
+    "title": "Client Settings | Aligned AI",
+    "description": "Client access and preferences.",
+    "noindex": true
+  },
+  {
+    "path": "/billing",
+    "visibility": "user",
+    "title": "Billing | Aligned AI",
+    "description": "Subscription and payments.",
+    "noindex": true
+  },
+  {
+    "path": "/client-portal",
+    "visibility": "client",
+    "title": "Client Portal",
+    "description": "Review and approve your content.",
+    "noindex": true,
+    "whiteLabel": true
+  }
+]

@@ -1,0 +1,34 @@
+Path,Visibility,Title,Description,Noindex,White Label
+/,public,"Aligned AI - AI-Powered Content Creation for Agencies & Brands","Transform your content workflow with AI. Aligned AI handles planning, writing, scheduling, and reporting so you can focus on what matters.",NO,NO
+/about,public,"About Aligned AI - Built by Marketers, for Marketers","Learn about our mission to make content creation feel less like a grind and more like a superpower.",NO,NO
+/features,public,"Features - AI Content, Scheduling & Analytics | Aligned AI","Explore AI content generation, smart scheduling, real-time analytics, collaboration tools, and more.",NO,NO
+/integrations,public,"Integrations - Connect All Your Channels | Aligned AI","Integrate with Facebook, Instagram, LinkedIn, Twitter, TikTok, Google Business Profile, and more.",NO,NO
+/help,public,"Help Center - Support & FAQs | Aligned AI","Find answers, explore resources, and get the most out of Aligned AI.",NO,NO
+/contact,public,"Contact Us - Get in Touch | Aligned AI","Have questions? Want a demo? We're here to help you get Aligned.",NO,NO
+/privacy,public,"Privacy Policy | Aligned AI","Learn how we protect and handle your data at Aligned AI.",NO,NO
+/terms,public,"Terms of Service | Aligned AI","Read our terms of service and usage agreement.",NO,NO
+/pricing,public,"Pricing - Simple, Scalable Plans | Aligned AI","Start at $199/mo per brand. Scale smarter with agency pricing. No hidden fees.",NO,NO
+/onboarding,user,"Onboarding - Get Started | Aligned AI","Set up your workspace and brand profile.",YES,NO
+/dashboard,user,"Dashboard | Aligned AI","Your content command center.",YES,NO
+/calendar,user,"Content Calendar | Aligned AI","Plan and schedule your content.",YES,NO
+/content-queue,user,"Content Queue | Aligned AI","Manage pending and scheduled posts.",YES,NO
+/approvals,user,"Approvals | Aligned AI","Review and approve content.",YES,NO
+/creative-studio,user,"Creative Studio | Aligned AI","Design and edit your content.",YES,NO
+/content-generator,user,"Content Generator | Aligned AI","AI-powered content creation.",YES,NO
+/campaigns,user,"Campaigns | Aligned AI","Manage your marketing campaigns.",YES,NO
+/brands,user,"Brands | Aligned AI","Manage multiple brands.",YES,NO
+/brand-intake,user,"Brand Intake | Aligned AI","Complete your brand profile.",YES,NO
+/brand-guide,user,"Brand Guide | Aligned AI","Your brand voice and guidelines.",YES,NO
+/brand-snapshot,user,"Brand Snapshot | Aligned AI","Brand overview and analysis.",YES,NO
+/brand-intelligence,user,"Brand Intelligence | Aligned AI","AI positioning and brand score.",YES,NO
+/analytics,user,"Analytics | Aligned AI","Performance insights and metrics.",YES,NO
+/reporting,user,"Reporting | Aligned AI","Generate and export reports.",YES,NO
+/paid-ads,user,"Paid Ads | Aligned AI","Manage your paid advertising.",YES,NO
+/library,user,"Media Library | Aligned AI","Manage your assets and media.",YES,NO
+/events,user,"Events | Aligned AI","Track content dates and events.",YES,NO
+/reviews,user,"Reviews | Aligned AI","Manage customer reviews.",YES,NO
+/linked-accounts,user,"Linked Accounts | Aligned AI","Connect your social media accounts.",YES,NO
+/settings,user,"Settings | Aligned AI","Team, account, and preferences.",YES,NO
+/client-settings,user,"Client Settings | Aligned AI","Client access and preferences.",YES,NO
+/billing,user,"Billing | Aligned AI","Subscription and payments.",YES,NO
+/client-portal,client,"Client Portal","Review and approve your content.",YES,YES
