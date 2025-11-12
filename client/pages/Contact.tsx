@@ -12,14 +12,18 @@ export default function Contact() {
     email: "",
     company: "",
     subject: "",
-    message: ""
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -33,7 +37,13 @@ export default function Contact() {
         title: "Message sent!",
         description: "We'll get back to you within 24 hours.",
       });
-      setFormData({ name: "", email: "", company: "", subject: "", message: "" });
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        subject: "",
+        message: "",
+      });
       setIsSubmitting(false);
     }, 1000);
   };
@@ -41,7 +51,7 @@ export default function Contact() {
   return (
     <UnauthenticatedLayout>
       <SiteHeader />
-      
+
       {/* Hero Section */}
       <section className="min-h-[50vh] bg-gradient-to-b from-indigo-50 via-white to-gray-50 pt-32 pb-16 px-4 sm:px-6 md:px-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-full h-full pointer-events-none -z-10">
@@ -77,7 +87,10 @@ export default function Contact() {
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-semibold text-slate-700 mb-2"
+                >
                   Name *
                 </label>
                 <input
@@ -93,7 +106,10 @@ export default function Contact() {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-semibold text-slate-700 mb-2"
+                >
                   Email *
                 </label>
                 <input
@@ -109,7 +125,10 @@ export default function Contact() {
               </div>
 
               <div>
-                <label htmlFor="company" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label
+                  htmlFor="company"
+                  className="block text-sm font-semibold text-slate-700 mb-2"
+                >
                   Company
                 </label>
                 <input
@@ -124,7 +143,10 @@ export default function Contact() {
               </div>
 
               <div>
-                <label htmlFor="subject" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label
+                  htmlFor="subject"
+                  className="block text-sm font-semibold text-slate-700 mb-2"
+                >
                   Subject *
                 </label>
                 <select
@@ -145,7 +167,10 @@ export default function Contact() {
               </div>
 
               <div>
-                <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label
+                  htmlFor="message"
+                  className="block text-sm font-semibold text-slate-700 mb-2"
+                >
                   Message *
                 </label>
                 <textarea
@@ -228,7 +253,8 @@ export default function Contact() {
                 <div>
                   <h3 className="font-bold text-slate-900 mb-1">Location</h3>
                   <p className="text-slate-600">
-                    Remote-first company<br />
+                    Remote-first company
+                    <br />
                     Serving clients worldwide
                   </p>
                 </div>

@@ -12,39 +12,39 @@ export default function Integrations() {
           name: "Facebook",
           logo: "📘",
           description: "Publish posts, stories, and manage pages",
-          features: ["Auto-posting", "Analytics", "Ad integration"]
+          features: ["Auto-posting", "Analytics", "Ad integration"],
         },
         {
           name: "Instagram",
           logo: "📸",
           description: "Share posts, reels, and stories seamlessly",
-          features: ["Feed posts", "Stories", "Reels", "Shopping tags"]
+          features: ["Feed posts", "Stories", "Reels", "Shopping tags"],
         },
         {
           name: "LinkedIn",
           logo: "💼",
           description: "Professional content for company pages and profiles",
-          features: ["Company pages", "Personal profiles", "Analytics"]
+          features: ["Company pages", "Personal profiles", "Analytics"],
         },
         {
           name: "Twitter / X",
           logo: "🐦",
           description: "Threads, tweets, and real-time engagement",
-          features: ["Tweets", "Threads", "Scheduling", "Analytics"]
+          features: ["Tweets", "Threads", "Scheduling", "Analytics"],
         },
         {
           name: "TikTok",
           logo: "🎵",
           description: "Short-form video content distribution",
-          features: ["Video posts", "Scheduling", "Analytics"]
+          features: ["Video posts", "Scheduling", "Analytics"],
         },
         {
           name: "Google Business Profile",
           logo: "🗺️",
           description: "Local business updates and reviews",
-          features: ["Posts", "Events", "Offers", "Q&A"]
-        }
-      ]
+          features: ["Posts", "Events", "Offers", "Q&A"],
+        },
+      ],
     },
     {
       category: "Marketing & Email",
@@ -53,15 +53,15 @@ export default function Integrations() {
           name: "Mailchimp",
           logo: "📧",
           description: "Email campaign automation",
-          features: ["Campaign sync", "List management", "Analytics"]
+          features: ["Campaign sync", "List management", "Analytics"],
         },
         {
           name: "Squarespace",
           logo: "🏗️",
           description: "Website content management",
-          features: ["Blog posts", "Page updates", "SEO optimization"]
-        }
-      ]
+          features: ["Blog posts", "Page updates", "SEO optimization"],
+        },
+      ],
     },
     {
       category: "Analytics & Reporting",
@@ -70,22 +70,30 @@ export default function Integrations() {
           name: "Google Analytics",
           logo: "📊",
           description: "Track website and campaign performance",
-          features: ["Traffic analysis", "Conversion tracking", "Custom reports"]
+          features: [
+            "Traffic analysis",
+            "Conversion tracking",
+            "Custom reports",
+          ],
         },
         {
           name: "Meta Business Suite",
           logo: "📈",
           description: "Cross-platform Facebook and Instagram insights",
-          features: ["Unified analytics", "Audience insights", "Ad performance"]
-        }
-      ]
-    }
+          features: [
+            "Unified analytics",
+            "Audience insights",
+            "Ad performance",
+          ],
+        },
+      ],
+    },
   ];
 
   return (
     <UnauthenticatedLayout>
       <SiteHeader />
-      
+
       {/* Hero Section */}
       <section className="min-h-[60vh] bg-gradient-to-b from-indigo-50 via-white to-gray-50 pt-32 pb-16 px-4 sm:px-6 md:px-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-full h-full pointer-events-none -z-10">
@@ -106,7 +114,8 @@ export default function Integrations() {
           </h1>
 
           <p className="text-xl sm:text-2xl text-slate-700 font-medium mb-10 max-w-3xl mx-auto">
-            Aligned AI integrates with the platforms you already use—so you can publish everywhere from one place.
+            Aligned AI integrates with the platforms you already use—so you can
+            publish everywhere from one place.
           </p>
         </div>
       </section>
@@ -121,7 +130,7 @@ export default function Integrations() {
               </h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {category.platforms.map((platform, platIndex) => (
-                  <div 
+                  <div
                     key={platIndex}
                     className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all hover:scale-105"
                   >
@@ -138,7 +147,10 @@ export default function Integrations() {
                     </p>
                     <ul className="space-y-2">
                       {platform.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-center gap-2 text-sm text-slate-700">
+                        <li
+                          key={idx}
+                          className="flex items-center gap-2 text-sm text-slate-700"
+                        >
                           <Check className="w-4 h-4 text-lime-500 flex-shrink-0" />
                           {feature}
                         </li>
@@ -159,7 +171,8 @@ export default function Integrations() {
             More integrations coming soon
           </h2>
           <p className="text-lg text-slate-600 mb-8">
-            We're constantly adding new platforms based on user feedback. Need a specific integration?
+            We're constantly adding new platforms based on user feedback. Need a
+            specific integration?
           </p>
           <a
             href="/contact"

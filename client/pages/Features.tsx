@@ -1,16 +1,16 @@
 import { UnauthenticatedLayout } from "@/components/layout/UnauthenticatedLayout";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
-import { 
-  Sparkles, 
-  Brain, 
-  Calendar, 
-  BarChart3, 
-  Zap, 
-  Users, 
-  Shield, 
+import {
+  Sparkles,
+  Brain,
+  Calendar,
+  BarChart3,
+  Zap,
+  Users,
+  Shield,
   Rocket,
-  Check
+  Check,
 } from "lucide-react";
 
 export default function Features() {
@@ -18,75 +18,81 @@ export default function Features() {
     {
       icon: <Brain className="w-8 h-8 text-purple-600" />,
       title: "AI Content Generation",
-      description: "Generate on-brand content that matches your voice, tone, and style. Our AI learns from your feedback to deliver better results every time.",
+      description:
+        "Generate on-brand content that matches your voice, tone, and style. Our AI learns from your feedback to deliver better results every time.",
       benefits: [
         "Brand voice learning",
         "Multi-platform optimization",
         "Instant variations",
-        "Performance-driven suggestions"
-      ]
+        "Performance-driven suggestions",
+      ],
     },
     {
       icon: <Calendar className="w-8 h-8 text-indigo-600" />,
       title: "Smart Scheduling",
-      description: "Never miss a posting window. Our intelligent calendar suggests optimal times and manages your entire content pipeline.",
+      description:
+        "Never miss a posting window. Our intelligent calendar suggests optimal times and manages your entire content pipeline.",
       benefits: [
         "Optimal timing recommendations",
         "Drag-and-drop calendar",
         "Cross-platform coordination",
-        "Automated publishing"
-      ]
+        "Automated publishing",
+      ],
     },
     {
       icon: <BarChart3 className="w-8 h-8 text-lime-600" />,
       title: "Real-Time Analytics",
-      description: "Track what matters. See engagement, reach, and ROI across all your channels in one unified dashboard.",
+      description:
+        "Track what matters. See engagement, reach, and ROI across all your channels in one unified dashboard.",
       benefits: [
         "Cross-platform insights",
         "Performance tracking",
         "Audience analytics",
-        "Actionable recommendations"
-      ]
+        "Actionable recommendations",
+      ],
     },
     {
       icon: <Users className="w-8 h-8 text-purple-600" />,
       title: "Collaboration Tools",
-      description: "Streamline approvals with team and client workflows. Everyone stays in the loop without the chaos.",
+      description:
+        "Streamline approvals with team and client workflows. Everyone stays in the loop without the chaos.",
       benefits: [
         "Client approval flows",
         "Team permissions",
         "Comment threads",
-        "Version history"
-      ]
+        "Version history",
+      ],
     },
     {
       icon: <Zap className="w-8 h-8 text-indigo-600" />,
       title: "Platform Integrations",
-      description: "Connect all your social accounts in one place. Publish everywhere from a single platform.",
+      description:
+        "Connect all your social accounts in one place. Publish everywhere from a single platform.",
       benefits: [
         "Meta (Facebook & Instagram)",
         "LinkedIn & Twitter",
         "Google Business Profile",
-        "TikTok & more"
-      ]
+        "TikTok & more",
+      ],
     },
     {
       icon: <Shield className="w-8 h-8 text-lime-600" />,
       title: "Brand Safety",
-      description: "Automated brand compliance checks ensure every post aligns with your guidelines before it goes live.",
+      description:
+        "Automated brand compliance checks ensure every post aligns with your guidelines before it goes live.",
       benefits: [
         "Brand fidelity scoring",
         "Compliance checks",
         "Safety guardrails",
-        "Approval workflows"
-      ]
-    }
+        "Approval workflows",
+      ],
+    },
   ];
 
   return (
     <UnauthenticatedLayout>
       <SiteHeader />
-      
+
       {/* Hero Section */}
       <section className="min-h-[60vh] bg-gradient-to-b from-purple-50 via-white to-gray-50 pt-32 pb-16 px-4 sm:px-6 md:px-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-full h-full pointer-events-none -z-10">
@@ -107,7 +113,8 @@ export default function Features() {
           </h1>
 
           <p className="text-xl sm:text-2xl text-slate-700 font-medium mb-10 max-w-3xl mx-auto">
-            From AI generation to publishing, analytics to approvals—all in one platform designed for agencies and brands that move fast.
+            From AI generation to publishing, analytics to approvals—all in one
+            platform designed for agencies and brands that move fast.
           </p>
         </div>
       </section>
@@ -117,7 +124,7 @@ export default function Features() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div 
+              <div
                 key={index}
                 className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 hover:shadow-xl transition-all hover:scale-105"
               >
@@ -130,7 +137,10 @@ export default function Features() {
                 </p>
                 <ul className="space-y-2">
                   {feature.benefits.map((benefit, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-slate-700">
+                    <li
+                      key={idx}
+                      className="flex items-center gap-2 text-slate-700"
+                    >
                       <Check className="w-4 h-4 text-lime-500 flex-shrink-0" />
                       <span className="text-sm">{benefit}</span>
                     </li>
@@ -150,7 +160,8 @@ export default function Features() {
             Ready to transform your workflow?
           </h2>
           <p className="text-xl mb-8">
-            Start your 7-day free trial and experience all features—no credit card required.
+            Start your 7-day free trial and experience all features—no credit
+            card required.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a

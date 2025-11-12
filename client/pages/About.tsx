@@ -8,29 +8,33 @@ export default function About() {
     {
       icon: <Target className="w-8 h-8 text-purple-600" />,
       title: "Mission-Driven",
-      description: "We believe content creation should empower, not exhaust. Our mission is to help brands and agencies tell better stories without burning out."
+      description:
+        "We believe content creation should empower, not exhaust. Our mission is to help brands and agencies tell better stories without burning out.",
     },
     {
       icon: <Users className="w-8 h-8 text-indigo-600" />,
       title: "Customer-First",
-      description: "Every feature we build starts with user feedback. We're not just building software—we're building with you."
+      description:
+        "Every feature we build starts with user feedback. We're not just building software—we're building with you.",
     },
     {
       icon: <Zap className="w-8 h-8 text-lime-600" />,
       title: "Innovation",
-      description: "We leverage the latest AI technology to stay ahead of the curve, ensuring you always have cutting-edge tools at your fingertips."
+      description:
+        "We leverage the latest AI technology to stay ahead of the curve, ensuring you always have cutting-edge tools at your fingertips.",
     },
     {
       icon: <Heart className="w-8 h-8 text-purple-600" />,
       title: "Transparency",
-      description: "No hidden fees. No surprise charges. No enterprise pricing mazes. What you see is what you get."
-    }
+      description:
+        "No hidden fees. No surprise charges. No enterprise pricing mazes. What you see is what you get.",
+    },
   ];
 
   return (
     <UnauthenticatedLayout>
       <SiteHeader />
-      
+
       {/* Hero Section */}
       <section className="min-h-[60vh] bg-gradient-to-b from-purple-50 via-white to-gray-50 pt-32 pb-16 px-4 sm:px-6 md:px-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-full h-full pointer-events-none -z-10">
@@ -51,7 +55,8 @@ export default function About() {
           </h1>
 
           <p className="text-xl sm:text-2xl text-slate-700 font-medium mb-10 max-w-3xl mx-auto">
-            We're on a mission to make content creation feel less like a grind and more like a superpower.
+            We're on a mission to make content creation feel less like a grind
+            and more like a superpower.
           </p>
         </div>
       </section>
@@ -64,19 +69,29 @@ export default function About() {
           </h2>
           <div className="prose prose-lg max-w-none text-slate-700 leading-relaxed space-y-6">
             <p>
-              We started Aligned AI because we experienced the pain ourselves. As agency owners and brand builders, we spent countless hours juggling spreadsheets, approval threads, and disconnected tools—just to get a single post live.
+              We started Aligned AI because we experienced the pain ourselves.
+              As agency owners and brand builders, we spent countless hours
+              juggling spreadsheets, approval threads, and disconnected
+              tools—just to get a single post live.
             </p>
             <p>
-              The work never stopped. The tabs never closed. And "done" always felt just out of reach.
+              The work never stopped. The tabs never closed. And "done" always
+              felt just out of reach.
             </p>
             <p>
-              So we asked ourselves: <strong>What if content creation could flow instead of fight?</strong>
+              So we asked ourselves:{" "}
+              <strong>
+                What if content creation could flow instead of fight?
+              </strong>
             </p>
             <p>
-              That question became Aligned AI—a platform designed to handle the planning, writing, scheduling, and reporting so you can get back to the work only you can do.
+              That question became Aligned AI—a platform designed to handle the
+              planning, writing, scheduling, and reporting so you can get back
+              to the work only you can do.
             </p>
             <p>
-              Today, we're proud to serve agencies, brands, and creators worldwide. And we're just getting started.
+              Today, we're proud to serve agencies, brands, and creators
+              worldwide. And we're just getting started.
             </p>
           </div>
         </div>
@@ -90,7 +105,7 @@ export default function About() {
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
             {values.map((value, index) => (
-              <div 
+              <div
                 key={index}
                 className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 hover:shadow-xl transition-all"
               >
@@ -114,7 +129,9 @@ export default function About() {
             A remote-first team
           </h2>
           <p className="text-lg text-slate-700 mb-8 leading-relaxed">
-            We're a distributed team of engineers, designers, marketers, and AI specialists working from around the world. What unites us? A shared belief that content shouldn't feel like a chore.
+            We're a distributed team of engineers, designers, marketers, and AI
+            specialists working from around the world. What unites us? A shared
+            belief that content shouldn't feel like a chore.
           </p>
           <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-8 border border-purple-200">
             <p className="text-xl font-semibold text-slate-900 mb-4">
@@ -141,7 +158,8 @@ export default function About() {
             Ready to get Aligned?
           </h2>
           <p className="text-xl mb-8">
-            Join hundreds of brands and agencies transforming their content workflow.
+            Join hundreds of brands and agencies transforming their content
+            workflow.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a

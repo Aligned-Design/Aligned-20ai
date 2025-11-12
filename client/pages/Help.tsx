@@ -1,14 +1,14 @@
 import { UnauthenticatedLayout } from "@/components/layout/UnauthenticatedLayout";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
-import { 
-  Sparkles, 
-  BookOpen, 
-  MessageCircle, 
-  Video, 
+import {
+  Sparkles,
+  BookOpen,
+  MessageCircle,
+  Video,
   FileText,
   Search,
-  HelpCircle
+  HelpCircle,
 } from "lucide-react";
 import {
   Accordion,
@@ -21,44 +21,54 @@ export default function Help() {
   const faqs = [
     {
       question: "How do I get started with Aligned AI?",
-      answer: "Sign up for a free 7-day trial, connect your social accounts, and complete the brand intake form. Our AI will learn your voice and you can start creating content immediately."
+      answer:
+        "Sign up for a free 7-day trial, connect your social accounts, and complete the brand intake form. Our AI will learn your voice and you can start creating content immediately.",
     },
     {
       question: "Can I connect multiple brands or clients?",
-      answer: "Yes! Our Base Plan supports 1 brand workspace. You can add up to 5 brands at $199 each. Once you have 5+ brands, pricing automatically adjusts to $99 per brand (Agency Tier)."
+      answer:
+        "Yes! Our Base Plan supports 1 brand workspace. You can add up to 5 brands at $199 each. Once you have 5+ brands, pricing automatically adjusts to $99 per brand (Agency Tier).",
     },
     {
       question: "How does the AI learn my brand voice?",
-      answer: "During onboarding, you'll complete a brand intake form covering tone, style, messaging, and values. The AI also learns from your feedback on generated content, improving over time."
+      answer:
+        "During onboarding, you'll complete a brand intake form covering tone, style, messaging, and values. The AI also learns from your feedback on generated content, improving over time.",
     },
     {
       question: "What platforms can I publish to?",
-      answer: "We support Facebook, Instagram, LinkedIn, Twitter/X, TikTok, Google Business Profile, and more. Check our Integrations page for the full list."
+      answer:
+        "We support Facebook, Instagram, LinkedIn, Twitter/X, TikTok, Google Business Profile, and more. Check our Integrations page for the full list.",
     },
     {
       question: "Can my clients approve content before publishing?",
-      answer: "Absolutely. Our approval workflows let you set up client review flows, team permissions, and automated notifications for every approval stage."
+      answer:
+        "Absolutely. Our approval workflows let you set up client review flows, team permissions, and automated notifications for every approval stage.",
     },
     {
       question: "Do you offer customer support?",
-      answer: "Yes! Base Plan includes email support. Agency Tier includes priority support. We also offer optional Onboarding Concierge ($299/client) for hands-on setup assistance."
+      answer:
+        "Yes! Base Plan includes email support. Agency Tier includes priority support. We also offer optional Onboarding Concierge ($299/client) for hands-on setup assistance.",
     },
     {
       question: "Can I cancel anytime?",
-      answer: "Yes. You can cancel or adjust your plan with 30 days' notice so we can wrap up any active projects."
+      answer:
+        "Yes. You can cancel or adjust your plan with 30 days' notice so we can wrap up any active projects.",
     },
     {
       question: "Is there a limit on posts or users?",
-      answer: "No hidden limits. Each brand workspace includes unlimited posts, AI generation, and analytics. Team member limits vary by plan."
+      answer:
+        "No hidden limits. Each brand workspace includes unlimited posts, AI generation, and analytics. Team member limits vary by plan.",
     },
     {
       question: "How secure is my data?",
-      answer: "We use enterprise-grade encryption, secure OAuth connections, and never store your social media passwords. All data is encrypted in transit and at rest."
+      answer:
+        "We use enterprise-grade encryption, secure OAuth connections, and never store your social media passwords. All data is encrypted in transit and at rest.",
     },
     {
       question: "Can I white-label the platform for my clients?",
-      answer: "Yes! Agency Tier includes a white-label portal. You can also add a custom domain for $49/mo."
-    }
+      answer:
+        "Yes! Agency Tier includes a white-label portal. You can also add a custom domain for $49/mo.",
+    },
   ];
 
   const resources = [
@@ -66,32 +76,32 @@ export default function Help() {
       icon: <BookOpen className="w-8 h-8 text-purple-600" />,
       title: "Documentation",
       description: "Comprehensive guides and tutorials",
-      link: "/docs"
+      link: "/docs",
     },
     {
       icon: <Video className="w-8 h-8 text-indigo-600" />,
       title: "Video Tutorials",
       description: "Step-by-step video walkthroughs",
-      link: "/tutorials"
+      link: "/tutorials",
     },
     {
       icon: <MessageCircle className="w-8 h-8 text-lime-600" />,
       title: "Community Forum",
       description: "Connect with other users",
-      link: "/community"
+      link: "/community",
     },
     {
       icon: <FileText className="w-8 h-8 text-purple-600" />,
       title: "API Documentation",
       description: "Developer resources and API reference",
-      link: "/api-docs"
-    }
+      link: "/api-docs",
+    },
   ];
 
   return (
     <UnauthenticatedLayout>
       <SiteHeader />
-      
+
       {/* Hero Section */}
       <section className="min-h-[60vh] bg-gradient-to-b from-lime-50 via-white to-gray-50 pt-32 pb-16 px-4 sm:px-6 md:px-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-full h-full pointer-events-none -z-10">
@@ -146,9 +156,7 @@ export default function Help() {
                 <h3 className="text-xl font-bold text-slate-900 mb-2">
                   {resource.title}
                 </h3>
-                <p className="text-slate-600 text-sm">
-                  {resource.description}
-                </p>
+                <p className="text-slate-600 text-sm">{resource.description}</p>
               </a>
             ))}
           </div>
