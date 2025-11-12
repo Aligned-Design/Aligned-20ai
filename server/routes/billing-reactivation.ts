@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { authenticateUser } from "../middleware/security";
-import { AppError } from "../lib/errors/AppError";
+import { AppError } from "../lib/error-middleware";
 import { getAccountStatus } from "../lib/account-status-service";
 
 const router = Router();

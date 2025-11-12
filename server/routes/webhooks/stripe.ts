@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { AppError } from "../../lib/errors/AppError";
+import { AppError } from "../../lib/error-middleware";
 
 const router = Router();
 
