@@ -29,8 +29,16 @@ export default tseslint.config(
         {
           patterns: [
             {
-              group: ["**/HeroMetricCard*", "**/AnalyticsPanel*", "**/AnalyticsCharts*"],
-              message: "Legacy dashboard components are deprecated. Use primitives from @/components/DashboardSystem instead.",
+              group: [
+                "**/HeroMetricCard*",
+                "**/AnalyticsPanel*",
+                "**/AnalyticsCharts*",
+                "**/DashboardEnhanced*",
+                "**/AnalyticsEnhanced*",
+                "**/legacy-dashboard/**",
+                "**/old-analytics/**",
+              ],
+              message: "Legacy dashboard components and paths are deprecated. Use primitives from @/components/DashboardSystem instead.",
             },
           ],
         },
