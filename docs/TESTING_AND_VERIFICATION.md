@@ -26,17 +26,19 @@ npm run typecheck
 
 **Expected Result:** ✅ No errors  
 **Common Issues:**
+
 - Missing imports from `@/lib/auth`
 - Type mismatches on role definitions
 - Missing `useCan` hook in components
 
 **Fix Pattern:**
+
 ```typescript
 // Wrong
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from "@/contexts/AuthContext";
 
 // Correct
-import { useAuth, useCan } from '@/lib/auth';
+import { useAuth, useCan } from "@/lib/auth";
 ```
 
 ### 1.2 ESLint & Formatting
@@ -63,6 +65,7 @@ npm run build
 ### 2.1 Component Rendering
 
 **Test: Auth Context Initialization**
+
 ```
 1. Open app in browser
 2. Check localStorage for 'aligned_user'
@@ -75,6 +78,7 @@ npm run build
 ### 2.2 useCan() Hook Testing
 
 **Test File:** Create `test-rbac.tsx`
+
 ```typescript
 import { useAuth, useCan } from '@/lib/auth';
 
@@ -96,6 +100,7 @@ export function RBACTest() {
 ```
 
 **Test Steps:**
+
 1. Mount component
 2. Login as CREATOR role
 3. Verify: canCreate=true, canApprove=false, canPublish=false
@@ -105,6 +110,7 @@ export function RBACTest() {
 ### 2.3 Component Permission Checks
 
 **Test: TopBar Component**
+
 ```
 CREATOR role (content:create):
 ✅ Generate Content button visible
@@ -117,6 +123,7 @@ VIEWER role (no permissions):
 ```
 
 **Test: Dashboard Layout**
+
 ```
 AGENCY_ADMIN role:
 ✅ See all dashboard widgets
@@ -142,6 +149,7 @@ VIEWER role:
 ### 3.1 Authentication Testing
 
 **Test: Missing Authorization Header**
+
 ```bash
 curl -X POST http://localhost:3000/api/approvals/bulk \
   -H "Content-Type: application/json" \
@@ -149,6 +157,7 @@ curl -X POST http://localhost:3000/api/approvals/bulk \
 ```
 
 **Expected:** 401 Unauthorized
+
 ```json
 {
   "error": "UNAUTHORIZED",
@@ -161,6 +170,7 @@ curl -X POST http://localhost:3000/api/approvals/bulk \
 **Setup:** Create JWT token for CREATOR role
 
 **Test: CREATOR cannot approve content**
+
 ```bash
 curl -X POST http://localhost:3000/api/approvals/bulk \
   -H "Authorization: Bearer <CREATOR_TOKEN>" \
@@ -169,6 +179,7 @@ curl -X POST http://localhost:3000/api/approvals/bulk \
 ```
 
 **Expected:** 403 Forbidden
+
 ```json
 {
   "error": "FORBIDDEN",
@@ -177,6 +188,7 @@ curl -X POST http://localhost:3000/api/approvals/bulk \
 ```
 
 **Test: BRAND_MANAGER can approve content**
+
 ```bash
 curl -X POST http://localhost:3000/api/approvals/bulk \
   -H "Authorization: Bearer <BRAND_MANAGER_TOKEN>" \
@@ -188,16 +200,17 @@ curl -X POST http://localhost:3000/api/approvals/bulk \
 
 ### 3.3 Route Permission Matrix
 
-| Endpoint | Method | CREATOR | MANAGER | APPROVER | VIEWER | Test |
-|----------|--------|---------|---------|----------|--------|------|
-| `/api/approvals/bulk` | POST | 403 | 200 | 200 | 403 | ✅ |
-| `/api/content/create` | POST | 200 | 200 | 403 | 403 | ✅ |
-| `/api/analytics/:id` | GET | 200 | 200 | 200 | 200 | ✅ |
-| `/api/billing/upgrade` | POST | 403 | 403 | 403 | 403 | ✅ |
+| Endpoint               | Method | CREATOR | MANAGER | APPROVER | VIEWER | Test |
+| ---------------------- | ------ | ------- | ------- | -------- | ------ | ---- |
+| `/api/approvals/bulk`  | POST   | 403     | 200     | 200      | 403    | ✅   |
+| `/api/content/create`  | POST   | 200     | 200     | 403      | 403    | ✅   |
+| `/api/analytics/:id`   | GET    | 200     | 200     | 200      | 200    | ✅   |
+| `/api/billing/upgrade` | POST   | 403     | 403     | 403      | 403    | ✅   |
 
 ### 3.4 Test with Postman/Insomnia
 
 **Collection Setup:**
+
 ```
 Environment Variables:
 - base_url: http://localhost:3000
@@ -220,19 +233,21 @@ Tests:
 **Setup:** Create two organizations with different users
 
 **Test: Cross-Organization Access Blocked**
+
 ```sql
 -- As User A (Org 1)
-SELECT * FROM milestones 
+SELECT * FROM milestones
 WHERE organization_id = 'org_2';
 -- Expected: 0 rows (RLS blocks access)
 
 -- As User A (Org 1)
-SELECT * FROM milestones 
+SELECT * FROM milestones
 WHERE organization_id = 'org_1';
 -- Expected: Rows accessible (RLS allows)
 ```
 
 **Test: INSERT RLS**
+
 ```sql
 -- As User A (Org 1)
 INSERT INTO milestones (organization_id, key, unlocked_at)
@@ -243,6 +258,7 @@ VALUES ('org_2', 'milestone_1', NOW());
 ### 4.2 User Permissions RLS
 
 **Test: Profile Access**
+
 ```sql
 -- As User A
 SELECT * FROM user_profiles WHERE id = user_b_id;
@@ -262,6 +278,7 @@ SELECT * FROM user_profiles WHERE id = user_a_id;
 **Prerequisites:** Login as CREATOR user
 
 **Flow:**
+
 ```
 1. ✅ See Dashboard
    - Expect: Main dashboard loads
@@ -282,6 +299,7 @@ SELECT * FROM user_profiles WHERE id = user_a_id;
 **Prerequisites:** Login as BRAND_MANAGER user
 
 **Flow:**
+
 ```
 1. ✅ See Dashboard
 2. ✅ View pending approvals
@@ -299,6 +317,7 @@ SELECT * FROM user_profiles WHERE id = user_a_id;
 **Prerequisites:** Login as CLIENT_APPROVER user
 
 **Flow:**
+
 ```
 1. ✅ See Dashboard (limited)
 2. ✅ View content to approve
@@ -315,6 +334,7 @@ SELECT * FROM user_profiles WHERE id = user_a_id;
 **Prerequisites:** Login as AGENCY_ADMIN user
 
 **Flow:**
+
 ```
 1. ✅ Full dashboard access
 2. ✅ All action buttons visible
@@ -330,6 +350,7 @@ SELECT * FROM user_profiles WHERE id = user_a_id;
 ### 6.1 Token Manipulation
 
 **Test:** Modify role in JWT
+
 ```
 1. Obtain valid token
 2. Decode and modify role from "CREATOR" to "SUPERADMIN"
@@ -342,6 +363,7 @@ SELECT * FROM user_profiles WHERE id = user_a_id;
 ### 6.2 Cross-Brand Access
 
 **Test:** Access another brand's data
+
 ```bash
 # As User A (Brand 1)
 GET /api/approvals/pending/brand_2
@@ -353,6 +375,7 @@ GET /api/approvals/pending/brand_2
 ### 6.3 Permission Escalation
 
 **Test:** POST with elevated scope
+
 ```bash
 # As CREATOR (no billing:manage)
 POST /api/billing/plans/upgrade
@@ -449,14 +472,17 @@ grep -r "role.*===" client/ || echo "  None found ✅"
 ## 9. Known Limitations & Workarounds
 
 ### Issue: Token Doesn't Have Role
+
 **Cause:** JWT payload missing role field  
 **Solution:** Ensure `authenticateUser` middleware sets `req.auth.role` from token
 
 ### Issue: useCan() Always Returns False
+
 **Cause:** Role not in `config/permissions.json`  
 **Solution:** Add role to config or normalize role name
 
 ### Issue: RLS Blocks Legitimate Access
+
 **Cause:** Organization/brand mismatch  
 **Solution:** Verify user is member of organization in brand_members table
 
@@ -469,7 +495,9 @@ grep -r "role.*===" client/ || echo "  None found ✅"
 ```typescript
 // server/middleware/requireScope.ts
 if (process.env.DEBUG_RBAC) {
-  console.log(`RBAC Check: role=${userRole}, scope=${scope}, allowed=${hasRequiredScope}`);
+  console.log(
+    `RBAC Check: role=${userRole}, scope=${scope}, allowed=${hasRequiredScope}`,
+  );
 }
 ```
 
@@ -482,7 +510,7 @@ DEBUG_RBAC=true npm run dev
 ```typescript
 // In route handler
 const user = (req as any).user;
-console.log('User:', {
+console.log("User:", {
   id: user?.id,
   role: user?.role,
   permissions: permissionsMap[user?.role as any],
@@ -500,30 +528,36 @@ Date: 2025-11-12
 Tester: [Name]
 
 ## Code Quality
+
 - [ ] TypeCheck: ✅ PASS
 - [ ] Lint: ✅ PASS
 - [ ] Build: ✅ PASS
 
 ## Component Tests
+
 - [ ] useAuth() hook: ✅ PASS
 - [ ] useCan() checks: ✅ PASS
 - [ ] Role-based UI: ✅ PASS
 
 ## API Tests
+
 - [ ] 401 on missing auth: ✅ PASS
 - [ ] 403 on insufficient permission: ✅ PASS
 - [ ] 200 on authorized: ✅ PASS
 
 ## Database Tests
+
 - [ ] RLS blocks cross-org access: ✅ PASS
 - [ ] User can access own data: ✅ PASS
 - [ ] Milestones policy enforced: ✅ PASS
 
 ## Security Tests
+
 - [ ] Token tampering detected: ✅ PASS
 - [ ] No privilege escalation: ✅ PASS
 
 ## Performance
+
 - [ ] Approval endpoint: 250ms ✅ PASS
 - [ ] Analytics endpoint: 180ms ✅ PASS
 
@@ -535,6 +569,7 @@ Tester: [Name]
 ## Summary
 
 **Testing Scope:**
+
 - ✅ Code quality (TypeScript, Lint, Build)
 - ✅ Component functionality
 - ✅ API authorization

@@ -3,7 +3,7 @@
  * Admin-only feature for customizing branding
  */
 
-import { useCan } from '@/lib/auth/useCan';
+import { useCan } from "@/lib/auth/useCan";
 
 interface WhiteLabelSettingsProps {
   className?: string;
@@ -13,11 +13,13 @@ export function WhiteLabelSettings({
   className = "",
 }: WhiteLabelSettingsProps) {
   // Only admins can access white-label settings
-  const canManageWhiteLabel = useCan('white_label:manage');
+  const canManageWhiteLabel = useCan("white_label:manage");
 
   if (!canManageWhiteLabel) {
     return (
-      <div className={`p-6 bg-yellow-50 border border-yellow-200 rounded ${className}`}>
+      <div
+        className={`p-6 bg-yellow-50 border border-yellow-200 rounded ${className}`}
+      >
         <p className="text-yellow-800">
           White label settings are only available to administrators.
         </p>
@@ -29,7 +31,7 @@ export function WhiteLabelSettings({
     <div className={`space-y-6 ${className}`}>
       <div>
         <h3 className="text-lg font-semibold mb-4">White Label Settings</h3>
-        
+
         <div className="space-y-4">
           {/* Logo upload */}
           <div>
@@ -48,8 +50,8 @@ export function WhiteLabelSettings({
             <label className="block text-sm font-medium mb-2">
               Brand Color
             </label>
-            <input 
-              type="color" 
+            <input
+              type="color"
               defaultValue="#8B5CF6"
               className="w-16 h-10 rounded border"
             />
@@ -60,8 +62,8 @@ export function WhiteLabelSettings({
             <label className="block text-sm font-medium mb-2">
               Company Name
             </label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="Your company name"
               className="w-full px-3 py-2 border rounded"
             />
@@ -72,8 +74,8 @@ export function WhiteLabelSettings({
             <label className="block text-sm font-medium mb-2">
               Support Email
             </label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               placeholder="support@company.com"
               className="w-full px-3 py-2 border rounded"
             />

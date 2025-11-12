@@ -44,11 +44,11 @@ export function createServer() {
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-XSS-Protection", "1; mode=block");
     res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-    
+
     if (process.env.NODE_ENV === "production") {
       res.setHeader(
         "Strict-Transport-Security",
-        "max-age=31536000; includeSubDomains; preload"
+        "max-age=31536000; includeSubDomains; preload",
       );
     }
     next();
@@ -70,7 +70,7 @@ export function createServer() {
   // =============================================================================
   // Mount Routers
   // =============================================================================
-  
+
   // Core routes that are working
   app.use("/api/milestones", milestonesRouter);
   app.use("/api/agents", agentsRouter);

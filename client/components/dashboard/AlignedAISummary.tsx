@@ -12,23 +12,28 @@ interface AlignedAISummaryProps {
 
 export function AlignedAISummary({ className = "" }: AlignedAISummaryProps) {
   const { user } = useAuth();
-  const canEditContent = useCan('content:edit');
+  const canEditContent = useCan("content:edit");
 
   return (
-    <div className={`bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 ${className}`}>
+    <div
+      className={`bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 ${className}`}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             🤖 AI Insights
           </h3>
           <p className="text-gray-700 mb-4">
-            Based on your recent activity and performance metrics, here are AI-generated insights:
+            Based on your recent activity and performance metrics, here are
+            AI-generated insights:
           </p>
-          
+
           <ul className="space-y-2 text-sm text-gray-700">
             <li>✨ Your best-performing content type: Educational threads</li>
             <li>⏰ Optimal posting time: 9 AM - 11 AM EST</li>
-            <li>📈 Recommended content topics: Market analysis, industry trends</li>
+            <li>
+              📈 Recommended content topics: Market analysis, industry trends
+            </li>
             <li>👥 Top engaging audience: C-suite professionals</li>
           </ul>
         </div>

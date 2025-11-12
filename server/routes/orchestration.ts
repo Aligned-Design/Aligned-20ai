@@ -231,40 +231,37 @@ function createOrchestrationRouter(): Router {
    * POST /brand-history/summary
    * Get weekly summary from BrandHistory
    */
-  router.post(
-    "/brand-history/summary",
-    async (req: Request, res: Response) => {
-      try {
-        const { brandId, days = 7 } = req.body;
+  router.post("/brand-history/summary", async (req: Request, res: Response) => {
+    try {
+      const { brandId, days = 7 } = req.body;
 
-        if (!brandId) {
-          return res.status(400).json({
-            error: "brandId is required",
-          });
-        }
-
-        return res.status(200).json({
-          success: true,
-          brandId,
-          period: `Last ${days} days`,
-          summary: {
-            totalCycles: 0,
-            successPatterns: [],
-            improvements: [],
-            trends: [],
-            recommendations: [],
-          },
-          message:
-            "Brand history would be summarized from database in production",
-        });
-      } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-          error: "Failed to retrieve brand history summary",
+      if (!brandId) {
+        return res.status(400).json({
+          error: "brandId is required",
         });
       }
+
+      return res.status(200).json({
+        success: true,
+        brandId,
+        period: `Last ${days} days`,
+        summary: {
+          totalCycles: 0,
+          successPatterns: [],
+          improvements: [],
+          trends: [],
+          recommendations: [],
+        },
+        message:
+          "Brand history would be summarized from database in production",
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        error: "Failed to retrieve brand history summary",
+      });
     }
-  );
+  });
 
   /**
    * GET /health

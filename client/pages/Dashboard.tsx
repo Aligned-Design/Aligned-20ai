@@ -4,37 +4,35 @@
  * Displays role-based content and actions
  */
 
-import { useAuth } from '@/lib/auth';
-import { useCan } from '@/lib/auth';
-import { useNavigate, Link } from 'react-router-dom';
-import AppLayout from '@/components/layout/AppLayout';
-import ActionButtonsHeader from '@/components/dashboard/ActionButtonsHeader';
-import DashboardWidgets from '@/components/dashboard/DashboardWidgets';
-import AlignedAISummary from '@/components/dashboard/AlignedAISummary';
-import SmartDashboard from '@/components/analytics/SmartDashboard';
+import { useAuth } from "@/lib/auth";
+import { useCan } from "@/lib/auth";
+import { useNavigate, Link } from "react-router-dom";
+import AppLayout from "@/components/layout/AppLayout";
+import ActionButtonsHeader from "@/components/dashboard/ActionButtonsHeader";
+import DashboardWidgets from "@/components/dashboard/DashboardWidgets";
+import AlignedAISummary from "@/components/dashboard/AlignedAISummary";
+import SmartDashboard from "@/components/analytics/SmartDashboard";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user, role, logout } = useAuth();
-  const canCreateContent = useCan('content:create');
-  const canManageBrand = useCan('brand:manage');
+  const canCreateContent = useCan("content:create");
+  const canManageBrand = useCan("brand:manage");
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
-    <AppLayout 
-      brandName={user?.name || 'Aligned AI'}
-      onLogout={handleLogout}
-    >
+    <AppLayout brandName={user?.name || "Aligned AI"} onLogout={handleLogout}>
       <div className="space-y-8">
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600 mt-2">
-            Welcome back, {user?.name}! You're logged in as <span className="font-medium">{role}</span>
+            Welcome back, {user?.name}! You're logged in as{" "}
+            <span className="font-medium">{role}</span>
           </p>
         </div>
 
@@ -42,10 +40,14 @@ export default function Dashboard() {
         {canCreateContent && (
           <div>
             <ActionButtonsHeader
-              onCreateContent={() => navigate('/creative-studio')}
-              onSchedulePost={() => navigate('/content-queue')}
-              onPublishNow={() => {/* Handle publish */}}
-              onBestTimeSuggestions={() => {/* Handle suggestions */}}
+              onCreateContent={() => navigate("/creative-studio")}
+              onSchedulePost={() => navigate("/content-queue")}
+              onPublishNow={() => {
+                /* Handle publish */
+              }}
+              onBestTimeSuggestions={() => {
+                /* Handle suggestions */
+              }}
             />
           </div>
         )}
@@ -55,9 +57,12 @@ export default function Dashboard() {
           <div className="flex items-start gap-4">
             <span className="text-4xl">🎉</span>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Good News!</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Good News!
+              </h2>
               <p className="text-gray-700 mb-4">
-                Your content is performing well. Here's a quick summary of your metrics:
+                Your content is performing well. Here's a quick summary of your
+                metrics:
               </p>
               <ul className="space-y-2 text-sm text-gray-700">
                 <li>✨ 5 new pieces of content created</li>
@@ -70,18 +75,26 @@ export default function Dashboard() {
         </div>
 
         {/* AI Summary */}
-        {canCreateContent && (
-          <AlignedAISummary />
-        )}
+        {canCreateContent && <AlignedAISummary />}
 
         {/* Dashboard Widgets */}
         <DashboardWidgets
           items={[
-            { id: '1', title: 'LinkedIn Post Review', status: 'pending', date: '2025-11-12' },
-            { id: '2', title: 'Twitter Thread Approval', status: 'pending', date: '2025-11-11' },
+            {
+              id: "1",
+              title: "LinkedIn Post Review",
+              status: "pending",
+              date: "2025-11-12",
+            },
+            {
+              id: "2",
+              title: "Twitter Thread Approval",
+              status: "pending",
+              date: "2025-11-11",
+            },
           ]}
-          onApprove={(id) => console.log('Approved:', id)}
-          onReject={(id) => console.log('Rejected:', id)}
+          onApprove={(id) => console.log("Approved:", id)}
+          onReject={(id) => console.log("Rejected:", id)}
         />
 
         {/* Analytics */}

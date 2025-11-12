@@ -10,7 +10,8 @@ const MOCK_MEDIA = [
     brandId: "brand_abd",
     type: "image",
     url: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800",
-    thumbnailUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200",
+    thumbnailUrl:
+      "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200",
     filename: "product-hero.jpg",
     size: 245600,
     width: 1920,
@@ -26,7 +27,8 @@ const MOCK_MEDIA = [
     brandId: "brand_abd",
     type: "image",
     url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800",
-    thumbnailUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=200",
+    thumbnailUrl:
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=200",
     filename: "analytics-dashboard.jpg",
     size: 189400,
     width: 1600,
@@ -42,7 +44,8 @@ const MOCK_MEDIA = [
     brandId: "brand_abd",
     type: "image",
     url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800",
-    thumbnailUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=200",
+    thumbnailUrl:
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=200",
     filename: "team-meeting.jpg",
     size: 312800,
     width: 2000,
@@ -58,7 +61,8 @@ const MOCK_MEDIA = [
     brandId: "brand_abd",
     type: "video",
     url: "https://example.com/videos/promo.mp4",
-    thumbnailUrl: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=200",
+    thumbnailUrl:
+      "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=200",
     filename: "promo-video.mp4",
     size: 15728640,
     width: 1920,
@@ -102,7 +106,7 @@ r.get("/", (req, res) => {
     filtered = filtered.filter(
       (m) =>
         m.filename.toLowerCase().includes(searchLower) ||
-        m.tags.some((tag) => tag.toLowerCase().includes(searchLower))
+        m.tags.some((tag) => tag.toLowerCase().includes(searchLower)),
     );
   }
 

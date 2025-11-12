@@ -38,7 +38,7 @@ export function MainNavigation({
 
   // Determine which nav items to show based on role
   // BRAND_MANAGER+ see agency items, others see client items
-  const canManageBrand = useCan('brand:manage');
+  const canManageBrand = useCan("brand:manage");
   const navItems = canManageBrand ? agencyNavItems : clientNavItems;
 
   return (

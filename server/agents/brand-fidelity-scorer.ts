@@ -20,7 +20,7 @@ let openaiClient: OpenAI | null = null;
 function getOpenAI(): OpenAI {
   if (!openaiClient) {
     openaiClient = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY || 'sk-placeholder'
+      apiKey: process.env.OPENAI_API_KEY || "sk-placeholder",
     });
   }
   return openaiClient;

@@ -10,13 +10,11 @@ interface SmartDashboardProps {
   hasGoals?: boolean;
 }
 
-export function SmartDashboard({
-  hasGoals = false,
-}: SmartDashboardProps) {
+export function SmartDashboard({ hasGoals = false }: SmartDashboardProps) {
   // Check permissions
-  const canExportAnalytics = useCan('analytics:export');
+  const canExportAnalytics = useCan("analytics:export");
   const [viewMode, setViewMode] = useState<"simple" | "advanced">(
-    canExportAnalytics ? "advanced" : "simple"
+    canExportAnalytics ? "advanced" : "simple",
   );
 
   return (
@@ -24,23 +22,23 @@ export function SmartDashboard({
       {/* Controls */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Analytics Dashboard</h2>
-        
+
         <div className="flex gap-2">
-          <button 
+          <button
             onClick={() => setViewMode("simple")}
             className={`px-3 py-1 text-sm rounded ${
-              viewMode === "simple" 
-                ? "bg-purple-600 text-white" 
+              viewMode === "simple"
+                ? "bg-purple-600 text-white"
                 : "bg-gray-100 text-gray-700"
             }`}
           >
             Simple
           </button>
-          <button 
+          <button
             onClick={() => setViewMode("advanced")}
             className={`px-3 py-1 text-sm rounded ${
-              viewMode === "advanced" 
-                ? "bg-purple-600 text-white" 
+              viewMode === "advanced"
+                ? "bg-purple-600 text-white"
                 : "bg-gray-100 text-gray-700"
             }`}
             disabled={!canExportAnalytics}
@@ -101,7 +99,9 @@ export function SmartDashboard({
           <div className="p-6 border rounded bg-gradient-to-r from-green-50 to-blue-50">
             <h3 className="font-semibold mb-2">Goals Achievement</h3>
             {hasGoals ? (
-              <p className="text-sm text-gray-700">15 of 20 quarterly goals met (75%)</p>
+              <p className="text-sm text-gray-700">
+                15 of 20 quarterly goals met (75%)
+              </p>
             ) : (
               <p className="text-sm text-gray-500">No goals set yet</p>
             )}

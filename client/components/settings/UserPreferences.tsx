@@ -3,9 +3,9 @@
  * Shows role-based settings
  */
 
-import { useState } from 'react';
-import { useCan } from '@/lib/auth/useCan';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState } from "react";
+import { useCan } from "@/lib/auth/useCan";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface UserPreferencesProps {
   className?: string;
@@ -14,7 +14,7 @@ interface UserPreferencesProps {
 export function UserPreferencesComponent({
   className = "",
 }: UserPreferencesProps) {
-  const canManageUsers = useCan('user:manage');
+  const canManageUsers = useCan("user:manage");
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [slackNotifications, setSlackNotifications] = useState(false);
 
@@ -52,8 +52,8 @@ export function UserPreferencesComponent({
             <h3 className="font-semibold mb-4">Notification Preferences</h3>
             <div className="space-y-3">
               <label className="flex items-center gap-2">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={emailNotifications}
                   onChange={(e) => setEmailNotifications(e.target.checked)}
                   className="w-4 h-4"
@@ -61,7 +61,7 @@ export function UserPreferencesComponent({
                 <span>Email notifications</span>
               </label>
               <label className="flex items-center gap-2">
-                <input 
+                <input
                   type="checkbox"
                   checked={slackNotifications}
                   onChange={(e) => setSlackNotifications(e.target.checked)}

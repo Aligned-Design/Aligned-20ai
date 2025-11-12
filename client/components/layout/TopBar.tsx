@@ -7,7 +7,7 @@ import { useCan } from "@/lib/auth/useCan";
 
 export function TopBar() {
   // Check if user can create content (agency users)
-  const canCreateContent = useCan('content:create');
+  const canCreateContent = useCan("content:create");
 
   return (
     <div className="flex items-center justify-between">

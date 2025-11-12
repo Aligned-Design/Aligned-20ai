@@ -65,7 +65,7 @@ r.get("/pending", (req, res) => {
     .parse(req.query);
 
   let filtered = MOCK_APPROVALS.filter((a) => a.brandId === brandId);
-  
+
   if (status) {
     filtered = filtered.filter((a) => a.status === status);
   }
@@ -152,7 +152,7 @@ r.get("/history", (req, res) => {
     .parse(req.query);
 
   const history = MOCK_APPROVALS.filter(
-    (a) => a.brandId === brandId && a.status !== "pending"
+    (a) => a.brandId === brandId && a.status !== "pending",
   ).slice(0, limit);
 
   res.json({ items: history, total: history.length });

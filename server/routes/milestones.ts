@@ -28,7 +28,9 @@ const MOCK_MILESTONES = [
 router.get("/", async (req, res) => {
   try {
     // Check if we should use mocks
-    const useMocks = process.env.USE_MOCKS === "true" || process.env.NODE_ENV === "development";
+    const useMocks =
+      process.env.USE_MOCKS === "true" ||
+      process.env.NODE_ENV === "development";
 
     if (useMocks) {
       return res.json(MOCK_MILESTONES);

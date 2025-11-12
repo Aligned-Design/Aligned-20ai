@@ -45,14 +45,14 @@ export interface BrandSnapshot {
 export type OnboardingStep = 1 | 2 | 3 | 3.5 | 4 | 4.5 | 5 | null;
 
 // Canonical role type (matches config/permissions.json)
-export type CanonicalRole = 
-  | 'SUPERADMIN'
-  | 'AGENCY_ADMIN'
-  | 'BRAND_MANAGER'
-  | 'CREATOR'
-  | 'ANALYST'
-  | 'CLIENT_APPROVER'
-  | 'VIEWER';
+export type CanonicalRole =
+  | "SUPERADMIN"
+  | "AGENCY_ADMIN"
+  | "BRAND_MANAGER"
+  | "CREATOR"
+  | "ANALYST"
+  | "CLIENT_APPROVER"
+  | "VIEWER";
 
 export interface AuthContextType {
   user: OnboardingUser | null;
@@ -69,25 +69,27 @@ export interface AuthContextType {
   login?: (email: string, password: string) => Promise<boolean>;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined,
+);
 
 // Normalize legacy role to canonical role
 function normalizeRole(legacyRole?: string): CanonicalRole {
-  if (!legacyRole) return 'VIEWER';
-  
+  if (!legacyRole) return "VIEWER";
+
   const roleMap: Record<string, CanonicalRole> = {
-    'agency': 'AGENCY_ADMIN',
-    'single_business': 'BRAND_MANAGER',
-    'superadmin': 'SUPERADMIN',
-    'admin': 'AGENCY_ADMIN',
-    'manager': 'BRAND_MANAGER',
-    'creator': 'CREATOR',
-    'client': 'CLIENT_APPROVER',
-    'viewer': 'VIEWER',
-    'analyst': 'ANALYST',
+    agency: "AGENCY_ADMIN",
+    single_business: "BRAND_MANAGER",
+    superadmin: "SUPERADMIN",
+    admin: "AGENCY_ADMIN",
+    manager: "BRAND_MANAGER",
+    creator: "CREATOR",
+    client: "CLIENT_APPROVER",
+    viewer: "VIEWER",
+    analyst: "ANALYST",
   };
-  
-  return roleMap[legacyRole.toLowerCase()] || 'VIEWER';
+
+  return roleMap[legacyRole.toLowerCase()] || "VIEWER";
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -261,11 +263,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     login: handleLogin,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export function useAuth(): AuthContextType {

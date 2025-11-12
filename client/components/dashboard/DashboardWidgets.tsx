@@ -24,7 +24,7 @@ export function DashboardWidgets({
   onReject,
 }: DashboardWidgetsProps) {
   // Check if user can approve content
-  const canApproveContent = useCan('content:approve');
+  const canApproveContent = useCan("content:approve");
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -36,7 +36,10 @@ export function DashboardWidgets({
         ) : (
           <div className="space-y-3">
             {items.map((item) => (
-              <div key={item.id} className="flex items-center justify-between p-2 border rounded">
+              <div
+                key={item.id}
+                className="flex items-center justify-between p-2 border rounded"
+              >
                 <div className="flex-1">
                   <p className="text-sm font-medium">{item.title}</p>
                   <p className="text-xs text-gray-500">{item.date}</p>

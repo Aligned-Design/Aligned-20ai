@@ -20,15 +20,15 @@ export function ActionButtonsHeader({
   onBestTimeSuggestions,
 }: ActionButtonsHeaderProps) {
   // Check permissions for different actions
-  const canCreateContent = useCan('content:create');
-  const canPublishNow = useCan('publish:now');
-  const canScheduleContent = useCan('publish:schedule');
+  const canCreateContent = useCan("content:create");
+  const canPublishNow = useCan("publish:now");
+  const canScheduleContent = useCan("publish:schedule");
 
   return (
     <div className="flex gap-3 flex-wrap">
       {/* Create Content */}
       {canCreateContent && (
-        <Button 
+        <Button
           onClick={onCreateContent}
           className="bg-purple-600 hover:bg-purple-700"
         >
@@ -38,29 +38,20 @@ export function ActionButtonsHeader({
 
       {/* Schedule Post */}
       {canScheduleContent && (
-        <Button 
-          variant="outline"
-          onClick={onSchedulePost}
-        >
+        <Button variant="outline" onClick={onSchedulePost}>
           📅 Schedule
         </Button>
       )}
 
       {/* Publish Now */}
       {canPublishNow && (
-        <Button 
-          variant="outline"
-          onClick={onPublishNow}
-        >
+        <Button variant="outline" onClick={onPublishNow}>
           🚀 Publish Now
         </Button>
       )}
 
       {/* Best Time Suggestions */}
-      <Button 
-        variant="outline"
-        onClick={onBestTimeSuggestions}
-      >
+      <Button variant="outline" onClick={onBestTimeSuggestions}>
         ⏰ Best Time
       </Button>
     </div>

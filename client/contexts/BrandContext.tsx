@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase, Brand} from "@/lib/supabase";
+import { supabase, Brand } from "@/lib/supabase";
 import { useAuth } from "./AuthContext";
 
 type BrandContextType = {
@@ -14,13 +14,13 @@ const BrandContext = createContext<BrandContextType | undefined>(undefined);
 
 // Default brand when no brands are available
 const DEFAULT_BRAND: Brand = {
-  id: 'default-brand',
-  name: 'Aligned by Design',
-  slug: 'aligned-by-design',
+  id: "default-brand",
+  name: "Aligned by Design",
+  slug: "aligned-by-design",
   logo_url: null,
-  website_url: 'https://aligned-bydesign.com',
-  industry: 'Marketing',
-  primary_color: '#8B5CF6',
+  website_url: "https://aligned-bydesign.com",
+  industry: "Marketing",
+  primary_color: "#8B5CF6",
   secondary_color: null,
   accent_color: null,
   created_at: new Date().toISOString(),

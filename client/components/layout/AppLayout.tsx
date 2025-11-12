@@ -3,10 +3,10 @@
  * Provides sidebar, header, and main content area
  */
 
-import { ReactNode } from 'react';
-import { MainNavigation } from './MainNavigation';
-import { Header } from './Header';
-import { useCan } from '@/lib/auth/useCan';
+import { ReactNode } from "react";
+import { MainNavigation } from "./MainNavigation";
+import { Header } from "./Header";
+import { useCan } from "@/lib/auth/useCan";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -20,7 +20,7 @@ export function AppLayout({
   onLogout,
 }: AppLayoutProps) {
   // Determine layout based on permissions
-  const canManageBrand = useCan('brand:manage');
+  const canManageBrand = useCan("brand:manage");
 
   return (
     <div className="flex h-screen bg-white">
@@ -38,9 +38,7 @@ export function AppLayout({
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto">
-          <div className="p-8">
-            {children}
-          </div>
+          <div className="p-8">{children}</div>
         </main>
       </div>
     </div>

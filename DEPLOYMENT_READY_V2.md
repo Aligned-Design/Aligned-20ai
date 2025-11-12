@@ -3,6 +3,7 @@
 ## ✅ Pre-Deployment Checklist
 
 ### Code Quality
+
 - [x] All TypeScript errors resolved (except non-critical Storybook imports)
 - [x] Client build passes successfully
 - [x] Server build passes successfully
@@ -11,6 +12,7 @@
 - [x] All mock endpoints tested and working
 
 ### Architecture
+
 - [x] Server v2 implementation complete
 - [x] Clean separation of concerns (routes in separate files)
 - [x] Proper error handling middleware
@@ -19,6 +21,7 @@
 - [x] Health check endpoints active
 
 ### API Endpoints
+
 - [x] 14 endpoints implemented with mock data
 - [x] All endpoints return valid JSON (no HTML)
 - [x] Graceful error handling (empty arrays, not 500s)
@@ -27,6 +30,7 @@
 - [x] Standardized error response format
 
 ### Frontend
+
 - [x] Dev-only authentication toggle working
 - [x] Brand context fixed with correct type
 - [x] Navigation working (React Router Links)
@@ -34,6 +38,7 @@
 - [x] Empty state UIs in place
 
 ### Performance
+
 - [x] Response times < 50ms (local)
 - [x] Build time < 15s
 - [x] Optimized chunk splitting
@@ -42,6 +47,7 @@
 ## 🚀 Deployment Commands
 
 ### Development
+
 ```bash
 # Install dependencies
 pnpm install
@@ -54,6 +60,7 @@ pnpm dev
 ```
 
 ### Production Build
+
 ```bash
 # Build everything
 pnpm build
@@ -64,6 +71,7 @@ pnpm build
 ```
 
 ### Production Start
+
 ```bash
 # Start production server
 pnpm start:v2
@@ -75,6 +83,7 @@ NODE_ENV=production PORT=3000 node dist/server/node-build.mjs
 ## 🔧 Environment Variables
 
 ### Development (.env.local)
+
 ```env
 # Dev mode - uses mock data
 NODE_ENV=development
@@ -87,6 +96,7 @@ VITE_SUPABASE_ANON_KEY=placeholder
 ```
 
 ### Staging (.env.staging)
+
 ```env
 # Staging - uses mock data
 NODE_ENV=production
@@ -103,6 +113,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-key
 ```
 
 ### Production (.env.production)
+
 ```env
 # Production - uses real database
 NODE_ENV=production
@@ -121,12 +132,14 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-key
 ## 📋 Post-Deployment Verification
 
 ### 1. Health Check
+
 ```bash
 curl https://your-domain.com/health
 # Expected: {"status":"ok","timestamp":"..."}
 ```
 
 ### 2. API Endpoints
+
 ```bash
 # Analytics
 curl https://your-domain.com/api/analytics/overview
@@ -145,6 +158,7 @@ curl https://your-domain.com/api/agents/review/queue/brand_abd
 ```
 
 ### 3. Frontend
+
 - [ ] Landing page loads
 - [ ] Dev login button visible (only in dev mode)
 - [ ] Click dev login → redirects to dashboard
@@ -153,6 +167,7 @@ curl https://your-domain.com/api/agents/review/queue/brand_abd
 - [ ] No console errors
 
 ### 4. Performance
+
 - [ ] Time to First Byte (TTFB) < 1s
 - [ ] Largest Contentful Paint (LCP) < 2.5s
 - [ ] First Input Delay (FID) < 100ms
@@ -170,26 +185,30 @@ curl https://your-domain.com/api/agents/review/queue/brand_abd
 ## 🗄️ Database Migration (When Ready)
 
 ### Step 1: Verify Tables Exist
+
 ```sql
 -- Check if tables exist
-SELECT table_name 
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
   AND table_name IN ('milestones', 'generation_logs', 'brands', 'brand_members');
 ```
 
 ### Step 2: Run Migrations (if needed)
+
 ```bash
 # Apply migrations
 psql $DATABASE_URL < supabase/migrations/20250112_milestones_rls.sql
 ```
 
 ### Step 3: Switch to Real Data
+
 ```env
 USE_MOCKS=false
 ```
 
 ### Step 4: Test
+
 ```bash
 # Should now return real data from DB
 curl http://localhost:3000/api/milestones
@@ -198,12 +217,14 @@ curl http://localhost:3000/api/milestones
 ## 📊 Monitoring
 
 ### Key Metrics to Track
+
 1. **API Response Times**: Should stay < 200ms (p95)
 2. **Error Rate**: Should be < 1%
 3. **Request Rate**: Monitor for unusual spikes
 4. **Database Connection Pool**: Monitor for exhaustion
 
 ### Recommended Tools
+
 - **Logging**: Use existing error middleware (already logs to console)
 - **APM**: Consider Sentry or Datadog for production
 - **Uptime**: Use Pingdom or UptimeRobot for /health endpoint
@@ -212,28 +233,36 @@ curl http://localhost:3000/api/milestones
 ## 🐛 Troubleshooting
 
 ### Issue: API returns HTML instead of JSON
+
 **Cause**: Request hitting wrong server or proxy misconfigured
-**Fix**: 
+**Fix**:
+
 1. Check `vite.config.ts` proxy settings
 2. Verify backend server is running on port 3000
 3. Check CORS headers in response
 
 ### Issue: "Missing Supabase environment variables" error
+
 **Cause**: Supabase env vars not set when USE_MOCKS=false
 **Fix**:
+
 1. Set USE_MOCKS=true to use mock data, OR
 2. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 
 ### Issue: Empty dashboard / Not logged in
+
 **Cause**: Dev auth not enabled or localStorage cleared
 **Fix**:
+
 1. Click "Login as Test User" button on landing page
 2. Check localStorage for 'aligned_dev_auth' = 'true'
 3. Reload page
 
 ### Issue: 404 on API routes
+
 **Cause**: Router not mounted or route path incorrect
 **Fix**:
+
 1. Check `server/index-v2.ts` - verify router is mounted
 2. Check route path matches exactly (case-sensitive)
 3. Check server logs for route registration
@@ -241,6 +270,7 @@ curl http://localhost:3000/api/milestones
 ## ✅ Go/No-Go Decision
 
 ### GO (Safe to Deploy) if:
+
 - [x] All tests pass
 - [x] Build completes successfully
 - [x] Health check returns 200
@@ -249,6 +279,7 @@ curl http://localhost:3000/api/milestones
 - [x] Performance metrics acceptable
 
 ### NO-GO (Do Not Deploy) if:
+
 - [ ] Build fails
 - [ ] Health check fails
 - [ ] Critical endpoints return errors
@@ -260,6 +291,7 @@ curl http://localhost:3000/api/milestones
 If issues arise in production:
 
 ### Quick Rollback
+
 ```bash
 # Revert to previous version
 git revert HEAD
@@ -268,12 +300,14 @@ pnpm start
 ```
 
 ### Immediate Mitigation
+
 1. Enable USE_MOCKS=true to bypass database issues
 2. Check server logs for errors
 3. Verify environment variables are set
 4. Restart server process
 
 ### Communication
+
 - Notify team in Slack/Discord
 - Update status page if applicable
 - Document issue and resolution
@@ -282,6 +316,7 @@ pnpm start
 
 **Current Status:** ✅ READY FOR DEPLOYMENT
 **Recommended Next Steps:**
+
 1. Deploy to staging with USE_MOCKS=true
 2. Run full QA pass
 3. Deploy to production with USE_MOCKS=true (or false if DB ready)

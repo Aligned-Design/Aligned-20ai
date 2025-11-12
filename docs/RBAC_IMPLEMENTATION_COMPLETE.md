@@ -9,6 +9,7 @@
 ## ✅ What Has Been Completed
 
 ### Phase 1: Quick Fixes & Foundation (COMPLETE)
+
 - ✅ Fixed `authenticateUser` import in security middleware
 - ✅ Completed milestones RLS policies (4 policies)
 - ✅ Created canonical `config/permissions.json` (7 roles, 24 scopes)
@@ -17,6 +18,7 @@
 - ✅ Comprehensive documentation
 
 ### Phase 2-4: Canonical System & Documentation (COMPLETE)
+
 - ✅ Centralized role-permission mapping
 - ✅ Mapping documentation for 5 legacy systems
 - ✅ Migration plan with detailed phases
@@ -24,30 +26,33 @@
 - ✅ Unit & integration tests
 
 ### Phase 5: Client-Side Migration (COMPLETE) ✅
+
 **All major components updated to use RBAC:**
 
-| Component | Status | Scope Change | Details |
-|-----------|--------|--------------|---------|
-| `AuthContext.tsx` | ✅ Updated | Role normalization | Canonical role type support |
-| `ProtectedRoute.tsx` | ✅ Updated | Permission checking | Uses `useCan(scope)` |
-| `TopBar.tsx` | ✅ Updated | Action visibility | Create content check |
-| `MainNavigation.tsx` | ✅ Updated | Nav items | Agency vs client menu |
-| `AppLayout.tsx` | ✅ Updated | Layout logic | Role-based UI |
-| `Header.tsx` | ✅ Updated | User menu | Auth info display |
-| `UserPreferences.tsx` | ✅ Updated | Admin tabs | Uses `useCan('user:manage')` |
-| `WhiteLabelSettings.tsx` | ✅ Updated | Admin only | Uses `useCan('white_label:manage')` |
-| `ActionButtonsHeader.tsx` | ✅ Updated | Content actions | Create/publish/schedule checks |
-| `DashboardWidgets.tsx` | ✅ Updated | Approval actions | Approval permission check |
-| `AlignedAISummary.tsx` | ✅ Updated | Edit capability | Uses `useCan('content:edit')` |
-| `SmartDashboard.tsx` | ✅ Updated | Advanced analytics | Export permission check |
-| `RoleBasedApprovalFlow.tsx` | ✅ Updated | Approval UI | 4 distinct flows (creator/approver/admin/viewer) |
-| `Dashboard.tsx` | ✅ Updated | Page layout | Full RBAC integration |
-| `client/lib/auth/index.ts` | ✅ Created | Auth exports | Centralized imports |
+| Component                   | Status     | Scope Change        | Details                                          |
+| --------------------------- | ---------- | ------------------- | ------------------------------------------------ |
+| `AuthContext.tsx`           | ✅ Updated | Role normalization  | Canonical role type support                      |
+| `ProtectedRoute.tsx`        | ✅ Updated | Permission checking | Uses `useCan(scope)`                             |
+| `TopBar.tsx`                | ✅ Updated | Action visibility   | Create content check                             |
+| `MainNavigation.tsx`        | ✅ Updated | Nav items           | Agency vs client menu                            |
+| `AppLayout.tsx`             | ✅ Updated | Layout logic        | Role-based UI                                    |
+| `Header.tsx`                | ✅ Updated | User menu           | Auth info display                                |
+| `UserPreferences.tsx`       | ✅ Updated | Admin tabs          | Uses `useCan('user:manage')`                     |
+| `WhiteLabelSettings.tsx`    | ✅ Updated | Admin only          | Uses `useCan('white_label:manage')`              |
+| `ActionButtonsHeader.tsx`   | ✅ Updated | Content actions     | Create/publish/schedule checks                   |
+| `DashboardWidgets.tsx`      | ✅ Updated | Approval actions    | Approval permission check                        |
+| `AlignedAISummary.tsx`      | ✅ Updated | Edit capability     | Uses `useCan('content:edit')`                    |
+| `SmartDashboard.tsx`        | ✅ Updated | Advanced analytics  | Export permission check                          |
+| `RoleBasedApprovalFlow.tsx` | ✅ Updated | Approval UI         | 4 distinct flows (creator/approver/admin/viewer) |
+| `Dashboard.tsx`             | ✅ Updated | Page layout         | Full RBAC integration                            |
+| `client/lib/auth/index.ts`  | ✅ Created | Auth exports        | Centralized imports                              |
 
 ### Phase 6: API Route Protection (COMPLETE) ✅
+
 **All critical routes updated with `requireScope` middleware:**
 
 #### Approvals Routes (7 endpoints)
+
 ```typescript
 ✅ POST /api/approvals/bulk → requireScope('content:approve')
 ✅ POST /api/approvals/single → requireScope('content:approve')
@@ -59,6 +64,7 @@
 ```
 
 #### Analytics Routes (11 endpoints)
+
 ```typescript
 ✅ GET /api/analytics/:brandId → requireScope('analytics:read')
 ✅ GET /api/analytics/:brandId/insights → requireScope('analytics:read')
@@ -75,6 +81,7 @@
 ```
 
 #### Client Portal Routes (9 endpoints)
+
 ```typescript
 ✅ GET /api/client-portal/:clientId/dashboard → requireScope('content:view')
 ✅ POST /api/client-portal/approve/:contentId → requireScope('content:approve')
@@ -88,6 +95,7 @@
 ```
 
 #### Workflow Routes (7 endpoints)
+
 ```typescript
 ✅ GET /api/workflow/templates/:brandId → requireScope('workflow:manage')
 ✅ POST /api/workflow/templates/:brandId → requireScope('workflow:manage')
@@ -106,17 +114,17 @@
 
 ### Files Created/Modified
 
-| Category | Count | Files |
-|----------|-------|-------|
-| **Config** | 1 | `config/permissions.json` |
-| **Client Hooks** | 2 | `useAuth.ts`, `useCan.ts` |
-| **Client Auth Index** | 1 | `client/lib/auth/index.ts` |
-| **Server Middleware** | 2 | `requireScope.ts`, `authenticateUser.ts` |
-| **Client Components Updated** | 14 | Layout, Dashboard, Settings, Generation, Approval |
-| **Server Routes Modified** | 1 | `server/index.ts` (34 endpoints) |
-| **Database Migrations** | 1 | `20250112_milestones_rls.sql` |
-| **Documentation** | 5 | Mapping, Migration, Examples, Summary, Complete Report |
-| **Tests** | 2 | Client tests, Server tests |
+| Category                      | Count | Files                                                  |
+| ----------------------------- | ----- | ------------------------------------------------------ |
+| **Config**                    | 1     | `config/permissions.json`                              |
+| **Client Hooks**              | 2     | `useAuth.ts`, `useCan.ts`                              |
+| **Client Auth Index**         | 1     | `client/lib/auth/index.ts`                             |
+| **Server Middleware**         | 2     | `requireScope.ts`, `authenticateUser.ts`               |
+| **Client Components Updated** | 14    | Layout, Dashboard, Settings, Generation, Approval      |
+| **Server Routes Modified**    | 1     | `server/index.ts` (34 endpoints)                       |
+| **Database Migrations**       | 1     | `20250112_milestones_rls.sql`                          |
+| **Documentation**             | 5     | Mapping, Migration, Examples, Summary, Complete Report |
+| **Tests**                     | 2     | Client tests, Server tests                             |
 
 **Total: 29 files**
 
@@ -125,17 +133,20 @@
 ## 🔐 Security Enhancements
 
 ### Client-Side ✅
+
 - Permission checks via `useCan()` before showing buttons/menus
 - Role-based component rendering
 - Navigation item filtering
 
 ### Server-Side ✅
+
 - JWT authentication via `authenticateUser` middleware
 - Scope-based authorization via `requireScope` middleware
 - 34 endpoints protected
 - Error handling returns 401 (unauthorized) or 403 (forbidden)
 
 ### Database-Level ✅
+
 - Milestones table RLS enforced
 - Organization/brand isolation
 - Read/write/update/delete policies
@@ -145,6 +156,7 @@
 ## 🧪 Testing Readiness
 
 ### Unit Tests ✅
+
 - `client/lib/auth/__tests__/useCan.test.ts` (336 lines)
   - Permission matrix validation
   - Role hierarchy tests
@@ -157,6 +169,7 @@
   - Error scenarios
 
 ### Test Commands
+
 ```bash
 # Run all tests
 npm test
@@ -178,15 +191,15 @@ npm run lint
 
 ### Canonical Roles & Access
 
-| Role | Key Permissions | Typical Use Case |
-|------|-----------------|------------------|
-| **SUPERADMIN** | All (`*`) | Platform administrators |
-| **AGENCY_ADMIN** | 27 scopes including brand:manage, user:invite, billing:manage | Agency owners |
-| **BRAND_MANAGER** | 19 scopes including content management, brand editing | Brand leaders |
-| **CREATOR** | Content creation/editing, analytics, integrations view | Content creators |
-| **ANALYST** | Analytics read/export | Analysts, reporters |
-| **CLIENT_APPROVER** | Content approval, comments | Client reviewers |
-| **VIEWER** | Read-only (view, analytics, comments) | Stakeholders |
+| Role                | Key Permissions                                               | Typical Use Case        |
+| ------------------- | ------------------------------------------------------------- | ----------------------- |
+| **SUPERADMIN**      | All (`*`)                                                     | Platform administrators |
+| **AGENCY_ADMIN**    | 27 scopes including brand:manage, user:invite, billing:manage | Agency owners           |
+| **BRAND_MANAGER**   | 19 scopes including content management, brand editing         | Brand leaders           |
+| **CREATOR**         | Content creation/editing, analytics, integrations view        | Content creators        |
+| **ANALYST**         | Analytics read/export                                         | Analysts, reporters     |
+| **CLIENT_APPROVER** | Content approval, comments                                    | Client reviewers        |
+| **VIEWER**          | Read-only (view, analytics, comments)                         | Stakeholders            |
 
 ---
 
@@ -217,6 +230,7 @@ Response
 ## ✨ Key Improvements
 
 ### Before
+
 - ❌ 5+ different role systems
 - ❌ Ad-hoc string role checks (`['client','agency','admin']`)
 - ❌ Inline permission logic in route handlers
@@ -224,6 +238,7 @@ Response
 - ❌ Inconsistent role naming across codebase
 
 ### After
+
 - ✅ Single canonical role system
 - ✅ Centralized scope-based permissions
 - ✅ Middleware-enforced authorization
@@ -235,6 +250,7 @@ Response
 ## 🚀 Deployment Checklist
 
 ### Pre-Deployment
+
 - [ ] All tests passing (`npm test`)
 - [ ] Type checking passes (`npm run typecheck`)
 - [ ] Linting passes (`npm run lint`)
@@ -242,6 +258,7 @@ Response
 - [ ] Code review approved
 
 ### Deployment Steps
+
 1. Deploy code changes to staging
 2. Verify all routes return 403 for unauthorized users
 3. Test approval workflows with different roles
@@ -250,6 +267,7 @@ Response
 6. Test admin-only features (white label, user management)
 
 ### Post-Deployment
+
 - [ ] Monitor 401/403 responses in logs
 - [ ] Test critical user flows
 - [ ] Verify no unauthorized access
@@ -260,15 +278,19 @@ Response
 ## 🛠️ Troubleshooting
 
 ### Issue: Permission Denied (403)
+
 **Solution:** Check if user role has required scope in `config/permissions.json`
 
 ### Issue: useAuth() hook not working
+
 **Solution:** Ensure component is within `<AuthProvider>` and imports from `@/lib/auth`
 
 ### Issue: Route returns 401
+
 **Solution:** Verify JWT token in Authorization header is valid
 
 ### Issue: TypeScript errors
+
 **Solution:** Run `npm run typecheck` and check for missing imports from `@/lib/auth`
 
 ---
@@ -287,16 +309,19 @@ Response
 ## 🎯 Next Steps
 
 ### Phase 7: RLS & Database (Next)
+
 - [ ] Audit all table RLS policies
 - [ ] Verify brand/organization isolation
 - [ ] Test cross-brand access blocking
 
 ### Phase 8: Feature Flag & Rollout
+
 - [ ] Add `ENFORCE_STRICT_RBAC` environment variable
 - [ ] Implement log-only mode
 - [ ] Gradual user rollout
 
 ### Phase 9: Testing & Cleanup
+
 - [ ] Full regression testing
 - [ ] Performance validation
 - [ ] Remove deprecated code
@@ -307,11 +332,13 @@ Response
 ## 📞 Support & Questions
 
 ### For Developers
+
 - Review `docs/EXAMPLE_ROUTE_SETUP.md` for route pattern
 - Check `client/lib/auth/useCan.ts` JSDoc for available scopes
 - Run tests: `npm test`
 
 ### For Code Review
+
 - Focus areas: Role checks, middleware ordering, permission logic
 - Acceptance criteria: All 34 endpoints protected, components use `useCan()`
 - Security: No hardcoded credentials, RLS enforced
