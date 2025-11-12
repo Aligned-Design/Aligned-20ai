@@ -26,7 +26,52 @@ const TONE_OPTIONS = [
   { label: "Approachable", emoji: "🤝" },
 ];
 
-const COLOR_PRESETS = ["#312E81", "#B9F227", "#3B82F6", "#EC4899", "#F59E0B"];
+// Color theme palettes - each palette has 2-3 colors
+const COLOR_THEMES = [
+  {
+    name: "Professional",
+    colors: ["#1F2937", "#3B82F6", "#E5E7EB"],
+    emoji: "💼",
+  },
+  {
+    name: "Vibrant",
+    colors: ["#312E81", "#B9F227", "#EC4899"],
+    emoji: "🌈",
+  },
+  {
+    name: "Modern",
+    colors: ["#0F172A", "#06B6D4", "#F43F5E"],
+    emoji: "✨",
+  },
+  {
+    name: "Earthy",
+    colors: ["#92400E", "#D97706", "#F3E8FF"],
+    emoji: "🌿",
+  },
+  {
+    name: "Tech",
+    colors: ["#1E293B", "#8B5CF6", "#10B981"],
+    emoji: "🚀",
+  },
+  {
+    name: "Bold",
+    colors: ["#7C2D12", "#DC2626", "#FBBF24"],
+    emoji: "⚡",
+  },
+  {
+    name: "Minimal",
+    colors: ["#000000", "#FFFFFF", "#64748B"],
+    emoji: "◇",
+  },
+  {
+    name: "Creative",
+    colors: ["#EC4899", "#A855F7", "#0EA5E9"],
+    emoji: "🎨",
+  },
+];
+
+// Legacy presets for backward compatibility
+const COLOR_PRESETS = COLOR_THEMES.flatMap((theme) => theme.colors).slice(0, 5);
 
 const AUDIENCE_OPTIONS = [
   "Startups & SMBs",
