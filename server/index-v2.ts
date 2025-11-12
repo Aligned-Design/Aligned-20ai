@@ -13,6 +13,7 @@ import { requireScope } from "./middleware/requireScope";
 // Import route routers (add incrementally)
 import milestonesRouter from "./routes/milestones";
 import agentsRouter from "./routes/agents";
+import analyticsRouter from "./routes/analytics-v2";
 
 export function createServer() {
   const app = express();
@@ -71,9 +72,9 @@ export function createServer() {
   // Core routes that are working
   app.use("/api/milestones", milestonesRouter);
   app.use("/api/agents", agentsRouter);
+  app.use("/api/analytics", analyticsRouter);
 
   // TODO: Add these routers incrementally after testing
-  // app.use("/api/analytics", analyticsRouter);
   // app.use("/api/approvals", approvalsRouter);
   // app.use("/api/client-portal", clientPortalRouter);
   // app.use("/api/media", mediaRouter);
