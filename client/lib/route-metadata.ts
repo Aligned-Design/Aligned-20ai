@@ -258,12 +258,21 @@ export const ROUTE_METADATA: Record<string, RouteMetadata> = {
   // ========================================
   // CLIENT ROUTES (White-Label Portal)
   // Visibility: client | SEO: No Index
+  // Token-based authentication required
   // ========================================
   '/client-portal': {
     path: '/client-portal',
     visibility: 'client',
     title: 'Client Portal',
     description: 'Review and approve your content.',
+    noindex: true,
+    whiteLabel: true,
+  },
+  '/client-portal/:token': {
+    path: '/client-portal/:token',
+    visibility: 'client',
+    title: 'Client Portal Access',
+    description: 'Accessing your client portal...',
     noindex: true,
     whiteLabel: true,
   },
