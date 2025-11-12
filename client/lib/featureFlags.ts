@@ -9,6 +9,7 @@ export interface FeatureFlags {
   studio_align_tools: boolean; // Advanced alignment & snap-to-grid
   ai_copy_v1: boolean; // AI content generator
   ai_palette_v1: boolean; // AI palette generator
+  unified_dash: boolean; // Unified Dashboard System (DashboardSystem components)
 }
 
 const DEFAULT_FLAGS: FeatureFlags = {
@@ -16,6 +17,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   studio_align_tools: false,
   ai_copy_v1: false,
   ai_palette_v1: false,
+  unified_dash: false, // Disabled by default; enable incrementally
 };
 
 /**
@@ -37,6 +39,9 @@ export function getFeatureFlags(): FeatureFlags {
   }
   if (import.meta.env.VITE_FEATURE_AI_PALETTE_V1 !== undefined) {
     flags.ai_palette_v1 = import.meta.env.VITE_FEATURE_AI_PALETTE_V1 === "true";
+  }
+  if (import.meta.env.VITE_FEATURE_UNIFIED_DASH !== undefined) {
+    flags.unified_dash = import.meta.env.VITE_FEATURE_UNIFIED_DASH === "true";
   }
 
   // Check localStorage
