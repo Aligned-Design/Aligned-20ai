@@ -1,15 +1,15 @@
-import crypto from 'crypto';
-import { Request, Response, NextFunction } from 'express';
-import { AppError } from './error-middleware';
-import { ErrorCode, HTTP_STATUS } from './error-responses';
-import { Role } from '../middleware/rbac';
+import crypto from "crypto";
+import { Request, Response, NextFunction } from "express";
+import { AppError } from "./error-middleware";
+import { ErrorCode, HTTP_STATUS } from "./error-responses";
+import { Role } from "../middleware/rbac";
 
 /**
  * JWT configuration
  */
 const ACCESS_TOKEN_EXPIRY = 3600; // 1 hour in seconds
 const REFRESH_TOKEN_EXPIRY = 604800; // 7 days in seconds
-const ALGORITHM = 'HS256';
+const ALGORITHM = "HS256";
 
 interface JWTPayload {
   userId: string;
@@ -19,7 +19,7 @@ interface JWTPayload {
   tenantId: string;
   iat: number; // Issued at
   exp: number; // Expiry
-  type: 'access' | 'refresh';
+  type: "access" | "refresh";
 }
 
 interface TokenPair {
@@ -33,12 +33,14 @@ interface TokenPair {
  */
 function getJWTSecret(): string {
   const secret = process.env.JWT_SECRET;
-  
+
   if (!secret) {
-    console.warn('⚠️  JWT_SECRET not set in environment. Using development secret. DO NOT USE IN PRODUCTION!');
-    return 'dev-jwt-secret-change-in-production';
+    console.warn(
+      "⚠️  JWT_SECRET not set in environment. Using development secret. DO NOT USE IN PRODUCTION!",
+    );
+    return "dev-jwt-secret-change-in-production";
   }
-  
+
   return secret;
 }
 
@@ -47,21 +49,21 @@ function getJWTSecret(): string {
  */
 function base64UrlEncode(str: string): string {
   return Buffer.from(str)
-    .toString('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
 }
 
 /**
  * Base64 URL decode
  */
 function base64UrlDecode(str: string): string {
-  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
   while (base64.length % 4) {
-    base64 += '=';
+    base64 += "=";
   }
-  return Buffer.from(base64, 'base64').toString('utf8');
+  return Buffer.from(base64, "base64").toString("utf8");
 }
 
 /**
@@ -70,19 +72,19 @@ function base64UrlDecode(str: string): string {
 function signToken(payload: JWTPayload): string {
   const header = {
     alg: ALGORITHM,
-    typ: 'JWT',
+    typ: "JWT",
   };
 
   const encodedHeader = base64UrlEncode(JSON.stringify(header));
   const encodedPayload = base64UrlEncode(JSON.stringify(payload));
-  
+
   const signature = crypto
-    .createHmac('sha256', getJWTSecret())
+    .createHmac("sha256", getJWTSecret())
     .update(`${encodedHeader}.${encodedPayload}`)
-    .digest('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
+    .digest("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
 
   return `${encodedHeader}.${encodedPayload}.${signature}`;
 }
@@ -91,33 +93,38 @@ function signToken(payload: JWTPayload): string {
  * Verify JWT token
  */
 function verifyToken(token: string): JWTPayload {
-  const parts = token.split('.');
-  
+  const parts = token.split(".");
+
   if (parts.length !== 3) {
-    throw new Error('Invalid token format');
+    throw new Error("Invalid token format");
   }
 
   const [encodedHeader, encodedPayload, signature] = parts;
-  
+
   // Verify signature
   const expectedSignature = crypto
-    .createHmac('sha256', getJWTSecret())
+    .createHmac("sha256", getJWTSecret())
     .update(`${encodedHeader}.${encodedPayload}`)
-    .digest('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
+    .digest("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
 
-  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
-    throw new Error('Invalid token signature');
+  if (
+    !crypto.timingSafeEqual(
+      Buffer.from(signature),
+      Buffer.from(expectedSignature),
+    )
+  ) {
+    throw new Error("Invalid token signature");
   }
 
   // Decode payload
   const payload = JSON.parse(base64UrlDecode(encodedPayload)) as JWTPayload;
-  
+
   // Check expiry
   if (payload.exp < Math.floor(Date.now() / 1000)) {
-    throw new Error('Token expired');
+    throw new Error("Token expired");
   }
 
   return payload;
@@ -139,14 +146,14 @@ export function generateTokenPair(user: {
     ...user,
     iat: now,
     exp: now + ACCESS_TOKEN_EXPIRY,
-    type: 'access',
+    type: "access",
   };
 
   const refreshPayload: JWTPayload = {
     ...user,
     iat: now,
     exp: now + REFRESH_TOKEN_EXPIRY,
-    type: 'refresh',
+    type: "refresh",
   };
 
   return {
@@ -162,9 +169,9 @@ export function generateTokenPair(user: {
 export function refreshAccessToken(refreshToken: string): TokenPair {
   try {
     const payload = verifyToken(refreshToken);
-    
-    if (payload.type !== 'refresh') {
-      throw new Error('Invalid token type');
+
+    if (payload.type !== "refresh") {
+      throw new Error("Invalid token type");
     }
 
     // Generate new token pair
@@ -178,9 +185,9 @@ export function refreshAccessToken(refreshToken: string): TokenPair {
   } catch (error) {
     throw new AppError(
       ErrorCode.UNAUTHORIZED,
-      'Invalid or expired refresh token',
+      "Invalid or expired refresh token",
       HTTP_STATUS.UNAUTHORIZED,
-      'warning'
+      "warning",
     );
   }
 }
@@ -191,25 +198,25 @@ export function refreshAccessToken(refreshToken: string): TokenPair {
 export function jwtAuth(req: Request, res: Response, next: NextFunction) {
   try {
     const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       throw new AppError(
         ErrorCode.UNAUTHORIZED,
-        'Missing or invalid authorization header',
+        "Missing or invalid authorization header",
         HTTP_STATUS.UNAUTHORIZED,
-        'warning'
+        "warning",
       );
     }
 
     const token = authHeader.substring(7);
     const payload = verifyToken(token);
 
-    if (payload.type !== 'access') {
+    if (payload.type !== "access") {
       throw new AppError(
         ErrorCode.UNAUTHORIZED,
-        'Invalid token type',
+        "Invalid token type",
         HTTP_STATUS.UNAUTHORIZED,
-        'warning'
+        "warning",
       );
     }
 
@@ -225,7 +232,7 @@ export function jwtAuth(req: Request, res: Response, next: NextFunction) {
     // Check if token is close to expiry (within 5 minutes)
     const timeUntilExpiry = payload.exp - Math.floor(Date.now() / 1000);
     if (timeUntilExpiry < 300) {
-      res.setHeader('X-Token-Expiring', 'true');
+      res.setHeader("X-Token-Expiring", "true");
     }
 
     next();
@@ -235,9 +242,9 @@ export function jwtAuth(req: Request, res: Response, next: NextFunction) {
     }
     throw new AppError(
       ErrorCode.UNAUTHORIZED,
-      error instanceof Error ? error.message : 'Authentication failed',
+      error instanceof Error ? error.message : "Authentication failed",
       HTTP_STATUS.UNAUTHORIZED,
-      'warning'
+      "warning",
     );
   }
 }
@@ -246,12 +253,12 @@ export function jwtAuth(req: Request, res: Response, next: NextFunction) {
  * Set refresh token as httpOnly cookie
  */
 export function setRefreshTokenCookie(res: Response, refreshToken: string) {
-  res.cookie('refreshToken', refreshToken, {
+  res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
     maxAge: REFRESH_TOKEN_EXPIRY * 1000,
-    path: '/api/auth/refresh',
+    path: "/api/auth/refresh",
   });
 }
 
@@ -259,11 +266,11 @@ export function setRefreshTokenCookie(res: Response, refreshToken: string) {
  * Clear refresh token cookie
  */
 export function clearRefreshTokenCookie(res: Response) {
-  res.clearCookie('refreshToken', {
+  res.clearCookie("refreshToken", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    path: '/api/auth/refresh',
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/api/auth/refresh",
   });
 }
 

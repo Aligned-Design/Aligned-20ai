@@ -7,24 +7,28 @@ This document outlines the procedures for detecting, responding to, and recoveri
 ## Severity Classification
 
 ### Critical (P0)
+
 - **Examples:** Data breach, credential exposure, system compromise, ransomware
 - **Response Time:** Immediate (15 minutes)
 - **Escalation:** All hands on deck
 - **Communication:** Immediate notification to all stakeholders
 
 ### High (P1)
+
 - **Examples:** Service outage, database failure, payment system down
 - **Response Time:** 1 hour
 - **Escalation:** Engineering lead + on-call team
 - **Communication:** Status page update, customer notification if > 2 hours
 
 ### Medium (P2)
+
 - **Examples:** Degraded performance, intermittent errors, failed integrations
 - **Response Time:** 4 hours
 - **Escalation:** Assigned team
 - **Communication:** Internal notification, status page if prolonged
 
 ### Low (P3)
+
 - **Examples:** Minor bugs, UI glitches, non-critical errors
 - **Response Time:** 24 hours
 - **Escalation:** Standard ticket queue
@@ -35,6 +39,7 @@ This document outlines the procedures for detecting, responding to, and recoveri
 ## Incident Response Team
 
 ### Core Team
+
 - **Incident Commander:** [Engineering Lead]
 - **Security Lead:** [Security Officer]
 - **Communications Lead:** [Client Success Lead]
@@ -65,6 +70,7 @@ Legal Counsel:
 ```
 
 ### Escalation Path
+
 1. On-call engineer
 2. Engineering lead
 3. Security officer
@@ -160,6 +166,7 @@ Legal Counsel:
    - [ ] Document data access logs
 
 2. **Update Status Page**
+
    ```
    Title: [Brief service status]
    Status: Investigating / Identified / Monitoring
@@ -227,6 +234,7 @@ Legal Counsel:
 #### Internal Communication
 
 **Slack Template:**
+
 ```
 📢 INCIDENT UPDATE
 
@@ -246,12 +254,13 @@ Next Update: [Time]
 #### External Communication (for P0-P1)
 
 **Email Template:**
+
 ```
 Subject: Service Notification - [Brief Description]
 
 Dear [Customer Name],
 
-We wanted to inform you of a [service issue/security incident] that 
+We wanted to inform you of a [service issue/security incident] that
 occurred on [date] at [time] affecting [description of impact].
 
 What happened:
@@ -266,7 +275,7 @@ What you need to do:
 Status:
 [Current status]
 
-We sincerely apologize for any inconvenience. If you have questions, 
+We sincerely apologize for any inconvenience. If you have questions,
 please contact support@aligned.ai.
 
 Best regards,
@@ -274,6 +283,7 @@ The Aligned AI Team
 ```
 
 **Legal Notification** (for data breaches):
+
 - Within 72 hours: Notify data protection authority
 - Within 30 days: Notify affected individuals
 - Consult legal counsel before communication
@@ -305,11 +315,13 @@ The Aligned AI Team
 ### Post-Mortem (Within 48 hours)
 
 **Attendees:**
+
 - Incident response team
 - Affected team members
 - Leadership (for P0-P1)
 
 **Agenda:**
+
 1. Timeline review
 2. Root cause analysis
 3. What went well?
@@ -323,6 +335,7 @@ The Aligned AI Team
 # Post-Mortem: [Incident Title]
 
 ## Metadata
+
 - Date: YYYY-MM-DD
 - Severity: P#
 - Duration: X hours
@@ -330,36 +343,45 @@ The Aligned AI Team
 - Incident Commander: [Name]
 
 ## Summary
+
 [Brief description of what happened]
 
 ## Timeline
+
 - [HH:MM] Event 1
 - [HH:MM] Event 2
 - [HH:MM] Event 3
 
 ## Root Cause
+
 [Detailed explanation]
 
 ## Impact
+
 - Users affected: X
 - Duration: X hours
 - Data exposed: Yes/No
 - Revenue impact: $X
 
 ## Response Evaluation
+
 ### What Went Well
+
 - Item 1
 - Item 2
 
 ### What Could Improve
+
 - Item 1
 - Item 2
 
 ## Action Items
+
 - [ ] Action 1 - Owner: [Name] - Due: [Date]
 - [ ] Action 2 - Owner: [Name] - Due: [Date]
 
 ## Prevention Measures
+
 - Measure 1
 - Measure 2
 ```
@@ -408,10 +430,11 @@ The Aligned AI Team
    - [ ] Document all actions for compliance
 
 4. **User Notification** (if PII exposed)
+
    ```
    Subject: Important Security Notice
 
-   We are writing to inform you of a security incident that may have 
+   We are writing to inform you of a security incident that may have
    affected your personal information.
 
    What happened:
@@ -473,6 +496,7 @@ The Aligned AI Team
 ### Quarterly Incident Response Drills
 
 **Scenarios:**
+
 1. Database credential exposure
 2. Ransomware attack
 3. Service outage (database failure)
@@ -480,6 +504,7 @@ The Aligned AI Team
 5. Insider threat
 
 **Drill Format:**
+
 - Announce drill start
 - Present scenario
 - Team responds as if real
@@ -499,24 +524,28 @@ The Aligned AI Team
 ## Tools & Resources
 
 ### Monitoring & Alerting
+
 - Sentry: Error tracking
 - Vercel Analytics: Performance monitoring
 - Supabase Dashboard: Database monitoring
 - Custom security alerts
 
 ### Communication
+
 - Slack: #incidents channel
 - Email: security@aligned.ai
 - Status Page: status.aligned.ai
 - PagerDuty: On-call rotation
 
 ### Investigation
+
 - Supabase logs
 - Vercel logs
 - Application logs (CloudWatch)
 - Security event logs
 
 ### Documentation
+
 - Incident tickets (GitHub)
 - Post-mortem documents (Notion)
 - Evidence storage (S3 bucket)
@@ -528,16 +557,19 @@ The Aligned AI Team
 ### Common Incident Patterns
 
 **Pattern 1: Failed Deployment**
+
 - Symptoms: Spike in errors after deployment
 - Response: Immediate rollback
 - Prevention: Enhanced staging tests
 
 **Pattern 2: Database Performance**
+
 - Symptoms: Slow queries, timeouts
 - Response: Scale database, optimize queries
 - Prevention: Query monitoring, indexing
 
 **Pattern 3: API Rate Limit Hit**
+
 - Symptoms: Third-party API failures
 - Response: Implement caching, backoff
 - Prevention: Monitor usage, implement quotas
@@ -545,6 +577,7 @@ The Aligned AI Team
 ### Incident Communication Examples
 
 See templates throughout this document for:
+
 - Initial detection messages
 - Status page updates
 - User notifications
@@ -553,11 +586,13 @@ See templates throughout this document for:
 ### Regulatory Requirements
 
 **GDPR (EU):**
+
 - Notify supervisory authority within 72 hours
 - Notify affected individuals "without undue delay"
 - Document all breaches
 
 **CCPA (California):**
+
 - Notify affected individuals
 - Provide free credit monitoring if SSN exposed
 - Maintain breach log
@@ -565,12 +600,14 @@ See templates throughout this document for:
 ### Contacts
 
 **External:**
+
 - Cybersecurity firm: [Contact]
 - Legal counsel: [Contact]
 - PR firm: [Contact]
 - Insurance: [Contact]
 
 **Regulatory:**
+
 - Data Protection Authority: [Contact]
 - FBI Cyber Division: [Contact]
 

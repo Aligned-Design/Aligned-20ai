@@ -1,16 +1,16 @@
-import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../lib/error-middleware';
-import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
+import { Request, Response, NextFunction } from "express";
+import { AppError } from "../lib/error-middleware";
+import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
 
 /**
  * User roles in the system
  */
 export enum Role {
-  SUPERADMIN = 'superadmin',
-  AGENCY_ADMIN = 'agency_admin',
-  BRAND_MANAGER = 'brand_manager',
-  CREATOR = 'creator',
-  CLIENT_VIEWER = 'client_viewer',
+  SUPERADMIN = "superadmin",
+  AGENCY_ADMIN = "agency_admin",
+  BRAND_MANAGER = "brand_manager",
+  CREATOR = "creator",
+  CLIENT_VIEWER = "client_viewer",
 }
 
 /**
@@ -18,39 +18,39 @@ export enum Role {
  */
 export enum Permission {
   // Content permissions
-  CREATE_CONTENT = 'content:create',
-  EDIT_CONTENT = 'content:edit',
-  DELETE_CONTENT = 'content:delete',
-  APPROVE_CONTENT = 'content:approve',
-  PUBLISH_CONTENT = 'content:publish',
-  VIEW_CONTENT = 'content:view',
+  CREATE_CONTENT = "content:create",
+  EDIT_CONTENT = "content:edit",
+  DELETE_CONTENT = "content:delete",
+  APPROVE_CONTENT = "content:approve",
+  PUBLISH_CONTENT = "content:publish",
+  VIEW_CONTENT = "content:view",
 
   // Brand permissions
-  MANAGE_BRAND = 'brand:manage',
-  VIEW_BRAND = 'brand:view',
-  EDIT_BRAND_SETTINGS = 'brand:settings',
+  MANAGE_BRAND = "brand:manage",
+  VIEW_BRAND = "brand:view",
+  EDIT_BRAND_SETTINGS = "brand:settings",
 
   // User/Team permissions
-  MANAGE_USERS = 'users:manage',
-  VIEW_USERS = 'users:view',
-  INVITE_USERS = 'users:invite',
+  MANAGE_USERS = "users:manage",
+  VIEW_USERS = "users:view",
+  INVITE_USERS = "users:invite",
 
   // Integration permissions
-  MANAGE_INTEGRATIONS = 'integrations:manage',
-  VIEW_INTEGRATIONS = 'integrations:view',
+  MANAGE_INTEGRATIONS = "integrations:manage",
+  VIEW_INTEGRATIONS = "integrations:view",
 
   // Analytics permissions
-  VIEW_ANALYTICS = 'analytics:view',
-  EXPORT_ANALYTICS = 'analytics:export',
+  VIEW_ANALYTICS = "analytics:view",
+  EXPORT_ANALYTICS = "analytics:export",
 
   // Billing permissions
-  MANAGE_BILLING = 'billing:manage',
-  VIEW_BILLING = 'billing:view',
+  MANAGE_BILLING = "billing:manage",
+  VIEW_BILLING = "billing:view",
 
   // Admin permissions
-  MANAGE_WHITE_LABEL = 'admin:white_label',
-  VIEW_AUDIT_LOGS = 'admin:audit_logs',
-  MANAGE_SYSTEM = 'admin:system',
+  MANAGE_WHITE_LABEL = "admin:white_label",
+  VIEW_AUDIT_LOGS = "admin:audit_logs",
+  MANAGE_SYSTEM = "admin:system",
 }
 
 /**
@@ -126,14 +126,20 @@ export function hasPermission(role: Role, permission: Permission): boolean {
 /**
  * Check if a role has any of the specified permissions
  */
-export function hasAnyPermission(role: Role, permissions: Permission[]): boolean {
+export function hasAnyPermission(
+  role: Role,
+  permissions: Permission[],
+): boolean {
   return permissions.some((p) => hasPermission(role, p));
 }
 
 /**
  * Check if a role has all of the specified permissions
  */
-export function hasAllPermissions(role: Role, permissions: Permission[]): boolean {
+export function hasAllPermissions(
+  role: Role,
+  permissions: Permission[],
+): boolean {
   return permissions.every((p) => hasPermission(role, p));
 }
 
@@ -146,9 +152,9 @@ export function requireAuth(req: Request, _res: Response, next: NextFunction) {
   if (!auth || !auth.userId) {
     throw new AppError(
       ErrorCode.UNAUTHORIZED,
-      'Authentication required',
+      "Authentication required",
       HTTP_STATUS.UNAUTHORIZED,
-      'warning'
+      "warning",
     );
   }
 
@@ -165,19 +171,19 @@ export function requireRole(...roles: Role[]) {
     if (!auth || !auth.role) {
       throw new AppError(
         ErrorCode.UNAUTHORIZED,
-        'Authentication required',
+        "Authentication required",
         HTTP_STATUS.UNAUTHORIZED,
-        'warning'
+        "warning",
       );
     }
 
     if (!roles.includes(auth.role)) {
       throw new AppError(
         ErrorCode.FORBIDDEN,
-        'Insufficient permissions',
+        "Insufficient permissions",
         HTTP_STATUS.FORBIDDEN,
-        'warning',
-        { requiredRoles: roles, userRole: auth.role }
+        "warning",
+        { requiredRoles: roles, userRole: auth.role },
       );
     }
 
@@ -195,23 +201,23 @@ export function requirePermission(...permissions: Permission[]) {
     if (!auth || !auth.role) {
       throw new AppError(
         ErrorCode.UNAUTHORIZED,
-        'Authentication required',
+        "Authentication required",
         HTTP_STATUS.UNAUTHORIZED,
-        'warning'
+        "warning",
       );
     }
 
     const hasRequiredPermission = permissions.some((p) =>
-      hasPermission(auth.role, p)
+      hasPermission(auth.role, p),
     );
 
     if (!hasRequiredPermission) {
       throw new AppError(
         ErrorCode.FORBIDDEN,
-        'Insufficient permissions',
+        "Insufficient permissions",
         HTTP_STATUS.FORBIDDEN,
-        'warning',
-        { requiredPermissions: permissions, userRole: auth.role }
+        "warning",
+        { requiredPermissions: permissions, userRole: auth.role },
       );
     }
 
@@ -222,39 +228,44 @@ export function requirePermission(...permissions: Permission[]) {
 /**
  * Middleware: Require brand access
  */
-export function requireBrandAccess(req: Request, _res: Response, next: NextFunction) {
+export function requireBrandAccess(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) {
   const auth = (req as any).auth;
   const brandId = req.params.brandId || req.body.brandId || req.query.brandId;
 
   if (!auth || !auth.userId) {
     throw new AppError(
       ErrorCode.UNAUTHORIZED,
-      'Authentication required',
+      "Authentication required",
       HTTP_STATUS.UNAUTHORIZED,
-      'warning'
+      "warning",
     );
   }
 
   if (!brandId) {
     throw new AppError(
       ErrorCode.BAD_REQUEST,
-      'Brand ID required',
+      "Brand ID required",
       HTTP_STATUS.BAD_REQUEST,
-      'warning'
+      "warning",
     );
   }
 
   // Check if user has access to this brand
   // In production, this would check against brand_members table in Supabase
-  const hasAccess = auth.brandIds?.includes(brandId) || auth.role === Role.SUPERADMIN;
+  const hasAccess =
+    auth.brandIds?.includes(brandId) || auth.role === Role.SUPERADMIN;
 
   if (!hasAccess) {
     throw new AppError(
       ErrorCode.FORBIDDEN,
-      'Access denied to this brand',
+      "Access denied to this brand",
       HTTP_STATUS.FORBIDDEN,
-      'warning',
-      { brandId, userId: auth.userId }
+      "warning",
+      { brandId, userId: auth.userId },
     );
   }
 
@@ -264,17 +275,20 @@ export function requireBrandAccess(req: Request, _res: Response, next: NextFunct
 /**
  * Middleware: Require ownership (user can only access their own resources)
  */
-export function requireOwnership(userIdField: string = 'userId') {
+export function requireOwnership(userIdField: string = "userId") {
   return (req: Request, _res: Response, next: NextFunction) => {
     const auth = (req as any).auth;
-    const resourceUserId = req.params[userIdField] || req.body[userIdField] || req.query[userIdField];
+    const resourceUserId =
+      req.params[userIdField] ||
+      req.body[userIdField] ||
+      req.query[userIdField];
 
     if (!auth || !auth.userId) {
       throw new AppError(
         ErrorCode.UNAUTHORIZED,
-        'Authentication required',
+        "Authentication required",
         HTTP_STATUS.UNAUTHORIZED,
-        'warning'
+        "warning",
       );
     }
 
@@ -286,10 +300,10 @@ export function requireOwnership(userIdField: string = 'userId') {
     if (auth.userId !== resourceUserId) {
       throw new AppError(
         ErrorCode.FORBIDDEN,
-        'You can only access your own resources',
+        "You can only access your own resources",
         HTTP_STATUS.FORBIDDEN,
-        'warning',
-        { userId: auth.userId, resourceUserId }
+        "warning",
+        { userId: auth.userId, resourceUserId },
       );
     }
 
@@ -311,17 +325,17 @@ export function getUserPermissions(role: Role): Permission[] {
 export function mockAuth(req: Request, _res: Response, next: NextFunction) {
   // Check for authorization header
   const authHeader = req.headers.authorization;
-  
-  if (authHeader && authHeader.startsWith('Bearer ')) {
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
     // In production, verify JWT token here
     const token = authHeader.substring(7);
-    
+
     // Mock user data - in production, extract from JWT
     (req as any).auth = {
-      userId: 'user-123',
+      userId: "user-123",
       role: Role.AGENCY_ADMIN,
-      brandIds: ['brand-1', 'brand-2'],
-      tenantId: 'tenant-123',
+      brandIds: ["brand-1", "brand-2"],
+      tenantId: "tenant-123",
     };
   }
 

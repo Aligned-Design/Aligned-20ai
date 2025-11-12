@@ -185,7 +185,8 @@ export function createSecureServer() {
           ],
           frameSrc: ["'self'", "https://js.stripe.com"],
           objectSrc: ["'none'"],
-          upgradeInsecureRequests: process.env.NODE_ENV === "production" ? [] : null,
+          upgradeInsecureRequests:
+            process.env.NODE_ENV === "production" ? [] : null,
         },
       },
       crossOriginEmbedderPolicy: false, // Allow embedding from trusted sources
@@ -196,7 +197,7 @@ export function createSecureServer() {
         includeSubDomains: true,
         preload: true,
       },
-    })
+    }),
   );
 
   // CORS - Restricted to specific origins
@@ -212,7 +213,12 @@ export function createSecureServer() {
           ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "X-CSRF-Token"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "X-CSRF-Token",
+    ],
     optionsSuccessStatus: 200,
   };
   app.use(cors(corsOptions));
@@ -245,11 +251,12 @@ export function createSecureServer() {
     rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes
       maxRequests: 1000, // 1000 requests per 15 minutes per IP
-    })
+    }),
   );
 
   // Authentication (use jwtAuth in production, mockAuth for development)
-  const authMiddleware = process.env.NODE_ENV === "production" ? jwtAuth : mockAuth;
+  const authMiddleware =
+    process.env.NODE_ENV === "production" ? jwtAuth : mockAuth;
   app.use(authMiddleware);
 
   // ============================================================================
@@ -326,7 +333,10 @@ export function createSecureServer() {
   app.post("/api/analytics/:brandId/offline-metric", addOfflineMetric);
   app.get("/api/analytics/:brandId/heatmap", getEngagementHeatmap);
   app.get("/api/analytics/:brandId/alerts", getAlerts);
-  app.post("/api/analytics/:brandId/alerts/:alertId/acknowledge", acknowledgeAlert);
+  app.post(
+    "/api/analytics/:brandId/alerts/:alertId/acknowledge",
+    acknowledgeAlert,
+  );
 
   // Approvals routes
   app.post("/api/approvals/bulk", bulkApproveContent);
@@ -341,13 +351,20 @@ export function createSecureServer() {
   app.get("/api/audit/logs/:brandId", strictRateLimit, getAuditLogs);
   app.get("/api/audit/logs/post/:postId", getPostAuditLog);
   app.get("/api/audit/stats/:brandId", getAuditStats);
-  app.get("/api/audit/export/:brandId", strictRateLimit, exportAuditLogsHandler);
+  app.get(
+    "/api/audit/export/:brandId",
+    strictRateLimit,
+    exportAuditLogsHandler,
+  );
   app.post("/api/audit/search/:brandId", searchAuditLogs);
   app.get("/api/audit/actions/:brandId", getAuditActions);
 
   // Brand Intelligence routes
   app.get("/api/brand-intelligence/:brandId", getBrandIntelligence);
-  app.post("/api/brand-intelligence/:brandId/feedback", submitRecommendationFeedback);
+  app.post(
+    "/api/brand-intelligence/:brandId/feedback",
+    submitRecommendationFeedback,
+  );
 
   // Bulk Approvals routes
   app.post("/api/bulk-approvals", bulkApproveOrReject);
@@ -364,13 +381,22 @@ export function createSecureServer() {
   app.post("/api/client-portal/media/upload", uploadClientMedia);
   app.get("/api/client-portal/:clientId/media", getClientMedia);
   app.get("/api/client-portal/:clientId/content", getPortalContent);
-  app.get("/api/client-portal/content/:contentId/with-comments", getContentWithComments);
+  app.get(
+    "/api/client-portal/content/:contentId/with-comments",
+    getContentWithComments,
+  );
 
   // Client Settings routes
   app.get("/api/client-settings/:clientId", getClientSettings);
   app.put("/api/client-settings/:clientId", updateClientSettings);
-  app.put("/api/client-settings/:clientId/email-preferences", updateEmailPreferences);
-  app.post("/api/client-settings/:clientId/unsubscribe-link", generateUnsubscribeLink);
+  app.put(
+    "/api/client-settings/:clientId/email-preferences",
+    updateEmailPreferences,
+  );
+  app.post(
+    "/api/client-settings/:clientId/unsubscribe-link",
+    generateUnsubscribeLink,
+  );
   app.post("/api/client-settings/unsubscribe", unsubscribeFromEmails);
   app.post("/api/client-settings/resubscribe", resubscribeToEmails);
   app.post("/api/client-settings/verify-unsubscribe", verifyUnsubscribeToken);
@@ -392,7 +418,10 @@ export function createSecureServer() {
   // Publishing routes (with strict rate limiting)
   app.post("/api/publishing/oauth/initiate", strictRateLimit, initiateOAuth);
   app.get("/api/publishing/:brandId/connections", getConnections);
-  app.delete("/api/publishing/:brandId/:platform/disconnect", disconnectPlatform);
+  app.delete(
+    "/api/publishing/:brandId/:platform/disconnect",
+    disconnectPlatform,
+  );
   app.post("/api/publishing/publish", strictRateLimit, publishContent);
   app.get("/api/publishing/:brandId/jobs", getPublishingJobs);
   app.post("/api/publishing/jobs/:jobId/retry", retryJob);
@@ -410,7 +439,11 @@ export function createSecureServer() {
   // White Label routes (stricter rate limit)
   app.get("/api/white-label/:brandId/config", getWhiteLabelConfig);
   app.get("/api/white-label/domain/:domain", getConfigByDomain);
-  app.put("/api/white-label/:brandId/config", strictRateLimit, updateWhiteLabelConfig);
+  app.put(
+    "/api/white-label/:brandId/config",
+    strictRateLimit,
+    updateWhiteLabelConfig,
+  );
 
   // Workflow routes
   app.get("/api/workflow/templates/:brandId", getWorkflowTemplates);
@@ -418,7 +451,10 @@ export function createSecureServer() {
   app.post("/api/workflow/start/:brandId", startWorkflow);
   app.post("/api/workflow/:workflowId/action", processWorkflowAction);
   app.get("/api/workflow/:brandId/notifications", getWorkflowNotifications);
-  app.put("/api/workflow/notifications/:notificationId/read", markNotificationRead);
+  app.put(
+    "/api/workflow/notifications/:notificationId/read",
+    markNotificationRead,
+  );
   app.post("/api/workflow/:workflowId/cancel", cancelWorkflow);
   app.get("/api/workflow/:workflowId", getWorkflow);
   app.get("/api/workflow/content/:contentId", getWorkflowsForContent);

@@ -12,7 +12,11 @@ declare global {
       isFeatureEnabled: (featureName: string) => boolean;
       onFeatureFlags: (callback: (flags: string[]) => void) => void;
       getFeatureFlag: (featureName: string) => string | boolean | undefined;
-      group: (groupType: string, groupKey: string, properties?: Record<string, any>) => void;
+      group: (
+        groupType: string,
+        groupKey: string,
+        properties?: Record<string, any>,
+      ) => void;
       alias: (alias: string) => void;
       set: (properties: Record<string, any>) => void;
       set_once: (properties: Record<string, any>) => void;

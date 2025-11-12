@@ -1,6 +1,6 @@
 /**
  * Password Policy Enforcement
- * 
+ *
  * Implements strong password requirements:
  * - Minimum 10 characters
  * - At least 1 uppercase letter
@@ -11,7 +11,7 @@
  * - Not similar to email/username
  */
 
-import { hashPassword } from './encryption';
+import { hashPassword } from "./encryption";
 
 /**
  * Password strength levels
@@ -39,10 +39,26 @@ export interface PasswordValidationResult {
  * Common passwords to reject (top 100)
  */
 const COMMON_PASSWORDS = new Set([
-  'password', 'password123', '123456', '123456789', '12345678',
-  'qwerty', 'abc123', 'password1', 'admin', 'letmein',
-  'welcome', 'monkey', '1234567890', 'password!', 'qwerty123',
-  'welcome123', 'admin123', 'root', 'toor', 'pass',
+  "password",
+  "password123",
+  "123456",
+  "123456789",
+  "12345678",
+  "qwerty",
+  "abc123",
+  "password1",
+  "admin",
+  "letmein",
+  "welcome",
+  "monkey",
+  "1234567890",
+  "password!",
+  "qwerty123",
+  "welcome123",
+  "admin123",
+  "root",
+  "toor",
+  "pass",
   // Add more as needed
 ]);
 
@@ -62,7 +78,7 @@ const CHAR_SETS = {
 export function validatePassword(
   password: string,
   email?: string,
-  username?: string
+  username?: string,
 ): PasswordValidationResult {
   const errors: string[] = [];
   const suggestions: string[] = [];
@@ -70,7 +86,7 @@ export function validatePassword(
 
   // Check minimum length (REQUIRED)
   if (password.length < 10) {
-    errors.push('Password must be at least 10 characters long');
+    errors.push("Password must be at least 10 characters long");
   } else {
     score += 20;
     if (password.length >= 12) score += 5;
@@ -79,63 +95,69 @@ export function validatePassword(
 
   // Check for lowercase letters (REQUIRED)
   if (!CHAR_SETS.lowercase.test(password)) {
-    errors.push('Password must contain at least one lowercase letter');
+    errors.push("Password must contain at least one lowercase letter");
   } else {
     score += 15;
   }
 
   // Check for uppercase letters (REQUIRED)
   if (!CHAR_SETS.uppercase.test(password)) {
-    errors.push('Password must contain at least one uppercase letter');
+    errors.push("Password must contain at least one uppercase letter");
   } else {
     score += 15;
   }
 
   // Check for numbers (REQUIRED)
   if (!CHAR_SETS.numbers.test(password)) {
-    errors.push('Password must contain at least one number');
+    errors.push("Password must contain at least one number");
   } else {
     score += 15;
   }
 
   // Check for special characters (REQUIRED)
   if (!CHAR_SETS.special.test(password)) {
-    errors.push('Password must contain at least one special character (!@#$%^&*...)');
+    errors.push(
+      "Password must contain at least one special character (!@#$%^&*...)",
+    );
   } else {
     score += 15;
   }
 
   // Check against common passwords
   if (COMMON_PASSWORDS.has(password.toLowerCase())) {
-    errors.push('This password is too common. Please choose a more unique password');
+    errors.push(
+      "This password is too common. Please choose a more unique password",
+    );
     score -= 30;
   }
 
   // Check for sequential characters
   if (hasSequentialChars(password)) {
-    suggestions.push('Avoid sequential characters (e.g., abc, 123)');
+    suggestions.push("Avoid sequential characters (e.g., abc, 123)");
     score -= 10;
   }
 
   // Check for repeated characters
   if (hasRepeatedChars(password)) {
-    suggestions.push('Avoid repeated characters (e.g., aaa, 111)');
+    suggestions.push("Avoid repeated characters (e.g., aaa, 111)");
     score -= 10;
   }
 
   // Check similarity to email/username
   if (email && isSimilarTo(password, email)) {
-    errors.push('Password is too similar to your email address');
+    errors.push("Password is too similar to your email address");
     score -= 20;
   }
 
   if (username && isSimilarTo(password, username)) {
-    errors.push('Password is too similar to your username');
+    errors.push("Password is too similar to your username");
     score -= 20;
   }
 
   // Bonus points for diversity
-  const charTypesUsed = Object.values(CHAR_SETS).filter(regex => regex.test(password)).length;
+  const charTypesUsed = Object.values(CHAR_SETS).filter((regex) =>
+    regex.test(password),
+  ).length;
   score += charTypesUsed * 5;
 
   // Ensure score is in range 0-100
@@ -158,12 +180,14 @@ export function validatePassword(
   // Add suggestions based on strength
   if (strength < PasswordStrength.STRONG) {
     if (password.length < 12) {
-      suggestions.push('Use at least 12 characters for better security');
+      suggestions.push("Use at least 12 characters for better security");
     }
     if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{2,}/.test(password)) {
-      suggestions.push('Use multiple special characters');
+      suggestions.push("Use multiple special characters");
     }
-    suggestions.push('Consider using a passphrase (e.g., "Coffee!Morning@2025#Sunrise")');
+    suggestions.push(
+      'Consider using a passphrase (e.g., "Coffee!Morning@2025#Sunrise")',
+    );
   }
 
   return {
@@ -180,15 +204,15 @@ export function validatePassword(
  */
 function hasSequentialChars(password: string): boolean {
   const sequences = [
-    'abcdefghijklmnopqrstuvwxyz',
-    '0123456789',
-    'qwertyuiop',
-    'asdfghjkl',
-    'zxcvbnm',
+    "abcdefghijklmnopqrstuvwxyz",
+    "0123456789",
+    "qwertyuiop",
+    "asdfghjkl",
+    "zxcvbnm",
   ];
 
   const lower = password.toLowerCase();
-  
+
   for (const seq of sequences) {
     for (let i = 0; i < seq.length - 2; i++) {
       const substring = seq.substring(i, i + 3);
@@ -196,7 +220,7 @@ function hasSequentialChars(password: string): boolean {
         return true;
       }
       // Check reverse sequence
-      if (lower.includes(substring.split('').reverse().join(''))) {
+      if (lower.includes(substring.split("").reverse().join(""))) {
         return true;
       }
     }
@@ -225,7 +249,10 @@ function isSimilarTo(password: string, reference: string): boolean {
   const referenceLower = reference.toLowerCase();
 
   // Direct inclusion
-  if (passwordLower.includes(referenceLower) || referenceLower.includes(passwordLower)) {
+  if (
+    passwordLower.includes(referenceLower) ||
+    referenceLower.includes(passwordLower)
+  ) {
     return true;
   }
 
@@ -257,8 +284,8 @@ function levenshteinDistance(str1: string, str2: string): number {
       } else {
         matrix[i][j] = Math.min(
           matrix[i - 1][j - 1] + 1, // substitution
-          matrix[i][j - 1] + 1,     // insertion
-          matrix[i - 1][j] + 1      // deletion
+          matrix[i][j - 1] + 1, // insertion
+          matrix[i - 1][j] + 1, // deletion
         );
       }
     }
@@ -271,14 +298,14 @@ function levenshteinDistance(str1: string, str2: string): number {
  * Generate a secure random password that meets policy
  */
 export function generateSecurePassword(length: number = 16): string {
-  const lowercase = 'abcdefghijklmnopqrstuvwxyz';
-  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const numbers = '0123456789';
-  const special = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+  const lowercase = "abcdefghijklmnopqrstuvwxyz";
+  const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const numbers = "0123456789";
+  const special = "!@#$%^&*()_+-=[]{}|;:,.<>?";
 
   const allChars = lowercase + uppercase + numbers + special;
 
-  let password = '';
+  let password = "";
 
   // Ensure at least one of each required type
   password += lowercase[Math.floor(Math.random() * lowercase.length)];
@@ -292,7 +319,10 @@ export function generateSecurePassword(length: number = 16): string {
   }
 
   // Shuffle the password
-  password = password.split('').sort(() => Math.random() - 0.5).join('');
+  password = password
+    .split("")
+    .sort(() => Math.random() - 0.5)
+    .join("");
 
   return password;
 }
@@ -303,17 +333,17 @@ export function generateSecurePassword(length: number = 16): string {
 export function getStrengthText(strength: PasswordStrength): string {
   switch (strength) {
     case PasswordStrength.VERY_WEAK:
-      return 'Very Weak';
+      return "Very Weak";
     case PasswordStrength.WEAK:
-      return 'Weak';
+      return "Weak";
     case PasswordStrength.MEDIUM:
-      return 'Medium';
+      return "Medium";
     case PasswordStrength.STRONG:
-      return 'Strong';
+      return "Strong";
     case PasswordStrength.VERY_STRONG:
-      return 'Very Strong';
+      return "Very Strong";
     default:
-      return 'Unknown';
+      return "Unknown";
   }
 }
 
@@ -323,17 +353,17 @@ export function getStrengthText(strength: PasswordStrength): string {
 export function getStrengthColor(strength: PasswordStrength): string {
   switch (strength) {
     case PasswordStrength.VERY_WEAK:
-      return '#dc2626'; // red-600
+      return "#dc2626"; // red-600
     case PasswordStrength.WEAK:
-      return '#f97316'; // orange-500
+      return "#f97316"; // orange-500
     case PasswordStrength.MEDIUM:
-      return '#fbbf24'; // yellow-400
+      return "#fbbf24"; // yellow-400
     case PasswordStrength.STRONG:
-      return '#22c55e'; // green-500
+      return "#22c55e"; // green-500
     case PasswordStrength.VERY_STRONG:
-      return '#059669'; // emerald-600
+      return "#059669"; // emerald-600
     default:
-      return '#6b7280'; // gray-500
+      return "#6b7280"; // gray-500
   }
 }
 
@@ -343,12 +373,14 @@ export function getStrengthColor(strength: PasswordStrength): string {
 export function createHashedPassword(
   password: string,
   email?: string,
-  username?: string
+  username?: string,
 ): { hash: string; validation: PasswordValidationResult } {
   const validation = validatePassword(password, email, username);
 
   if (!validation.valid) {
-    throw new Error(`Password does not meet requirements: ${validation.errors.join(', ')}`);
+    throw new Error(
+      `Password does not meet requirements: ${validation.errors.join(", ")}`,
+    );
   }
 
   const hash = hashPassword(password);
@@ -362,20 +394,26 @@ export function createHashedPassword(
  */
 export async function checkPasswordPwned(password: string): Promise<boolean> {
   try {
-    const crypto = await import('crypto');
-    const sha1 = crypto.createHash('sha1').update(password).digest('hex').toUpperCase();
+    const crypto = await import("crypto");
+    const sha1 = crypto
+      .createHash("sha1")
+      .update(password)
+      .digest("hex")
+      .toUpperCase();
     const prefix = sha1.substring(0, 5);
     const suffix = sha1.substring(5);
 
-    const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+    const response = await fetch(
+      `https://api.pwnedpasswords.com/range/${prefix}`,
+    );
     const text = await response.text();
 
-    const hashes = text.split('\n');
-    const found = hashes.some(line => line.startsWith(suffix));
+    const hashes = text.split("\n");
+    const found = hashes.some((line) => line.startsWith(suffix));
 
     return found;
   } catch (error) {
-    console.error('Error checking password against HIBP:', error);
+    console.error("Error checking password against HIBP:", error);
     return false; // Fail open - don't block if API is unavailable
   }
 }
