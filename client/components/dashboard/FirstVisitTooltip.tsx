@@ -20,10 +20,7 @@ export function FirstVisitTooltip({ page, children }: FirstVisitTooltipProps) {
     }
   }, [page, isTipDismissed]);
 
-  if (!isVisible) return null;
-
   const tip = PAGE_TIPS[page];
-  if (!tip) return null;
 
   const handleDismiss = () => {
     dismissTip(page);
@@ -40,7 +37,7 @@ export function FirstVisitTooltip({ page, children }: FirstVisitTooltipProps) {
   return (
     <div className="relative">
       {children}
-      {isVisible && (
+      {isVisible && tip && (
         <div
           className={`fixed ${placementClasses[tip.placement]} max-w-xs bg-white rounded-xl shadow-2xl border border-indigo-200 p-4 z-40 animate-[slideDown_300ms_ease-out] motion-reduce:animate-none`}
         >
