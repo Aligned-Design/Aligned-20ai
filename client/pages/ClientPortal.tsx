@@ -66,6 +66,8 @@ import {
   getStoredClientToken,
   getBrandIdFromToken,
 } from "@/lib/client-portal-auth";
+import { isFeatureEnabled } from "@/lib/featureFlags";
+import { KpiCard as UnifiedKpiCard } from "@/components/DashboardSystem";
 
 export default function ClientPortal() {
   const [dashboardData, setDashboardData] =
@@ -386,41 +388,77 @@ function ActionChip({
 }
 
 function OverviewSection({ data }: { data: ClientDashboardData }) {
+  const unifiedDashEnabled = isFeatureEnabled("unified_dash");
+
   return (
     <div className="space-y-8">
       {/* KPIs Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <KPICard
-          title="Total Reach"
-          value={formatNumber(data.metrics.totalReach)}
-          subtitle="Last 28 days"
-          growth={data.metrics.growth.reach}
-          icon={<Eye className="h-6 w-6" />}
-          color="blue"
-        />
-        <KPICard
-          title="Engagement Rate"
-          value={`${data.metrics.engagementRate}%`}
-          subtitle="Average"
-          growth={data.metrics.growth.engagement}
-          icon={<Heart className="h-6 w-6" />}
-          color="red"
-        />
-        <KPICard
-          title="Posts Published"
-          value={data.metrics.postsThisMonth.toString()}
-          subtitle="This month"
-          icon={<FileText className="h-6 w-6" />}
-          color="green"
-        />
-        <KPICard
-          title="Followers"
-          value={formatNumber(data.metrics.followers)}
-          subtitle="Total across platforms"
-          growth={data.metrics.growth.followers}
-          icon={<Users className="h-6 w-6" />}
-          color="purple"
-        />
+        {unifiedDashEnabled ? (
+          <>
+            <UnifiedKpiCard
+              title="Total Reach"
+              value={formatNumber(data.metrics.totalReach)}
+              description="Last 28 days"
+              delta={data.metrics.growth.reach ? { value: data.metrics.growth.reach, trend: data.metrics.growth.reach > 0 ? "up" : "down", label: "vs previous period" } : undefined}
+              icon={Eye}
+            />
+            <UnifiedKpiCard
+              title="Engagement Rate"
+              value={`${data.metrics.engagementRate}%`}
+              description="Average"
+              delta={data.metrics.growth.engagement ? { value: data.metrics.growth.engagement, trend: data.metrics.growth.engagement > 0 ? "up" : "down", label: "vs previous period" } : undefined}
+              icon={Heart}
+            />
+            <UnifiedKpiCard
+              title="Posts Published"
+              value={data.metrics.postsThisMonth.toString()}
+              description="This month"
+              icon={FileText}
+            />
+            <UnifiedKpiCard
+              title="Followers"
+              value={formatNumber(data.metrics.followers)}
+              description="Total across platforms"
+              delta={data.metrics.growth.followers ? { value: data.metrics.growth.followers, trend: data.metrics.growth.followers > 0 ? "up" : "down", label: "vs previous period" } : undefined}
+              icon={Users}
+            />
+          </>
+        ) : (
+          <>
+            <KPICard
+              title="Total Reach"
+              value={formatNumber(data.metrics.totalReach)}
+              subtitle="Last 28 days"
+              growth={data.metrics.growth.reach}
+              icon={<Eye className="h-6 w-6" />}
+              color="blue"
+            />
+            <KPICard
+              title="Engagement Rate"
+              value={`${data.metrics.engagementRate}%`}
+              subtitle="Average"
+              growth={data.metrics.growth.engagement}
+              icon={<Heart className="h-6 w-6" />}
+              color="red"
+            />
+            <KPICard
+              title="Posts Published"
+              value={data.metrics.postsThisMonth.toString()}
+              subtitle="This month"
+              icon={<FileText className="h-6 w-6" />}
+              color="green"
+            />
+            <KPICard
+              title="Followers"
+              value={formatNumber(data.metrics.followers)}
+              subtitle="Total across platforms"
+              growth={data.metrics.growth.followers}
+              icon={<Users className="h-6 w-6" />}
+              color="purple"
+            />
+          </>
+        )}
       </div>
 
       {/* Upcoming Posts */}
