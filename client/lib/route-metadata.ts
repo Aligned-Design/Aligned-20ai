@@ -28,7 +28,7 @@ export const ROUTE_METADATA: Record<string, RouteMetadata> = {
   '/': {
     path: '/',
     visibility: 'public',
-    title: 'Aligned AI - AI-Powered Content Creation for Agencies & Brands',
+    title: 'Aligned AI - AI Content Creation for Agencies & Brands',
     description: 'Transform your content workflow with AI. Aligned AI handles planning, writing, scheduling, and reporting so you can focus on what matters.',
     noindex: false,
     ogImage: 'https://www.aligned-bydesign.com/og-home.jpg',
@@ -80,8 +80,9 @@ export const ROUTE_METADATA: Record<string, RouteMetadata> = {
     path: '/terms',
     visibility: 'public',
     title: 'Terms of Service | Aligned AI',
-    description: 'Read our terms of service and usage agreement.',
+    description: 'Read our complete terms of service, usage agreement, and legal policies for using Aligned AI.',
     noindex: false,
+    ogImage: 'https://www.aligned-bydesign.com/og-default.jpg',
   },
   '/pricing': {
     path: '/pricing',
