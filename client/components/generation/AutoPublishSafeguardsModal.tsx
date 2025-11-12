@@ -52,7 +52,9 @@ export function AutoPublishSafeguardsModal({
   };
 
   const handleNextPreview = () => {
-    setCurrentPreviewIndex((prev) => Math.min(generatedPosts.length - 1, prev + 1));
+    setCurrentPreviewIndex((prev) =>
+      Math.min(generatedPosts.length - 1, prev + 1),
+    );
   };
 
   const currentPost = generatedPosts[currentPreviewIndex];
@@ -68,7 +70,8 @@ export function AutoPublishSafeguardsModal({
                 Content Plan Generated!
               </DialogTitle>
               <DialogDescription className="text-base mt-2">
-                I've created {generatedPosts.length} posts for the next 30 days. Review samples below and choose how to proceed.
+                I've created {generatedPosts.length} posts for the next 30 days.
+                Review samples below and choose how to proceed.
               </DialogDescription>
             </div>
             <button
@@ -86,7 +89,9 @@ export function AutoPublishSafeguardsModal({
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <p className="text-3xl font-black text-indigo-600">{generatedPosts.length}</p>
+                  <p className="text-3xl font-black text-indigo-600">
+                    {generatedPosts.length}
+                  </p>
                   <p className="text-sm text-slate-600 mt-1">Posts Created</p>
                 </div>
               </CardContent>
@@ -103,7 +108,7 @@ export function AutoPublishSafeguardsModal({
               <CardContent className="pt-6">
                 <div className="text-center">
                   <p className="text-3xl font-black text-purple-600">
-                    {new Set(generatedPosts.map(p => p.platform)).size}
+                    {new Set(generatedPosts.map((p) => p.platform)).size}
                   </p>
                   <p className="text-sm text-slate-600 mt-1">Platforms</p>
                 </div>
@@ -142,7 +147,9 @@ export function AutoPublishSafeguardsModal({
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="font-bold text-slate-900">{currentPost.title}</h4>
+                        <h4 className="font-bold text-slate-900">
+                          {currentPost.title}
+                        </h4>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge variant="secondary" className="capitalize">
                             {currentPost.platform}
@@ -152,7 +159,13 @@ export function AutoPublishSafeguardsModal({
                           </span>
                         </div>
                       </div>
-                      <Badge variant={currentPost.status === "scheduled" ? "default" : "outline"}>
+                      <Badge
+                        variant={
+                          currentPost.status === "scheduled"
+                            ? "default"
+                            : "outline"
+                        }
+                      >
                         {currentPost.status}
                       </Badge>
                     </div>
@@ -177,10 +190,19 @@ export function AutoPublishSafeguardsModal({
                   ✋ Hold on! Nothing will auto-publish without your permission.
                 </p>
                 <ul className="text-xs text-blue-800 space-y-1">
-                  <li>• All posts will be saved as <strong>drafts</strong> or <strong>queued</strong> based on your choice</li>
-                  <li>• You can edit, delete, or reschedule any post before it goes live</li>
+                  <li>
+                    • All posts will be saved as <strong>drafts</strong> or{" "}
+                    <strong>queued</strong> based on your choice
+                  </li>
+                  <li>
+                    • You can edit, delete, or reschedule any post before it
+                    goes live
+                  </li>
                   <li>• Review and approve posts individually or in batches</li>
-                  <li>• Auto-publishing only happens if you explicitly enable it in settings</li>
+                  <li>
+                    • Auto-publishing only happens if you explicitly enable it
+                    in settings
+                  </li>
                 </ul>
               </div>
             </div>
@@ -189,7 +211,7 @@ export function AutoPublishSafeguardsModal({
           {/* Action Options */}
           <div className="space-y-3">
             <h3 className="font-bold text-slate-900">Choose how to proceed:</h3>
-            
+
             <button
               onClick={() => {
                 onQueueAll();
@@ -203,8 +225,12 @@ export function AutoPublishSafeguardsModal({
                     <CheckCircle className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="font-bold">Queue All {generatedPosts.length} Posts</p>
-                    <p className="text-xs opacity-90">Review and edit posts in Content Queue before publishing</p>
+                    <p className="font-bold">
+                      Queue All {generatedPosts.length} Posts
+                    </p>
+                    <p className="text-xs opacity-90">
+                      Review and edit posts in Content Queue before publishing
+                    </p>
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -224,8 +250,12 @@ export function AutoPublishSafeguardsModal({
                     <Eye className="w-5 h-5 text-indigo-600" />
                   </div>
                   <div>
-                    <p className="font-bold text-slate-900">Review 7 Days at a Time</p>
-                    <p className="text-xs text-slate-600">Break it into weekly batches for easier review</p>
+                    <p className="font-bold text-slate-900">
+                      Review 7 Days at a Time
+                    </p>
+                    <p className="text-xs text-slate-600">
+                      Break it into weekly batches for easier review
+                    </p>
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
@@ -246,7 +276,9 @@ export function AutoPublishSafeguardsModal({
                   </div>
                   <div>
                     <p className="font-bold text-slate-900">Skip for Now</p>
-                    <p className="text-xs text-slate-600">I'll create content manually instead</p>
+                    <p className="text-xs text-slate-600">
+                      I'll create content manually instead
+                    </p>
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
@@ -258,20 +290,29 @@ export function AutoPublishSafeguardsModal({
           <div className="bg-slate-50 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-3">
               <Calendar className="w-4 h-4 text-slate-600" />
-              <p className="text-sm font-bold text-slate-900">Schedule Preview (Next 7 Days)</p>
+              <p className="text-sm font-bold text-slate-900">
+                Schedule Preview (Next 7 Days)
+              </p>
             </div>
             <div className="grid grid-cols-7 gap-2">
               {generatedPosts.slice(0, 7).map((post, idx) => (
                 <div key={post.id} className="text-center">
                   <div className="text-xs text-slate-600 mb-1">
-                    {new Date(post.scheduledDate).toLocaleDateString('en-US', { weekday: 'short' })}
+                    {new Date(post.scheduledDate).toLocaleDateString("en-US", {
+                      weekday: "short",
+                    })}
                   </div>
                   <div className="w-full aspect-square bg-indigo-100 rounded-lg flex items-center justify-center">
                     <span className="text-lg">
-                      {post.platform === 'instagram' ? '📸' : 
-                       post.platform === 'linkedin' ? '💼' :
-                       post.platform === 'twitter' ? '🐦' :
-                       post.platform === 'facebook' ? '👥' : '📱'}
+                      {post.platform === "instagram"
+                        ? "📸"
+                        : post.platform === "linkedin"
+                          ? "💼"
+                          : post.platform === "twitter"
+                            ? "🐦"
+                            : post.platform === "facebook"
+                              ? "👥"
+                              : "📱"}
                     </span>
                   </div>
                   <div className="text-xs text-slate-500 mt-1 truncate">

@@ -126,11 +126,15 @@ const allPosts: Post[] = [
     campaign: "Brand Awareness",
     createdDate: "Nov 11",
     excerpt: "Failed to sync with email marketing platform...",
-    errorMessage: "Failed to sync with email marketing platform. Please check your API credentials.",
+    errorMessage:
+      "Failed to sync with email marketing platform. Please check your API credentials.",
   },
 ];
 
-const statusConfig: Record<PostStatus, { label: string; color: string; icon: React.ReactNode; bgColor: string }> = {
+const statusConfig: Record<
+  PostStatus,
+  { label: string; color: string; icon: React.ReactNode; bgColor: string }
+> = {
   draft: {
     label: "Drafts",
     color: "text-gray-700",
@@ -185,7 +189,9 @@ export default function ContentQueue() {
 
   const togglePlatform = (platform: string) => {
     setSelectedPlatforms((prev) =>
-      prev.includes(platform) ? prev.filter((p) => p !== platform) : [...prev, platform]
+      prev.includes(platform)
+        ? prev.filter((p) => p !== platform)
+        : [...prev, platform],
     );
   };
 
@@ -209,7 +215,8 @@ export default function ContentQueue() {
     }, 1500);
   };
 
-  const hasActiveFilters = selectedBrand || selectedPlatforms.length > 0 || selectedCampaign;
+  const hasActiveFilters =
+    selectedBrand || selectedPlatforms.length > 0 || selectedCampaign;
 
   // Filter posts
   const filteredPosts = allPosts.filter((post) => {
@@ -226,7 +233,8 @@ export default function ContentQueue() {
         youtube: "YouTube",
         pinterest: "Pinterest",
       };
-      if (!selectedPlatforms.includes(platformNames[post.platform])) return false;
+      if (!selectedPlatforms.includes(platformNames[post.platform]))
+        return false;
     }
     if (selectedCampaign && post.campaign !== selectedCampaign) return false;
     return true;
@@ -245,7 +253,12 @@ export default function ContentQueue() {
     postsByStatus[post.status].push(post);
   });
 
-  const statusOrder: PostStatus[] = ["reviewing", "draft", "scheduled", "published"];
+  const statusOrder: PostStatus[] = [
+    "reviewing",
+    "draft",
+    "scheduled",
+    "published",
+  ];
 
   const PostCard = ({ post }: { post: Post }) => {
     const Icon = PLATFORM_ICONS[post.platform] as React.ComponentType<any>;
@@ -256,8 +269,8 @@ export default function ContentQueue() {
       post.id === "1"
         ? "1552664730-d307ca884978?w=400&h=300&fit=crop"
         : post.id === "3"
-        ? "1611532736579-6b16e2b50449?w=400&h=300&fit=crop"
-        : "1460661419201-fd4cecdf8a8b?w=400&h=300&fit=crop"
+          ? "1611532736579-6b16e2b50449?w=400&h=300&fit=crop"
+          : "1460661419201-fd4cecdf8a8b?w=400&h=300&fit=crop"
     }`;
 
     if (isPending) {
@@ -303,7 +316,9 @@ export default function ContentQueue() {
               <div>
                 <span>Created {post.createdDate}</span>
                 {post.scheduledDate && (
-                  <span className="block text-indigo-600 font-bold">Scheduled {post.scheduledDate}</span>
+                  <span className="block text-indigo-600 font-bold">
+                    Scheduled {post.scheduledDate}
+                  </span>
                 )}
               </div>
               <PostActionMenu
@@ -358,7 +373,9 @@ export default function ContentQueue() {
             <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
               <span>Created {post.createdDate}</span>
               {post.scheduledDate && (
-                <span className="text-indigo-600 font-bold">Scheduled {post.scheduledDate}</span>
+                <span className="text-indigo-600 font-bold">
+                  Scheduled {post.scheduledDate}
+                </span>
               )}
             </div>
           </div>
@@ -432,8 +449,7 @@ export default function ContentQueue() {
               {currentWorkspace?.logo} {currentWorkspace?.name} —
               {statusFilter
                 ? ` View all ${filteredPosts.length} posts in ${getStatusLabel(statusFilter).toLowerCase()}.`
-                : " Organize and manage all your content by status. Review, approve, and schedule posts across all platforms."
-              }
+                : " Organize and manage all your content by status. Review, approve, and schedule posts across all platforms."}
             </p>
           </div>
 
@@ -455,7 +471,9 @@ export default function ContentQueue() {
               )}
             </button>
             <button
-              onClick={() => setViewMode(viewMode === "grid" ? "carousel" : "grid")}
+              onClick={() =>
+                setViewMode(viewMode === "grid" ? "carousel" : "grid")
+              }
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-bold text-sm ${
                 viewMode === "carousel"
                   ? "bg-lime-400 hover:bg-lime-500 text-indigo-950"
@@ -473,7 +491,9 @@ export default function ContentQueue() {
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-400 hover:bg-lime-500 text-indigo-950 font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                {bulkApprovingReviewing ? "Approving..." : `Approve All (${filteredPosts.length})`}
+                {bulkApprovingReviewing
+                  ? "Approving..."
+                  : `Approve All (${filteredPosts.length})`}
               </button>
             )}
             {statusFilter === "errored" && filteredPosts.length > 0 && (
@@ -483,7 +503,9 @@ export default function ContentQueue() {
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-400 hover:bg-lime-500 text-indigo-950 font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <RefreshCw className="w-4 h-4" />
-                {bulkRetryingErrored ? "Retrying..." : `Retry All (${filteredPosts.length})`}
+                {bulkRetryingErrored
+                  ? "Retrying..."
+                  : `Retry All (${filteredPosts.length})`}
               </button>
             )}
           </div>
@@ -498,7 +520,9 @@ export default function ContentQueue() {
                   {brands.map((brand) => (
                     <button
                       key={brand}
-                      onClick={() => setSelectedBrand(selectedBrand === brand ? null : brand)}
+                      onClick={() =>
+                        setSelectedBrand(selectedBrand === brand ? null : brand)
+                      }
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                         selectedBrand === brand
                           ? "bg-lime-400 text-indigo-950"
@@ -513,7 +537,9 @@ export default function ContentQueue() {
 
               {/* Platform Filter */}
               <div>
-                <h3 className="font-bold text-slate-900 text-sm mb-2">Platforms</h3>
+                <h3 className="font-bold text-slate-900 text-sm mb-2">
+                  Platforms
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {platforms.map((platform) => {
                     const platformNames: Record<string, string> = {
@@ -545,12 +571,18 @@ export default function ContentQueue() {
 
               {/* Campaign Filter */}
               <div>
-                <h3 className="font-bold text-slate-900 text-sm mb-2">Campaign</h3>
+                <h3 className="font-bold text-slate-900 text-sm mb-2">
+                  Campaign
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {campaigns.map((campaign) => (
                     <button
                       key={campaign}
-                      onClick={() => setSelectedCampaign(selectedCampaign === campaign ? null : campaign)}
+                      onClick={() =>
+                        setSelectedCampaign(
+                          selectedCampaign === campaign ? null : campaign,
+                        )
+                      }
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                         selectedCampaign === campaign
                           ? "bg-lime-400 text-indigo-950"
@@ -604,8 +636,13 @@ export default function ContentQueue() {
                 ) : (
                   <div className="text-center py-12">
                     <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-                    <h3 className="text-lg font-bold text-slate-900 mb-1">No posts found</h3>
-                    <p className="text-slate-600">No posts in {getStatusLabel(statusFilter).toLowerCase()} status.</p>
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">
+                      No posts found
+                    </h3>
+                    <p className="text-slate-600">
+                      No posts in {getStatusLabel(statusFilter).toLowerCase()}{" "}
+                      status.
+                    </p>
                   </div>
                 )
               ) : (
@@ -625,7 +662,10 @@ export default function ContentQueue() {
                           setPreviewPost(post);
                           setShowPreview(true);
                         }}
-                        hasError={status === "draft" && posts.some((p) => p.errorMessage)}
+                        hasError={
+                          status === "draft" &&
+                          posts.some((p) => p.errorMessage)
+                        }
                       />
                     );
                   })}

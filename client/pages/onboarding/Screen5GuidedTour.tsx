@@ -106,20 +106,28 @@ export default function Screen5GuidedTour() {
               {currentStep === 0 && (
                 <>
                   <div className="h-20 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-lg flex items-center justify-center">
-                    <p className="text-xs font-bold text-indigo-700">Dashboard Overview</p>
+                    <p className="text-xs font-bold text-indigo-700">
+                      Dashboard Overview
+                    </p>
                   </div>
                   <div className="h-20 bg-gradient-to-br from-lime-100 to-green-100 rounded-lg flex items-center justify-center">
-                    <p className="text-xs font-bold text-green-700">Quick Stats</p>
+                    <p className="text-xs font-bold text-green-700">
+                      Quick Stats
+                    </p>
                   </div>
                 </>
               )}
               {currentStep === 1 && (
                 <>
                   <div className="h-20 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-lg flex items-center justify-center">
-                    <p className="text-xs font-bold text-blue-700">Content Queue</p>
+                    <p className="text-xs font-bold text-blue-700">
+                      Content Queue
+                    </p>
                   </div>
                   <div className="h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center">
-                    <p className="text-xs font-bold text-purple-700">Draft Posts</p>
+                    <p className="text-xs font-bold text-purple-700">
+                      Draft Posts
+                    </p>
                   </div>
                 </>
               )}
@@ -129,14 +137,18 @@ export default function Screen5GuidedTour() {
                     <p className="text-xs font-bold text-pink-700">Approvals</p>
                   </div>
                   <div className="h-20 bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg flex items-center justify-center">
-                    <p className="text-xs font-bold text-amber-700">Pending Items</p>
+                    <p className="text-xs font-bold text-amber-700">
+                      Pending Items
+                    </p>
                   </div>
                 </>
               )}
               {currentStep === 3 && (
                 <>
                   <div className="h-20 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-lg flex items-center justify-center">
-                    <p className="text-xs font-bold text-emerald-700">Analytics</p>
+                    <p className="text-xs font-bold text-emerald-700">
+                      Analytics
+                    </p>
                   </div>
                   <div className="h-20 bg-gradient-to-br from-sky-100 to-cyan-100 rounded-lg flex items-center justify-center">
                     <p className="text-xs font-bold text-sky-700">Insights</p>
@@ -148,13 +160,15 @@ export default function Screen5GuidedTour() {
             {/* Tooltip */}
             <div
               className={`absolute ${getTooltipPosition(
-                step.id
+                step.id,
               )} bg-white rounded-xl shadow-2xl border-2 border-indigo-200 p-6 max-w-sm animate-[slideDown_300ms_ease-out] z-10`}
             >
               <div className="flex items-start gap-3 mb-3">
                 <div className="text-3xl">{step.emoji}</div>
                 <div className="flex-1">
-                  <h3 className="font-black text-slate-900 text-base">{step.title}</h3>
+                  <h3 className="font-black text-slate-900 text-base">
+                    {step.title}
+                  </h3>
                 </div>
                 <button
                   onClick={skipTour}
@@ -164,7 +178,9 @@ export default function Screen5GuidedTour() {
                 </button>
               </div>
 
-              <p className="text-sm font-medium text-slate-600 mb-4">{step.description}</p>
+              <p className="text-sm font-medium text-slate-600 mb-4">
+                {step.description}
+              </p>
 
               {/* Step Progress */}
               <div className="flex items-center justify-between mb-4">
@@ -233,7 +249,8 @@ export default function Screen5GuidedTour() {
           {/* Bottom Info */}
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
             <p className="text-sm text-blue-900 font-medium">
-              💡 <strong>Tip:</strong> After the tour, we'll help you create your first post with AI!
+              💡 <strong>Tip:</strong> After the tour, we'll help you create
+              your first post with AI!
             </p>
           </div>
         </div>

@@ -1,37 +1,37 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Button } from './button';
+import type { Meta, StoryObj } from "@storybook/react";
+import { Button } from "./button";
 
 const meta = {
-  title: 'UI/Button',
+  title: "UI/Button",
   component: Button,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     variant: {
-      control: 'select',
+      control: "select",
       options: [
-        'default',
-        'secondary',
-        'destructive',
-        'outline',
-        'ghost',
-        'link',
-        'success',
-        'warning',
+        "default",
+        "secondary",
+        "destructive",
+        "outline",
+        "ghost",
+        "link",
+        "success",
+        "warning",
       ],
     },
     size: {
-      control: 'select',
-      options: ['default', 'sm', 'lg', 'icon'],
+      control: "select",
+      options: ["default", "sm", "lg", "icon"],
     },
     disabled: {
-      control: 'boolean',
+      control: "boolean",
     },
   },
   args: {
-    children: 'Click me',
+    children: "Click me",
   },
 } satisfies Meta<typeof Button>;
 
@@ -43,9 +43,9 @@ type Story = StoryObj<typeof meta>;
  */
 export const Primary: Story = {
   args: {
-    variant: 'default',
-    size: 'default',
-    children: 'Primary Button',
+    variant: "default",
+    size: "default",
+    children: "Primary Button",
   },
 };
 
@@ -54,8 +54,8 @@ export const Primary: Story = {
  */
 export const Secondary: Story = {
   args: {
-    variant: 'secondary',
-    children: 'Secondary Button',
+    variant: "secondary",
+    children: "Secondary Button",
   },
 };
 
@@ -64,8 +64,8 @@ export const Secondary: Story = {
  */
 export const Destructive: Story = {
   args: {
-    variant: 'destructive',
-    children: 'Delete',
+    variant: "destructive",
+    children: "Delete",
   },
 };
 
@@ -74,8 +74,8 @@ export const Destructive: Story = {
  */
 export const Outline: Story = {
   args: {
-    variant: 'outline',
-    children: 'Outline Button',
+    variant: "outline",
+    children: "Outline Button",
   },
 };
 
@@ -84,8 +84,8 @@ export const Outline: Story = {
  */
 export const Ghost: Story = {
   args: {
-    variant: 'ghost',
-    children: 'Ghost Button',
+    variant: "ghost",
+    children: "Ghost Button",
   },
 };
 
@@ -94,8 +94,8 @@ export const Ghost: Story = {
  */
 export const Link: Story = {
   args: {
-    variant: 'link',
-    children: 'Link Button',
+    variant: "link",
+    children: "Link Button",
   },
 };
 
@@ -104,8 +104,8 @@ export const Link: Story = {
  */
 export const Success: Story = {
   args: {
-    variant: 'success',
-    children: 'Approve',
+    variant: "success",
+    children: "Approve",
   },
 };
 
@@ -114,8 +114,8 @@ export const Success: Story = {
  */
 export const Warning: Story = {
   args: {
-    variant: 'warning',
-    children: 'Warning',
+    variant: "warning",
+    children: "Warning",
   },
 };
 
@@ -124,8 +124,8 @@ export const Warning: Story = {
  */
 export const Small: Story = {
   args: {
-    size: 'sm',
-    children: 'Small',
+    size: "sm",
+    children: "Small",
   },
 };
 
@@ -134,8 +134,8 @@ export const Small: Story = {
  */
 export const Large: Story = {
   args: {
-    size: 'lg',
-    children: 'Large Button',
+    size: "lg",
+    children: "Large Button",
   },
 };
 
@@ -144,8 +144,8 @@ export const Large: Story = {
  */
 export const Icon: Story = {
   args: {
-    size: 'icon',
-    children: '🔍',
+    size: "icon",
+    children: "🔍",
   },
 };
 
@@ -155,7 +155,7 @@ export const Icon: Story = {
 export const Disabled: Story = {
   args: {
     disabled: true,
-    children: 'Disabled Button',
+    children: "Disabled Button",
   },
 };
 
@@ -164,14 +164,14 @@ export const Disabled: Story = {
  */
 export const AllVariants: Story = {
   render: () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
         <Button variant="default">Default</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="destructive">Destructive</Button>
         <Button variant="outline">Outline</Button>
       </div>
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
         <Button variant="ghost">Ghost</Button>
         <Button variant="link">Link</Button>
         <Button variant="success">Success</Button>
@@ -186,6 +186,6 @@ export const AllVariants: Story = {
  */
 export const WithIcon: Story = {
   args: {
-    children: '✨ Generate',
+    children: "✨ Generate",
   },
 };

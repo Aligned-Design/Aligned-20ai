@@ -55,9 +55,13 @@ export interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<OnboardingUser | null>(null);
-  const [brandSnapshot, setBrandSnapshot] = useState<BrandSnapshot | null>(null);
+  const [brandSnapshot, setBrandSnapshot] = useState<BrandSnapshot | null>(
+    null,
+  );
   const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(null);
 
   // Load from localStorage on mount (defensive parsing to avoid crashes from corrupted values)
@@ -68,7 +72,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           setUser(JSON.parse(stored));
         } catch (err) {
-          console.warn("Failed to parse aligned_user, clearing corrupted localStorage key", err);
+          console.warn(
+            "Failed to parse aligned_user, clearing corrupted localStorage key",
+            err,
+          );
           localStorage.removeItem("aligned_user");
         }
       }
@@ -78,7 +85,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           setBrandSnapshot(JSON.parse(storedBrand));
         } catch (err) {
-          console.warn("Failed to parse aligned_brand, clearing corrupted key", err);
+          console.warn(
+            "Failed to parse aligned_brand, clearing corrupted key",
+            err,
+          );
           localStorage.removeItem("aligned_brand");
         }
       }
@@ -88,7 +98,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           setOnboardingStep(JSON.parse(storedStep));
         } catch (err) {
-          console.warn("Failed to parse aligned_onboarding_step, clearing corrupted key", err);
+          console.warn(
+            "Failed to parse aligned_onboarding_step, clearing corrupted key",
+            err,
+          );
           localStorage.removeItem("aligned_onboarding_step");
         }
       }

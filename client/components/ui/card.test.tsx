@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
+import { describe, it, expect } from "vitest";
+import { render } from "@testing-library/react";
 import {
   Card,
   CardContent,
@@ -7,65 +7,65 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from './card';
+} from "./card";
 
-describe('Card Components', () => {
-  it('renders Card component correctly', () => {
+describe("Card Components", () => {
+  it("renders Card component correctly", () => {
     const { container } = render(<Card>Content</Card>);
     expect(container.firstChild).toMatchSnapshot();
   });
 
-  it('renders CardHeader correctly', () => {
+  it("renders CardHeader correctly", () => {
     const { container } = render(
       <Card>
         <CardHeader>Header content</CardHeader>
-      </Card>
+      </Card>,
     );
     expect(container.firstChild).toMatchSnapshot();
   });
 
-  it('renders CardTitle correctly', () => {
+  it("renders CardTitle correctly", () => {
     const { container } = render(
       <Card>
         <CardHeader>
           <CardTitle>Title</CardTitle>
         </CardHeader>
-      </Card>
+      </Card>,
     );
     expect(container.firstChild).toMatchSnapshot();
   });
 
-  it('renders CardDescription correctly', () => {
+  it("renders CardDescription correctly", () => {
     const { container } = render(
       <Card>
         <CardHeader>
           <CardTitle>Title</CardTitle>
           <CardDescription>Description text</CardDescription>
         </CardHeader>
-      </Card>
+      </Card>,
     );
     expect(container.firstChild).toMatchSnapshot();
   });
 
-  it('renders CardContent correctly', () => {
+  it("renders CardContent correctly", () => {
     const { container } = render(
       <Card>
         <CardContent>Content area</CardContent>
-      </Card>
+      </Card>,
     );
     expect(container.firstChild).toMatchSnapshot();
   });
 
-  it('renders CardFooter correctly', () => {
+  it("renders CardFooter correctly", () => {
     const { container } = render(
       <Card>
         <CardFooter>Footer content</CardFooter>
-      </Card>
+      </Card>,
     );
     expect(container.firstChild).toMatchSnapshot();
   });
 
-  it('renders complete card structure correctly', () => {
+  it("renders complete card structure correctly", () => {
     const { container } = render(
       <Card>
         <CardHeader>
@@ -74,15 +74,13 @@ describe('Card Components', () => {
         </CardHeader>
         <CardContent>Content goes here</CardContent>
         <CardFooter>Footer actions</CardFooter>
-      </Card>
+      </Card>,
     );
     expect(container.firstChild).toMatchSnapshot();
   });
 
-  it('applies className to Card', () => {
-    const { container } = render(
-      <Card className="custom-class">Content</Card>
-    );
+  it("applies className to Card", () => {
+    const { container } = render(<Card className="custom-class">Content</Card>);
     expect(container.firstChild).toMatchSnapshot();
   });
 });

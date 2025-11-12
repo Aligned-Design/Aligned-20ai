@@ -50,7 +50,7 @@ export function RoleBasedApprovalFlow({
 
   // Auto-detect eligible approvers (admins and managers)
   const eligibleApprovers = teamMembers.filter(
-    (member) => member.role === "admin" || member.role === "manager"
+    (member) => member.role === "admin" || member.role === "manager",
   );
 
   // Auto-assign to first available admin/manager if only one exists
@@ -81,7 +81,8 @@ export function RoleBasedApprovalFlow({
                     ✅ Ready to Publish
                   </p>
                   <p className="text-xs text-green-800">
-                    You have permission to publish directly. No approval required.
+                    You have permission to publish directly. No approval
+                    required.
                   </p>
                 </div>
               </div>
@@ -130,7 +131,8 @@ export function RoleBasedApprovalFlow({
                     Approval Required
                   </p>
                   <p className="text-xs text-blue-800">
-                    Your brand settings require manager/admin approval before publishing.
+                    Your brand settings require manager/admin approval before
+                    publishing.
                   </p>
                 </div>
               </div>
@@ -183,7 +185,10 @@ export function RoleBasedApprovalFlow({
                           <SelectItem key={member.id} value={member.id}>
                             <div className="flex items-center gap-2">
                               <span>{member.name}</span>
-                              <Badge variant="outline" className="capitalize text-xs">
+                              <Badge
+                                variant="outline"
+                                className="capitalize text-xs"
+                              >
                                 {member.role}
                               </Badge>
                             </div>
@@ -244,10 +249,13 @@ export function RoleBasedApprovalFlow({
                 <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-bold text-purple-900 mb-1">
-                    {userRole === "admin" ? "🔑 Admin Privileges" : "✓ Manager Access"}
+                    {userRole === "admin"
+                      ? "🔑 Admin Privileges"
+                      : "✓ Manager Access"}
                   </p>
                   <p className="text-xs text-purple-800">
-                    You can publish directly or schedule posts without additional approval.
+                    You can publish directly or schedule posts without
+                    additional approval.
                   </p>
                 </div>
               </div>
@@ -296,7 +304,8 @@ export function RoleBasedApprovalFlow({
                     Client View Mode
                   </p>
                   <p className="text-xs text-yellow-800">
-                    You can approve or reject this content. Your agency will handle publishing.
+                    You can approve or reject this content. Your agency will
+                    handle publishing.
                   </p>
                 </div>
               </div>

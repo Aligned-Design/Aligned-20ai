@@ -14,7 +14,9 @@ export function Header({ onHelpClick }: HeaderProps) {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
             <span className="text-white font-bold text-sm">A</span>
           </div>
-          <span className="font-semibold text-foreground hidden sm:inline">Aligned</span>
+          <span className="font-semibold text-foreground hidden sm:inline">
+            Aligned
+          </span>
         </Link>
 
         <div className="flex items-center gap-4">
@@ -45,7 +47,9 @@ export function Header({ onHelpClick }: HeaderProps) {
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center text-xs font-semibold">
               JD
             </div>
-            <span className="text-sm font-medium hidden sm:inline">Jane Doe</span>
+            <span className="text-sm font-medium hidden sm:inline">
+              Jane Doe
+            </span>
             <ChevronDown className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>

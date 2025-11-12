@@ -7,10 +7,16 @@ interface PostPreviewModalProps {
   onClose: () => void;
 }
 
-export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProps) {
+export function PostPreviewModal({
+  post,
+  isOpen,
+  onClose,
+}: PostPreviewModalProps) {
   if (!isOpen || !post) return null;
 
-  const Icon = PLATFORM_ICONS[post.platform] as React.ComponentType<{ className?: string }>;
+  const Icon = PLATFORM_ICONS[post.platform] as React.ComponentType<{
+    className?: string;
+  }>;
   const platformName = PLATFORM_NAMES[post.platform];
 
   // Different preview layouts based on platform
@@ -26,9 +32,12 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
                 <div className="flex-1">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-bold text-slate-900 text-sm">Your Company</p>
+                      <p className="font-bold text-slate-900 text-sm">
+                        Your Company
+                      </p>
                       <p className="text-xs text-slate-600">
-                        {post.brand || "Company Page"} • {post.scheduledDate || "Just now"}
+                        {post.brand || "Company Page"} •{" "}
+                        {post.scheduledDate || "Just now"}
                       </p>
                     </div>
                     <button className="text-slate-400 text-lg">•••</button>
@@ -39,8 +48,12 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
 
             {/* Content */}
             <div className="p-4 space-y-3">
-              <p className="text-slate-900 text-sm leading-relaxed">{post.title}</p>
-              <p className="text-slate-700 text-sm leading-relaxed">{post.excerpt}</p>
+              <p className="text-slate-900 text-sm leading-relaxed">
+                {post.title}
+              </p>
+              <p className="text-slate-700 text-sm leading-relaxed">
+                {post.excerpt}
+              </p>
             </div>
 
             {/* Image */}
@@ -57,9 +70,15 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
                 <span className="ml-auto">45 comments • 12 shares</span>
               </div>
               <div className="flex gap-0 text-slate-600 text-sm font-semibold">
-                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">👍 Like</button>
-                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">💬 Comment</button>
-                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">↗️ Share</button>
+                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">
+                  👍 Like
+                </button>
+                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">
+                  💬 Comment
+                </button>
+                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">
+                  ↗️ Share
+                </button>
               </div>
             </div>
           </div>
@@ -105,11 +124,17 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
             {/* Caption */}
             <div className="px-4 py-3 space-y-2">
               <div>
-                <span className="font-bold text-sm text-slate-900">your_brand</span>
+                <span className="font-bold text-sm text-slate-900">
+                  your_brand
+                </span>
                 <p className="text-sm text-slate-900 inline"> {post.title}</p>
               </div>
-              <p className="text-sm text-slate-700 leading-relaxed">{post.excerpt}</p>
-              <button className="text-xs text-slate-500 font-semibold">View all 45 comments</button>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                {post.excerpt}
+              </p>
+              <button className="text-xs text-slate-500 font-semibold">
+                View all 45 comments
+              </button>
             </div>
           </div>
         );
@@ -124,10 +149,14 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex-shrink-0"></div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="font-bold text-slate-900 text-sm">Your Brand</p>
+                      <p className="font-bold text-slate-900 text-sm">
+                        Your Brand
+                      </p>
                       <span className="text-xs text-slate-600">@yourbrand</span>
                     </div>
-                    <p className="text-xs text-slate-600 mt-1">{post.scheduledDate || "now"}</p>
+                    <p className="text-xs text-slate-600 mt-1">
+                      {post.scheduledDate || "now"}
+                    </p>
                   </div>
                 </div>
                 <button className="text-slate-400">•••</button>
@@ -136,8 +165,12 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
 
             {/* Content */}
             <div className="px-4 py-3">
-              <p className="text-slate-900 text-base leading-relaxed">{post.title}</p>
-              <p className="text-slate-700 text-base leading-relaxed mt-3">{post.excerpt}</p>
+              <p className="text-slate-900 text-base leading-relaxed">
+                {post.title}
+              </p>
+              <p className="text-slate-700 text-base leading-relaxed mt-3">
+                {post.excerpt}
+              </p>
             </div>
 
             {/* Image */}
@@ -185,9 +218,15 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black via-black/80 to-transparent">
               <div className="flex items-end gap-3">
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-white text-sm mb-2">@yourbrand</p>
-                  <p className="text-white text-xs line-clamp-2 leading-relaxed">{post.title}</p>
-                  <p className="text-slate-200 text-xs line-clamp-2 mt-1">{post.excerpt}</p>
+                  <p className="font-bold text-white text-sm mb-2">
+                    @yourbrand
+                  </p>
+                  <p className="text-white text-xs line-clamp-2 leading-relaxed">
+                    {post.title}
+                  </p>
+                  <p className="text-slate-200 text-xs line-clamp-2 mt-1">
+                    {post.excerpt}
+                  </p>
                 </div>
                 <div className="flex flex-col gap-3 flex-shrink-0 text-center">
                   <div className="text-2xl">❤️</div>
@@ -222,8 +261,12 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex-shrink-0"></div>
                 <div className="flex-1">
-                  <p className="font-bold text-slate-900 text-sm">{post.brand || "Your Brand"}</p>
-                  <p className="text-xs text-slate-600">{post.scheduledDate || "Just now"}</p>
+                  <p className="font-bold text-slate-900 text-sm">
+                    {post.brand || "Your Brand"}
+                  </p>
+                  <p className="text-xs text-slate-600">
+                    {post.scheduledDate || "Just now"}
+                  </p>
                 </div>
                 <button className="text-slate-400">•••</button>
               </div>
@@ -232,7 +275,9 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
             {/* Content */}
             <div className="p-4 space-y-2">
               <p className="text-slate-900 text-sm font-medium">{post.title}</p>
-              <p className="text-slate-700 text-sm leading-relaxed">{post.excerpt}</p>
+              <p className="text-slate-700 text-sm leading-relaxed">
+                {post.excerpt}
+              </p>
             </div>
 
             {/* Image */}
@@ -246,12 +291,20 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
             <div className="px-4 py-3 border-t border-slate-200">
               <div className="flex items-center gap-2 text-xs text-slate-600 mb-3">
                 <span>👍 ❤️ 😊</span>
-                <span className="ml-auto">234 reactions • 45 comments • 12 shares</span>
+                <span className="ml-auto">
+                  234 reactions • 45 comments • 12 shares
+                </span>
               </div>
               <div className="flex gap-0 text-slate-600 text-sm font-semibold">
-                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">👍 Like</button>
-                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">💬 Comment</button>
-                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">📤 Share</button>
+                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">
+                  👍 Like
+                </button>
+                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">
+                  💬 Comment
+                </button>
+                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">
+                  📤 Share
+                </button>
               </div>
             </div>
           </div>
@@ -268,14 +321,18 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center text-white text-2xl">▶️</div>
+                <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center text-white text-2xl">
+                  ▶️
+                </div>
               </div>
             </div>
 
             {/* Video info */}
             <div className="p-4 space-y-3">
               <div>
-                <h3 className="font-bold text-slate-900 text-sm leading-snug line-clamp-2">{post.title}</h3>
+                <h3 className="font-bold text-slate-900 text-sm leading-snug line-clamp-2">
+                  {post.title}
+                </h3>
               </div>
 
               {/* Channel info */}
@@ -283,11 +340,15 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex-shrink-0"></div>
                   <div>
-                    <p className="font-bold text-slate-900 text-xs">{post.brand || "Your Channel"}</p>
+                    <p className="font-bold text-slate-900 text-xs">
+                      {post.brand || "Your Channel"}
+                    </p>
                     <p className="text-xs text-slate-600">1.2M subscribers</p>
                   </div>
                 </div>
-                <button className="text-red-600 font-bold text-xs px-4 py-1.5 rounded-full border border-red-600 hover:bg-red-50">Subscribe</button>
+                <button className="text-red-600 font-bold text-xs px-4 py-1.5 rounded-full border border-red-600 hover:bg-red-50">
+                  Subscribe
+                </button>
               </div>
 
               {/* Stats */}
@@ -298,9 +359,15 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
 
               {/* Engagement buttons */}
               <div className="flex gap-2 pt-2">
-                <button className="flex items-center gap-1 px-3 py-1.5 rounded hover:bg-slate-100 text-xs font-semibold">👍 234</button>
-                <button className="flex items-center gap-1 px-3 py-1.5 rounded hover:bg-slate-100 text-xs font-semibold">👎 5</button>
-                <button className="flex items-center gap-1 px-3 py-1.5 rounded hover:bg-slate-100 text-xs font-semibold">📤 Share</button>
+                <button className="flex items-center gap-1 px-3 py-1.5 rounded hover:bg-slate-100 text-xs font-semibold">
+                  👍 234
+                </button>
+                <button className="flex items-center gap-1 px-3 py-1.5 rounded hover:bg-slate-100 text-xs font-semibold">
+                  👎 5
+                </button>
+                <button className="flex items-center gap-1 px-3 py-1.5 rounded hover:bg-slate-100 text-xs font-semibold">
+                  📤 Share
+                </button>
               </div>
             </div>
           </div>
@@ -316,27 +383,39 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
                 alt="preview"
                 className="w-full h-full object-cover"
               />
-              <button className="absolute top-3 right-3 bg-red-600 text-white rounded-full px-4 py-2 font-bold text-sm hover:bg-red-700">📌 Save</button>
+              <button className="absolute top-3 right-3 bg-red-600 text-white rounded-full px-4 py-2 font-bold text-sm hover:bg-red-700">
+                📌 Save
+              </button>
             </div>
 
             {/* Pin info */}
             <div className="p-4 space-y-3">
-              <h3 className="font-bold text-slate-900 text-sm leading-snug">{post.title}</h3>
-              <p className="text-slate-700 text-xs leading-relaxed">{post.excerpt}</p>
+              <h3 className="font-bold text-slate-900 text-sm leading-snug">
+                {post.title}
+              </h3>
+              <p className="text-slate-700 text-xs leading-relaxed">
+                {post.excerpt}
+              </p>
 
               {/* Source info */}
               <div className="flex items-center gap-2 border-t border-slate-200 pt-3">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 flex-shrink-0"></div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-slate-900">{post.brand || "Your Brand"}</p>
+                  <p className="text-xs font-semibold text-slate-900">
+                    {post.brand || "Your Brand"}
+                  </p>
                   <p className="text-xs text-slate-600">45 followers</p>
                 </div>
               </div>
 
               {/* Save & Share buttons */}
               <div className="flex gap-2 pt-2">
-                <button className="flex-1 bg-red-600 text-white py-2 rounded-full font-bold text-sm hover:bg-red-700">📌 Save</button>
-                <button className="flex-1 border border-slate-300 text-slate-900 py-2 rounded-full font-bold text-sm hover:bg-slate-100">📤 Share</button>
+                <button className="flex-1 bg-red-600 text-white py-2 rounded-full font-bold text-sm hover:bg-red-700">
+                  📌 Save
+                </button>
+                <button className="flex-1 border border-slate-300 text-slate-900 py-2 rounded-full font-bold text-sm hover:bg-slate-100">
+                  📤 Share
+                </button>
               </div>
             </div>
           </div>

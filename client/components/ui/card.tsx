@@ -4,13 +4,13 @@ import { cn } from "@/lib/utils";
 
 /**
  * Card Component
- * 
+ *
  * Base card container that consumes design tokens for:
  * - Border radius (--radius-lg)
  * - Border color (--color-border)
  * - Background (--color-surface)
  * - Shadow (--shadow-xs)
- * 
+ *
  * Usage:
  * <Card>
  *   <CardHeader>
@@ -47,7 +47,7 @@ const CardHeader = React.forwardRef<
     className={cn(
       "flex flex-col space-y-[var(--spacing-xs)]",
       "p-[var(--spacing-lg)]",
-      className
+      className,
     )}
     {...props}
   />
@@ -81,7 +81,7 @@ const CardDescription = React.forwardRef<
     className={cn(
       "text-[var(--font-size-body-sm)] text-[var(--color-muted)]",
       "dark:text-[var(--color-slate-400)]",
-      className
+      className,
     )}
     {...props}
   />
@@ -94,10 +94,7 @@ const CardContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn(
-      "p-[var(--spacing-lg)] pt-0",
-      className
-    )}
+    className={cn("p-[var(--spacing-lg)] pt-0", className)}
     {...props}
   />
 ));
@@ -109,10 +106,7 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn(
-      "flex items-center p-[var(--spacing-lg)] pt-0",
-      className
-    )}
+    className={cn("flex items-center p-[var(--spacing-lg)] pt-0", className)}
     {...props}
   />
 ));

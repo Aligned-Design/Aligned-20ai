@@ -29,9 +29,15 @@ interface FirstPostQuickStartProps {
   };
 }
 
-export function FirstPostQuickStart({ open, onClose, brandData }: FirstPostQuickStartProps) {
+export function FirstPostQuickStart({
+  open,
+  onClose,
+  brandData,
+}: FirstPostQuickStartProps) {
   const navigate = useNavigate();
-  const [step, setStep] = useState<"intro" | "generating" | "preview" | "success">("intro");
+  const [step, setStep] = useState<
+    "intro" | "generating" | "preview" | "success"
+  >("intro");
   const [generatedPost, setGeneratedPost] = useState<{
     platform: string;
     copy: string;
@@ -53,7 +59,10 @@ export function FirstPostQuickStart({ open, onClose, brandData }: FirstPostQuick
       retail: "This Week's Special Offer",
     };
 
-    return industryTopics[brandData.industry || ""] || "Introducing Our Brand to the World";
+    return (
+      industryTopics[brandData.industry || ""] ||
+      "Introducing Our Brand to the World"
+    );
   };
 
   const handleGeneratePost = async () => {
@@ -123,50 +132,77 @@ Ready to get started? Let's connect and explore how we can work together.`,
                 Let's Create Your First Post!
               </DialogTitle>
               <DialogDescription className="text-center text-base">
-                See AI in action with a pre-filled post idea based on your industry
+                See AI in action with a pre-filled post idea based on your
+                industry
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-6 py-4">
               {/* Pre-filled Topic */}
               <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border-2 border-indigo-200">
-                <p className="text-sm font-bold text-slate-900 mb-2">Suggested Topic:</p>
-                <p className="text-lg font-bold text-indigo-900">{getDefaultTopic()}</p>
+                <p className="text-sm font-bold text-slate-900 mb-2">
+                  Suggested Topic:
+                </p>
+                <p className="text-lg font-bold text-indigo-900">
+                  {getDefaultTopic()}
+                </p>
                 <div className="flex items-center gap-2 mt-3">
                   <Badge variant="secondary">LinkedIn</Badge>
-                  <Badge variant="secondary">{brandData.industry || "General"}</Badge>
+                  <Badge variant="secondary">
+                    {brandData.industry || "General"}
+                  </Badge>
                 </div>
               </div>
 
               {/* What Happens */}
               <div className="space-y-3">
-                <p className="text-sm font-bold text-slate-900">What happens next:</p>
+                <p className="text-sm font-bold text-slate-900">
+                  What happens next:
+                </p>
                 <div className="space-y-2">
                   <div className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-bold text-indigo-600">1</span>
+                      <span className="text-xs font-bold text-indigo-600">
+                        1
+                      </span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-slate-900">AI generates your post</p>
-                      <p className="text-xs text-slate-600">Using your brand voice and tone</p>
+                      <p className="text-sm font-medium text-slate-900">
+                        AI generates your post
+                      </p>
+                      <p className="text-xs text-slate-600">
+                        Using your brand voice and tone
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-bold text-indigo-600">2</span>
+                      <span className="text-xs font-bold text-indigo-600">
+                        2
+                      </span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-slate-900">Review and edit if needed</p>
-                      <p className="text-xs text-slate-600">Make it perfect before publishing</p>
+                      <p className="text-sm font-medium text-slate-900">
+                        Review and edit if needed
+                      </p>
+                      <p className="text-xs text-slate-600">
+                        Make it perfect before publishing
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-bold text-indigo-600">3</span>
+                      <span className="text-xs font-bold text-indigo-600">
+                        3
+                      </span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-slate-900">Add to queue or schedule</p>
-                      <p className="text-xs text-slate-600">Publish now or save for later</p>
+                      <p className="text-sm font-medium text-slate-900">
+                        Add to queue or schedule
+                      </p>
+                      <p className="text-xs text-slate-600">
+                        Publish now or save for later
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -174,11 +210,7 @@ Ready to get started? Let's connect and explore how we can work together.`,
 
               {/* CTA */}
               <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  onClick={onClose}
-                  className="flex-1"
-                >
+                <Button variant="outline" onClick={onClose} className="flex-1">
                   Skip for Now
                 </Button>
                 <Button
@@ -209,8 +241,12 @@ Ready to get started? Let's connect and explore how we can work together.`,
                   <Sparkles className="w-6 h-6 text-purple-500 absolute top-0 right-0 animate-pulse" />
                 </div>
                 <div className="text-center space-y-2">
-                  <p className="text-lg font-bold text-slate-900">Analyzing your brand...</p>
-                  <p className="text-sm text-slate-600">This usually takes 2-3 seconds</p>
+                  <p className="text-lg font-bold text-slate-900">
+                    Analyzing your brand...
+                  </p>
+                  <p className="text-sm text-slate-600">
+                    This usually takes 2-3 seconds
+                  </p>
                 </div>
               </div>
             </div>
@@ -235,21 +271,26 @@ Ready to get started? Let's connect and explore how we can work together.`,
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <Badge variant="secondary">{generatedPost.platform}</Badge>
+                      <Badge variant="secondary">
+                        {generatedPost.platform}
+                      </Badge>
                       <div className="flex items-center gap-2 text-xs text-slate-600">
                         <Eye className="w-4 h-4" />
                         Preview
                       </div>
                     </div>
-                    
+
                     <div className="space-y-3">
                       <p className="text-sm text-slate-900 whitespace-pre-line leading-relaxed">
                         {generatedPost.copy}
                       </p>
-                      
+
                       <div className="flex flex-wrap gap-2">
                         {generatedPost.hashtags.map((tag) => (
-                          <span key={tag} className="text-xs text-indigo-600 font-medium">
+                          <span
+                            key={tag}
+                            className="text-xs text-indigo-600 font-medium"
+                          >
                             {tag}
                           </span>
                         ))}
@@ -267,7 +308,9 @@ Ready to get started? Let's connect and explore how we can work together.`,
                 <ul className="space-y-1 text-xs text-blue-800">
                   <li className="flex items-start gap-2">
                     <Check className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                    Matched your brand tone ({brandData.industry || "industry"} style)
+                    Matched your brand tone ({brandData.industry ||
+                      "industry"}{" "}
+                    style)
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-3 h-3 mt-0.5 flex-shrink-0" />
@@ -335,29 +378,47 @@ Ready to get started? Let's connect and explore how we can work together.`,
                 <div className="space-y-2">
                   <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                     <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-bold text-indigo-600">1</span>
+                      <span className="text-xs font-bold text-indigo-600">
+                        1
+                      </span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-slate-900">Review your post in the queue</p>
-                      <p className="text-xs text-slate-600">Make edits if needed</p>
+                      <p className="text-sm font-medium text-slate-900">
+                        Review your post in the queue
+                      </p>
+                      <p className="text-xs text-slate-600">
+                        Make edits if needed
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                     <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-bold text-indigo-600">2</span>
+                      <span className="text-xs font-bold text-indigo-600">
+                        2
+                      </span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-slate-900">Schedule or publish</p>
-                      <p className="text-xs text-slate-600">Choose when to share it</p>
+                      <p className="text-sm font-medium text-slate-900">
+                        Schedule or publish
+                      </p>
+                      <p className="text-xs text-slate-600">
+                        Choose when to share it
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                     <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-bold text-indigo-600">3</span>
+                      <span className="text-xs font-bold text-indigo-600">
+                        3
+                      </span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-slate-900">Create more content</p>
-                      <p className="text-xs text-slate-600">Build your content calendar</p>
+                      <p className="text-sm font-medium text-slate-900">
+                        Create more content
+                      </p>
+                      <p className="text-xs text-slate-600">
+                        Build your content calendar
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -365,11 +426,7 @@ Ready to get started? Let's connect and explore how we can work together.`,
 
               {/* CTAs */}
               <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  onClick={onClose}
-                  className="flex-1"
-                >
+                <Button variant="outline" onClick={onClose} className="flex-1">
                   Go to Dashboard
                 </Button>
                 <Button

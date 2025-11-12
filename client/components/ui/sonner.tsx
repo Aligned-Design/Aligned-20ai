@@ -6,14 +6,14 @@ type ToasterProps = React.ComponentProps<typeof Sonner>;
 
 /**
  * Toaster Component
- * 
+ *
  * Toast notification system that consumes design tokens for:
  * - Background color (--color-surface)
  * - Text color (--color-foreground)
  * - Border color (--color-border)
  * - Shadow (--shadow-lg)
  * - Theme-aware dark mode support
- * 
+ *
  * Usage:
  * import { toast } from "sonner";
  * toast.success("Success message");
@@ -40,12 +40,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
             "group-[.toaster]:px-[var(--spacing-md)] group-[.toaster]:py-[var(--spacing-md)]",
             "dark:group-[.toaster]:bg-[var(--color-dark-surface)]",
             "dark:group-[.toaster]:text-[var(--color-dark-foreground)]",
-            "dark:group-[.toaster]:border-[var(--color-slate-600)]"
+            "dark:group-[.toaster]:border-[var(--color-slate-600)]",
           ),
-          
+
           /* Description text */
-          description: "group-[.toast]:text-[var(--color-muted)] dark:group-[.toast]:text-[var(--color-slate-400)]",
-          
+          description:
+            "group-[.toast]:text-[var(--color-muted)] dark:group-[.toast]:text-[var(--color-slate-400)]",
+
           /* Action button */
           actionButton: cn(
             "group-[.toast]:bg-[var(--color-primary)] group-[.toast]:text-white",
@@ -54,9 +55,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
             "group-[.toast]:font-[var(--font-weight-semibold)]",
             "group-[.toast]:text-[var(--font-size-body-sm)]",
             "hover:group-[.toast]:bg-[var(--color-primary-light)]",
-            "transition-colors duration-[var(--animation-duration-quick)]"
+            "transition-colors duration-[var(--animation-duration-quick)]",
           ),
-          
+
           /* Cancel button */
           cancelButton: cn(
             "group-[.toast]:bg-[var(--color-border)] group-[.toast]:text-[var(--color-foreground)]",
@@ -66,7 +67,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
             "group-[.toast]:text-[var(--font-size-body-sm)]",
             "hover:group-[.toast]:bg-[var(--color-gray-300)]",
             "dark:group-[.toast]:bg-[var(--color-slate-600)] dark:group-[.toast]:text-[var(--color-dark-foreground)] dark:hover:group-[.toast]:bg-[var(--color-slate-500)]",
-            "transition-colors duration-[var(--animation-duration-quick)]"
+            "transition-colors duration-[var(--animation-duration-quick)]",
           ),
         },
       }}

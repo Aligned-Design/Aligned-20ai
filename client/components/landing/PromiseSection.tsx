@@ -15,7 +15,10 @@ export function PromiseSection({ onCTA }: PromiseSectionProps) {
       {/* Premium gradient orbs with animation */}
       <div className="absolute top-10 left-10 w-72 h-72 bg-indigo-100/30 rounded-full blur-3xl pointer-events-none -z-10 animate-gradient-shift"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-100/25 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-glow"></div>
-      <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-indigo-50/20 rounded-full blur-3xl pointer-events-none -z-10" style={{ animationDelay: "1s" }}></div>
+      <div
+        className="absolute top-1/2 left-1/4 w-64 h-64 bg-indigo-50/20 rounded-full blur-3xl pointer-events-none -z-10"
+        style={{ animationDelay: "1s" }}
+      ></div>
       {/* Light reflection */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-white/10 pointer-events-none -z-10"></div>
 
@@ -23,7 +26,9 @@ export function PromiseSection({ onCTA }: PromiseSectionProps) {
         <div
           ref={headingRef}
           className={`transition-all duration-700 ${
-            headingVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            headingVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-8"
           }`}
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-6 leading-tight">
@@ -31,15 +36,18 @@ export function PromiseSection({ onCTA }: PromiseSectionProps) {
           </h2>
 
           <p className="text-lg sm:text-xl text-indigo-600 font-bold mb-6">
-            All created, scheduled, and optimized — automatically — without ever losing your voice.
+            All created, scheduled, and optimized — automatically — without ever
+            losing your voice.
           </p>
 
           <p className="text-base sm:text-lg text-slate-700 mb-6 leading-relaxed">
-            We don't flatten brands. We understand them. Your visuals, your tone, your rhythm — learned once, carried through every channel.
+            We don't flatten brands. We understand them. Your visuals, your
+            tone, your rhythm — learned once, carried through every channel.
           </p>
 
           <p className="text-base sm:text-lg text-slate-700 mb-8 leading-relaxed">
-            So your agency finally runs like it looks: clean, confident, consistent.
+            So your agency finally runs like it looks: clean, confident,
+            consistent.
           </p>
         </div>
 
@@ -53,8 +61,14 @@ export function PromiseSection({ onCTA }: PromiseSectionProps) {
             <div className="flex items-start gap-4">
               <span className="text-3xl">🎨</span>
               <div className="flex-1">
-                <h3 className="font-bold text-slate-900 mb-2 group-hover:text-indigo-700 transition-colors">Brand Management</h3>
-                <p className="text-sm text-slate-700 leading-relaxed">Dynamic brand guides that embed your tone, voice, and visual identity. AI learns your brand voice and applies it automatically.</p>
+                <h3 className="font-bold text-slate-900 mb-2 group-hover:text-indigo-700 transition-colors">
+                  Brand Management
+                </h3>
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  Dynamic brand guides that embed your tone, voice, and visual
+                  identity. AI learns your brand voice and applies it
+                  automatically.
+                </p>
               </div>
             </div>
           </div>
@@ -63,8 +77,13 @@ export function PromiseSection({ onCTA }: PromiseSectionProps) {
             <div className="flex items-start gap-4">
               <span className="text-3xl">✨</span>
               <div className="flex-1">
-                <h3 className="font-bold text-slate-900 mb-2 group-hover:text-indigo-700 transition-colors">Content Automation</h3>
-                <p className="text-sm text-slate-700 leading-relaxed">AI drafts posts, emails, and content—all aligned with your brand. Your team reviews and approves. It ships automatically.</p>
+                <h3 className="font-bold text-slate-900 mb-2 group-hover:text-indigo-700 transition-colors">
+                  Content Automation
+                </h3>
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  AI drafts posts, emails, and content—all aligned with your
+                  brand. Your team reviews and approves. It ships automatically.
+                </p>
               </div>
             </div>
           </div>
@@ -73,8 +92,13 @@ export function PromiseSection({ onCTA }: PromiseSectionProps) {
             <div className="flex items-start gap-4">
               <span className="text-3xl">👥</span>
               <div className="flex-1">
-                <h3 className="font-bold text-slate-900 mb-2 group-hover:text-indigo-700 transition-colors">Client Collaboration</h3>
-                <p className="text-sm text-slate-700 leading-relaxed">White-labeled approval portals. Clients review, comment, and approve from anywhere. No scattered feedback.</p>
+                <h3 className="font-bold text-slate-900 mb-2 group-hover:text-indigo-700 transition-colors">
+                  Client Collaboration
+                </h3>
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  White-labeled approval portals. Clients review, comment, and
+                  approve from anywhere. No scattered feedback.
+                </p>
               </div>
             </div>
           </div>
@@ -83,8 +107,13 @@ export function PromiseSection({ onCTA }: PromiseSectionProps) {
             <div className="flex items-start gap-4">
               <span className="text-3xl">📊</span>
               <div className="flex-1">
-                <h3 className="font-bold text-slate-900 mb-2 group-hover:text-indigo-700 transition-colors">AI-Powered Reporting</h3>
-                <p className="text-sm text-slate-700 leading-relaxed">Automated reports with insights, trends, and actionable recommendations. No data chaos. Pure clarity.</p>
+                <h3 className="font-bold text-slate-900 mb-2 group-hover:text-indigo-700 transition-colors">
+                  AI-Powered Reporting
+                </h3>
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  Automated reports with insights, trends, and actionable
+                  recommendations. No data chaos. Pure clarity.
+                </p>
               </div>
             </div>
           </div>

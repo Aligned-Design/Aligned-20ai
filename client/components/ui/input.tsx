@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Input Component
- * 
+ *
  * Form input field that consumes design tokens for:
  * - Height (--spacing-xl / 40px)
  * - Border radius (--radius-md)
@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  * - Border color (--color-border)
  * - Focus ring (--color-primary)
  * - Font size (--font-size-body)
- * 
+ *
  * Usage:
  * <Input type="text" placeholder="Enter text..." />
  * <Input type="email" disabled />

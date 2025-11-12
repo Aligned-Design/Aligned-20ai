@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader, Sparkles, Clock, X, CheckCircle, AlertCircle } from "lucide-react";
+import {
+  Loader,
+  Sparkles,
+  Clock,
+  X,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 interface AIGenerationProgressProps {
@@ -74,21 +81,33 @@ export function AIGenerationProgress({
   }
 
   return (
-    <Card className={`border-2 ${
-      status === "generating" ? "border-indigo-200 bg-indigo-50/50" :
-      status === "success" ? "border-green-200 bg-green-50/50" :
-      status === "error" ? "border-red-200 bg-red-50/50" : "border-slate-200"
-    }`}>
+    <Card
+      className={`border-2 ${
+        status === "generating"
+          ? "border-indigo-200 bg-indigo-50/50"
+          : status === "success"
+            ? "border-green-200 bg-green-50/50"
+            : status === "error"
+              ? "border-red-200 bg-red-50/50"
+              : "border-slate-200"
+      }`}
+    >
       <CardContent className="pt-6">
         <div className="space-y-4">
           {/* Header with Status Icon */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                status === "generating" ? "bg-indigo-100" :
-                status === "success" ? "bg-green-100" :
-                status === "error" ? "bg-red-100" : "bg-slate-100"
-              }`}>
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  status === "generating"
+                    ? "bg-indigo-100"
+                    : status === "success"
+                      ? "bg-green-100"
+                      : status === "error"
+                        ? "bg-red-100"
+                        : "bg-slate-100"
+                }`}
+              >
                 {status === "generating" && (
                   <Loader className="w-5 h-5 text-indigo-600 animate-spin" />
                 )}
@@ -116,14 +135,17 @@ export function AIGenerationProgress({
                   <div className="flex items-center gap-2 mt-1">
                     <Clock className="w-3 h-3 text-slate-500" />
                     <span className="text-xs text-slate-600">
-                      ~{Math.max(0, Math.ceil(estimatedTime - elapsedTime))}s remaining
+                      ~{Math.max(0, Math.ceil(estimatedTime - elapsedTime))}s
+                      remaining
                     </span>
                   </div>
                 )}
 
                 {status === "success" && generatedCount > 0 && (
                   <p className="text-xs text-green-700 mt-1">
-                    ✅ Generated {generatedCount} {type === "copy" ? "variations" : "options"} in {elapsedTime.toFixed(1)}s
+                    ✅ Generated {generatedCount}{" "}
+                    {type === "copy" ? "variations" : "options"} in{" "}
+                    {elapsedTime.toFixed(1)}s
                   </p>
                 )}
 
@@ -166,7 +188,8 @@ export function AIGenerationProgress({
               <div className="flex items-center justify-between text-xs text-slate-600">
                 <span>{Math.round(progressPercent)}% complete</span>
                 <span>
-                  {generatedCount}/{targetCount} {type === "copy" ? "variations" : "items"}
+                  {generatedCount}/{targetCount}{" "}
+                  {type === "copy" ? "variations" : "items"}
                 </span>
               </div>
             </div>
@@ -192,10 +215,12 @@ export function AIGenerationProgress({
                   <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-sm text-red-800 font-medium">
-                      {errorMessage || "Couldn't generate content. Please try again."}
+                      {errorMessage ||
+                        "Couldn't generate content. Please try again."}
                     </p>
                     <p className="text-xs text-red-700 mt-1">
-                      If the problem persists, check your internet connection or contact support.
+                      If the problem persists, check your internet connection or
+                      contact support.
                     </p>
                   </div>
                 </div>
@@ -206,7 +231,11 @@ export function AIGenerationProgress({
           {/* Helpful Tips During Generation */}
           {status === "generating" && (
             <div className="text-xs text-slate-600 italic">
-              💡 Tip: Press <kbd className="px-1 py-0.5 bg-slate-200 rounded text-[10px] font-mono">Esc</kbd> to cancel generation
+              💡 Tip: Press{" "}
+              <kbd className="px-1 py-0.5 bg-slate-200 rounded text-[10px] font-mono">
+                Esc
+              </kbd>{" "}
+              to cancel generation
             </div>
           )}
         </div>

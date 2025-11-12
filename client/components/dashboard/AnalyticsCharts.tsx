@@ -11,7 +11,6 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-
 } from "recharts";
 import {
   ChartContainer,
@@ -26,13 +25,13 @@ import { cn } from "@/lib/utils";
  * Using CSS custom properties for consistency across themes
  */
 const CHART_COLORS = {
-  primary: "var(--color-primary)",      // #3D0FD6 - Primary brand color
-  success: "var(--color-success)",      // #12B76A - Success/positive trend
-  warning: "var(--color-warning)",      // #F59E0B - Warning/alert
-  error: "var(--color-error)",          // #DC2626 - Error/negative trend
-  info: "var(--color-info)",            // #2563EB - Info state
-  muted: "var(--color-muted)",          // #6B7280 - Secondary/comparison
-  slate400: "var(--color-slate-400)",   // #94A3B8 - Accent
+  primary: "var(--color-primary)", // #3D0FD6 - Primary brand color
+  success: "var(--color-success)", // #12B76A - Success/positive trend
+  warning: "var(--color-warning)", // #F59E0B - Warning/alert
+  error: "var(--color-error)", // #DC2626 - Error/negative trend
+  info: "var(--color-info)", // #2563EB - Info state
+  muted: "var(--color-muted)", // #6B7280 - Secondary/comparison
+  slate400: "var(--color-slate-400)", // #94A3B8 - Accent
 } as const;
 
 // Reach/Engagement Area Chart

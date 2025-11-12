@@ -14,8 +14,14 @@ export function WhatItFeelsLikeSection({ onCTA }: WhatItFeelsLikeSectionProps) {
       {/* Premium background with animated elements */}
       <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-100/25 rounded-full blur-3xl animate-gradient-shift"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-slate-200/15 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: "1s" }}></div>
-        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-blue-100/15 rounded-full blur-3xl animate-float-soft" style={{ animationDelay: "2s" }}></div>
+        <div
+          className="absolute bottom-0 left-0 w-80 h-80 bg-slate-200/15 rounded-full blur-3xl animate-pulse-glow"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 right-1/3 w-64 h-64 bg-blue-100/15 rounded-full blur-3xl animate-float-soft"
+          style={{ animationDelay: "2s" }}
+        ></div>
         {/* Light reflection */}
         <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-white/10"></div>
       </div>
@@ -24,7 +30,9 @@ export function WhatItFeelsLikeSection({ onCTA }: WhatItFeelsLikeSectionProps) {
         <div
           ref={containerRef}
           className={`bg-white/55 backdrop-blur-xl rounded-3xl border border-indigo-200/60 p-8 md:p-12 text-center transition-all duration-700 hover:bg-white/70 hover:border-indigo-400/70 hover:shadow-2xl hover:shadow-indigo-300/40 group ${
-            isVisible ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-8"
+            isVisible
+              ? "opacity-100 scale-100 translate-y-0"
+              : "opacity-0 scale-95 translate-y-8"
           }`}
         >
           <p className="text-2xl font-black text-slate-900 mb-6 group-hover:text-indigo-900 transition-colors">
@@ -32,7 +40,9 @@ export function WhatItFeelsLikeSection({ onCTA }: WhatItFeelsLikeSectionProps) {
           </p>
 
           <p className="text-base sm:text-lg text-slate-700 mb-8 leading-relaxed group-hover:text-slate-900 transition-colors">
-            You open your laptop. Everything's already scheduled. The content looks sharp. The clients are happy. And for once, you actually remember to eat lunch.
+            You open your laptop. Everything's already scheduled. The content
+            looks sharp. The clients are happy. And for once, you actually
+            remember to eat lunch.
           </p>
 
           <p className="text-xl md:text-2xl font-black text-slate-900 mb-6 group-hover:text-indigo-900 transition-colors">

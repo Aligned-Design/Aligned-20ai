@@ -92,46 +92,256 @@ function ProtectedRoutes() {
   return (
     <Routes>
       {/* Public Routes - landing page */}
-      <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />
+      <Route
+        path="/"
+        element={
+          <PublicRoute>
+            <Index />
+          </PublicRoute>
+        }
+      />
 
       {/* Auth Routes - redirect to onboarding or show onboarding */}
-      <Route path="/login" element={<PublicRoute><Index /></PublicRoute>} />
-      <Route path="/signup" element={<PublicRoute><Index /></PublicRoute>} />
-      <Route path="/onboarding" element={<OnboardingRoute><Onboarding /></OnboardingRoute>} />
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <Index />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <PublicRoute>
+            <Index />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/onboarding"
+        element={
+          <OnboardingRoute>
+            <Onboarding />
+          </OnboardingRoute>
+        }
+      />
 
       {/* Protected Routes - only accessible when authenticated and onboarding complete */}
-      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
-      <Route path="/content-queue" element={<ProtectedRoute><ContentQueue /></ProtectedRoute>} />
-      <Route path="/queue" element={<ProtectedRoute><ContentQueue /></ProtectedRoute>} />
-      <Route path="/approvals" element={<ProtectedRoute><Approvals /></ProtectedRoute>} />
-      <Route path="/creative-studio" element={<ProtectedRoute><CreativeStudio /></ProtectedRoute>} />
-      <Route path="/content-generator" element={<ProtectedRoute><ContentGenerator /></ProtectedRoute>} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/calendar"
+        element={
+          <ProtectedRoute>
+            <Calendar />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/content-queue"
+        element={
+          <ProtectedRoute>
+            <ContentQueue />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/queue"
+        element={
+          <ProtectedRoute>
+            <ContentQueue />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/approvals"
+        element={
+          <ProtectedRoute>
+            <Approvals />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/creative-studio"
+        element={
+          <ProtectedRoute>
+            <CreativeStudio />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/content-generator"
+        element={
+          <ProtectedRoute>
+            <ContentGenerator />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Strategy Navigation */}
-      <Route path="/campaigns" element={<ProtectedRoute><Campaigns /></ProtectedRoute>} />
-      <Route path="/brands" element={<ProtectedRoute><Brands /></ProtectedRoute>} />
-      <Route path="/brand-intake" element={<ProtectedRoute><BrandIntake /></ProtectedRoute>} />
-      <Route path="/brand-guide" element={<ProtectedRoute><BrandGuide /></ProtectedRoute>} />
-      <Route path="/brand-snapshot" element={<ProtectedRoute><BrandSnapshot /></ProtectedRoute>} />
-      <Route path="/brand-intelligence" element={<ProtectedRoute><BrandIntelligence /></ProtectedRoute>} />
-      <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-      <Route path="/reporting" element={<ProtectedRoute><Reporting /></ProtectedRoute>} />
-      <Route path="/reports" element={<ProtectedRoute><Reporting /></ProtectedRoute>} />
-      <Route path="/paid-ads" element={<ProtectedRoute><PaidAds /></ProtectedRoute>} />
-      <Route path="/ads" element={<ProtectedRoute><PaidAds /></ProtectedRoute>} />
+      <Route
+        path="/campaigns"
+        element={
+          <ProtectedRoute>
+            <Campaigns />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/brands"
+        element={
+          <ProtectedRoute>
+            <Brands />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/brand-intake"
+        element={
+          <ProtectedRoute>
+            <BrandIntake />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/brand-guide"
+        element={
+          <ProtectedRoute>
+            <BrandGuide />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/brand-snapshot"
+        element={
+          <ProtectedRoute>
+            <BrandSnapshot />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/brand-intelligence"
+        element={
+          <ProtectedRoute>
+            <BrandIntelligence />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <Analytics />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reporting"
+        element={
+          <ProtectedRoute>
+            <Reporting />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute>
+            <Reporting />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/paid-ads"
+        element={
+          <ProtectedRoute>
+            <PaidAds />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ads"
+        element={
+          <ProtectedRoute>
+            <PaidAds />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Assets Navigation */}
-      <Route path="/library" element={<ProtectedRoute><LibraryPage /></ProtectedRoute>} />
-      <Route path="/client-portal" element={<ProtectedRoute><ClientPortal /></ProtectedRoute>} />
-      <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
-      <Route path="/reviews" element={<ProtectedRoute><Reviews /></ProtectedRoute>} />
-      <Route path="/linked-accounts" element={<ProtectedRoute><LinkedAccounts /></ProtectedRoute>} />
+      <Route
+        path="/library"
+        element={
+          <ProtectedRoute>
+            <LibraryPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/client-portal"
+        element={
+          <ProtectedRoute>
+            <ClientPortal />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/events"
+        element={
+          <ProtectedRoute>
+            <Events />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reviews"
+        element={
+          <ProtectedRoute>
+            <Reviews />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/linked-accounts"
+        element={
+          <ProtectedRoute>
+            <LinkedAccounts />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Settings */}
-      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-      <Route path="/client-settings" element={<ProtectedRoute><ClientSettings /></ProtectedRoute>} />
-      <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Settings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/client-settings"
+        element={
+          <ProtectedRoute>
+            <ClientSettings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/billing"
+        element={
+          <ProtectedRoute>
+            <Billing />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Catch-all - show 404 page */}
       <Route path="*" element={<NotFound />} />

@@ -4,13 +4,15 @@ const STEPS = [
   {
     number: 1,
     title: "Set up your brands",
-    description: "Each client gets their own private workspace. No mix-ups. No brand bleed.",
+    description:
+      "Each client gets their own private workspace. No mix-ups. No brand bleed.",
     emoji: "🏢",
   },
   {
     number: 2,
     title: "Build your brand guide",
-    description: "Link the website. Upload logos, colors, tone, and visuals — or let Aligned generate one automatically.",
+    description:
+      "Link the website. Upload logos, colors, tone, and visuals — or let Aligned generate one automatically.",
     emoji: "🎨",
   },
   {
@@ -22,7 +24,8 @@ const STEPS = [
   {
     number: 4,
     title: "Automate your week",
-    description: "Posts go live. Reports update. Clients stay in the loop — without you chasing them.",
+    description:
+      "Posts go live. Reports update. Clients stay in the loop — without you chasing them.",
     emoji: "🚀",
   },
 ];
@@ -36,8 +39,14 @@ export function HowItWorksSection() {
       {/* Premium background with multiple animated orbs */}
       <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-indigo-100/25 rounded-full blur-3xl animate-gradient-shift"></div>
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-blue-100/15 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: "1s" }}></div>
-        <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-indigo-50/20 rounded-full blur-3xl animate-float-soft" style={{ animationDelay: "2s" }}></div>
+        <div
+          className="absolute bottom-0 right-1/4 w-80 h-80 bg-blue-100/15 rounded-full blur-3xl animate-pulse-glow"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/3 left-1/4 w-64 h-64 bg-indigo-50/20 rounded-full blur-3xl animate-float-soft"
+          style={{ animationDelay: "2s" }}
+        ></div>
         {/* Light reflection */}
         <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-white/10"></div>
       </div>
@@ -46,19 +55,20 @@ export function HowItWorksSection() {
         <div
           ref={titleRef}
           className={`text-center mb-16 transition-all duration-700 ${
-            titleVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            titleVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-8"
           }`}
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-4">
             How It Works
           </h2>
-          <p className="text-lg text-slate-600">Four simple steps to content freedom.</p>
+          <p className="text-lg text-slate-600">
+            Four simple steps to content freedom.
+          </p>
         </div>
 
-        <div
-          ref={cardsRef}
-          className="grid md:grid-cols-4 gap-6"
-        >
+        <div ref={cardsRef} className="grid md:grid-cols-4 gap-6">
           {STEPS.map((step) => (
             <div
               key={step.number}
@@ -68,7 +78,9 @@ export function HowItWorksSection() {
                   : "opacity-0 translate-y-8"
               }`}
               style={{
-                transitionDelay: cardsVisible ? `${step.number * 100}ms` : "0ms",
+                transitionDelay: cardsVisible
+                  ? `${step.number * 100}ms`
+                  : "0ms",
               }}
             >
               {/* Step Number Badge with glow */}
@@ -77,11 +89,17 @@ export function HowItWorksSection() {
               </div>
 
               {/* Emoji Icon with enhanced animation */}
-              <div className="text-4xl mb-4 mt-2 group-hover:scale-125 group-hover:-translate-y-1 transition-all duration-300">{step.emoji}</div>
+              <div className="text-4xl mb-4 mt-2 group-hover:scale-125 group-hover:-translate-y-1 transition-all duration-300">
+                {step.emoji}
+              </div>
 
               {/* Content */}
-              <h3 className="text-lg font-black text-slate-900 mb-3 group-hover:text-indigo-700 transition-colors">{step.title}</h3>
-              <p className="text-sm text-slate-600 leading-relaxed group-hover:text-slate-700 transition-colors">{step.description}</p>
+              <h3 className="text-lg font-black text-slate-900 mb-3 group-hover:text-indigo-700 transition-colors">
+                {step.title}
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed group-hover:text-slate-700 transition-colors">
+                {step.description}
+              </p>
 
               {/* Arrow connector (hidden on mobile) */}
               {step.number < 4 && (

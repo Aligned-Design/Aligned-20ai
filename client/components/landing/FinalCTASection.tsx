@@ -17,7 +17,10 @@ export function FinalCTASection({ onCTA }: FinalCTASectionProps) {
         {/* Primary indigo glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 rounded-full blur-3xl animate-pulse-glow"></div>
         {/* Secondary slate glow */}
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-tl from-slate-600/15 to-slate-600/5 rounded-full blur-3xl animate-float-soft" style={{ animationDelay: "0.5s" }}></div>
+        <div
+          className="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-tl from-slate-600/15 to-slate-600/5 rounded-full blur-3xl animate-float-soft"
+          style={{ animationDelay: "0.5s" }}
+        ></div>
         {/* Accent lime glow */}
         <div className="absolute bottom-1/3 left-1/4 w-64 h-64 bg-lime-500/10 rounded-full blur-3xl opacity-60"></div>
         {/* Light reflection from top */}
@@ -28,7 +31,9 @@ export function FinalCTASection({ onCTA }: FinalCTASectionProps) {
         <div
           ref={headingRef}
           className={`transition-all duration-700 ${
-            headingVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            headingVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-8"
           }`}
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
@@ -50,7 +55,8 @@ export function FinalCTASection({ onCTA }: FinalCTASectionProps) {
             Aligned.ai — for the ones brave enough to build differently.
           </p>
           <p className="text-base sm:text-lg text-slate-300 leading-relaxed">
-            For the bold brands that care deeply, create intentionally, and refuse to blend in.
+            For the bold brands that care deeply, create intentionally, and
+            refuse to blend in.
           </p>
         </div>
 

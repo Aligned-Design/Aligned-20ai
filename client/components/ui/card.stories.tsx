@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from "@storybook/react";
 import {
   Card,
   CardContent,
@@ -6,16 +6,16 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from './card';
-import { Button } from './button';
+} from "./card";
+import { Button } from "./button";
 
 const meta = {
-  title: 'UI/Card',
+  title: "UI/Card",
   component: Card,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 } satisfies Meta<typeof Card>;
 
 export default meta;
@@ -26,7 +26,7 @@ type Story = StoryObj<typeof meta>;
  */
 export const Basic: Story = {
   render: () => (
-    <Card style={{ width: '400px' }}>
+    <Card style={{ width: "400px" }}>
       <CardHeader>
         <CardTitle>Card Title</CardTitle>
         <CardDescription>Card description goes here</CardDescription>
@@ -43,7 +43,7 @@ export const Basic: Story = {
  */
 export const Complete: Story = {
   render: () => (
-    <Card style={{ width: '400px' }}>
+    <Card style={{ width: "400px" }}>
       <CardHeader>
         <CardTitle>Complete Card</CardTitle>
         <CardDescription>With header, content, and footer</CardDescription>
@@ -54,7 +54,7 @@ export const Complete: Story = {
           Use this for forms, confirmations, or detailed information displays.
         </p>
       </CardContent>
-      <CardFooter style={{ display: 'flex', gap: '8px' }}>
+      <CardFooter style={{ display: "flex", gap: "8px" }}>
         <Button variant="outline">Cancel</Button>
         <Button>Save</Button>
       </CardFooter>
@@ -67,10 +67,15 @@ export const Complete: Story = {
  */
 export const ContentOnly: Story = {
   render: () => (
-    <Card style={{ width: '400px' }}>
-      <CardContent style={{ paddingTop: 'var(--spacing-lg)' }}>
+    <Card style={{ width: "400px" }}>
+      <CardContent style={{ paddingTop: "var(--spacing-lg)" }}>
         <p>Simple content card without headers or footers.</p>
-        <p style={{ marginTop: 'var(--spacing-md)', color: 'var(--color-muted)' }}>
+        <p
+          style={{
+            marginTop: "var(--spacing-md)",
+            color: "var(--color-muted)",
+          }}
+        >
           Perfect for displaying simple information or stats.
         </p>
       </CardContent>
@@ -83,13 +88,18 @@ export const ContentOnly: Story = {
  */
 export const Stats: Story = {
   render: () => (
-    <Card style={{ width: '300px' }}>
+    <Card style={{ width: "300px" }}>
       <CardHeader>
-        <CardTitle style={{ fontSize: 'var(--font-size-h2)' }}>1,234</CardTitle>
+        <CardTitle style={{ fontSize: "var(--font-size-h2)" }}>1,234</CardTitle>
         <CardDescription>Total Users</CardDescription>
       </CardHeader>
       <CardContent>
-        <p style={{ fontSize: 'var(--font-size-body-sm)', color: 'var(--color-success)' }}>
+        <p
+          style={{
+            fontSize: "var(--font-size-body-sm)",
+            color: "var(--color-success)",
+          }}
+        >
           ↑ 12% from last month
         </p>
       </CardContent>
@@ -102,7 +112,14 @@ export const Stats: Story = {
  */
 export const Grid: Story = {
   render: () => (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', width: '800px' }}>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: "16px",
+        width: "800px",
+      }}
+    >
       <Card>
         <CardHeader>
           <CardTitle>Card 1</CardTitle>
@@ -136,21 +153,29 @@ export const Grid: Story = {
  */
 export const LongContent: Story = {
   render: () => (
-    <Card style={{ width: '400px' }}>
+    <Card style={{ width: "400px" }}>
       <CardHeader>
         <CardTitle>Post Preview</CardTitle>
         <CardDescription>Review before publishing</CardDescription>
       </CardHeader>
       <CardContent>
-        <p style={{ marginBottom: 'var(--spacing-md)' }}>
-          This is a longer piece of content that demonstrates how the card handles text wrapping
-          and multiple paragraphs. It shows proper spacing and typography.
+        <p style={{ marginBottom: "var(--spacing-md)" }}>
+          This is a longer piece of content that demonstrates how the card
+          handles text wrapping and multiple paragraphs. It shows proper spacing
+          and typography.
         </p>
-        <p style={{ color: 'var(--color-muted)', fontSize: 'var(--font-size-body-sm)' }}>
+        <p
+          style={{
+            color: "var(--color-muted)",
+            fontSize: "var(--font-size-body-sm)",
+          }}
+        >
           Created: November 25, 2025 at 3:45 PM
         </p>
       </CardContent>
-      <CardFooter style={{ display: 'flex', gap: '8px', justifyContent: 'space-between' }}>
+      <CardFooter
+        style={{ display: "flex", gap: "8px", justifyContent: "space-between" }}
+      >
         <Button variant="outline">Edit</Button>
         <Button variant="success">Approve</Button>
       </CardFooter>

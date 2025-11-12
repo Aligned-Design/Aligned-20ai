@@ -180,9 +180,13 @@ export function PlatformSpecificPreview({
 
               {/* Media Preview */}
               {content.mediaUrl ? (
-                <div className={`w-full ${
-                  activePlatform.id === "tiktok" ? "aspect-[9/16]" : "aspect-square"
-                } bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center`}>
+                <div
+                  className={`w-full ${
+                    activePlatform.id === "tiktok"
+                      ? "aspect-[9/16]"
+                      : "aspect-square"
+                  } bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center`}
+                >
                   <img
                     src={content.mediaUrl}
                     alt="Post preview"
@@ -190,9 +194,13 @@ export function PlatformSpecificPreview({
                   />
                 </div>
               ) : (
-                <div className={`w-full ${
-                  activePlatform.id === "tiktok" ? "aspect-[9/16]" : "aspect-square"
-                } bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center`}>
+                <div
+                  className={`w-full ${
+                    activePlatform.id === "tiktok"
+                      ? "aspect-[9/16]"
+                      : "aspect-square"
+                  } bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center`}
+                >
                   <p className="text-xs text-slate-400">Image Preview</p>
                 </div>
               )}
@@ -208,10 +216,7 @@ export function PlatformSpecificPreview({
                 {content.hashtags.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {content.hashtags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="text-xs text-blue-600"
-                      >
+                      <span key={idx} className="text-xs text-blue-600">
                         {tag}
                       </span>
                     ))}
@@ -335,7 +340,7 @@ export function PlatformSpecificPreview({
               {platforms.map((platformId) => {
                 const platform = PLATFORM_CONFIGS[platformId];
                 const status = getCompatibilityStatus(platformId);
-                
+
                 return (
                   <TabsTrigger
                     key={platformId}
@@ -353,7 +358,11 @@ export function PlatformSpecificPreview({
             </TabsList>
 
             {platforms.map((platformId) => (
-              <TabsContent key={platformId} value={platformId} className="space-y-6">
+              <TabsContent
+                key={platformId}
+                value={platformId}
+                className="space-y-6"
+              >
                 {/* Compatibility Warning */}
                 {(() => {
                   const status = getCompatibilityStatus(platformId);
@@ -366,9 +375,12 @@ export function PlatformSpecificPreview({
                             <p className="font-bold text-red-900 mb-1">
                               ⚠️ Compatibility Issue
                             </p>
-                            <p className="text-sm text-red-800">{status.message}</p>
+                            <p className="text-sm text-red-800">
+                              {status.message}
+                            </p>
                             <p className="text-xs text-red-700 mt-2">
-                              This post will be skipped when publishing to {activePlatform?.name}
+                              This post will be skipped when publishing to{" "}
+                              {activePlatform?.name}
                             </p>
                           </div>
                         </div>
@@ -398,7 +410,9 @@ export function PlatformSpecificPreview({
                             {activePlatform?.deviceType} View
                           </span>
                         </div>
-                        <Badge variant={isOverLimit ? "destructive" : "secondary"}>
+                        <Badge
+                          variant={isOverLimit ? "destructive" : "secondary"}
+                        >
                           {charCount} / {activePlatform?.charLimit} chars
                         </Badge>
                       </div>
@@ -408,7 +422,10 @@ export function PlatformSpecificPreview({
                         <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                           <p className="text-sm text-red-800">
                             ⚠️ Your caption exceeds the character limit by{" "}
-                            <strong>{charCount - (activePlatform?.charLimit || 0)}</strong> characters.
+                            <strong>
+                              {charCount - (activePlatform?.charLimit || 0)}
+                            </strong>{" "}
+                            characters.
                             {activePlatform?.name} will truncate your post.
                           </p>
                         </div>
@@ -417,18 +434,28 @@ export function PlatformSpecificPreview({
                       {/* Format Info */}
                       <div className="grid grid-cols-2 gap-4 p-3 bg-slate-50 rounded-lg">
                         <div>
-                          <p className="text-xs text-slate-600 mb-1">Supported Formats</p>
+                          <p className="text-xs text-slate-600 mb-1">
+                            Supported Formats
+                          </p>
                           <div className="flex flex-wrap gap-1">
                             {activePlatform?.supportedFormats.map((format) => (
-                              <Badge key={format} variant="outline" className="text-xs">
+                              <Badge
+                                key={format}
+                                variant="outline"
+                                className="text-xs"
+                              >
                                 {format}
                               </Badge>
                             ))}
                           </div>
                         </div>
                         <div>
-                          <p className="text-xs text-slate-600 mb-1">Aspect Ratio</p>
-                          <p className="text-sm font-medium">{activePlatform?.aspectRatio}</p>
+                          <p className="text-xs text-slate-600 mb-1">
+                            Aspect Ratio
+                          </p>
+                          <p className="text-sm font-medium">
+                            {activePlatform?.aspectRatio}
+                          </p>
                         </div>
                       </div>
 
@@ -457,7 +484,7 @@ export function PlatformSpecificPreview({
               <Button
                 onClick={() => {
                   const compatiblePlatforms = platforms.filter(
-                    (p) => getCompatibilityStatus(p).compatible
+                    (p) => getCompatibilityStatus(p).compatible,
                   );
                   onConfirmPublish(compatiblePlatforms);
                   onClose();
@@ -465,7 +492,12 @@ export function PlatformSpecificPreview({
                 className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
               >
                 <CheckCircle className="w-4 h-4 mr-2" />
-                Publish to {platforms.filter((p) => getCompatibilityStatus(p).compatible).length} Platform(s)
+                Publish to{" "}
+                {
+                  platforms.filter((p) => getCompatibilityStatus(p).compatible)
+                    .length
+                }{" "}
+                Platform(s)
               </Button>
             </div>
           )}

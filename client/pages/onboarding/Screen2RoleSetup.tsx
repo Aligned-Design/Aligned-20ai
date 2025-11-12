@@ -9,7 +9,9 @@ import {
 
 export default function Screen2RoleSetup() {
   const { user, updateUser, setOnboardingStep } = useAuth();
-  const [selectedRole, setSelectedRole] = useState<"agency" | "brand" | null>(null);
+  const [selectedRole, setSelectedRole] = useState<"agency" | "brand" | null>(
+    null,
+  );
   const [clientCount, setClientCount] = useState<string>("");
   const [teamEmails, setTeamEmails] = useState<string[]>([]);
   const [currentEmail, setCurrentEmail] = useState("");
@@ -28,9 +30,11 @@ export default function Screen2RoleSetup() {
     }
 
     if (selectedRole === "agency") {
-      if (!clientCount) newErrors.clientCount = "Please specify number of clients";
+      if (!clientCount)
+        newErrors.clientCount = "Please specify number of clients";
     } else {
-      if (!businessName.trim()) newErrors.businessName = "Business name is required";
+      if (!businessName.trim())
+        newErrors.businessName = "Business name is required";
       if (!industry) newErrors.industry = "Please select an industry";
     }
 
@@ -39,7 +43,10 @@ export default function Screen2RoleSetup() {
   };
 
   const addTeamMember = () => {
-    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentEmail) && !teamEmails.includes(currentEmail)) {
+    if (
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentEmail) &&
+      !teamEmails.includes(currentEmail)
+    ) {
       setTeamEmails([...teamEmails, currentEmail]);
       setCurrentEmail("");
     }
@@ -53,12 +60,14 @@ export default function Screen2RoleSetup() {
     if (validate()) {
       updateUser({
         role: selectedRole,
-        clientCount: selectedRole === "agency" ? parseInt(clientCount) : undefined,
+        clientCount:
+          selectedRole === "agency" ? parseInt(clientCount) : undefined,
         teamMembers: selectedRole === "agency" ? teamEmails : undefined,
         businessName: selectedRole === "brand" ? businessName : undefined,
         website: selectedRole === "brand" ? website : undefined,
         industry: selectedRole === "brand" ? industry : undefined,
-        workspaceName: selectedRole === "agency" ? `Workspace ${Date.now()}` : businessName,
+        workspaceName:
+          selectedRole === "agency" ? `Workspace ${Date.now()}` : businessName,
       });
       setOnboardingStep(3);
     }
@@ -116,13 +125,14 @@ export default function Screen2RoleSetup() {
               <div className="w-14 h-14 rounded-xl bg-indigo-100 flex items-center justify-center mb-4 group-hover:bg-indigo-200 transition-colors">
                 <Building2 className="w-7 h-7 text-indigo-600" />
               </div>
-              
+
               <h3 className="text-xl font-black text-slate-900 mb-2">
                 I run an agency
               </h3>
-              
+
               <p className="text-sm text-slate-600 mb-4">
-                Manage multiple client brands, white-label client portals, and collaborate with your team
+                Manage multiple client brands, white-label client portals, and
+                collaborate with your team
               </p>
 
               <div className="flex items-center gap-2 text-xs text-indigo-600 font-bold">
@@ -161,13 +171,14 @@ export default function Screen2RoleSetup() {
               <div className="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
                 <User className="w-7 h-7 text-blue-600" />
               </div>
-              
+
               <h3 className="text-xl font-black text-slate-900 mb-2">
                 I manage a single brand/business
               </h3>
-              
+
               <p className="text-sm text-slate-600 mb-4">
-                Focus on one business, invite team members, and streamline your content workflow
+                Focus on one business, invite team members, and streamline your
+                content workflow
               </p>
 
               <div className="flex items-center gap-2 text-xs text-blue-600 font-bold">
@@ -181,9 +192,11 @@ export default function Screen2RoleSetup() {
             {/* Selected Role Display */}
             <div className="bg-white/50 backdrop-blur-xl rounded-2xl border border-white/60 p-4 mb-6 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                  selectedRole === "agency" ? "bg-indigo-100" : "bg-blue-100"
-                }`}>
+                <div
+                  className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                    selectedRole === "agency" ? "bg-indigo-100" : "bg-blue-100"
+                  }`}
+                >
                   {selectedRole === "agency" ? (
                     <Building2 className="w-5 h-5 text-indigo-600" />
                   ) : (
@@ -191,9 +204,13 @@ export default function Screen2RoleSetup() {
                   )}
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 font-medium">Selected role</p>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Selected role
+                  </p>
                   <p className="text-sm font-bold text-slate-900">
-                    {selectedRole === "agency" ? "Agency" : "Single Brand/Business"}
+                    {selectedRole === "agency"
+                      ? "Agency"
+                      : "Single Brand/Business"}
                   </p>
                 </div>
               </div>
@@ -230,13 +247,20 @@ export default function Screen2RoleSetup() {
                       <option value="20">11-20 Clients</option>
                       <option value="50">20+ Clients</option>
                     </select>
-                    {errors.clientCount && <p className="text-xs text-red-600 mt-1">{errors.clientCount}</p>}
+                    {errors.clientCount && (
+                      <p className="text-xs text-red-600 mt-1">
+                        {errors.clientCount}
+                      </p>
+                    )}
                   </div>
 
                   {/* Agency: Team Members */}
                   <div>
                     <label className="block text-sm font-bold text-slate-900 mb-2">
-                      Invite Your Team <span className="text-slate-500 font-normal">(Optional)</span>
+                      Invite Your Team{" "}
+                      <span className="text-slate-500 font-normal">
+                        (Optional)
+                      </span>
                     </label>
                     <div className="flex gap-2 mb-3">
                       <input
@@ -293,13 +317,20 @@ export default function Screen2RoleSetup() {
                           : "border-slate-200 bg-white/50 focus:border-indigo-500"
                       }`}
                     />
-                    {errors.businessName && <p className="text-xs text-red-600 mt-1">{errors.businessName}</p>}
+                    {errors.businessName && (
+                      <p className="text-xs text-red-600 mt-1">
+                        {errors.businessName}
+                      </p>
+                    )}
                   </div>
 
                   {/* Single Business: Website */}
                   <div>
                     <label className="block text-sm font-bold text-slate-900 mb-2">
-                      Website or Social URL <span className="text-slate-500 font-normal">(Optional)</span>
+                      Website or Social URL{" "}
+                      <span className="text-slate-500 font-normal">
+                        (Optional)
+                      </span>
                     </label>
                     <input
                       type="url"
@@ -333,11 +364,17 @@ export default function Screen2RoleSetup() {
                       <option value="education">Education</option>
                       <option value="real_estate">Real Estate</option>
                       <option value="hospitality">Hospitality & Travel</option>
-                      <option value="professional_services">Professional Services</option>
+                      <option value="professional_services">
+                        Professional Services
+                      </option>
                       <option value="retail">Retail</option>
                       <option value="other">Other</option>
                     </select>
-                    {errors.industry && <p className="text-xs text-red-600 mt-1">{errors.industry}</p>}
+                    {errors.industry && (
+                      <p className="text-xs text-red-600 mt-1">
+                        {errors.industry}
+                      </p>
+                    )}
                   </div>
                 </>
               )}

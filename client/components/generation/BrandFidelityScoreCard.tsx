@@ -86,10 +86,14 @@ export function BrandFidelityScoreCard({
     }
   };
 
-  const allCriteriaPassed = Object.values(reasoning).every((r) => r.status === "pass");
+  const allCriteriaPassed = Object.values(reasoning).every(
+    (r) => r.status === "pass",
+  );
 
   return (
-    <Card className={`border-2 ${getScoreBorderColor()} ${getScoreBgColor()} ${className}`}>
+    <Card
+      className={`border-2 ${getScoreBorderColor()} ${getScoreBgColor()} ${className}`}
+    >
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -126,9 +130,13 @@ export function BrandFidelityScoreCard({
           {/* Score Display */}
           <div className="flex items-center justify-between p-4 bg-white rounded-lg border-2 border-slate-200">
             <div>
-              <p className="text-sm font-medium text-slate-700 mb-1">Overall Score</p>
+              <p className="text-sm font-medium text-slate-700 mb-1">
+                Overall Score
+              </p>
               <div className="flex items-baseline gap-2">
-                <span className={`text-5xl font-black ${getScoreColor()}`}>{score}</span>
+                <span className={`text-5xl font-black ${getScoreColor()}`}>
+                  {score}
+                </span>
                 <span className="text-2xl text-slate-400">/100</span>
               </div>
               <p className="text-sm text-slate-600 mt-1">{getScoreGrade()}</p>
@@ -170,7 +178,9 @@ export function BrandFidelityScoreCard({
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-600">Brand Alignment Strength</span>
-              <span className={`font-bold ${getScoreColor()}`}>{getScoreGrade()}</span>
+              <span className={`font-bold ${getScoreColor()}`}>
+                {getScoreGrade()}
+              </span>
             </div>
             <Progress value={score} className={`h-3 ${getScoreColor()}`} />
             <div className="flex justify-between text-xs text-slate-500">
@@ -184,8 +194,10 @@ export function BrandFidelityScoreCard({
 
           {/* Reasoning Breakdown */}
           <div className="space-y-3">
-            <p className="text-sm font-bold text-slate-900">Detailed Analysis:</p>
-            
+            <p className="text-sm font-bold text-slate-900">
+              Detailed Analysis:
+            </p>
+
             <div className="space-y-2">
               {Object.entries(reasoning).map(([key, value]) => (
                 <div
@@ -197,20 +209,31 @@ export function BrandFidelityScoreCard({
                     <p className="text-sm font-medium text-slate-900 capitalize">
                       {key === "callToAction" ? "Call to Action" : key}
                     </p>
-                    <p className="text-xs text-slate-600 mt-0.5">{value.message}</p>
+                    <p className="text-xs text-slate-600 mt-0.5">
+                      {value.message}
+                    </p>
                   </div>
                   {value.status === "pass" && (
-                    <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
+                    <Badge
+                      variant="secondary"
+                      className="bg-green-100 text-green-700 border-green-200"
+                    >
                       ✓
                     </Badge>
                   )}
                   {value.status === "warn" && (
-                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 border-yellow-200">
+                    <Badge
+                      variant="secondary"
+                      className="bg-yellow-100 text-yellow-700 border-yellow-200"
+                    >
                       ⚠
                     </Badge>
                   )}
                   {value.status === "fail" && (
-                    <Badge variant="secondary" className="bg-red-100 text-red-700 border-red-200">
+                    <Badge
+                      variant="secondary"
+                      className="bg-red-100 text-red-700 border-red-200"
+                    >
                       ✗
                     </Badge>
                   )}
@@ -228,7 +251,8 @@ export function BrandFidelityScoreCard({
                 </div>
                 <div className="flex-1">
                   <p className="font-bold text-purple-900 mb-1">
-                    💡 How to reach {score >= 95 ? "100%" : score >= 90 ? "95%+" : "90%+"}:
+                    💡 How to reach{" "}
+                    {score >= 95 ? "100%" : score >= 90 ? "95%+" : "90%+"}:
                   </p>
                   <p className="text-sm text-purple-800">{suggestion}</p>
                   {onShowSuggestion && (
@@ -253,7 +277,8 @@ export function BrandFidelityScoreCard({
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-green-600" />
                 <p className="text-sm text-green-800 font-medium">
-                  ✓ Excellent! This content meets all brand fidelity requirements.
+                  ✓ Excellent! This content meets all brand fidelity
+                  requirements.
                 </p>
               </div>
             </div>
@@ -311,7 +336,8 @@ export function BrandFidelityScoreCard({
                       className="rounded"
                     />
                     <span className="text-xs text-slate-700">
-                      🤖 Don't check brand alignment for future content (power users only)
+                      🤖 Don't check brand alignment for future content (power
+                      users only)
                     </span>
                   </label>
                   <p className="text-xs text-slate-500 mt-2 ml-5">

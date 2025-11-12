@@ -1,4 +1,10 @@
-import { AlertCircle, Clock, Edit3, CheckCircle2, TrendingUp } from "lucide-react";
+import {
+  AlertCircle,
+  Clock,
+  Edit3,
+  CheckCircle2,
+  TrendingUp,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface StatusCard {
@@ -18,7 +24,10 @@ interface StatusOverviewBannerProps {
   navigateToQueue?: boolean;
 }
 
-export function StatusOverviewBanner({ onStatusClick, navigateToQueue = false }: StatusOverviewBannerProps) {
+export function StatusOverviewBanner({
+  onStatusClick,
+  navigateToQueue = false,
+}: StatusOverviewBannerProps) {
   const navigate = useNavigate();
   const statuses: StatusCard[] = [
     {
@@ -108,7 +117,9 @@ export function StatusOverviewBanner({ onStatusClick, navigateToQueue = false }:
 
           {/* Content */}
           <div className="flex items-start gap-2 mb-2">
-            <div className={`flex-shrink-0 ${status.color} group-hover:scale-110 transition-transform duration-300`}>
+            <div
+              className={`flex-shrink-0 ${status.color} group-hover:scale-110 transition-transform duration-300`}
+            >
               {status.icon}
             </div>
             <div className="text-left flex-1">

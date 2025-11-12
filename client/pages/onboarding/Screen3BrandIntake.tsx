@@ -98,7 +98,9 @@ export default function Screen3BrandIntake() {
     colors: [],
     logo: null,
   });
-  const [screenState, setScreenState] = useState<ScreenState>({ step: "questions" });
+  const [screenState, setScreenState] = useState<ScreenState>({
+    step: "questions",
+  });
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Calculate progress percentage
@@ -160,13 +162,14 @@ export default function Screen3BrandIntake() {
 
   const generateBrandSnapshot = async () => {
     setIsGenerating(true);
-    
+
     // Simulate AI generation delay
     await new Promise((resolve) => setTimeout(resolve, 2500));
 
     const snapshot = {
       name: form.brandName || "Your Brand",
-      voice: form.businessDescription.slice(0, 150) || "Professional and engaging",
+      voice:
+        form.businessDescription.slice(0, 150) || "Professional and engaging",
       tone: form.tone.length > 0 ? form.tone : ["Professional"],
       audience: form.audience || "Mixed",
       goal: form.goal || "Strengthen brand consistency",
@@ -209,9 +212,12 @@ export default function Screen3BrandIntake() {
       <div className="min-h-screen bg-gradient-to-b from-indigo-50/30 via-white to-blue-50/20 p-4">
         <div className="max-w-2xl mx-auto pt-6">
           <div className="text-center mb-10">
-            <h1 className="text-3xl font-black text-slate-900 mb-2">Your Brand Colors</h1>
+            <h1 className="text-3xl font-black text-slate-900 mb-2">
+              Your Brand Colors
+            </h1>
             <p className="text-slate-600 font-medium">
-              We've extracted these colors from your logo. Adjust or confirm to use them.
+              We've extracted these colors from your logo. Adjust or confirm to
+              use them.
             </p>
           </div>
 
@@ -254,7 +260,9 @@ export default function Screen3BrandIntake() {
               {progressPercent}% Complete
             </span>
             <span className="text-xs text-slate-500">
-              {progressPercent === 100 ? "🎉 All set!" : "Fill in what you know"}
+              {progressPercent === 100
+                ? "🎉 All set!"
+                : "Fill in what you know"}
             </span>
           </div>
           <Progress value={progressPercent} className="h-2" />
@@ -300,7 +308,9 @@ export default function Screen3BrandIntake() {
             </div>
             <textarea
               value={form.businessDescription}
-              onChange={(e) => setForm({ ...form, businessDescription: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, businessDescription: e.target.value })
+              }
               placeholder="E.g., We help agencies create on-brand content at scale using AI..."
               className="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-white/50 focus:border-indigo-500 focus:outline-none text-sm font-medium resize-none"
               rows={3}
@@ -317,7 +327,9 @@ export default function Screen3BrandIntake() {
               {form.tone.length > 0 && (
                 <div className="flex items-center gap-1 text-green-600">
                   <Check className="w-4 h-4" />
-                  <span className="text-xs font-bold">{form.tone.length} selected</span>
+                  <span className="text-xs font-bold">
+                    {form.tone.length} selected
+                  </span>
                 </div>
               )}
             </div>
@@ -429,14 +441,22 @@ export default function Screen3BrandIntake() {
                       alt="Logo preview"
                       className="w-16 h-16 object-contain mb-2"
                     />
-                    <p className="text-sm font-bold text-slate-700">{form.logo.name}</p>
-                    <p className="text-xs text-slate-500 mt-1">Click to change</p>
+                    <p className="text-sm font-bold text-slate-700">
+                      {form.logo.name}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Click to change
+                    </p>
                   </div>
                 ) : (
                   <div>
                     <p className="text-2xl mb-2">📸</p>
-                    <p className="text-sm font-bold text-slate-700">Click to upload</p>
-                    <p className="text-xs text-slate-500">PNG, JPG up to 5MB • AI will extract your brand colors</p>
+                    <p className="text-sm font-bold text-slate-700">
+                      Click to upload
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      PNG, JPG up to 5MB • AI will extract your brand colors
+                    </p>
                   </div>
                 )}
               </label>
@@ -453,7 +473,9 @@ export default function Screen3BrandIntake() {
               {form.colors.length > 0 && (
                 <div className="flex items-center gap-1 text-green-600">
                   <Check className="w-4 h-4" />
-                  <span className="text-xs font-bold">{form.colors.length} colors</span>
+                  <span className="text-xs font-bold">
+                    {form.colors.length} colors
+                  </span>
                 </div>
               )}
             </div>
@@ -475,7 +497,9 @@ export default function Screen3BrandIntake() {
                   }`}
                 >
                   <div className="text-xl mb-2">{theme.emoji}</div>
-                  <p className="text-xs font-bold text-slate-700 mb-2">{theme.name}</p>
+                  <p className="text-xs font-bold text-slate-700 mb-2">
+                    {theme.name}
+                  </p>
                   <div className="flex gap-1 justify-center">
                     {theme.colors.map((color) => (
                       <div
@@ -492,15 +516,22 @@ export default function Screen3BrandIntake() {
             {/* Selected Colors Preview */}
             {form.colors.length > 0 && (
               <div className="border-t pt-4 mt-4">
-                <p className="text-xs font-bold text-slate-700 mb-3">Selected Colors:</p>
+                <p className="text-xs font-bold text-slate-700 mb-3">
+                  Selected Colors:
+                </p>
                 <div className="flex flex-wrap gap-3">
                   {form.colors.map((color) => (
-                    <div key={color} className="flex flex-col items-center gap-1">
+                    <div
+                      key={color}
+                      className="flex flex-col items-center gap-1"
+                    >
                       <div
                         className="w-12 h-12 rounded-lg border-2 border-slate-900 shadow-md"
                         style={{ backgroundColor: color }}
                       />
-                      <code className="text-xs font-mono text-slate-600">{color}</code>
+                      <code className="text-xs font-mono text-slate-600">
+                        {color}
+                      </code>
                     </div>
                   ))}
                 </div>
@@ -518,9 +549,10 @@ export default function Screen3BrandIntake() {
         {/* Info Box */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8">
           <p className="text-xs text-blue-800 font-medium">
-            💡 <strong>Pro tip:</strong> You only need to fill in your brand name to continue. 
-            The more details you provide, the better AI will understand your brand. You can always 
-            refine this later from Settings → Brand Profile.
+            💡 <strong>Pro tip:</strong> You only need to fill in your brand
+            name to continue. The more details you provide, the better AI will
+            understand your brand. You can always refine this later from
+            Settings → Brand Profile.
           </p>
         </div>
 

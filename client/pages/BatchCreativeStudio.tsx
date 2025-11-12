@@ -93,7 +93,7 @@ export default function BatchCreativeStudio() {
 
   const toggleSelectRow = (id: string) => {
     setSelectedRows((prev) =>
-      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id],
     );
   };
 
@@ -123,8 +123,8 @@ export default function BatchCreativeStudio() {
     const generatingIds = validPosts.map((p) => p.id);
     setPosts((prev) =>
       prev.map((p) =>
-        generatingIds.includes(p.id) ? { ...p, status: "generating" } : p
-      )
+        generatingIds.includes(p.id) ? { ...p, status: "generating" } : p,
+      ),
     );
 
     // Simulate parallel AI generation (in real app, would call API)
@@ -133,8 +133,8 @@ export default function BatchCreativeStudio() {
     // Update status to ready
     setPosts((prev) =>
       prev.map((p) =>
-        generatingIds.includes(p.id) ? { ...p, status: "ready" } : p
-      )
+        generatingIds.includes(p.id) ? { ...p, status: "ready" } : p,
+      ),
     );
 
     setIsGenerating(false);
@@ -161,8 +161,10 @@ export default function BatchCreativeStudio() {
     // Update status to queued
     setPosts((prev) =>
       prev.map((p) =>
-        readyPosts.some((rp) => rp.id === p.id) ? { ...p, status: "queued" } : p
-      )
+        readyPosts.some((rp) => rp.id === p.id)
+          ? { ...p, status: "queued" }
+          : p,
+      ),
     );
 
     toast({
@@ -200,7 +202,9 @@ export default function BatchCreativeStudio() {
     });
   };
 
-  const validPostsCount = posts.filter((p) => p.topic && p.platforms.length > 0).length;
+  const validPostsCount = posts.filter(
+    (p) => p.topic && p.platforms.length > 0,
+  ).length;
 
   return (
     <MainLayout>
@@ -244,7 +248,9 @@ export default function BatchCreativeStudio() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-black text-slate-900">{posts.length}</p>
+              <p className="text-3xl font-black text-slate-900">
+                {posts.length}
+              </p>
             </CardContent>
           </Card>
 
@@ -255,7 +261,9 @@ export default function BatchCreativeStudio() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-black text-indigo-600">{validPostsCount}</p>
+              <p className="text-3xl font-black text-indigo-600">
+                {validPostsCount}
+              </p>
             </CardContent>
           </Card>
 
@@ -289,11 +297,7 @@ export default function BatchCreativeStudio() {
         {/* Action Bar */}
         <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
           <div className="flex items-center gap-3">
-            <Button
-              onClick={handleAddRow}
-              variant="outline"
-              size="sm"
-            >
+            <Button onClick={handleAddRow} variant="outline" size="sm">
               <Plus className="w-4 h-4 mr-2" />
               Add Row
             </Button>
@@ -352,15 +356,22 @@ export default function BatchCreativeStudio() {
                     <TableHead className="w-12">
                       <input
                         type="checkbox"
-                        checked={selectedRows.length === posts.length && posts.length > 0}
+                        checked={
+                          selectedRows.length === posts.length &&
+                          posts.length > 0
+                        }
                         onChange={toggleSelectAll}
                         className="rounded"
                       />
                     </TableHead>
                     <TableHead className="w-8">#</TableHead>
-                    <TableHead className="min-w-[250px]">Topic / Headline</TableHead>
+                    <TableHead className="min-w-[250px]">
+                      Topic / Headline
+                    </TableHead>
                     <TableHead className="min-w-[200px]">Platforms</TableHead>
-                    <TableHead className="min-w-[150px]">Schedule Date</TableHead>
+                    <TableHead className="min-w-[150px]">
+                      Schedule Date
+                    </TableHead>
                     <TableHead className="w-32">Safety Mode</TableHead>
                     <TableHead className="w-32">Status</TableHead>
                     <TableHead className="w-20">Actions</TableHead>
@@ -368,7 +379,12 @@ export default function BatchCreativeStudio() {
                 </TableHeader>
                 <TableBody>
                   {posts.map((post, index) => (
-                    <TableRow key={post.id} className={selectedRows.includes(post.id) ? "bg-indigo-50" : ""}>
+                    <TableRow
+                      key={post.id}
+                      className={
+                        selectedRows.includes(post.id) ? "bg-indigo-50" : ""
+                      }
+                    >
                       <TableCell>
                         <input
                           type="checkbox"
@@ -396,7 +412,9 @@ export default function BatchCreativeStudio() {
                           {PLATFORMS.map((platform) => (
                             <button
                               key={platform.id}
-                              onClick={() => togglePlatform(post.id, platform.id)}
+                              onClick={() =>
+                                togglePlatform(post.id, platform.id)
+                              }
                               className={`px-2 py-1 rounded text-xs font-medium transition-all ${
                                 post.platforms.includes(platform.id)
                                   ? "bg-indigo-100 text-indigo-700 border-2 border-indigo-500"
@@ -488,10 +506,21 @@ export default function BatchCreativeStudio() {
             💡 <strong>Pro Tips for Batch Creation:</strong>
           </p>
           <ul className="text-xs text-blue-800 space-y-1">
-            <li>• Fill in topics and platforms for each row before clicking "Generate All"</li>
-            <li>• Generation happens in parallel - create 10 posts in the same time as 1</li>
-            <li>• Safety Mode runs brand fidelity checks on all posts automatically</li>
-            <li>• Use CSV import/export to prepare content in spreadsheets offline</li>
+            <li>
+              • Fill in topics and platforms for each row before clicking
+              "Generate All"
+            </li>
+            <li>
+              • Generation happens in parallel - create 10 posts in the same
+              time as 1
+            </li>
+            <li>
+              • Safety Mode runs brand fidelity checks on all posts
+              automatically
+            </li>
+            <li>
+              • Use CSV import/export to prepare content in spreadsheets offline
+            </li>
             <li>• Select multiple rows to queue or delete them together</li>
           </ul>
         </div>

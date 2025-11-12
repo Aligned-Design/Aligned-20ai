@@ -9,7 +9,9 @@ export default function Screen4BrandSnapshot() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-indigo-50/30 via-white to-blue-50/20">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-4"></div>
-          <p className="text-slate-600 font-medium">Loading your brand profile...</p>
+          <p className="text-slate-600 font-medium">
+            Loading your brand profile...
+          </p>
         </div>
       </div>
     );

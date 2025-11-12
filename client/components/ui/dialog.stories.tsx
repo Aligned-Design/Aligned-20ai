@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
+import type { Meta, StoryObj } from "@storybook/react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,16 +8,16 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from './dialog';
-import { Button } from './button';
+} from "./dialog";
+import { Button } from "./button";
 
 const meta = {
-  title: 'UI/Dialog',
+  title: "UI/Dialog",
   component: Dialog,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 } satisfies Meta<typeof Dialog>;
 
 export default meta;
@@ -39,7 +39,7 @@ export const Basic: Story = {
             <DialogTitle>Dialog Title</DialogTitle>
             <DialogDescription>Dialog description goes here</DialogDescription>
           </DialogHeader>
-          <div style={{ padding: 'var(--spacing-md)' }}>
+          <div style={{ padding: "var(--spacing-md)" }}>
             <p>This is the dialog content area.</p>
           </div>
         </DialogContent>
@@ -63,10 +63,18 @@ export const Confirmation: Story = {
           <DialogHeader>
             <DialogTitle>Are you sure?</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete the item.
+              This action cannot be undone. This will permanently delete the
+              item.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter style={{ display: 'flex', gap: 'var(--spacing-md)', justifyContent: 'flex-end', marginTop: 'var(--spacing-lg)' }}>
+          <DialogFooter
+            style={{
+              display: "flex",
+              gap: "var(--spacing-md)",
+              justifyContent: "flex-end",
+              marginTop: "var(--spacing-lg)",
+            }}
+          >
             <Button variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
@@ -91,44 +99,74 @@ export const Form: Story = {
         <DialogTrigger asChild>
           <Button>Edit Profile</Button>
         </DialogTrigger>
-        <DialogContent style={{ maxWidth: '500px' }}>
+        <DialogContent style={{ maxWidth: "500px" }}>
           <DialogHeader>
             <DialogTitle>Edit Profile</DialogTitle>
-            <DialogDescription>Make changes to your profile information</DialogDescription>
+            <DialogDescription>
+              Make changes to your profile information
+            </DialogDescription>
           </DialogHeader>
-          <div style={{ padding: 'var(--spacing-md)', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+          <div
+            style={{
+              padding: "var(--spacing-md)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "var(--spacing-md)",
+            }}
+          >
             <div>
-              <label style={{ fontSize: 'var(--font-size-label)', fontWeight: 'var(--font-weight-semibold)', display: 'block', marginBottom: 'var(--spacing-sm)' }}>
+              <label
+                style={{
+                  fontSize: "var(--font-size-label)",
+                  fontWeight: "var(--font-weight-semibold)",
+                  display: "block",
+                  marginBottom: "var(--spacing-sm)",
+                }}
+              >
                 Name
               </label>
               <input
                 type="text"
                 defaultValue="John Doe"
                 style={{
-                  width: '100%',
-                  padding: 'var(--spacing-sm) var(--spacing-md)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-md)',
+                  width: "100%",
+                  padding: "var(--spacing-sm) var(--spacing-md)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-md)",
                 }}
               />
             </div>
             <div>
-              <label style={{ fontSize: 'var(--font-size-label)', fontWeight: 'var(--font-weight-semibold)', display: 'block', marginBottom: 'var(--spacing-sm)' }}>
+              <label
+                style={{
+                  fontSize: "var(--font-size-label)",
+                  fontWeight: "var(--font-weight-semibold)",
+                  display: "block",
+                  marginBottom: "var(--spacing-sm)",
+                }}
+              >
                 Email
               </label>
               <input
                 type="email"
                 defaultValue="john@example.com"
                 style={{
-                  width: '100%',
-                  padding: 'var(--spacing-sm) var(--spacing-md)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-md)',
+                  width: "100%",
+                  padding: "var(--spacing-sm) var(--spacing-md)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-md)",
                 }}
               />
             </div>
           </div>
-          <DialogFooter style={{ display: 'flex', gap: 'var(--spacing-md)', justifyContent: 'flex-end', marginTop: 'var(--spacing-lg)' }}>
+          <DialogFooter
+            style={{
+              display: "flex",
+              gap: "var(--spacing-md)",
+              justifyContent: "flex-end",
+              marginTop: "var(--spacing-lg)",
+            }}
+          >
             <Button variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
@@ -158,8 +196,14 @@ export const Alert: Story = {
               This post is pending approval. Review it before publishing.
             </DialogDescription>
           </DialogHeader>
-          <div style={{ padding: 'var(--spacing-md)', backgroundColor: 'var(--color-warning)' + '20', borderRadius: 'var(--radius-md)' }}>
-            <p style={{ fontSize: 'var(--font-size-body-sm)' }}>
+          <div
+            style={{
+              padding: "var(--spacing-md)",
+              backgroundColor: "var(--color-warning)" + "20",
+              borderRadius: "var(--radius-md)",
+            }}
+          >
+            <p style={{ fontSize: "var(--font-size-body-sm)" }}>
               The post content may need adjustments based on brand guidelines.
             </p>
           </div>
@@ -186,16 +230,23 @@ export const LongContent: Story = {
         <DialogTrigger asChild>
           <Button>View Terms</Button>
         </DialogTrigger>
-        <DialogContent style={{ maxHeight: '80vh', overflow: 'auto' }}>
+        <DialogContent style={{ maxHeight: "80vh", overflow: "auto" }}>
           <DialogHeader>
             <DialogTitle>Terms of Service</DialogTitle>
           </DialogHeader>
-          <div style={{ padding: 'var(--spacing-md)' }}>
+          <div style={{ padding: "var(--spacing-md)" }}>
             {Array.from({ length: 5 }).map((_, i) => (
-              <p key={i} style={{ marginBottom: 'var(--spacing-md)', lineHeight: 'var(--line-height-relaxed)' }}>
-                This is a sample of the terms and conditions document. The dialog properly handles
-                long content with scrolling. Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              <p
+                key={i}
+                style={{
+                  marginBottom: "var(--spacing-md)",
+                  lineHeight: "var(--line-height-relaxed)",
+                }}
+              >
+                This is a sample of the terms and conditions document. The
+                dialog properly handles long content with scrolling. Lorem ipsum
+                dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                tempor incididunt ut labore et dolore magna aliqua.
               </p>
             ))}
           </div>
@@ -223,17 +274,24 @@ export const MultipleActions: Story = {
           <DialogHeader>
             <DialogTitle>What would you like to do?</DialogTitle>
           </DialogHeader>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', padding: 'var(--spacing-md)' }}>
-            <Button variant="outline" style={{ justifyContent: 'flex-start' }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "var(--spacing-md)",
+              padding: "var(--spacing-md)",
+            }}
+          >
+            <Button variant="outline" style={{ justifyContent: "flex-start" }}>
               ✏️ Edit Post
             </Button>
-            <Button variant="outline" style={{ justifyContent: 'flex-start' }}>
+            <Button variant="outline" style={{ justifyContent: "flex-start" }}>
               👀 Preview
             </Button>
-            <Button variant="outline" style={{ justifyContent: 'flex-start' }}>
+            <Button variant="outline" style={{ justifyContent: "flex-start" }}>
               📅 Reschedule
             </Button>
-            <Button variant="outline" style={{ justifyContent: 'flex-start' }}>
+            <Button variant="outline" style={{ justifyContent: "flex-start" }}>
               🗑️ Delete
             </Button>
           </div>

@@ -6,14 +6,14 @@ import { cn } from "@/lib/utils";
 
 /**
  * Dialog (Modal) Component
- * 
+ *
  * Modal dialog that consumes design tokens for:
  * - Border radius (--radius-2xl on desktop, --radius-lg on mobile)
  * - Padding (--spacing-lg)
  * - Shadow (--shadow-xl)
  * - Typography (--font-size-body, --font-weight-semibold)
  * - Animation duration (--animation-duration-normal)
- * 
+ *
  * Usage:
  * <Dialog>
  *   <DialogTrigger>Open</DialogTrigger>
@@ -77,7 +77,7 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close 
+      <DialogPrimitive.Close
         className={cn(
           "absolute right-[var(--spacing-md)] top-[var(--spacing-md)]",
           "rounded-[var(--radius-md)]",
@@ -153,7 +153,7 @@ const DialogDescription = React.forwardRef<
     className={cn(
       "text-[var(--font-size-body-sm)] text-[var(--color-muted)]",
       "dark:text-[var(--color-slate-400)]",
-      className
+      className,
     )}
     {...props}
   />

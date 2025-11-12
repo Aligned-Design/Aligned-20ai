@@ -44,7 +44,8 @@ const MONTH_DATA: DayData[] = [
         title: "Product Launch",
         platform: "linkedin",
         status: "scheduled",
-        excerpt: "Excited to announce our latest features that will transform your workflow.",
+        excerpt:
+          "Excited to announce our latest features that will transform your workflow.",
         brand: "Aligned-20AI",
         campaign: "Product Launch",
         createdDate: "2024-11-01",
@@ -108,7 +109,8 @@ const MONTH_DATA: DayData[] = [
         title: "TikTok Challenge",
         platform: "tiktok",
         status: "scheduled",
-        excerpt: "Join the #CreativeChallenge and show us your best content! ���",
+        excerpt:
+          "Join the #CreativeChallenge and show us your best content! ���",
         brand: "Aligned-20AI",
         campaign: "Product Launch",
         createdDate: "2024-11-06",
@@ -125,7 +127,8 @@ const MONTH_DATA: DayData[] = [
         title: "Video Demo",
         platform: "youtube",
         status: "published",
-        excerpt: "Full walkthrough of our new dashboard and all its powerful features.",
+        excerpt:
+          "Full walkthrough of our new dashboard and all its powerful features.",
         brand: "Brand B",
         campaign: "Product Launch",
         createdDate: "2024-11-07",
@@ -221,7 +224,8 @@ export function MonthCalendarView({
           youtube: "YouTube",
           pinterest: "Pinterest",
         };
-        if (!filterPlatforms.includes(platformNames[post.platform])) return false;
+        if (!filterPlatforms.includes(platformNames[post.platform]))
+          return false;
       }
       if (filterCampaign && post.campaign !== filterCampaign) return false;
       return true;
@@ -238,13 +242,18 @@ export function MonthCalendarView({
         {/* Month header */}
         <div className="mb-6 pb-4 border-b border-indigo-200/40">
           <h3 className="text-lg font-black text-slate-900">November 2024</h3>
-          <p className="text-xs text-slate-600 font-medium">Click a day to see details</p>
+          <p className="text-xs text-slate-600 font-medium">
+            Click a day to see details
+          </p>
         </div>
 
         {/* Week day headers */}
         <div className="grid grid-cols-7 gap-2 mb-2">
           {weekDays.map((day) => (
-            <div key={day} className="text-center text-xs font-black text-slate-600 py-2">
+            <div
+              key={day}
+              className="text-center text-xs font-black text-slate-600 py-2"
+            >
               {day}
             </div>
           ))}
@@ -261,7 +270,9 @@ export function MonthCalendarView({
                   : "bg-slate-100/30 border-slate-200/30 opacity-50"
               }`}
             >
-              <span className={`text-xs font-bold ${day.isCurrentMonth ? "text-slate-900" : "text-slate-500"}`}>
+              <span
+                className={`text-xs font-bold ${day.isCurrentMonth ? "text-slate-900" : "text-slate-500"}`}
+              >
                 {day.date}
               </span>
 
@@ -301,7 +312,9 @@ export function MonthCalendarView({
                       >
                         <div className="flex items-center gap-0.5 bg-white/70 rounded-md px-1.5 py-1 border border-indigo-200/50 hover:border-indigo-400/70 transition-all hover:shadow-sm">
                           <Icon className="w-3 h-3 text-indigo-600" />
-                          <span className="text-xs font-bold text-slate-700">{statusIndicator}</span>
+                          <span className="text-xs font-bold text-slate-700">
+                            {statusIndicator}
+                          </span>
                         </div>
                         {/* Tooltip on hover */}
                         <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-slate-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 font-medium shadow-lg">

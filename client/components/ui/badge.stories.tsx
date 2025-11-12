@@ -1,29 +1,29 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Badge } from './badge';
+import type { Meta, StoryObj } from "@storybook/react";
+import { Badge } from "./badge";
 
 const meta = {
-  title: 'UI/Badge',
+  title: "UI/Badge",
   component: Badge,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     variant: {
-      control: 'select',
+      control: "select",
       options: [
-        'default',
-        'secondary',
-        'destructive',
-        'outline',
-        'success',
-        'warning',
-        'info',
+        "default",
+        "secondary",
+        "destructive",
+        "outline",
+        "success",
+        "warning",
+        "info",
       ],
     },
   },
   args: {
-    children: 'Badge',
+    children: "Badge",
   },
 } satisfies Meta<typeof Badge>;
 
@@ -35,8 +35,8 @@ type Story = StoryObj<typeof meta>;
  */
 export const Default: Story = {
   args: {
-    variant: 'default',
-    children: 'New',
+    variant: "default",
+    children: "New",
   },
 };
 
@@ -45,8 +45,8 @@ export const Default: Story = {
  */
 export const Secondary: Story = {
   args: {
-    variant: 'secondary',
-    children: 'Draft',
+    variant: "secondary",
+    children: "Draft",
   },
 };
 
@@ -55,8 +55,8 @@ export const Secondary: Story = {
  */
 export const Success: Story = {
   args: {
-    variant: 'success',
-    children: 'Published',
+    variant: "success",
+    children: "Published",
   },
 };
 
@@ -65,8 +65,8 @@ export const Success: Story = {
  */
 export const Warning: Story = {
   args: {
-    variant: 'warning',
-    children: 'Pending',
+    variant: "warning",
+    children: "Pending",
   },
 };
 
@@ -75,8 +75,8 @@ export const Warning: Story = {
  */
 export const Destructive: Story = {
   args: {
-    variant: 'destructive',
-    children: 'Failed',
+    variant: "destructive",
+    children: "Failed",
   },
 };
 
@@ -85,8 +85,8 @@ export const Destructive: Story = {
  */
 export const Info: Story = {
   args: {
-    variant: 'info',
-    children: 'Info',
+    variant: "info",
+    children: "Info",
   },
 };
 
@@ -95,8 +95,8 @@ export const Info: Story = {
  */
 export const Outline: Story = {
   args: {
-    variant: 'outline',
-    children: 'Optional',
+    variant: "outline",
+    children: "Optional",
   },
 };
 
@@ -105,7 +105,7 @@ export const Outline: Story = {
  */
 export const StatusShowcase: Story = {
   render: () => (
-    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
       <Badge variant="default">New</Badge>
       <Badge variant="success">Approved</Badge>
       <Badge variant="warning">Pending</Badge>
@@ -122,18 +122,24 @@ export const StatusShowcase: Story = {
  */
 export const WithContent: Story = {
   render: () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
         <Badge variant="success">LinkedIn</Badge>
-        <span style={{ fontSize: 'var(--font-size-body)' }}>Published to LinkedIn</span>
+        <span style={{ fontSize: "var(--font-size-body)" }}>
+          Published to LinkedIn
+        </span>
       </div>
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
         <Badge variant="warning">Instagram</Badge>
-        <span style={{ fontSize: 'var(--font-size-body)' }}>Scheduled for tomorrow</span>
+        <span style={{ fontSize: "var(--font-size-body)" }}>
+          Scheduled for tomorrow
+        </span>
       </div>
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
         <Badge variant="destructive">Twitter</Badge>
-        <span style={{ fontSize: 'var(--font-size-body)' }}>Failed to publish</span>
+        <span style={{ fontSize: "var(--font-size-body)" }}>
+          Failed to publish
+        </span>
       </div>
     </div>
   ),
@@ -144,11 +150,18 @@ export const WithContent: Story = {
  */
 export const Sizes: Story = {
   render: () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <div style={{ display: 'flex', gap: '8px' }}>
-        <Badge variant="default" style={{ fontSize: 'var(--font-size-body-sm)' }}>Small</Badge>
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <div style={{ display: "flex", gap: "8px" }}>
+        <Badge
+          variant="default"
+          style={{ fontSize: "var(--font-size-body-sm)" }}
+        >
+          Small
+        </Badge>
         <Badge variant="default">Default</Badge>
-        <Badge variant="default" style={{ fontSize: 'var(--font-size-body)' }}>Large</Badge>
+        <Badge variant="default" style={{ fontSize: "var(--font-size-body)" }}>
+          Large
+        </Badge>
       </div>
     </div>
   ),
@@ -159,21 +172,40 @@ export const Sizes: Story = {
  */
 export const PostStatus: Story = {
   render: () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '300px' }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+        width: "300px",
+      }}
+    >
       <div>
-        <p style={{ fontSize: 'var(--font-size-body-sm)', marginBottom: '8px', color: 'var(--color-muted)' }}>
+        <p
+          style={{
+            fontSize: "var(--font-size-body-sm)",
+            marginBottom: "8px",
+            color: "var(--color-muted)",
+          }}
+        >
           Post Status
         </p>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: "flex", gap: "8px" }}>
           <Badge variant="warning">Pending Review</Badge>
           <Badge variant="secondary">Draft</Badge>
         </div>
       </div>
       <div>
-        <p style={{ fontSize: 'var(--font-size-body-sm)', marginBottom: '8px', color: 'var(--color-muted)' }}>
+        <p
+          style={{
+            fontSize: "var(--font-size-body-sm)",
+            marginBottom: "8px",
+            color: "var(--color-muted)",
+          }}
+        >
           Platforms
         </p>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           <Badge variant="info">LinkedIn</Badge>
           <Badge variant="info">Instagram</Badge>
           <Badge variant="info">Twitter</Badge>
