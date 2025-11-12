@@ -26,14 +26,14 @@ export const milestoneCopy: Record<MilestoneKey, { title: string; body: string }
   },
   goal_met: {
     title: 'Goal achieved! 🏁',
-    body: 'Performance goal hit—AI has updated next week's plan.',
+    body: 'Performance goal hit—AI has updated next week\'s plan.',
   },
   agency_scale_5: {
-    title: 'You're scaling smart. 📈',
-    body: 'You've reached 5 brands—pricing auto-adjusted to $99/brand.',
+    title: "You're scaling smart. 📈",
+    body: "You've reached 5 brands—pricing auto-adjusted to $99/brand.",
   },
   month_1_anniversary: {
     title: 'One month in! 💫',
-    body: 'Thanks for building with us—here's to the next wins.',
+    body: 'Thanks for building with us—here\'s to the next wins.',
   },
 };
