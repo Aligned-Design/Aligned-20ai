@@ -16,6 +16,8 @@ import orchestrationRouter from "./routes/orchestration";
 import milestonesRouter from "./routes/milestones";
 import trialRouter from "./routes/trial";
 import billingRouter from "./routes/billing";
+import billingReactivationRouter from "./routes/billing-reactivation";
+import stripeWebhookRouter from "./routes/webhooks/stripe";
 
 // Import route handlers
 import {
@@ -219,6 +221,8 @@ export function createServer() {
   app.use("/api/milestones", milestonesRouter);
   app.use("/api/trial", trialRouter);
   app.use("/api/billing", billingRouter);
+  app.use("/api/billing", billingReactivationRouter);
+  app.use("/api/webhooks/stripe", stripeWebhookRouter);
 
   // Register individual route handlers with appropriate paths
 
