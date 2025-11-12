@@ -208,8 +208,33 @@ export default function Calendar() {
 
           {/* ZONE 4: Performance Metrics */}
           <div>
-            <h2 className="text-xl font-black text-slate-900 mb-4">Performance Insights</h2>
-            <AnalyticsPanel />
+            <h2 className="text-xl font-black text-slate-900 dark:text-slate-100 mb-4">Performance Insights</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <KpiCard
+                title="Total Reach"
+                value="45.2K"
+                delta={{ value: 12.5, trend: "up", label: "vs last week" }}
+                icon={TrendingUp}
+              />
+              <KpiCard
+                title="Engagement Rate"
+                value="8.3%"
+                delta={{ value: 2.1, trend: "up", label: "vs last week" }}
+                icon={Target}
+              />
+              <KpiCard
+                title="Posts Published"
+                value={24}
+                delta={{ value: 4, trend: "up", label: "vs last week" }}
+                icon={Activity}
+              />
+              <KpiCard
+                title="New Followers"
+                value="1.2K"
+                delta={{ value: 15.3, trend: "up", label: "vs last week" }}
+                icon={Users}
+              />
+            </div>
           </div>
         </div>
       </div>
