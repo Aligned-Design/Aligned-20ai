@@ -233,7 +233,7 @@ export default function Screen3BrandIntake() {
           {/* Q2: Tone */}
           <div className="bg-white/50 backdrop-blur-xl rounded-2xl border border-white/60 p-6">
             <label className="block text-sm font-black text-slate-900 mb-4">
-              2️⃣ What's your tone?
+              2️⃣ What's your tone? (Optional)
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {TONE_OPTIONS.map((option) => (
