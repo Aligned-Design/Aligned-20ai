@@ -751,7 +751,7 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
     });
 
     toast({
-      title: "✅ Approval Requested",
+      title: "�� Approval Requested",
       description: `Sent to ${reviewers.length} reviewer(s)`,
     });
 
@@ -1004,6 +1004,36 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
                   <Eye className="w-4 h-4" />
                   Preview
                 </button>
+
+                {/* Request Approval */}
+                {state.design.approvalStatus === "draft" && (
+                  <button
+                    onClick={() => setShowRequestApproval(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-bold hover:bg-blue-200 transition-all"
+                  >
+                    <Send className="w-4 h-4" />
+                    Request Approval
+                  </button>
+                )}
+
+                {/* Comments */}
+                <button
+                  onClick={() => setShowComments(!showComments)}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg font-bold hover:bg-green-200 transition-all"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  Comments {state.design.commentCount ? `(${state.design.commentCount})` : ''}
+                </button>
+
+                {/* Version History */}
+                <button
+                  onClick={() => setShowVersionHistory(!showVersionHistory)}
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg font-bold hover:bg-indigo-200 transition-all"
+                >
+                  <History className="w-4 h-4" />
+                  Versions
+                </button>
+
                 <button
                   onClick={() =>
                     setState((prev) => ({ ...prev, showBrandKit: !prev.showBrandKit }))
