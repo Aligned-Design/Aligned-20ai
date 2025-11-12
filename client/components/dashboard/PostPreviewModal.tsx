@@ -67,41 +67,49 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
 
       case "instagram":
         return (
-          <div className="bg-gradient-to-b from-slate-50 to-white rounded-lg overflow-hidden">
+          <div className="bg-white rounded-lg overflow-hidden border border-slate-300 w-full">
             {/* Instagram header */}
-            <div className="bg-white border-b p-4 flex items-center justify-between">
+            <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-400 to-orange-400"></div>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 via-rose-400 to-orange-400 flex-shrink-0"></div>
                 <div>
                   <p className="font-bold text-sm text-slate-900">your_brand</p>
-                  <p className="text-xs text-slate-600">Location</p>
+                  <p className="text-xs text-slate-600">Followed</p>
                 </div>
               </div>
-              <span className="text-slate-600 cursor-pointer">•••</span>
+              <button className="text-slate-400 text-lg">•••</button>
             </div>
 
             {/* Image */}
-            <div className="bg-slate-200">
+            <div className="bg-slate-200 aspect-square overflow-hidden">
               <img
                 src={`https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=500&fit=crop`}
                 alt="preview"
-                className="w-full aspect-square object-cover"
+                className="w-full h-full object-cover"
               />
             </div>
 
-            {/* Actions and content */}
-            <div className="bg-white p-4 space-y-3">
-              <div className="flex justify-between text-xl">
-                <span>❤️ 💬 ➤</span>
-                <span>🔖</span>
+            {/* Actions */}
+            <div className="px-4 py-3 border-b border-slate-200">
+              <div className="flex justify-between text-2xl mb-3">
+                <div className="flex gap-3">
+                  <button className="hover:opacity-70 transition">❤️</button>
+                  <button className="hover:opacity-70 transition">💬</button>
+                  <button className="hover:opacity-70 transition">➤</button>
+                </div>
+                <button className="hover:opacity-70 transition">🔖</button>
               </div>
+              <p className="text-xs text-slate-600 mb-2">1,234 likes</p>
+            </div>
+
+            {/* Caption */}
+            <div className="px-4 py-3 space-y-2">
               <div>
-                <p className="text-sm font-bold text-slate-900">
-                  {post.title}
-                </p>
-                <p className="text-sm text-slate-700 mt-1">{post.excerpt}</p>
+                <span className="font-bold text-sm text-slate-900">your_brand</span>
+                <p className="text-sm text-slate-900 inline"> {post.title}</p>
               </div>
-              <button className="text-sm text-slate-600">View all comments</button>
+              <p className="text-sm text-slate-700 leading-relaxed">{post.excerpt}</p>
+              <button className="text-xs text-slate-500 font-semibold">View all 45 comments</button>
             </div>
           </div>
         );
