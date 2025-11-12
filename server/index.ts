@@ -286,17 +286,19 @@ export function createServer() {
   app.get("/api/bulk-approvals/batch/:batchId/status", getBatchApprovalStatus);
   app.post("/api/bulk-approvals/:contentId/lock", lockPostsAfterApproval);
 
-  // Client Portal routes
-  app.get("/api/client-portal/:clientId/dashboard", getClientDashboard);
-  app.post("/api/client-portal/approve/:contentId", approveClientContent);
-  app.post("/api/client-portal/reject/:contentId", rejectClientContent);
-  app.post("/api/client-portal/comments/:contentId", addContentComment);
-  app.get("/api/client-portal/comments/:contentId", getContentComments);
-  app.post("/api/client-portal/media/upload", uploadClientMedia);
-  app.get("/api/client-portal/:clientId/media", getClientMedia);
-  app.get("/api/client-portal/:clientId/content", getPortalContent);
+  // Client Portal routes - with RBAC enforcement
+  app.get("/api/client-portal/:clientId/dashboard", authenticateUser, requireScope('content:view'), getClientDashboard);
+  app.post("/api/client-portal/approve/:contentId", authenticateUser, requireScope('content:approve'), approveClientContent);
+  app.post("/api/client-portal/reject/:contentId", authenticateUser, requireScope('content:approve'), rejectClientContent);
+  app.post("/api/client-portal/comments/:contentId", authenticateUser, requireScope('comment:create'), addContentComment);
+  app.get("/api/client-portal/comments/:contentId", authenticateUser, requireScope('content:view'), getContentComments);
+  app.post("/api/client-portal/media/upload", authenticateUser, requireScope('content:view'), uploadClientMedia);
+  app.get("/api/client-portal/:clientId/media", authenticateUser, requireScope('content:view'), getClientMedia);
+  app.get("/api/client-portal/:clientId/content", authenticateUser, requireScope('content:view'), getPortalContent);
   app.get(
     "/api/client-portal/content/:contentId/with-comments",
+    authenticateUser,
+    requireScope('content:view'),
     getContentWithComments,
   );
 
@@ -343,17 +345,19 @@ export function createServer() {
   app.get("/api/white-label/domain/:domain", getConfigByDomain);
   app.put("/api/white-label/:brandId/config", updateWhiteLabelConfig);
 
-  // Workflow routes
-  app.get("/api/workflow/templates/:brandId", getWorkflowTemplates);
-  app.post("/api/workflow/templates/:brandId", createWorkflowTemplate);
-  app.post("/api/workflow/start/:brandId", startWorkflow);
-  app.post("/api/workflow/:workflowId/action", processWorkflowAction);
-  app.get("/api/workflow/:brandId/notifications", getWorkflowNotifications);
+  // Workflow routes - with RBAC enforcement
+  app.get("/api/workflow/templates/:brandId", authenticateUser, requireScope('workflow:manage'), getWorkflowTemplates);
+  app.post("/api/workflow/templates/:brandId", authenticateUser, requireScope('workflow:manage'), createWorkflowTemplate);
+  app.post("/api/workflow/start/:brandId", authenticateUser, requireScope('workflow:manage'), startWorkflow);
+  app.post("/api/workflow/:workflowId/action", authenticateUser, requireScope('workflow:manage'), processWorkflowAction);
+  app.get("/api/workflow/:brandId/notifications", authenticateUser, requireScope('content:view'), getWorkflowNotifications);
   app.put(
     "/api/workflow/notifications/:notificationId/read",
+    authenticateUser,
+    requireScope('content:view'),
     markNotificationRead,
   );
-  app.post("/api/workflow/:workflowId/cancel", cancelWorkflow);
+  app.post("/api/workflow/:workflowId/cancel", authenticateUser, requireScope('workflow:manage'), cancelWorkflow);
   app.get("/api/workflow/:workflowId", getWorkflow);
   app.get("/api/workflow/content/:contentId", getWorkflowsForContent);
 
