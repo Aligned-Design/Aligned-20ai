@@ -13,6 +13,7 @@ import integrationsRouter from "./routes/integrations";
 import mediaManagementRouter from "./routes/media-management";
 import publishingRouter from "./routes/publishing-router";
 import orchestrationRouter from "./routes/orchestration";
+import milestonesRouter from "./routes/milestones";
 
 // Import route handlers
 import {
@@ -213,6 +214,7 @@ export function createServer() {
   app.use("/api/media-management", mediaManagementRouter);
   app.use("/api/publishing", publishingRouter);
   app.use("/api/orchestration", orchestrationRouter);
+  app.use("/api/milestones", milestonesRouter);
 
   // Register individual route handlers with appropriate paths
 

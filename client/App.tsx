@@ -10,6 +10,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "@/contexts/UserContext";
 import { WorkspaceProvider } from "@/contexts/WorkspaceContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import MilestoneCelebrator from "@/components/MilestoneCelebrator";
 import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
@@ -357,6 +358,7 @@ export const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
+            <MilestoneCelebrator />
             <BrowserRouter>
               <ProtectedRoutes />
             </BrowserRouter>
