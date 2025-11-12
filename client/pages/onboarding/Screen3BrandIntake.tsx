@@ -209,6 +209,9 @@ export default function Screen3BrandIntake() {
           <p className="text-slate-600 font-medium">
             This helps your content and AI stay on brand from day one.
           </p>
+          <p className="text-xs text-slate-500 mt-2">
+            💡 All fields are optional — skip what you're unsure about
+          </p>
         </div>
 
         {/* Form */}
