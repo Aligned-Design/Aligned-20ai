@@ -392,22 +392,53 @@ export default function ContentQueue() {
     );
   };
 
+  const getStatusLabel = (status: PostStatus | null): string => {
+    if (!status) return "";
+    const labels: Record<PostStatus, string> = {
+      draft: "Drafts",
+      reviewing: "Pending Approvals",
+      scheduled: "Scheduled",
+      published: "Published",
+      errored: "Errored",
+    };
+    return labels[status];
+  };
+
+  const clearStatusFilter = () => {
+    setSearchParams({});
+  };
+
   return (
     <MainLayout>
       <div className="min-h-screen bg-gradient-to-b from-indigo-50/30 via-white to-blue-50/20">
         <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
           {/* Page Header */}
           <div className="mb-8 sm:mb-12">
-            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-2 sm:mb-3">
-              Content Queue
-            </h1>
+            <div className="flex items-center gap-3 mb-2 sm:mb-3">
+              {statusFilter && (
+                <button
+                  onClick={clearStatusFilter}
+                  className="p-2 hover:bg-slate-200/50 rounded-lg transition-colors text-slate-600"
+                  title="Back to all posts"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+              )}
+              <h1 className="text-3xl sm:text-4xl font-black text-slate-900">
+                {statusFilter ? getStatusLabel(statusFilter) : "Content Queue"}
+              </h1>
+            </div>
             <p className="text-slate-600 text-xs sm:text-sm font-medium">
-              {currentWorkspace?.logo} {currentWorkspace?.name} — Organize and manage all your content by status. Review, approve, and schedule posts across all platforms.
+              {currentWorkspace?.logo} {currentWorkspace?.name} —
+              {statusFilter
+                ? ` View all ${filteredPosts.length} posts in ${getStatusLabel(statusFilter).toLowerCase()}.`
+                : " Organize and manage all your content by status. Review, approve, and schedule posts across all platforms."
+              }
             </p>
           </div>
 
           {/* Status Overview Banner */}
-          <StatusOverviewBanner />
+          <StatusOverviewBanner navigateToQueue={!statusFilter} />
 
           {/* Filter Controls */}
           <div className="mb-8 flex items-center gap-4">
