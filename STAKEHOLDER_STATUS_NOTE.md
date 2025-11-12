@@ -66,12 +66,12 @@ After validation, we'll post a **"V1 Staging Live"** confirmation with:
 
 ## ⏱️ Timeline
 
-| Phase | Status | ETA |
-|-------|--------|-----|
-| Code fix | ✅ **Complete** | Done |
-| Deployment | 🔄 **In Progress** | ~5 min |
-| Validation | ⏳ Pending | ~40 min after deploy |
-| Final report | ⏳ Pending | ~1 hour from now |
+| Phase        | Status             | ETA                  |
+| ------------ | ------------------ | -------------------- |
+| Code fix     | ✅ **Complete**    | Done                 |
+| Deployment   | 🔄 **In Progress** | ~5 min               |
+| Validation   | ⏳ Pending         | ~40 min after deploy |
+| Final report | ⏳ Pending         | ~1 hour from now     |
 
 ---
 
@@ -80,12 +80,14 @@ After validation, we'll post a **"V1 Staging Live"** confirmation with:
 **Short version:** We're on track for V1 staging validation today.
 
 **What's working:**
+
 - Main dashboard displays user metrics and insights
 - Analytics dashboard shows performance data
 - Demo mode allows safe testing without real data
 - All core features are functional
 
 **What's being finalized:**
+
 - Ensuring all routes handle demo mode correctly
 - Capturing proof artifacts for stakeholder review
 - Documenting baseline performance metrics

@@ -1,19 +1,21 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Server-side Supabase Client with Demo Mode Support
- * 
+ *
  * CRITICAL: Uses SERVER_DEMO_MODE (server-only flag) to bypass Supabase entirely.
  * Lazy-initialized to prevent top-level crashes when credentials are missing.
  * Provides stub client in demo mode that returns mock data.
  */
 
 // Check SERVER_DEMO_MODE first (server-only flag), fallback to VITE_DEMO_MODE
-const isDemoMode = process.env.SERVER_DEMO_MODE === 'true' || process.env.VITE_DEMO_MODE === 'true';
+const isDemoMode =
+  process.env.SERVER_DEMO_MODE === "true" ||
+  process.env.VITE_DEMO_MODE === "true";
 
 // Log demo mode status once on module load
 if (isDemoMode) {
-  console.log('[DEMO MODE] Server bypassing Supabase - using stub client');
+  console.log("[DEMO MODE] Server bypassing Supabase - using stub client");
 }
 
 // Lazy-initialized Supabase client (only created when needed and NOT in demo mode)
@@ -62,7 +64,7 @@ const createStubClient = (): any => {
     storage: {
       from: (bucket: string) => ({
         upload: () => ({
-          data: { path: 'mock-path' },
+          data: { path: "mock-path" },
           error: null,
         }),
         list: () => ({
@@ -70,7 +72,9 @@ const createStubClient = (): any => {
           error: null,
         }),
         getPublicUrl: (path: string) => ({
-          data: { publicUrl: `https://demo.supabase.co/storage/v1/object/public/${bucket}/${path}` },
+          data: {
+            publicUrl: `https://demo.supabase.co/storage/v1/object/public/${bucket}/${path}`,
+          },
         }),
       }),
       listBuckets: () => ({
@@ -113,9 +117,11 @@ export function getSupabaseClient(): SupabaseClient | any {
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseServiceKey) {
-      console.error('⚠️ Missing Supabase credentials. Set SERVER_DEMO_MODE=true to bypass.');
+      console.error(
+        "⚠️ Missing Supabase credentials. Set SERVER_DEMO_MODE=true to bypass.",
+      );
       throw new Error(
-        'Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY. Set SERVER_DEMO_MODE=true for demo mode.'
+        "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY. Set SERVER_DEMO_MODE=true for demo mode.",
       );
     }
 
@@ -156,12 +162,14 @@ export async function ensureBrandBucket(brandId: string): Promise<string> {
   // Real mode: create bucket if it doesn't exist
   const client = getSupabaseClient();
   const { data: buckets } = await client.storage.listBuckets();
-  const bucketExists = buckets?.some((bucket: any) => bucket.name === bucketName);
+  const bucketExists = buckets?.some(
+    (bucket: any) => bucket.name === bucketName,
+  );
 
   if (!bucketExists) {
     const { error } = await client.storage.createBucket(bucketName, {
       public: false,
-      allowedMimeTypes: ['image/*', 'video/*'],
+      allowedMimeTypes: ["image/*", "video/*"],
       fileSizeLimit: 50 * 1024 * 1024, // 50MB
     });
 

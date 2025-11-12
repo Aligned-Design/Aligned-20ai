@@ -9,11 +9,13 @@
 ## 🎯 Deployment Summary
 
 **Build Time:**
+
 - Client: ~11s
 - Server: ~0.3s
 - Total: ~11.5s
 
 **Environment Flags Set:**
+
 - ✅ `VITE_DEMO_MODE=true` (client bypasses Supabase)
 - ✅ `SERVER_DEMO_MODE=true` (server uses stub client)
 - ✅ `VITE_FEATURE_UNIFIED_DASH=true` (unified dashboard enabled)
@@ -23,6 +25,7 @@
 ## 🖥️ Server Verification
 
 **Logs (fly logs --since 5m):**
+
 ```
 [DEMO MODE] Server bypassing Supabase - using stub client
 🚀 Fusion Starter server running on port 8080
@@ -31,12 +34,14 @@
 ```
 
 **Health Check:**
+
 ```bash
 curl -sI https://YOUR_APP.fly.dev/health
 # HTTP/2 200 ✅
 ```
 
 **Status:**
+
 - ✅ Server starts successfully
 - ✅ Demo mode guard active
 - ✅ No Supabase initialization errors
@@ -47,6 +52,7 @@ curl -sI https://YOUR_APP.fly.dev/health
 ## 🌐 Client Verification
 
 **Browser Console (on /dashboard):**
+
 ```
 [DEMO MODE] Using mock auth user
 [DEMO MODE] Using mock brands
@@ -54,11 +60,13 @@ curl -sI https://YOUR_APP.fly.dev/health
 ```
 
 **Network Tab:**
+
 - Filter: `supabase.co`
 - Result: **0 requests** ✅
 - All `/api/*` endpoints: **200 OK** ✅
 
 **Status:**
+
 - ✅ Client in demo mode
 - ✅ Mock data loading correctly
 - ✅ No Supabase network calls
@@ -70,14 +78,15 @@ curl -sI https://YOUR_APP.fly.dev/health
 
 **All 4 Core Routes Load Without 500 Errors:**
 
-| Route | Status | Notes |
-|-------|--------|-------|
-| `/dashboard` | ✅ PASS | KPIs render, mock data displays |
-| `/analytics` | ✅ PASS | Charts render with mock series data |
-| `/admin/billing` | ✅ PASS | Billing table loads |
+| Route            | Status  | Notes                                    |
+| ---------------- | ------- | ---------------------------------------- |
+| `/dashboard`     | ✅ PASS | KPIs render, mock data displays          |
+| `/analytics`     | ✅ PASS | Charts render with mock series data      |
+| `/admin/billing` | ✅ PASS | Billing table loads                      |
 | `/client-portal` | ✅ PASS | Read-only enforced (no edit/delete CTAs) |
 
 **Client Portal Verification:**
+
 - ✅ No "Edit" buttons visible
 - ✅ No "Delete" buttons visible
 - ✅ No destructive actions (approve, reject)
@@ -88,12 +97,14 @@ curl -sI https://YOUR_APP.fly.dev/health
 ## 🎨 UI/UX Verification
 
 **Light/Dark Mode:**
+
 - ✅ Toggle works correctly
 - ✅ Colors legible in both modes
 - ✅ Brand colors visible (primary, secondary, accent)
 - ✅ WCAG AA contrast maintained
 
 **Interactive Elements:**
+
 - ✅ Brand selector: Change from "Acme Corp" → "GreenLeaf Organics" → All cards update
 - ✅ Period picker: Change from "Week" → "Month" → All charts update
 - ✅ Navigation: All routes accessible via header/sidebar
@@ -106,16 +117,13 @@ curl -sI https://YOUR_APP.fly.dev/health
 ### Screenshots (8 total)
 
 **Desktop (1920x1080):**
+
 1. ✅ `/dashboard` - Light mode - [ATTACH SCREENSHOT]
 2. ✅ `/dashboard` - Dark mode - [ATTACH SCREENSHOT]
 3. ✅ `/analytics` - Light mode - [ATTACH SCREENSHOT]
 4. ✅ `/analytics` - Dark mode - [ATTACH SCREENSHOT]
 
-**Mobile (375x667):**
-5. ✅ `/dashboard` - Light mode - [ATTACH SCREENSHOT]
-6. ✅ `/dashboard` - Dark mode - [ATTACH SCREENSHOT]
-7. ✅ `/client-portal` - Light mode - [ATTACH SCREENSHOT]
-8. ✅ `/client-portal` - Dark mode - [ATTACH SCREENSHOT]
+**Mobile (375x667):** 5. ✅ `/dashboard` - Light mode - [ATTACH SCREENSHOT] 6. ✅ `/dashboard` - Dark mode - [ATTACH SCREENSHOT] 7. ✅ `/client-portal` - Light mode - [ATTACH SCREENSHOT] 8. ✅ `/client-portal` - Dark mode - [ATTACH SCREENSHOT]
 
 ### Looms (4 videos, ≤2 min each)
 
@@ -152,17 +160,19 @@ curl -sI https://YOUR_APP.fly.dev/health
 
 **Lighthouse (Mobile, Throttled):**
 
-| Page | LCP | INP | CLS | Status |
-|------|-----|-----|-----|--------|
+| Page         | LCP    | INP    | CLS    | Status            |
+| ------------ | ------ | ------ | ------ | ----------------- |
 | `/dashboard` | [X.X]s | [XX]ms | [0.XX] | [PASS/ACCEPTABLE] |
 | `/analytics` | [X.X]s | [XX]ms | [0.XX] | [PASS/ACCEPTABLE] |
 
 **Targets:**
+
 - LCP < 2.0s (acceptable: <2.5s)
 - INP < 150ms (acceptable: <200ms)
 - CLS < 0.1 (acceptable: <0.15)
 
 **Notes:**
+
 - [ADD ANY PERFORMANCE NOTES]
 - Bundle size: 283 KB gzipped (acceptable for V1)
 
@@ -172,16 +182,17 @@ curl -sI https://YOUR_APP.fly.dev/health
 
 **axe DevTools Summary:**
 
-| Page | Critical | Serious | Moderate | Minor | Status |
-|------|----------|---------|----------|-------|--------|
-| `/dashboard` | 0 | 0 | [X] | [X] | ✅ PASS |
-| `/analytics` | 0 | 0 | [X] | [X] | ✅ PASS |
-| `/admin/billing` | 0 | 0 | [X] | [X] | ✅ PASS |
-| `/client-portal` | 0 | 0 | [X] | [X] | ✅ PASS |
+| Page             | Critical | Serious | Moderate | Minor | Status  |
+| ---------------- | -------- | ------- | -------- | ----- | ------- |
+| `/dashboard`     | 0        | 0       | [X]      | [X]   | ✅ PASS |
+| `/analytics`     | 0        | 0       | [X]      | [X]   | ✅ PASS |
+| `/admin/billing` | 0        | 0       | [X]      | [X]   | ✅ PASS |
+| `/client-portal` | 0        | 0       | [X]      | [X]   | ✅ PASS |
 
 **Target Met:** 0 critical/serious violations ✅
 
 **Notes:**
+
 - [ADD ANY A11Y NOTES]
 - Moderate/minor issues documented for V1.1 fix
 
@@ -192,6 +203,7 @@ curl -sI https://YOUR_APP.fly.dev/health
 **Console Events (filtered by `[Analytics]`):**
 
 **Page Load:**
+
 ```javascript
 [Analytics] dash_view: {
   dashboardId: "main",
@@ -201,6 +213,7 @@ curl -sI https://YOUR_APP.fly.dev/health
 ```
 
 **Brand Switch:**
+
 ```javascript
 [Analytics] dash_brand_switched: {
   dashboardId: "main",
@@ -211,6 +224,7 @@ curl -sI https://YOUR_APP.fly.dev/health
 ```
 
 **Period Change:**
+
 ```javascript
 [Analytics] dash_filter_applied: {
   dashboardId: "main",
@@ -221,6 +235,7 @@ curl -sI https://YOUR_APP.fly.dev/health
 ```
 
 **Export (if wired):**
+
 ```javascript
 [Analytics] dash_export: {
   dashboardId: "analytics",
@@ -238,6 +253,7 @@ curl -sI https://YOUR_APP.fly.dev/health
 ## 🔨 Build Logs
 
 **TypeCheck (last 20 lines):**
+
 ```
 [ATTACH OR PASTE TYPECHECK OUTPUT]
 
@@ -247,6 +263,7 @@ Summary:
 ```
 
 **Lint (last 20 lines):**
+
 ```
 [ATTACH OR PASTE LINT OUTPUT]
 
@@ -256,6 +273,7 @@ Summary:
 ```
 
 **Build (last 20 lines):**
+
 ```
 dist/assets/index-B17jQwL_.css          202.03 kB │ gzip:  29.65 kB
 dist/assets/vendor-form-D7FysIDo.js      52.99 kB │ gzip:  12.11 kB
@@ -275,6 +293,7 @@ dist/assets/index-As80rKIk.js         1,981.52 kB │ gzip: 283.02 kB
 ## 🔒 Security & Hygiene
 
 **Secrets Hygiene:**
+
 ```bash
 # Check for leaked Supabase URLs in bundle
 grep -r 'supabase' dist/assets/ | grep -v 'demo.supabase.co'
@@ -283,16 +302,19 @@ Result: No matches ✅ (only demo URLs present)
 ```
 
 **Server Console Hygiene:**
+
 - ✅ Only ONE `[DEMO MODE]` log on server startup
 - ✅ No duplicate/verbose logs
 - ✅ Clean startup sequence
 
 **Client Console Hygiene:**
+
 - ✅ Minimal demo mode logs (2 lines)
 - ✅ No verbose debug output
 - ✅ No errors/warnings
 
 **Flags Independence:**
+
 - ✅ Tested: `VITE_DEMO_MODE=true` + `VITE_FEATURE_UNIFIED_DASH=false` → Legacy dashboard
 - ✅ Tested: `VITE_DEMO_MODE=true` + `VITE_FEATURE_UNIFIED_DASH=true` → Unified dashboard
 - ✅ Demo mode does NOT force unified flag
@@ -304,6 +326,7 @@ Result: No matches ✅ (only demo URLs present)
 **None Blocking V1 Core Flows ✅**
 
 **Low Priority (Post-V1):**
+
 1. **Lint Warnings (786 total)**
    - Impact: None (build passing, runtime unaffected)
    - Scope: UI components, Storybook stories
@@ -319,6 +342,7 @@ Result: No matches ✅ (only demo URLs present)
    - Fix: V2 code splitting
 
 **All Core Flows Functional:**
+
 - ✅ Auth working (demo mode)
 - ✅ Dashboard rendering
 - ✅ Routing functional
@@ -397,12 +421,14 @@ Result: No matches ✅ (only demo URLs present)
 ## 📞 Support & Escalation
 
 **If issues arise:**
+
 1. Check `TRIAGE_500_ERRORS.md` for common fixes
 2. Review `EDGE_POLISH_CHECKLIST.md` for validation steps
 3. Rollback: `fly releases rollback`
 4. Contact: [YOUR SUPPORT CHANNEL]
 
 **Emergency rollback:**
+
 ```bash
 fly releases list
 fly releases rollback <VERSION>

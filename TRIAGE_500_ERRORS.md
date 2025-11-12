@@ -15,6 +15,7 @@ fly logs --since 15m | tail -n +1
 ### 2. Look for These Common Issues
 
 #### Missing Environment Variables
+
 ```
 ❌ Error: Missing SUPABASE_URL
 ❌ ReferenceError: process is not defined
@@ -22,12 +23,14 @@ fly logs --since 15m | tail -n +1
 ```
 
 **Fix:**
+
 ```bash
 fly secrets set SERVER_DEMO_MODE=true VITE_DEMO_MODE=true
 fly deploy --build-arg NO_CACHE=$(date +%s)
 ```
 
 #### Import Side-Effects (Supabase Init at Top-Level)
+
 ```
 ❌ Error: createClient is not a function
 ❌ TypeError: Cannot read property 'from' of undefined
@@ -35,6 +38,7 @@ fly deploy --build-arg NO_CACHE=$(date +%s)
 ```
 
 **Check logs for:**
+
 ```
 [DEMO MODE] Server bypassing Supabase - using stub client
 ```
@@ -42,28 +46,33 @@ fly deploy --build-arg NO_CACHE=$(date +%s)
 If missing, the guard isn't early enough. **The fix we applied should prevent this.**
 
 **If you still see Supabase errors:**
+
 1. Check `server/lib/supabase.ts` - guard should be at the TOP
 2. No Supabase imports should execute before checking `SERVER_DEMO_MODE`
 3. Verify `SERVER_DEMO_MODE=true` is set: `fly secrets list`
 
 #### ESM/CJS Import Errors
+
 ```
 ❌ Error [ERR_REQUIRE_ESM]: require() of ES Module
 ❌ SyntaxError: Cannot use import statement outside a module
 ```
 
 **Fix:** Already handled in our config. If you see this:
+
 1. Check `package.json` has `"type": "module"`
 2. Check `vite.config.server.ts` has correct format
 3. Redeploy with cache bust
 
 #### Invalid Adapter Paths
+
 ```
 ❌ Cannot find module './dist/server/node-build.mjs'
 ❌ Error: Cannot find module '@/lib/supabase'
 ```
 
 **Fix:**
+
 ```bash
 # Verify build artifacts exist
 ls -la dist/server/
@@ -80,6 +89,7 @@ fly deploy --build-arg NO_CACHE=$(date +%s)
 ### 3. Check Server Startup Sequence
 
 **Expected logs (in order):**
+
 ```
 [DEMO MODE] Server bypassing Supabase - using stub client
 🚀 Fusion Starter server running on port 8080
@@ -88,12 +98,14 @@ fly deploy --build-arg NO_CACHE=$(date +%s)
 ```
 
 **If you see Supabase anywhere while `SERVER_DEMO_MODE=true`:**
+
 ```
 ❌ Initializing Supabase client...
 ❌ Connecting to Supabase at https://...
 ```
 
 **This means the guard isn't working. Check:**
+
 1. `SERVER_DEMO_MODE` is set: `fly secrets list`
 2. Server is reading the env var correctly
 3. No import side-effects creating clients before the check
@@ -161,11 +173,13 @@ grep -r 'supabase' dist/ | grep -v 'demo.supabase.co'
 ### Pattern 1: Server Won't Start (Missing Secrets)
 
 **Symptom:**
+
 ```
 Error: Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY
 ```
 
 **Fix:**
+
 ```bash
 fly secrets set SERVER_DEMO_MODE=true
 fly deploy --build-arg NO_CACHE=$(date +%s)
@@ -178,6 +192,7 @@ fly deploy --build-arg NO_CACHE=$(date +%s)
 ### Pattern 2: Client Shows Supabase Errors
 
 **Symptom:**
+
 ```
 Console: TypeError: Failed to fetch
 Console: Invalid API key
@@ -185,6 +200,7 @@ Network: 401 from supabase.co
 ```
 
 **Fix:**
+
 ```bash
 # Verify client env var is set
 fly secrets list | grep VITE_DEMO_MODE
@@ -206,6 +222,7 @@ fly deploy --build-arg NO_CACHE=$(date +%s)
 ### Pattern 3: Routes Return 404
 
 **Symptom:**
+
 ```
 /dashboard → 404 Not Found
 /analytics → 404 Not Found
@@ -231,6 +248,7 @@ If missing, server isn't serving SPA correctly.
 ### Pattern 4: Network Tab Shows Supabase Requests
 
 **Symptom:**
+
 ```
 Network tab: Requests to supabase.co (even with VITE_DEMO_MODE=true)
 Console: [DEMO MODE] logs missing
@@ -239,6 +257,7 @@ Console: [DEMO MODE] logs missing
 **Root cause:** Client isn't in demo mode.
 
 **Fix:**
+
 ```bash
 # Verify env var
 fly secrets list | grep VITE_DEMO_MODE
@@ -291,16 +310,19 @@ pnpm build:client
 If you're stuck after 15 minutes:
 
 1. **Capture full logs:**
+
    ```bash
    fly logs --since 30m > full-logs.txt
    ```
 
 2. **Capture secrets list (redact values):**
+
    ```bash
    fly secrets list > secrets-list.txt
    ```
 
 3. **Capture build output:**
+
    ```bash
    pnpm build > build-output.txt 2>&1
    ```
@@ -324,23 +346,27 @@ If you're stuck after 15 minutes:
 **You know it's working when:**
 
 ✅ Server logs show:
+
 ```
 [DEMO MODE] Server bypassing Supabase - using stub client
 🚀 Fusion Starter server running on port 8080
 ```
 
 ✅ Client console shows:
+
 ```
 [DEMO MODE] Using mock auth user
 [DEMO MODE] Using mock brands
 ```
 
 ✅ Network tab shows:
+
 ```
 0 requests to supabase.co
 ```
 
 ✅ All routes load:
+
 ```
 /dashboard → 200
 /analytics → 200
@@ -349,6 +375,7 @@ If you're stuck after 15 minutes:
 ```
 
 ✅ Health check passes:
+
 ```
 curl https://YOUR_APP.fly.dev/health
 {"status":"ok"}

@@ -9,16 +9,19 @@
 ### Expected: Single [DEMO MODE] Log Per Context
 
 **Check server logs:**
+
 ```bash
 fly logs --since 5m | grep "DEMO MODE"
 ```
 
 **Expected output (GOOD ✅):**
+
 ```
 [DEMO MODE] Server bypassing Supabase - using stub client
 ```
 
 **Bad output (FIX ❌):**
+
 ```
 [DEMO MODE] Server bypassing Supabase - using stub client
 [DEMO MODE] Server bypassing Supabase - using stub client  ← Duplicate
@@ -28,14 +31,16 @@ fly logs --since 5m | grep "DEMO MODE"
 ```
 
 **If you see duplicates:**
+
 - Check `server/lib/supabase.ts` - log should only appear ONCE on module load
 - No logs inside functions that get called repeatedly
 
 **Current implementation (GOOD):**
+
 ```typescript
 // Log demo mode status once on module load
 if (isDemoMode) {
-  console.log('[DEMO MODE] Server bypassing Supabase - using stub client');
+  console.log("[DEMO MODE] Server bypassing Supabase - using stub client");
 }
 ```
 
@@ -50,6 +55,7 @@ if (isDemoMode) {
 **Open browser console on `/dashboard`:**
 
 **Expected output (GOOD ✅):**
+
 ```
 [DEMO MODE] Using mock auth user
 [DEMO MODE] Using mock brands
@@ -57,6 +63,7 @@ if (isDemoMode) {
 ```
 
 **Bad output (FIX ❌):**
+
 ```
 [DEMO MODE] Using mock auth user
 [DEMO MODE] Using mock brands
@@ -68,6 +75,7 @@ if (isDemoMode) {
 ```
 
 **If you see verbose logs:**
+
 - Check `client/contexts/AuthContext.tsx` - should log ONCE
 - Check `client/contexts/BrandContext.tsx` - should log ONCE
 - Remove debug logs from `client/lib/mockData.ts`
@@ -81,6 +89,7 @@ if (isDemoMode) {
 ### Check: No Real Supabase URLs/Keys in dist/
 
 **After building locally:**
+
 ```bash
 # Build production bundle
 pnpm build
@@ -96,26 +105,30 @@ grep -r 'supabase' dist/assets/ | grep -v 'demo.supabase.co'
 ```
 
 **Bad output (FIX ❌):**
+
 ```
 dist/assets/index-ABC123.js:...https://yourproject.supabase.co...
 dist/assets/index-ABC123.js:...eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **If you see real URLs/keys:**
+
 - Check `.env` file is NOT committed to git
 - Verify `client/lib/supabase.ts` only uses `import.meta.env.VITE_*`
 - Verify demo mode check happens BEFORE using real values
 
 ✅ **Current implementation (GOOD):**
+
 ```typescript
 // client/lib/supabase.ts
 export const supabase = createClient(
-  isDemoMode() ? DEMO_URL : supabaseUrl,  // ✅ Demo URL used in demo mode
-  isDemoMode() ? DEMO_KEY : supabaseAnonKey
+  isDemoMode() ? DEMO_URL : supabaseUrl, // ✅ Demo URL used in demo mode
+  isDemoMode() ? DEMO_KEY : supabaseAnonKey,
 );
 ```
 
 **Final check:**
+
 ```bash
 # Search entire dist for real credentials (none should appear)
 grep -r 'SUPABASE_URL\|SUPABASE_ANON_KEY' dist/
@@ -134,30 +147,35 @@ grep -r 'SUPABASE_URL\|SUPABASE_ANON_KEY' dist/
 **Verify these combinations work independently:**
 
 #### Test 1: Demo ON, Unified OFF
+
 ```bash
 fly secrets set VITE_DEMO_MODE=true VITE_FEATURE_UNIFIED_DASH=false
 fly deploy --build-arg NO_CACHE=$(date +%s)
 ```
 
 **Expected:**
+
 - ✅ Demo mode active (mock data)
 - ✅ Legacy dashboard displayed (NOT unified)
 - ✅ No Supabase calls
 - ✅ Routes load
 
 #### Test 2: Demo ON, Unified ON
+
 ```bash
 fly secrets set VITE_DEMO_MODE=true VITE_FEATURE_UNIFIED_DASH=true
 fly deploy --build-arg NO_CACHE=$(date +%s)
 ```
 
 **Expected:**
+
 - ✅ Demo mode active (mock data)
 - ✅ Unified dashboard displayed (new DashboardSystem)
 - ✅ No Supabase calls
 - ✅ Routes load
 
 **Code verification:**
+
 ```typescript
 // client/pages/Dashboard.tsx
 export default function Dashboard() {
@@ -180,26 +198,31 @@ export default function Dashboard() {
 ### Lighthouse (Throttled Mobile)
 
 **Run on these pages:**
+
 - `/dashboard`
 - `/analytics`
 
 **Quick command (Chrome DevTools):**
+
 1. Open DevTools
 2. Lighthouse tab
 3. Select "Mobile" + "Throttling"
 4. Run audit
 
 **Targets:**
+
 - **LCP (Largest Contentful Paint):** < 2.0s ✅
 - **INP (Interaction to Next Paint):** < 150ms ✅
 - **CLS (Cumulative Layout Shift):** < 0.1 ✅
 
 **Acceptable for V1:**
+
 - LCP: 1.5-2.5s
 - INP: 100-200ms
 - CLS: 0.05-0.15
 
 **If metrics are worse:**
+
 - Note as "known issue - optimize in V2"
 - Don't block V1 deployment
 - Capture baseline for future comparison
@@ -213,28 +236,33 @@ export default function Dashboard() {
 ### axe DevTools (Free Browser Extension)
 
 **Install:**
+
 - Chrome: [axe DevTools](https://chrome.google.com/webstore/detail/axe-devtools-web-accessib/lhdoppojpmngadmnindnejefpokejbdd)
 - Firefox: [axe DevTools](https://addons.mozilla.org/en-US/firefox/addon/axe-devtools/)
 
 **Run on these pages:**
+
 - `/dashboard`
 - `/analytics`
 - `/admin/billing`
 - `/client-portal`
 
 **Quick scan (30 seconds per page):**
+
 1. Open DevTools
 2. axe DevTools tab
 3. Click "Scan ALL of my page"
 4. Wait ~10 seconds
 
 **Expected results:**
+
 - **Critical:** 0 ✅
 - **Serious:** 0 ✅
 - **Moderate:** < 5 (acceptable)
 - **Minor:** < 10 (acceptable)
 
 **If you see critical/serious violations:**
+
 - Screenshot the violation
 - Note as "known issue"
 - Fix in V1.1 (not blocking for V1)
@@ -254,6 +282,7 @@ export default function Dashboard() {
 **Expected events (in order):**
 
 1. **Page Load:**
+
    ```javascript
    [Analytics] dash_view: {
      dashboardId: "main",
@@ -263,6 +292,7 @@ export default function Dashboard() {
    ```
 
 2. **Change Brand Selector:**
+
    ```javascript
    [Analytics] dash_brand_switched: {
      dashboardId: "main",
@@ -273,6 +303,7 @@ export default function Dashboard() {
    ```
 
 3. **Change Period Picker:**
+
    ```javascript
    [Analytics] dash_filter_applied: {
      dashboardId: "main",
@@ -294,10 +325,12 @@ export default function Dashboard() {
 **ALL events MUST include `demo_mode: true` when in demo mode.**
 
 **If `demo_mode` is missing:**
+
 - Check `client/lib/analytics.ts` - should add `demo_mode` to all events
 - Verify `import.meta.env.VITE_DEMO_MODE` is accessible
 
 ✅ **Current implementation (GOOD):**
+
 ```typescript
 // client/lib/analytics.ts
 track<T extends EventName>(eventName: T, properties: AnalyticsEvent[T]) {
@@ -319,6 +352,7 @@ track<T extends EventName>(eventName: T, properties: AnalyticsEvent[T]) {
 ### Capture Clean Build Output
 
 **Commands:**
+
 ```bash
 # TypeCheck
 pnpm typecheck 2>&1 | tail -20
@@ -333,18 +367,21 @@ pnpm build 2>&1 | tail -20
 **Expected (acceptable for V1):**
 
 **TypeCheck:**
+
 ```
 ✅ CLIENT DASHBOARD CODE: No errors
 ⚠️ Server-only errors (not blocking client)
 ```
 
 **Lint:**
+
 ```
 ✅ DASHBOARD PAGES: Passing
 ⚠️ UI component warnings (786 total - not blocking)
 ```
 
 **Build:**
+
 ```
 dist/assets/index-ABC123.js  1,981.52 kB │ gzip: 283.02 kB
 ✓ client built in 11.26s
@@ -352,6 +389,7 @@ dist/assets/index-ABC123.js  1,981.52 kB │ gzip: 283.02 kB
 ```
 
 **Known warnings (acceptable for V1):**
+
 - Bundle size warning (>1000 kB uncompressed) - optimize in V2
 - Lint warnings in UI components - fix in V2
 - Server typecheck errors (integration scripts) - not blocking
@@ -393,6 +431,7 @@ grep -r 'supabase' dist/assets/ | grep -v 'demo.supabase.co' > bundle-check.txt
 ```
 
 **Take screenshots:**
+
 1. Browser console (filtered by `[Analytics]`)
 2. Network tab (filtered by `supabase.co` - should be empty)
 3. Lighthouse results (2 pages)

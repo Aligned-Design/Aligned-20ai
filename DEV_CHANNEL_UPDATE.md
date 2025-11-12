@@ -11,6 +11,7 @@
 I've pushed **9 commits** to the `pulse-nest` branch with the robust server-side demo guard:
 
 **Key Changes:**
+
 - ✅ **Lazy initialization** - No top-level Supabase client creation
 - ✅ **SERVER_DEMO_MODE guard** - Server checks this flag first (server-only, runtime)
 - ✅ **Stub client in demo mode** - Returns mock data, never touches network
@@ -18,6 +19,7 @@ I've pushed **9 commits** to the `pulse-nest` branch with the robust server-side
 - ✅ **Independent flags** - Demo mode doesn't force unified dashboard flag
 
 **Commits:**
+
 ```
 927daf2 Create quick deployment reference card
 dc73dc4 Create V1 GO note template
@@ -33,6 +35,7 @@ ca54d0b Create deployment commands with SERVER_DEMO_MODE
 **I cannot run `fly` commands** due to ACL policies in my environment.
 
 **Blocked commands:**
+
 - ❌ `fly secrets set`
 - ❌ `fly deploy`
 - ❌ `fly logs`
@@ -44,14 +47,15 @@ Someone with Fly access to run 3 commands (see #ops or DEVOPS_DEPLOY_REQUEST.md)
 
 ## 📊 Current Staging Status
 
-| Route | Status | Notes |
-|-------|--------|-------|
-| `/dashboard` | ✅ **WORKING** | Demo User logged in, KPIs rendering |
-| `/analytics` | ✅ **WORKING** | Charts displaying with mock data |
-| `/admin/billing` | ⚠️ **404** | Will verify post-deploy if route exists or out-of-scope for V1 |
-| `/client-portal` | ❌ **500 ERROR** | Needs server fix deployment |
+| Route            | Status           | Notes                                                          |
+| ---------------- | ---------------- | -------------------------------------------------------------- |
+| `/dashboard`     | ✅ **WORKING**   | Demo User logged in, KPIs rendering                            |
+| `/analytics`     | ✅ **WORKING**   | Charts displaying with mock data                               |
+| `/admin/billing` | ⚠️ **404**       | Will verify post-deploy if route exists or out-of-scope for V1 |
+| `/client-portal` | ❌ **500 ERROR** | Needs server fix deployment                                    |
 
 **Why `/client-portal` is 500'ing:**
+
 - Server is trying to initialize Supabase on startup
 - Missing `SERVER_DEMO_MODE` flag in staging environment
 - Missing `SUPABASE_SERVICE_ROLE_KEY` (not needed in demo mode)
@@ -62,10 +66,12 @@ Someone with Fly access to run 3 commands (see #ops or DEVOPS_DEPLOY_REQUEST.md)
 ## ⏭️ Next Steps
 
 **Immediate (waiting on):**
+
 1. DevOps runs deployment commands
 2. They reply "deployed"
 
 **After "deployed" (I'll do immediately):**
+
 1. ✅ **V1 Smoke Test** - Verify all routes load
    - `/dashboard` - KPIs render
    - `/analytics` - Charts display
@@ -91,6 +97,7 @@ Someone with Fly access to run 3 commands (see #ops or DEVOPS_DEPLOY_REQUEST.md)
 ## 🎯 Known State After This Deploy
 
 **What should work:**
+
 - ✅ All 4 routes load without 500 errors
 - ✅ Demo mode active (server + client)
 - ✅ Zero Supabase network traffic
@@ -101,6 +108,7 @@ Someone with Fly access to run 3 commands (see #ops or DEVOPS_DEPLOY_REQUEST.md)
 - ✅ Period picker updates all charts
 
 **What's out of scope for V1:**
+
 - ❌ Real Supabase connection (production only)
 - ❌ Bundle size optimization (V2)
 - ❌ Lint perfection (acceptable warnings documented)
@@ -111,6 +119,7 @@ Someone with Fly access to run 3 commands (see #ops or DEVOPS_DEPLOY_REQUEST.md)
 ## 📚 Documentation Created
 
 **Deployment guides:**
+
 - `GO_NO_GO_CHECKLIST.md` - Full deployment sequence
 - `DEPLOY_COMMANDS_ONLY.sh` - Copy/paste commands
 - `QUICK_DEPLOY_REFERENCE.md` - 1-page cheat sheet
@@ -118,6 +127,7 @@ Someone with Fly access to run 3 commands (see #ops or DEVOPS_DEPLOY_REQUEST.md)
 - `DEVOPS_DEPLOY_REQUEST.md` - This request (for ops)
 
 **Templates:**
+
 - `V1_STAGING_GO_NOTE_TEMPLATE.md` - Final GO note format
 - `EDGE_POLISH_CHECKLIST.md` - 10-minute quality checks
 
@@ -135,6 +145,7 @@ Someone with Fly access to run 3 commands (see #ops or DEVOPS_DEPLOY_REQUEST.md)
 ## 🔍 What to Watch For
 
 **Good signs (after deploy):**
+
 ```
 ✅ Server logs: [DEMO MODE] Server bypassing Supabase - using stub client
 ✅ Client console: [DEMO MODE] Using mock auth user
@@ -143,6 +154,7 @@ Someone with Fly access to run 3 commands (see #ops or DEVOPS_DEPLOY_REQUEST.md)
 ```
 
 **Red flags (report immediately):**
+
 ```
 ❌ Server logs: Error: Missing SUPABASE_URL
 ❌ Client console: TypeError: Failed to fetch

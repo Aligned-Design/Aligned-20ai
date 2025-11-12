@@ -13,25 +13,29 @@
 **Changed:** `server/lib/supabase.ts`
 
 **Key improvements:**
+
 - ✅ Checks `SERVER_DEMO_MODE` first (server-only flag)
 - ✅ Lazy-initialized Supabase (no top-level client creation)
 - ✅ Stub client in demo mode (never touches network)
 - ✅ Never requires Supabase secrets when `SERVER_DEMO_MODE=true`
 
 **Implementation:**
+
 ```typescript
 // Check SERVER_DEMO_MODE first (server-only flag)
-const isDemoMode = process.env.SERVER_DEMO_MODE === 'true' || process.env.VITE_DEMO_MODE === 'true';
+const isDemoMode =
+  process.env.SERVER_DEMO_MODE === "true" ||
+  process.env.VITE_DEMO_MODE === "true";
 
 // Log once on module load
 if (isDemoMode) {
-  console.log('[DEMO MODE] Server bypassing Supabase - using stub client');
+  console.log("[DEMO MODE] Server bypassing Supabase - using stub client");
 }
 
 // Lazy-initialized client (only created when needed)
 export function getSupabaseClient(): SupabaseClient | any {
   if (isDemoMode) {
-    return createStubClient();  // ✅ Returns mock client, no network
+    return createStubClient(); // ✅ Returns mock client, no network
   }
   // ... real client only if not in demo mode
 }
@@ -46,6 +50,7 @@ export const supabase = new Proxy({} as SupabaseClient, {
 ```
 
 **Benefits:**
+
 1. **Server never crashes** when Supabase credentials missing (if demo mode enabled)
 2. **No network calls** in demo mode (stub client returns mock data)
 3. **Lazy initialization** prevents top-level errors on module load
@@ -76,6 +81,7 @@ fly secrets set VITE_DEMO_MODE=true SERVER_DEMO_MODE=true VITE_FEATURE_UNIFIED_D
 ```
 
 **Why both flags?**
+
 - `VITE_DEMO_MODE=true` → Client bypasses Supabase (compile-time)
 - `SERVER_DEMO_MODE=true` → Server uses stub client (runtime, checked first)
 - `VITE_FEATURE_UNIFIED_DASH=true` → Enables unified dashboard
@@ -87,6 +93,7 @@ fly deploy --build-arg NO_CACHE=$(date +%s)
 ```
 
 **Expected output:**
+
 ```
 ✓ client built in ~11s
 ✓ server built in ~0.3s
@@ -100,12 +107,14 @@ fly logs --since 5m | grep -E "DEMO MODE|Supabase"
 ```
 
 **Expected (GOOD ✅):**
+
 ```
 [DEMO MODE] Server bypassing Supabase - using stub client
 🚀 Fusion Starter server running on port 8080
 ```
 
 **Red flags (BAD ❌ - use TRIAGE_500_ERRORS.md):**
+
 ```
 Error: Missing SUPABASE_URL
 TypeError: Failed to fetch
@@ -129,17 +138,20 @@ curl -sI https://YOUR_APP.fly.dev/health
 **Open:** `https://YOUR_APP.fly.dev/dashboard`
 
 **DevTools → Console:**
+
 - ✅ `[DEMO MODE] Using mock auth user`
 - ✅ `[DEMO MODE] Using mock brands`
 - ✅ `[Analytics] dash_view: { ..., demo_mode: true }`
 
 **DevTools → Network:**
+
 - Filter by `supabase.co`
 - ✅ Expected: **0 requests**
 
 ### 3. Test Routes
 
 Visit and verify each loads without 500:
+
 - ✅ `/dashboard` - KPIs render
 - ✅ `/analytics` - Charts display
 - ✅ `/admin/billing` - Table loads
@@ -158,27 +170,33 @@ Visit and verify each loads without 500:
 **After validation passes, capture these:**
 
 ### Screenshots (8 total)
+
 - Desktop (1920x1080): `/dashboard` light/dark, `/analytics` light/dark
 - Mobile (375x667): `/dashboard` light/dark, `/client-portal` light/dark
 
 ### Looms (4 videos, ≤2 min each)
+
 1. Agency Flow (dashboard → analytics → content → approvals → export)
 2. Client Flow (client portal, verify read-only, export)
 3. Filter Sync (change brand + period, show updates)
 4. Dark Mode + Mobile (toggle mode, mobile viewport)
 
 ### Performance
+
 - Lighthouse: `/dashboard` and `/analytics` (mobile, throttled)
 - Targets: LCP <2.5s, INP <200ms, CLS <0.15
 
 ### Accessibility
+
 - axe DevTools: All 4 core routes
 - Target: 0 critical/serious violations
 
 ### Telemetry
+
 - Console screenshot showing analytics events with `demo_mode: true`
 
 ### Build Logs
+
 ```bash
 fly logs --since 5m > staging-build-logs.txt
 pnpm typecheck > typecheck-output.txt 2>&1
@@ -250,6 +268,7 @@ pnpm build > build-output.txt 2>&1
 If stuck for >15 minutes:
 
 1. **Check logs:**
+
    ```bash
    fly logs --since 15m | tail -n +1
    ```
@@ -260,6 +279,7 @@ If stuck for >15 minutes:
    - Look for common patterns
 
 3. **Rollback if needed:**
+
    ```bash
    fly releases rollback
    ```
@@ -276,23 +296,27 @@ If stuck for >15 minutes:
 **You know it's working when:**
 
 ✅ **Server logs:**
+
 ```
 [DEMO MODE] Server bypassing Supabase - using stub client
 🚀 Fusion Starter server running on port 8080
 ```
 
 ✅ **Client console:**
+
 ```
 [DEMO MODE] Using mock auth user
 [DEMO MODE] Using mock brands
 ```
 
 ✅ **Network tab:**
+
 ```
 0 requests to supabase.co
 ```
 
 ✅ **All routes load:**
+
 ```
 /dashboard → 200
 /analytics → 200
@@ -301,6 +325,7 @@ If stuck for >15 minutes:
 ```
 
 ✅ **Health check:**
+
 ```
 curl https://YOUR_APP.fly.dev/health
 {"status":"ok"}
@@ -311,18 +336,21 @@ curl https://YOUR_APP.fly.dev/health
 ## 📊 Build Baseline (Current State)
 
 **TypeCheck:**
+
 ```
 ✅ CLIENT DASHBOARD CODE: No errors
 ⚠️ Server-only errors (19 total - not blocking client)
 ```
 
 **Lint:**
+
 ```
 ✅ DASHBOARD PAGES: Passing
 ⚠️ UI component warnings (786 total - not blocking)
 ```
 
 **Build:**
+
 ```
 dist/assets/index-As80rKIk.js  1,981.52 kB │ gzip: 283.02 kB
 ✓ client built in 11.26s
@@ -331,6 +359,7 @@ dist/assets/index-As80rKIk.js  1,981.52 kB │ gzip: 283.02 kB
 ```
 
 **Known acceptable warnings for V1:**
+
 - Bundle size >1000 kB (optimize in V2)
 - Lint warnings in UI components (fix in V1.1)
 - Server typecheck errors (integration scripts, not blocking)
@@ -340,18 +369,22 @@ dist/assets/index-As80rKIk.js  1,981.52 kB │ gzip: 283.02 kB
 ## 📚 Related Documentation
 
 **Deployment:**
+
 - `DEPLOY_V1_STAGING.sh` - Step-by-step deployment guide
 - `V1_STAGING_GO_NOTE_TEMPLATE.md` - Final GO note template
 
 **Troubleshooting:**
+
 - `TRIAGE_500_ERRORS.md` - Detailed 500 error diagnostics
 - `STAGING_500_FIX.md` - Original fix documentation
 
 **Validation:**
+
 - `EDGE_POLISH_CHECKLIST.md` - 10-minute quality checks
 - `DEMO_MODE_VALIDATION_CHECKLIST.md` - Demo mode testing
 
 **Reference:**
+
 - `V1_STAGING_GO_NOTE.md` - Previous GO note (pre-robust fix)
 - `URGENT_DEPLOY_SUMMARY.md` - Previous deployment summary
 

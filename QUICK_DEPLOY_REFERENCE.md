@@ -30,6 +30,7 @@ open https://YOUR_APP.fly.dev/dashboard
 ```
 
 **Browser checks:**
+
 - Console: `[DEMO MODE] Using mock auth user` ✅
 - Network: `0 requests to supabase.co` ✅
 - Routes: `/dashboard`, `/analytics`, `/admin/billing`, `/client-portal` all load ✅
@@ -39,16 +40,19 @@ open https://YOUR_APP.fly.dev/dashboard
 ## 📸 Capture Artifacts
 
 **Screenshots (8):**
+
 - Desktop: `/dashboard` light/dark, `/analytics` light/dark
 - Mobile: `/dashboard` light/dark, `/client-portal` light/dark
 
 **Looms (4, ≤2 min each):**
+
 1. Agency flow
 2. Client flow
 3. Filter sync
 4. Dark mode + mobile
 
 **Metrics:**
+
 - Lighthouse: `/dashboard`, `/analytics`
 - axe: All 4 routes
 - Telemetry: Console screenshot
@@ -85,6 +89,7 @@ fly releases rollback
 ```
 
 **Common fixes:**
+
 - Missing `SERVER_DEMO_MODE` → Set secret, redeploy
 - Supabase errors in logs → Verify demo mode flag set
 - Client errors → Hard refresh browser (Cmd+Shift+R)

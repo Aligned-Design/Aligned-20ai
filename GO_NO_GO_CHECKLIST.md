@@ -78,11 +78,11 @@
 
 ✅ Separate checks (line 22-28):
    const unifiedDashEnabled = isFeatureEnabled("unified_dash");
-   
+
    if (unifiedDashEnabled) {
      return <UnifiedDashboard />;  // Independent of demo mode
    }
-   
+
    return <LegacyDashboard />;
 ```
 
@@ -93,6 +93,7 @@
 ### 📊 Pre-Deploy Sanity (3-5 min)
 
 **Git Status:**
+
 ```bash
 On branch pulse-nest
 9 commits ahead of origin (needs push)
@@ -100,6 +101,7 @@ Working tree clean ✅
 ```
 
 **Last 5 Commits:**
+
 ```
 927daf2 Create quick deployment reference card
 dc73dc4 Create V1 GO note template
@@ -109,6 +111,7 @@ ca54d0b Create deployment commands with SERVER_DEMO_MODE
 ```
 
 **Build Status:**
+
 ```bash
 ✓ client built in 10.84s
 ✓ server built in 251ms
@@ -116,6 +119,7 @@ ca54d0b Create deployment commands with SERVER_DEMO_MODE
 ```
 
 **Staging URL:**
+
 ```
 https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/dashboard
 Current Status: 500 Internal Server Error (expected - needs redeploy)
@@ -126,6 +130,7 @@ Current Status: 500 Internal Server Error (expected - needs redeploy)
 ## 🚀 DECISION: GO FOR DEPLOYMENT
 
 **All criteria met:**
+
 - ✅ Server has robust lazy-init with SERVER_DEMO_MODE guard
 - ✅ Client uses mock data in demo mode
 - ✅ Unified flag is independent of demo mode
@@ -156,11 +161,13 @@ fly secrets set VITE_DEMO_MODE=true SERVER_DEMO_MODE=true VITE_FEATURE_UNIFIED_D
 ```
 
 **Why all three:**
+
 - `VITE_DEMO_MODE=true` → Client bypasses Supabase (compile-time)
 - `SERVER_DEMO_MODE=true` → Server uses stub client (runtime, checked first)
 - `VITE_FEATURE_UNIFIED_DASH=true` → Enables unified dashboard
 
 **Verify:**
+
 ```bash
 fly secrets list
 
@@ -179,6 +186,7 @@ fly deploy --build-arg NO_CACHE=$(date +%s)
 ```
 
 **Monitor deployment:**
+
 ```bash
 # In separate terminal:
 fly logs
@@ -201,6 +209,7 @@ fly logs --since 5m | grep -E "DEMO MODE|Supabase|error"
 ```
 
 **Expected (GOOD ✅):**
+
 ```
 [DEMO MODE] Server bypassing Supabase - using stub client
 🚀 Fusion Starter server running on port 8080
@@ -209,6 +218,7 @@ fly logs --since 5m | grep -E "DEMO MODE|Supabase|error"
 ```
 
 **Red flags (BAD ❌ - use TRIAGE_500_ERRORS.md):**
+
 ```
 Error: Missing SUPABASE_URL
 TypeError: Failed to fetch
@@ -221,6 +231,7 @@ Stack trace with Supabase initialization
 ### Phase 5: Fast Smoke Test (5-10 min)
 
 **1. Health Check:**
+
 ```bash
 curl -sI https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/health
 
@@ -228,6 +239,7 @@ curl -sI https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.
 ```
 
 **2. Open Dashboard:**
+
 ```
 https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/dashboard
 ```
@@ -235,6 +247,7 @@ https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/dashb
 **3. Browser DevTools → Console:**
 
 **Expected (printed EXACTLY ONCE):**
+
 ```javascript
 [DEMO MODE] Using mock auth user
 [DEMO MODE] Using mock brands
@@ -249,12 +262,12 @@ https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/dashb
 
 **5. Test All Routes:**
 
-| Route | Expected | Check |
-|-------|----------|-------|
-| `/dashboard` | Loads, KPIs render | No 500 error |
-| `/analytics` | Charts display | Mock data visible |
-| `/admin/billing` | Table loads | No fetch errors |
-| `/client-portal` | Loads, read-only | **NO edit/delete CTAs** |
+| Route            | Expected           | Check                   |
+| ---------------- | ------------------ | ----------------------- |
+| `/dashboard`     | Loads, KPIs render | No 500 error            |
+| `/analytics`     | Charts display     | Mock data visible       |
+| `/admin/billing` | Table loads        | No fetch errors         |
+| `/client-portal` | Loads, read-only   | **NO edit/delete CTAs** |
 
 **6. Test Interactions:**
 
@@ -271,18 +284,16 @@ https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/dashb
 **Desktop (1920x1080):**
 
 **Legacy Dashboard (VITE_FEATURE_UNIFIED_DASH=false):**
+
 1. `/dashboard` - Light mode
 2. `/dashboard` - Dark mode
 3. `/analytics` - Light mode
 4. `/analytics` - Dark mode
 
-**Unified Dashboard (VITE_FEATURE_UNIFIED_DASH=true):**
-5. `/dashboard` - Light mode (DashboardShell + KpiCard)
-6. `/dashboard` - Dark mode (DashboardShell + KpiCard)
-7. `/analytics` - Light mode (DashboardShell + ChartCard)
-8. `/analytics` - Dark mode (DashboardShell + ChartCard)
+**Unified Dashboard (VITE_FEATURE_UNIFIED_DASH=true):** 5. `/dashboard` - Light mode (DashboardShell + KpiCard) 6. `/dashboard` - Dark mode (DashboardShell + KpiCard) 7. `/analytics` - Light mode (DashboardShell + ChartCard) 8. `/analytics` - Dark mode (DashboardShell + ChartCard)
 
 **OR Mobile (375x667) - Alternative:**
+
 - `/dashboard` - Light mode
 - `/dashboard` - Dark mode
 - `/client-portal` - Light mode
@@ -293,6 +304,7 @@ https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/dashb
 **6.2 Looms (4 videos, ≤2 min each) - 10 min**
 
 **Loom 1: Agency Flow (2 min)**
+
 - Load `/dashboard` → show KPIs rendering
 - Navigate to `/analytics` → charts display
 - Visit `/content-queue` → content loads (if route exists)
@@ -300,12 +312,14 @@ https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/dashb
 - Click export button → CSV downloads (if wired)
 
 **Loom 2: Client Flow (2 min)**
+
 - Load `/client-portal`
 - **Point out: NO edit buttons, NO delete buttons**
 - Export data → CSV downloads
 - Show browser console (clean, only demo mode logs)
 
 **Loom 3: Filter Sync Demo (90 sec)**
+
 - Change brand selector: "Acme Corp" → "GreenLeaf Organics"
 - **Show all KPIs update simultaneously**
 - Change period: "Week" → "Month"
@@ -313,6 +327,7 @@ https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/dashb
 - Show console: `[Analytics] dash_brand_switched`, `dash_filter_applied`
 
 **Loom 4: Dark Mode + Mobile (90 sec)**
+
 - Toggle dark mode on desktop
 - Verify colors/contrast legible
 - Switch to mobile viewport (375px width in DevTools)
@@ -324,15 +339,18 @@ https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/dashb
 **6.3 Performance (Lighthouse) - 5 min**
 
 **Run on these pages (Mobile, Throttled):**
+
 - `/dashboard`
 - `/analytics`
 
 **Capture:**
+
 - **LCP (Largest Contentful Paint):** Target <2.0s (acceptable <2.5s)
 - **INP (Interaction to Next Paint):** Target <150ms (acceptable <200ms)
 - **CLS (Cumulative Layout Shift):** Target <0.1 (acceptable <0.15)
 
 **How to run:**
+
 1. Open Chrome DevTools
 2. Lighthouse tab
 3. Select "Mobile" + "Throttling"
@@ -344,6 +362,7 @@ https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/dashb
 **6.4 Accessibility (axe DevTools) - 5 min**
 
 **Run on these pages:**
+
 - `/dashboard`
 - `/analytics`
 - `/admin/billing`
@@ -352,6 +371,7 @@ https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/dashb
 **Expected:** 0 critical, 0 serious violations
 
 **How to run:**
+
 1. Install axe DevTools browser extension
 2. Open DevTools → axe tab
 3. Click "Scan ALL of my page"
@@ -364,6 +384,7 @@ https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/dashb
 **Open `/dashboard` with console filtered by `[Analytics]`**
 
 **Capture screenshot showing:**
+
 ```javascript
 [Analytics] dash_view: { dashboardId: "main", userId: "demo-user-123", demo_mode: true }
 [Analytics] dash_brand_switched: { dashboardId: "main", fromBrand: "brand-1", toBrand: "brand-2", demo_mode: true }
@@ -421,6 +442,7 @@ fly logs --since 5m | grep "DEMO MODE"
 Test both combinations work:
 
 **Test 1:** Legacy Dashboard
+
 ```bash
 fly secrets set VITE_FEATURE_UNIFIED_DASH=false
 fly deploy --build-arg NO_CACHE=$(date +%s)
@@ -428,6 +450,7 @@ fly deploy --build-arg NO_CACHE=$(date +%s)
 ```
 
 **Test 2:** Unified Dashboard
+
 ```bash
 fly secrets set VITE_FEATURE_UNIFIED_DASH=true
 fly deploy --build-arg NO_CACHE=$(date +%s)
@@ -485,9 +508,11 @@ fly deploy --build-arg NO_CACHE=$(date +%s)
 📝 Build logs: [ATTACH]
 
 **Known Issues:**
+
 - None blocking V1 ✅
 
 **Next Steps:**
+
 - Stakeholder review
 - Plan production canary (admins only)
 ```
@@ -556,6 +581,7 @@ pnpm build
 **Decision:** ✅ **GO FOR DEPLOYMENT**
 
 **Rationale:**
+
 - Server fix is robust (lazy-init, SERVER_DEMO_MODE guard, stub client)
 - Client guards are in place (demo mode, mock data)
 - Flags are independent (tested)

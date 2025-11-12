@@ -9,6 +9,7 @@
 ## 📦 Step 1: Fresh Staging Build
 
 ### Environment Configuration
+
 ```bash
 VITE_DEMO_MODE=true           # ✅ Set in staging
 VITE_FEATURE_UNIFIED_DASH=true # ✅ Set in staging (OFF in prod)
@@ -17,6 +18,7 @@ VITE_FEATURE_UNIFIED_DASH=true # ✅ Set in staging (OFF in prod)
 ### Build Logs (Last 20 Lines)
 
 **TypeCheck:**
+
 ```bash
 $ pnpm typecheck
 
@@ -29,6 +31,7 @@ shared/accessibility-utils.ts: ARIA attribute types
 ```
 
 **Lint:**
+
 ```bash
 $ pnpm lint
 
@@ -43,6 +46,7 @@ $ pnpm lint
 ```
 
 **Build:**
+
 ```bash
 $ pnpm build
 
@@ -60,6 +64,7 @@ dist/assets/index-As80rKIk.js         1,981.52 kB │ gzip: 283.02 kB
 ### Test Credentials
 
 **Admin User (Agency):**
+
 ```
 Username: demo@aligned-by-design.com
 Password: [Auto-login in demo mode]
@@ -68,6 +73,7 @@ Access: Full dashboard, analytics, admin/billing
 ```
 
 **Viewer User (Client Portal):**
+
 ```
 URL: /client-portal
 Token: Auto-generated in demo mode
@@ -76,9 +82,11 @@ Access: Dashboard view, exports only
 ```
 
 ### Network Verification
+
 **Supabase Calls:** ✅ **0 requests** (demo mode bypass working)
 
 **Expected Console Output:**
+
 ```
 [DEMO MODE] Using mock auth user
 [DEMO MODE] Using mock brands
@@ -205,12 +213,14 @@ Access: Dashboard view, exports only
 ```
 
 **Contract Validation:** ✅ **PASS**
+
 - `kpis`: Matches spec (key, label, value, optional delta, spark)
 - `series`: Record<string, {x, y}[]> ✅
 - `topItems`: Uses title/metric (not name/value) ✅
 - `activity`: Uses ts/type/actor/target ✅
 
 **Mock Brands:**
+
 ```json
 [
   {
@@ -239,11 +249,13 @@ Access: Dashboard view, exports only
 ## 🎬 Step 3: Core Flows Smoke Test
 
 ### Agency Flow
+
 **Route:** Auth → Dashboard → Analytics → Content/Campaigns → Approvals → Exports
 
 **Status:** ⏳ **PENDING - Need staging deployment**
 
 **Expected Loom (2 min):**
+
 1. Load /dashboard - shows KPIs, no errors
 2. Navigate to /analytics - charts render
 3. Visit /content-queue - loads cleanly
@@ -251,17 +263,20 @@ Access: Dashboard view, exports only
 5. Click export - CSV downloads
 
 ### Client Flow
+
 **Route:** Login → Client Portal (read-only) → Export
 
 **Status:** ⏳ **PENDING - Need staging deployment**
 
 **Expected Loom (2 min):**
+
 1. Load /client-portal
 2. Verify no edit/delete buttons
 3. Export data - CSV downloads
 4. Console clean, no errors
 
 **Blocker Resolution:** If routes fail, check:
+
 1. Console for errors
 2. Network tab for failed requests
 3. React DevTools for component state
@@ -271,21 +286,27 @@ Access: Dashboard view, exports only
 ## 🎨 Step 4: Unified Dashboard Proof
 
 ### Flag OFF (Legacy) - 4 Screenshots
+
 ⏳ **PENDING:** Need to deploy with flag OFF, capture:
+
 - `/dashboard` (legacy)
 - `/analytics` (legacy)
 - `/admin/billing` (legacy)
 - `/client-portal` (legacy)
 
 ### Flag ON (Unified) - 4 Screenshots
+
 ⏳ **PENDING:** Deploy with flag ON, capture:
+
 - `/dashboard` (DashboardShell + KpiCard)
 - `/analytics` (DashboardShell + charts)
 - `/admin/billing` (DashboardShell + TableCard)
 - `/client-portal` (Unified KpiCard, read-only)
 
 ### Filter Sync Demo (90-sec Loom)
+
 ⏳ **PENDING:** Show:
+
 1. Change brand selector: Acme Corp → GreenLeaf Organics
 2. All KPIs update simultaneously
 3. Change period: Week → Month
@@ -300,12 +321,13 @@ Access: Dashboard view, exports only
 
 **⏳ PENDING - Need staging deployment**
 
-| Page | LCP | INP | CLS | Status |
-|------|-----|-----|-----|--------|
+| Page         | LCP | INP | CLS | Status     |
+| ------------ | --- | --- | --- | ---------- |
 | `/dashboard` | TBD | TBD | TBD | ⏳ Pending |
 | `/analytics` | TBD | TBD | TBD | ⏳ Pending |
 
 **Targets:**
+
 - LCP < 2.0s ✅
 - INP < 150ms ✅
 - CLS < 0.1 ✅
@@ -317,6 +339,7 @@ Access: Dashboard view, exports only
 **Expected:** "No serious or critical violations"
 
 **Manual Checks:**
+
 - [x] Keyboard focus order: Header → Filters → Cards → Tables
 - [x] Focus indicators visible (2px solid primary, 2px offset)
 - [x] ARIA labels on charts (ChartWrapper implementation)
@@ -331,16 +354,19 @@ Access: Dashboard view, exports only
 **⏳ PENDING - Need screenshots**
 
 **Screenshot 1:** Client Portal Overview
+
 - ✅ No "Edit" buttons visible
 - ✅ No "Delete" buttons visible
 - ✅ No destructive actions (approve, reject, etc.)
 
 **Screenshot 2:** Empty State
+
 - ✅ EmptyState component shows for sections with no data
 - ✅ Message: "No pending approvals" or similar
 - ✅ No CTAs to create/edit content
 
 **Code Verification:**
+
 ```typescript
 // client/pages/ClientPortal.tsx
 const unifiedDashEnabled = isFeatureEnabled("unified_dash");
@@ -367,6 +393,7 @@ if (unifiedDashEnabled) {
 **⏳ PENDING - Need console/network capture**
 
 **Page Load:**
+
 ```javascript
 [Analytics] dash_view: {
   dashboardId: "main",
@@ -376,6 +403,7 @@ if (unifiedDashEnabled) {
 ```
 
 **Apply Filter:**
+
 ```javascript
 [Analytics] dash_filter_applied: {
   dashboardId: "main",
@@ -386,6 +414,7 @@ if (unifiedDashEnabled) {
 ```
 
 **Brand Switch:**
+
 ```javascript
 [Analytics] dash_brand_switched: {
   dashboardId: "main",
@@ -396,6 +425,7 @@ if (unifiedDashEnabled) {
 ```
 
 **Export (if wired):**
+
 ```javascript
 [Analytics] dash_export: {
   dashboardId: "analytics",
@@ -405,6 +435,7 @@ if (unifiedDashEnabled) {
 ```
 
 **Verification Method:**
+
 - Open DevTools → Console
 - Filter by "[Analytics]"
 - Verify events fire on interactions
@@ -417,6 +448,7 @@ if (unifiedDashEnabled) {
 ### ESLint Rule Verification
 
 **Config (eslint.config.js):**
+
 ```javascript
 "no-restricted-imports": [
   "error",
@@ -444,16 +476,19 @@ if (unifiedDashEnabled) {
 **⏳ PENDING - Need grep output**
 
 **Command:**
+
 ```bash
 grep -r "HeroMetricCard\|AnalyticsPanel\|DashboardEnhanced\|AnalyticsEnhanced" client/
 ```
 
 **Expected Output:**
+
 ```
 # 0 matches found ✅
 ```
 
 **Deleted Files:**
+
 ```
 ✅ client/components/dashboard/HeroMetricCard.tsx (deleted)
 ✅ client/components/dashboard/AnalyticsPanel.tsx (deleted)
@@ -469,18 +504,19 @@ grep -r "HeroMetricCard\|AnalyticsPanel\|DashboardEnhanced\|AnalyticsEnhanced" c
 
 ### Coverage Matrix
 
-| Primitive | Light | Dark | Loading | Error | Empty |
-|-----------|-------|------|---------|-------|-------|
-| KpiCard | ✅ | ✅ | ✅ | N/A | N/A |
-| ChartCard | ✅ | ✅ | ✅ | ✅ | N/A |
-| TableCard | ✅ | ✅ | ✅ | ✅ | ✅ |
-| ActivityFeedCard | ✅ | ✅ | ✅ | N/A | ✅ |
-| SegmentedControl | ✅ | ✅ | N/A | N/A | N/A |
-| FilterBar | ✅ | ✅ | N/A | N/A | N/A |
-| EmptyState | ✅ | ✅ | N/A | N/A | N/A |
-| ErrorState | ✅ | ✅ | N/A | N/A | N/A |
+| Primitive        | Light | Dark | Loading | Error | Empty |
+| ---------------- | ----- | ---- | ------- | ----- | ----- |
+| KpiCard          | ✅    | ✅   | ✅      | N/A   | N/A   |
+| ChartCard        | ✅    | ✅   | ✅      | ✅    | N/A   |
+| TableCard        | ✅    | ✅   | ✅      | ✅    | ✅    |
+| ActivityFeedCard | ✅    | ✅   | ✅      | N/A   | ✅    |
+| SegmentedControl | ✅    | ✅   | N/A     | N/A   | N/A   |
+| FilterBar        | ✅    | ✅   | N/A     | N/A   | N/A   |
+| EmptyState       | ✅    | ✅   | N/A     | N/A   | N/A   |
+| ErrorState       | ✅    | ✅   | N/A     | N/A   | N/A   |
 
 **Stories Created:**
+
 ```
 stories/DashboardSystem/
 ├── KpiCard.stories.tsx         (9 variants)
@@ -518,6 +554,7 @@ stories/DashboardSystem/
 ### Critical Blockers (NONE) ✅
 
 **All core flows functional:**
+
 - ✅ Auth working (demo mode)
 - ✅ Dashboard rendering
 - ✅ Routing functional
@@ -543,6 +580,7 @@ stories/DashboardSystem/
 ## 🚀 Deployment Status
 
 **Current State:**
+
 - ✅ Code committed and ready
 - ✅ Environment variables set (VITE_DEMO_MODE=true, VITE_FEATURE_UNIFIED_DASH=true)
 - ✅ Build passing locally
@@ -551,6 +589,7 @@ stories/DashboardSystem/
 **Next Actions:**
 
 1. **Deploy to Staging:**
+
    ```bash
    git push origin pulse-nest
    # Or: fly deploy (if manual deploy needed)
@@ -597,6 +636,7 @@ stories/DashboardSystem/
 ## 📞 Escalation Path
 
 **If blocked >30 min:**
+
 1. Triage: Fix, Stub, or Hide behind flag
 2. Document workaround in Known Issues
 3. Move to next checklist item

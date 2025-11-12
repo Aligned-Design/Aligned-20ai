@@ -44,6 +44,7 @@
 ### Phase 1: Quick Smoke Test (5 min)
 
 - [ ] **Health Check**
+
   ```bash
   curl -sI https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/health
   # Expected: HTTP/2 200
@@ -154,6 +155,7 @@
 #### Build Logs (5 min)
 
 - [ ] **Capture Last 20 Lines**
+
   ```bash
   pnpm typecheck 2>&1 | tail -20 > typecheck-output.txt
   pnpm lint 2>&1 | tail -20 > lint-output.txt
@@ -168,6 +170,7 @@
 ### Phase 3: Edge Polish (5 min)
 
 - [ ] **Secrets Hygiene**
+
   ```bash
   grep -r 'supabase' dist/assets/ | grep -v 'demo.supabase.co'
   # Expected: No matches

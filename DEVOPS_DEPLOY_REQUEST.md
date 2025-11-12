@@ -13,6 +13,7 @@
 I've pushed the server fix for demo mode with robust guards (9 commits to `pulse-nest` branch). The code is ready to deploy, but I'm ACL-blocked from running Fly CLI commands in my environment.
 
 **Current Status:**
+
 - ✅ Code pushed to remote: `pulse-nest` branch
 - ✅ `/dashboard` and `/analytics` routes working
 - ❌ `/client-portal` returning 500 error (needs server fix deployment)
@@ -49,6 +50,7 @@ fly logs --since 5m | grep "DEMO MODE"
 ```
 
 **Health check:**
+
 ```bash
 curl -sI https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/health
 # Expected: HTTP/2 200
@@ -103,11 +105,11 @@ Once you reply **"deployed"**, I will immediately:
 
 ## 🔧 Why These Secrets Are Required
 
-| Secret | Purpose | Impact if Missing |
-|--------|---------|-------------------|
-| `VITE_DEMO_MODE=true` | Client bypasses Supabase (compile-time) | Client will try to connect to real Supabase, fail with 401 errors |
-| `SERVER_DEMO_MODE=true` | Server uses stub client (runtime, checked first) | Server crashes on startup with "Missing SUPABASE_URL" |
-| `VITE_FEATURE_UNIFIED_DASH=true` | Enables unified dashboard UI | Uses legacy dashboard instead (acceptable, but need to test both) |
+| Secret                           | Purpose                                          | Impact if Missing                                                 |
+| -------------------------------- | ------------------------------------------------ | ----------------------------------------------------------------- |
+| `VITE_DEMO_MODE=true`            | Client bypasses Supabase (compile-time)          | Client will try to connect to real Supabase, fail with 401 errors |
+| `SERVER_DEMO_MODE=true`          | Server uses stub client (runtime, checked first) | Server crashes on startup with "Missing SUPABASE_URL"             |
+| `VITE_FEATURE_UNIFIED_DASH=true` | Enables unified dashboard UI                     | Uses legacy dashboard instead (acceptable, but need to test both) |
 
 **Note:** `VITE_*` variables are build-time, so the cache bust (`NO_CACHE`) is critical to force a rebuild with new values.
 

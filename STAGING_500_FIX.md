@@ -12,8 +12,8 @@ The server was trying to initialize Supabase on startup with **required** enviro
 
 ```typescript
 // server/lib/supabase.ts (OLD - BROKEN)
-const supabaseUrl = process.env.SUPABASE_URL!;              // ❌ Required, crashes if missing
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;  // ❌ Required, crashes if missing
+const supabaseUrl = process.env.SUPABASE_URL!; // ❌ Required, crashes if missing
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; // ❌ Required, crashes if missing
 ```
 
 When `VITE_DEMO_MODE=true` but server credentials weren't set, the server would **crash on startup** with a 500 error.
@@ -26,26 +26,31 @@ Updated `server/lib/supabase.ts` to respect demo mode:
 
 ```typescript
 // server/lib/supabase.ts (NEW - FIXED)
-const isDemoMode = process.env.VITE_DEMO_MODE === 'true';
-const DEMO_URL = 'https://demo.supabase.co';
-const DEMO_KEY = 'demo-service-role-key';
+const isDemoMode = process.env.VITE_DEMO_MODE === "true";
+const DEMO_URL = "https://demo.supabase.co";
+const DEMO_KEY = "demo-service-role-key";
 
 const supabaseUrl = isDemoMode ? DEMO_URL : process.env.SUPABASE_URL!;
-const supabaseServiceKey = isDemoMode ? DEMO_KEY : process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabaseServiceKey = isDemoMode
+  ? DEMO_KEY
+  : process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 // Warn if not in demo mode and credentials are missing
 if (!isDemoMode && (!supabaseUrl || !supabaseServiceKey)) {
-  console.error('⚠️ Missing Supabase credentials. Set VITE_DEMO_MODE=true to bypass.');
-  throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+  console.error(
+    "⚠️ Missing Supabase credentials. Set VITE_DEMO_MODE=true to bypass.",
+  );
+  throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
 }
 
 // Log demo mode status (once on server startup)
 if (isDemoMode) {
-  console.log('[DEMO MODE] Server using mock Supabase credentials');
+  console.log("[DEMO MODE] Server using mock Supabase credentials");
 }
 ```
 
 **Key Changes:**
+
 1. ✅ Server checks `VITE_DEMO_MODE` environment variable
 2. ✅ Uses demo/placeholder credentials when `VITE_DEMO_MODE=true`
 3. ✅ Logs `[DEMO MODE]` on server startup for visibility
@@ -64,10 +69,12 @@ fly secrets list --app your-app-name
 ```
 
 **Required for demo mode:**
+
 - `VITE_DEMO_MODE=true`
 - `VITE_FEATURE_UNIFIED_DASH=true`
 
 **Set if missing:**
+
 ```bash
 fly secrets set VITE_DEMO_MODE=true --app your-app-name
 fly secrets set VITE_FEATURE_UNIFIED_DASH=true --app your-app-name
@@ -80,6 +87,7 @@ fly deploy --build-arg NO_CACHE=$(date +%s)
 ```
 
 **Expected output:**
+
 ```
 ✓ client built in ~10s
 ✓ server built in ~0.3s
@@ -98,6 +106,7 @@ fly logs --since 5m
 ```
 
 **Expected logs (GOOD SIGNS):**
+
 ```
 [DEMO MODE] Server using mock Supabase credentials
 🚀 Fusion Starter server running on port 8080
@@ -106,6 +115,7 @@ fly logs --since 5m
 ```
 
 **Red flags (REPORT IF YOU SEE THESE):**
+
 ```
 ❌ Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY
 ❌ Error: Invalid API key
@@ -145,6 +155,7 @@ Visit these routes and confirm they load without 500 errors:
 4. `/client-portal` - Read-only client view
 
 **For each route:**
+
 - ✅ Page loads (no 500 error)
 - ✅ Console shows demo mode logs
 - ✅ Network tab shows 0 Supabase requests
@@ -191,12 +202,14 @@ After deployment, verify these conditions:
 ### 1. Screenshots (8 total)
 
 **Desktop (1920x1080):**
+
 - Light mode: `/dashboard`
 - Dark mode: `/dashboard`
 - Light mode: `/analytics`
 - Dark mode: `/analytics`
 
 **Mobile (375x667):**
+
 - Light mode: `/dashboard`
 - Dark mode: `/dashboard`
 - Light mode: `/client-portal`
@@ -235,14 +248,15 @@ After deployment, verify these conditions:
 
 Run Lighthouse on these pages (throttled, mobile):
 
-| Page | LCP Target | INP Target | CLS Target |
-|------|------------|------------|------------|
-| `/dashboard` | <2.0s | <150ms | <0.1 |
-| `/analytics` | <2.0s | <150ms | <0.1 |
+| Page         | LCP Target | INP Target | CLS Target |
+| ------------ | ---------- | ---------- | ---------- |
+| `/dashboard` | <2.0s      | <150ms     | <0.1       |
+| `/analytics` | <2.0s      | <150ms     | <0.1       |
 
 ### 4. A11y Audit (axe DevTools)
 
 Run axe on all 4 core routes:
+
 - `/dashboard`
 - `/analytics`
 - `/admin/billing`
@@ -253,6 +267,7 @@ Run axe on all 4 core routes:
 ### 5. Telemetry Events (Console Screenshot)
 
 Filter console by `[Analytics]` and capture:
+
 - `dash_view`
 - `dash_filter_applied`
 - `dash_brand_switched`
@@ -263,11 +278,13 @@ Filter console by `[Analytics]` and capture:
 ### 6. Build Logs
 
 Capture last 30 lines of:
+
 ```bash
 fly logs --since 5m
 ```
 
 **Expected:**
+
 - `[DEMO MODE]` log
 - No errors/warnings
 - Server running on port 8080
@@ -325,16 +342,19 @@ Once all validation steps pass, post this in chat:
 ### Issue: Server still crashes with 500 error
 
 **Check:**
+
 ```bash
 fly logs --since 10m | grep -i error
 ```
 
 **Look for:**
+
 - `Missing SUPABASE_URL` - Env var not set correctly
 - `Invalid API key` - Not in demo mode, but credentials invalid
 - `TypeError: Failed to fetch` - Client trying to call Supabase
 
 **Fix:**
+
 1. Verify `VITE_DEMO_MODE=true` is set: `fly secrets list`
 2. Re-deploy with cache bust: `fly deploy --build-arg NO_CACHE=$(date +%s)`
 3. Check server logs: `fly logs --since 5m`
@@ -342,10 +362,12 @@ fly logs --since 10m | grep -i error
 ### Issue: Client shows Supabase errors
 
 **Check browser console:**
+
 - Look for `[DEMO MODE]` logs
 - If missing, demo mode not active
 
 **Fix:**
+
 1. Verify build-time env vars: Check build logs for `VITE_DEMO_MODE`
 2. Client env vars are compile-time, must redeploy after changing
 3. Clear browser cache: Hard refresh (Cmd+Shift+R / Ctrl+Shift+F5)
@@ -353,10 +375,12 @@ fly logs --since 10m | grep -i error
 ### Issue: Routes return 404
 
 **Check:**
+
 - Server routing config
 - SPA fallback serving index.html
 
 **Fix:**
+
 - Ensure `server/node-build.ts` has catch-all route for React Router
 
 ---
