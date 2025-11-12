@@ -9,7 +9,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "@/contexts/UserContext";
 import { WorkspaceProvider } from "@/contexts/WorkspaceContext";
-import { AuthProvider, useAuth as useOnboardingAuth } from "@/contexts/AuthContext";
+import {
+  AuthProvider,
+  useAuth as useOnboardingAuth,
+} from "@/contexts/AuthContext";
 import { BrandProvider } from "@/contexts/BrandContext";
 import MilestoneCelebrator from "@/components/MilestoneCelebrator";
 import { SEOHead } from "@/components/seo";
