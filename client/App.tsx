@@ -38,6 +38,7 @@ import Brands from "./pages/Brands";
 import BrandIntake from "./pages/BrandIntake";
 import BrandSnapshot from "./pages/BrandSnapshot";
 import Billing from "./pages/Billing";
+import Pricing from "./pages/Pricing";
 
 const queryClient = new QueryClient();
 
@@ -101,6 +102,9 @@ function ProtectedRoutes() {
           </PublicRoute>
         }
       />
+
+      {/* Pricing page - accessible to everyone */}
+      <Route path="/pricing" element={<Pricing />} />
 
       {/* Auth Routes - redirect to onboarding or show onboarding */}
       <Route
