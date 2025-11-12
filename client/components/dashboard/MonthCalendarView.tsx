@@ -1,27 +1,8 @@
 import { Facebook, Twitter, Instagram, Linkedin, Music, Youtube, MapPin } from "lucide-react";
 
-import {
-  Facebook,
-  Twitter,
-  Instagram,
-  Linkedin,
-  Music,
-  Youtube,
-  MapPin,
-} from "lucide-react";
 import { useState } from "react";
 import { PostPreviewModal } from "./PostPreviewModal";
-
-interface Post {
-  id: string;
-  title: string;
-  platform: "linkedin" | "instagram" | "facebook" | "twitter" | "tiktok" | "youtube" | "pinterest";
-  status: "draft" | "reviewing" | "approved" | "scheduled";
-  scheduledTime: string;
-  excerpt: string;
-  brand?: string;
-  campaign?: string;
-}
+import { Post } from "@/types/post";
 
 interface DayData {
   date: number;
