@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "../lib/errors/AppError";
+import { AppError } from "../lib/error-middleware";
 
 /**
  * Trial Middleware - Enforces trial limitations

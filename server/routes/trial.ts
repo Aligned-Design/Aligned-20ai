@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { getTrialStatus, incrementTrialCount } from "../middleware/trial";
 import { authenticateUser } from "../middleware/security";
-import { AppError } from "../lib/errors/AppError";
+import { AppError } from "../lib/error-middleware";
 
 const router = Router();
 
