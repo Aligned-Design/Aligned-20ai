@@ -1,6 +1,6 @@
 /**
  * SegmentedControl Component
- * 
+ *
  * Period selector for dashboards: Day / Week / Month / Custom
  * Consistent UI pattern across all dashboard views.
  */
@@ -36,7 +36,7 @@ export function SegmentedControl({
         "bg-slate-100 dark:bg-slate-800",
         "rounded-lg p-1",
         "gap-1",
-        className
+        className,
       )}
       role="tablist"
       aria-label="Time period selector"
@@ -52,7 +52,7 @@ export function SegmentedControl({
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2",
             value === option.value
               ? "bg-white dark:bg-slate-700 text-[var(--color-foreground)] shadow-sm"
-              : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
+              : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]",
           )}
           role="tab"
           aria-selected={value === option.value}

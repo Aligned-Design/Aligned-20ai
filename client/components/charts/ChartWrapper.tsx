@@ -1,6 +1,6 @@
 /**
  * ChartWrapper Component
- * 
+ *
  * Wrapper for Recharts with consistent styling and accessibility.
  * Supports line, area, and bar charts.
  */
@@ -36,11 +36,11 @@ interface ChartWrapperProps {
 }
 
 const DEFAULT_COLORS = [
-  "var(--color-primary)",      // Purple
-  "#3b82f6",                    // Blue
-  "#10b981",                    // Green
-  "#f59e0b",                    // Orange
-  "#ef4444",                    // Red
+  "var(--color-primary)", // Purple
+  "#3b82f6", // Blue
+  "#10b981", // Green
+  "#f59e0b", // Orange
+  "#ef4444", // Red
 ];
 
 export function ChartWrapper({
@@ -72,7 +72,12 @@ export function ChartWrapper({
       case "line":
         return (
           <LineChart {...chartProps}>
-            {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />}
+            {showGrid && (
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--color-border)"
+              />
+            )}
             <XAxis dataKey={xAxisKey} {...commonAxisProps} />
             <YAxis {...commonAxisProps} />
             <Tooltip
@@ -100,7 +105,12 @@ export function ChartWrapper({
       case "area":
         return (
           <AreaChart {...chartProps}>
-            {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />}
+            {showGrid && (
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--color-border)"
+              />
+            )}
             <XAxis dataKey={xAxisKey} {...commonAxisProps} />
             <YAxis {...commonAxisProps} />
             <Tooltip
@@ -127,7 +137,12 @@ export function ChartWrapper({
       case "bar":
         return (
           <BarChart {...chartProps}>
-            {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />}
+            {showGrid && (
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--color-border)"
+              />
+            )}
             <XAxis dataKey={xAxisKey} {...commonAxisProps} />
             <YAxis {...commonAxisProps} />
             <Tooltip
@@ -158,7 +173,8 @@ export function ChartWrapper({
       </ResponsiveContainer>
       {/* Screen reader text summary */}
       <span className="sr-only">
-        Chart showing {dataKeys.join(", ")} over {xAxisKey}. Contains {data.length} data points.
+        Chart showing {dataKeys.join(", ")} over {xAxisKey}. Contains{" "}
+        {data.length} data points.
       </span>
     </div>
   );

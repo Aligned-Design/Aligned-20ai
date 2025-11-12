@@ -1,6 +1,6 @@
 /**
  * DashboardSystem - Unified Dashboard Components
- * 
+ *
  * Single source of truth for all dashboard UI across the application.
  * Enforces consistent layout, spacing, and behavior.
  */

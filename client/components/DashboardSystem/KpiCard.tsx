@@ -1,6 +1,6 @@
 /**
  * KpiCard Component
- * 
+ *
  * Standard KPI/metric card showing value, delta, trend sparkline.
  * Used across all dashboards for consistent metric visualization.
  */
@@ -39,16 +39,16 @@ export function KpiCard({
     ? delta.trend === "up"
       ? TrendingUp
       : delta.trend === "down"
-      ? TrendingDown
-      : Minus
+        ? TrendingDown
+        : Minus
     : null;
 
   const trendColor =
     delta?.trend === "up"
       ? "text-green-600 dark:text-green-500"
       : delta?.trend === "down"
-      ? "text-red-600 dark:text-red-500"
-      : "text-slate-500";
+        ? "text-red-600 dark:text-red-500"
+        : "text-slate-500";
 
   return (
     <Card className={cn("relative overflow-hidden", className)}>
@@ -57,21 +57,26 @@ export function KpiCard({
           {title}
         </CardTitle>
         {Icon && (
-          <Icon className="w-4 h-4 text-[var(--color-muted)]" aria-hidden="true" />
+          <Icon
+            className="w-4 h-4 text-[var(--color-muted)]"
+            aria-hidden="true"
+          />
         )}
       </CardHeader>
-      
+
       <CardContent>
         {/* Main value */}
         <div className="text-[var(--font-size-h2)] font-[var(--font-weight-bold)] text-[var(--color-foreground)] mb-1">
           {value}
         </div>
-        
+
         {/* Delta/Change */}
         {delta && TrendIcon && (
           <div className="flex items-center gap-1 text-[var(--font-size-body-sm)]">
             <TrendIcon className={cn("w-3.5 h-3.5", trendColor)} />
-            <span className={cn("font-[var(--font-weight-medium)]", trendColor)}>
+            <span
+              className={cn("font-[var(--font-weight-medium)]", trendColor)}
+            >
               {delta.value > 0 ? "+" : ""}
               {delta.value}%
             </span>
@@ -80,17 +85,20 @@ export function KpiCard({
             )}
           </div>
         )}
-        
+
         {/* Description */}
         {description && (
           <p className="text-[var(--font-size-body-sm)] text-[var(--color-muted)] mt-2">
             {description}
           </p>
         )}
-        
+
         {/* Sparkline placeholder */}
         {sparkline && sparkline.length > 0 && (
-          <div className="mt-4 h-12 flex items-end gap-0.5" aria-label="Trend sparkline">
+          <div
+            className="mt-4 h-12 flex items-end gap-0.5"
+            aria-label="Trend sparkline"
+          >
             {sparkline.map((val, i) => {
               const max = Math.max(...sparkline);
               const height = (val / max) * 100;
@@ -105,7 +113,7 @@ export function KpiCard({
             })}
           </div>
         )}
-        
+
         {children}
       </CardContent>
     </Card>

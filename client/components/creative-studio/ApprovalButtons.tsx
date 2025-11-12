@@ -58,11 +58,7 @@ export function ApprovalButtons({
           <CheckCircle className="w-4 h-4 mr-2" />
           {showApproveNotes ? "Confirm Approval" : "Approve"}
         </Button>
-        <Button
-          onClick={handleReject}
-          variant="destructive"
-          className="flex-1"
-        >
+        <Button onClick={handleReject} variant="destructive" className="flex-1">
           <XCircle className="w-4 h-4 mr-2" />
           {showRejectReason ? "Confirm Rejection" : "Reject"}
         </Button>

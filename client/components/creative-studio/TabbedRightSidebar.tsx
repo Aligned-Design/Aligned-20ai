@@ -30,7 +30,9 @@ export function TabbedRightSidebar({
   onClose,
   isCollapsible = false,
 }: TabbedRightSidebarProps) {
-  const [activeTab, setActiveTab] = useState<"brand-kit" | "advisor">("brand-kit");
+  const [activeTab, setActiveTab] = useState<"brand-kit" | "advisor">(
+    "brand-kit",
+  );
 
   return (
     <div className="w-80 bg-white border-l border-slate-200 flex flex-col h-full">
@@ -51,7 +53,9 @@ export function TabbedRightSidebar({
       {/* Tabbed Interface */}
       <Tabs
         value={activeTab}
-        onValueChange={(value) => setActiveTab(value as "brand-kit" | "advisor")}
+        onValueChange={(value) =>
+          setActiveTab(value as "brand-kit" | "advisor")
+        }
         className="flex-1 flex flex-col overflow-hidden"
       >
         <TabsList className="grid w-full grid-cols-2 rounded-none border-b border-slate-200 bg-slate-50 p-0 h-12">

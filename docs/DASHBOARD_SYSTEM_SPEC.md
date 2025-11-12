@@ -52,12 +52,12 @@ Mobile (<768px):     12 columns, 12px gutters
 
 Standard card heights for consistent visual rhythm:
 
-| Size | Height | Use Case |
-|------|--------|----------|
-| XS   | 120px  | Compact KPI, status indicator |
-| S    | 180px  | Standard KPI with sparkline |
-| M    | 280px  | Charts, small tables |
-| L    | 360px  | Large charts, medium tables |
+| Size | Height | Use Case                            |
+| ---- | ------ | ----------------------------------- |
+| XS   | 120px  | Compact KPI, status indicator       |
+| S    | 180px  | Standard KPI with sparkline         |
+| M    | 280px  | Charts, small tables                |
+| L    | 360px  | Large charts, medium tables         |
 | XL   | 480px  | Complex visualizations, full tables |
 
 ---
@@ -98,42 +98,35 @@ All components consume tokens from `client/styles/tokens.css`:
 ### Colors
 
 ```css
---color-primary: #3D0FD6          /* Purple */
---color-surface: #F9FAFB          /* Background (light) */
---color-foreground: #111827       /* Text (light) */
---color-border: #E5E7EB           /* Borders */
---color-muted: #6B7280            /* Secondary text */
+--color-primary: #3d0fd6 /* Purple */ --color-surface: #f9fafb
+  /* Background (light) */ --color-foreground: #111827 /* Text (light) */
+  --color-border: #e5e7eb /* Borders */ --color-muted: #6b7280
+  /* Secondary text */;
 ```
 
 ### Spacing (4px base unit)
 
 ```css
---spacing-xs: 4px
---spacing-sm: 8px
---spacing-md: 16px
---spacing-lg: 24px
---spacing-xl: 32px
---spacing-2xl: 40px
---spacing-3xl: 48px
---spacing-4xl: 64px
+--spacing-xs: 4px --spacing-sm: 8px --spacing-md: 16px --spacing-lg: 24px
+  --spacing-xl: 32px --spacing-2xl: 40px --spacing-3xl: 48px --spacing-4xl: 64px;
 ```
 
 ### Typography
 
 ```css
---font-family: Inter, sans-serif
---font-size-h1: 32px              /* Page titles */
---font-size-h2: 24px              /* Section headers */
---font-size-h3: 20px              /* Card titles */
---font-size-body: 14px            /* Body text */
---font-size-body-sm: 12px         /* Labels, meta */
+--font-family:
+  Inter,
+  sans-serif --font-size-h1: 32px /* Page titles */ --font-size-h2: 24px
+    /* Section headers */ --font-size-h3: 20px /* Card titles */
+    --font-size-body: 14px /* Body text */ --font-size-body-sm: 12px
+    /* Labels, meta */;
 ```
 
 ### Radius & Shadows
 
 ```css
---radius-xl: 12px                 /* Card corners */
---shadow-base: 0 4px 6px rgba...  /* Card elevation */
+--radius-xl: 12px /* Card corners */ --shadow-base: 0 4px 6px rgba...
+  /* Card elevation */;
 ```
 
 ---
@@ -165,39 +158,46 @@ All components consume tokens from `client/styles/tokens.css`:
 
 ### Core Components
 
-| Component | Purpose | Props |
-|-----------|---------|-------|
-| `DashboardShell` | Main container | title, period, brandSelector, filters |
-| `DashboardHeader` | Top bar | title, subtitle, period, actions |
-| `KpiCard` | Metric display | value, delta, sparkline |
-| `ChartCard` | Chart wrapper | type, data, loading, error |
-| `TableCard` | Table wrapper | data, columns, loading, error |
-| `ActivityFeedCard` | Timeline | items, loading, error |
-| `SegmentedControl` | Period picker | Day/Week/Month/Custom |
-| `FilterBar` | Filter chips | activeFilters, onRemove, onClearAll |
-| `LoadingSkeleton` | Loading state | variant, count, height |
-| `EmptyState` | No data | icon, title, description, action |
-| `ErrorState` | Error | title, message, onRetry, onSupport |
+| Component          | Purpose        | Props                                 |
+| ------------------ | -------------- | ------------------------------------- |
+| `DashboardShell`   | Main container | title, period, brandSelector, filters |
+| `DashboardHeader`  | Top bar        | title, subtitle, period, actions      |
+| `KpiCard`          | Metric display | value, delta, sparkline               |
+| `ChartCard`        | Chart wrapper  | type, data, loading, error            |
+| `TableCard`        | Table wrapper  | data, columns, loading, error         |
+| `ActivityFeedCard` | Timeline       | items, loading, error                 |
+| `SegmentedControl` | Period picker  | Day/Week/Month/Custom                 |
+| `FilterBar`        | Filter chips   | activeFilters, onRemove, onClearAll   |
+| `LoadingSkeleton`  | Loading state  | variant, count, height                |
+| `EmptyState`       | No data        | icon, title, description, action      |
+| `ErrorState`       | Error          | title, message, onRetry, onSupport    |
 
 ### Shared Utilities
 
-| Utility | Purpose |
-|---------|---------|
+| Utility            | Purpose                                 |
+| ------------------ | --------------------------------------- |
 | `useDashboardData` | Centralized data fetching (React Query) |
-| `ChartWrapper` | Recharts wrapper with tokens |
-| `PeriodPicker` | Enhanced date range picker |
-| `BrandSelector` | Brand/workspace switcher |
+| `ChartWrapper`     | Recharts wrapper with tokens            |
+| `PeriodPicker`     | Enhanced date range picker              |
+| `BrandSelector`    | Brand/workspace switcher                |
 
 ---
 
 ## Layout Example
 
 ```tsx
-import { DashboardShell, KpiCard, ChartCard, TableCard } from "@/components/DashboardSystem";
+import {
+  DashboardShell,
+  KpiCard,
+  ChartCard,
+  TableCard,
+} from "@/components/DashboardSystem";
 import { useDashboardData } from "@/lib/useDashboardData";
 
 export default function MyDashboard() {
-  const { kpis, series, isLoading, error } = useDashboardData({ period: "week" });
+  const { kpis, series, isLoading, error } = useDashboardData({
+    period: "week",
+  });
 
   return (
     <DashboardShell
@@ -212,7 +212,11 @@ export default function MyDashboard() {
       ))}
 
       {/* Chart */}
-      <ChartCard title="Impressions Over Time" isLoading={isLoading} error={error}>
+      <ChartCard
+        title="Impressions Over Time"
+        isLoading={isLoading}
+        error={error}
+      >
         <ChartWrapper type="line" data={series} />
       </ChartCard>
 
@@ -251,13 +255,13 @@ export default function MyDashboard() {
 
 ## Performance Targets
 
-| Metric | Target | Measured With |
-|--------|--------|---------------|
-| First Contentful Paint (FCP) | < 1.5s | Lighthouse |
-| Largest Contentful Paint (LCP) | < 2.0s | Lighthouse |
-| Time to Interactive (TTI) | < 3.0s | Lighthouse |
-| Interaction to Next Paint (INP) | < 150ms | DevTools |
-| Bundle Size (DashboardSystem) | < 50KB gzip | webpack-bundle-analyzer |
+| Metric                          | Target      | Measured With           |
+| ------------------------------- | ----------- | ----------------------- |
+| First Contentful Paint (FCP)    | < 1.5s      | Lighthouse              |
+| Largest Contentful Paint (LCP)  | < 2.0s      | Lighthouse              |
+| Time to Interactive (TTI)       | < 3.0s      | Lighthouse              |
+| Interaction to Next Paint (INP) | < 150ms     | DevTools                |
+| Bundle Size (DashboardSystem)   | < 50KB gzip | webpack-bundle-analyzer |
 
 ### Optimization Strategies
 

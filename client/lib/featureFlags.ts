@@ -29,10 +29,12 @@ export function getFeatureFlags(): FeatureFlags {
 
   // Check environment variables
   if (import.meta.env.VITE_FEATURE_STUDIO_SIDEBAR !== undefined) {
-    flags.studio_sidebar = import.meta.env.VITE_FEATURE_STUDIO_SIDEBAR === "true";
+    flags.studio_sidebar =
+      import.meta.env.VITE_FEATURE_STUDIO_SIDEBAR === "true";
   }
   if (import.meta.env.VITE_FEATURE_STUDIO_ALIGN_TOOLS !== undefined) {
-    flags.studio_align_tools = import.meta.env.VITE_FEATURE_STUDIO_ALIGN_TOOLS === "true";
+    flags.studio_align_tools =
+      import.meta.env.VITE_FEATURE_STUDIO_ALIGN_TOOLS === "true";
   }
   if (import.meta.env.VITE_FEATURE_AI_COPY_V1 !== undefined) {
     flags.ai_copy_v1 = import.meta.env.VITE_FEATURE_AI_COPY_V1 === "true";

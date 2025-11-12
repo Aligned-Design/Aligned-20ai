@@ -31,7 +31,9 @@ export function VersionHistoryTimeline({
   onRestore,
   onPreview,
 }: VersionHistoryTimelineProps) {
-  const [previewingVersion, setPreviewingVersion] = useState<Version | null>(null);
+  const [previewingVersion, setPreviewingVersion] = useState<Version | null>(
+    null,
+  );
 
   // Mock versions - in production, fetch from API
   const versions: Version[] = [

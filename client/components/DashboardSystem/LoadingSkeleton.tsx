@@ -1,6 +1,6 @@
 /**
  * LoadingSkeleton Component
- * 
+ *
  * Shimmer placeholder for loading states across all dashboards.
  * Provides consistent loading experience and reduces layout shift.
  */
@@ -92,7 +92,12 @@ export function LoadingSkeleton({
 
   // Default: Card skeleton
   return (
-    <div className={cn("grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3", className)}>
+    <div
+      className={cn(
+        "grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+        className,
+      )}
+    >
       {skeletons.map((_, i) => (
         <div
           key={i}
@@ -101,7 +106,7 @@ export function LoadingSkeleton({
         >
           {/* Shimmer overlay */}
           <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 dark:via-slate-700/20 to-transparent" />
-          
+
           {/* Content placeholders */}
           <div className="space-y-4">
             <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded w-1/2 animate-pulse" />

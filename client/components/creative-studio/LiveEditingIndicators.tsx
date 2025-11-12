@@ -49,9 +49,7 @@ export function LiveEditingIndicators({
           )}
           <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full">
             <Edit3 className="w-3 h-3" />
-            <span className="text-xs font-bold">
-              {editors.length} editing
-            </span>
+            <span className="text-xs font-bold">{editors.length} editing</span>
           </div>
         </div>
       )}
@@ -77,9 +75,7 @@ export function LiveEditingIndicators({
           )}
           <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
             <Eye className="w-3 h-3" />
-            <span className="text-xs font-bold">
-              {viewers.length} viewing
-            </span>
+            <span className="text-xs font-bold">{viewers.length} viewing</span>
           </div>
         </div>
       )}

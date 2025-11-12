@@ -3,7 +3,15 @@
  * Touch-optimized toolbar for mobile/tablet devices
  */
 
-import { Type, Image, Square, Palette, Layers, Save, Share2 } from "lucide-react";
+import {
+  Type,
+  Image,
+  Square,
+  Palette,
+  Layers,
+  Save,
+  Share2,
+} from "lucide-react";
 
 interface MobileToolbarProps {
   onAddText: () => void;

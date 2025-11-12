@@ -1,12 +1,18 @@
 /**
  * ActivityFeedCard Component
- * 
+ *
  * Timeline list for activity/events across dashboards.
  * Consistent UI for showing recent actions, notifications, etc.
  */
 
 import { ReactNode } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { LucideIcon, Clock } from "lucide-react";
 import { LoadingSkeleton } from "./LoadingSkeleton";
@@ -56,7 +62,7 @@ export function ActivityFeedCard({
         <CardTitle>{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
-      
+
       <CardContent>
         {isLoading ? (
           <LoadingSkeleton variant="text" count={5} />
@@ -73,14 +79,16 @@ export function ActivityFeedCard({
             {displayItems.map((item, index) => {
               const ItemIcon = item.icon || Clock;
               const isLast = index === displayItems.length - 1;
-              
+
               return (
                 <div
                   key={item.id}
                   className={cn(
                     "relative pl-8 pb-4",
-                    !isLast && "border-l-2 border-slate-200 dark:border-slate-700",
-                    onItemClick && "cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg p-2 -ml-2 transition-colors"
+                    !isLast &&
+                      "border-l-2 border-slate-200 dark:border-slate-700",
+                    onItemClick &&
+                      "cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg p-2 -ml-2 transition-colors",
                   )}
                   onClick={() => onItemClick?.(item)}
                   role={onItemClick ? "button" : undefined}
@@ -93,17 +101,17 @@ export function ActivityFeedCard({
                       "flex items-center justify-center",
                       "bg-white dark:bg-slate-900",
                       "border-2 border-slate-200 dark:border-slate-700",
-                      "-translate-x-[13px]"
+                      "-translate-x-[13px]",
                     )}
                   >
-                    <ItemIcon 
+                    <ItemIcon
                       className={cn(
                         "w-3 h-3",
-                        item.iconColor || "text-slate-500"
-                      )} 
+                        item.iconColor || "text-slate-500",
+                      )}
                     />
                   </div>
-                  
+
                   {/* Content */}
                   <div className="flex-1">
                     <p className="text-[var(--font-size-body-sm)] font-[var(--font-weight-medium)] text-[var(--color-foreground)] mb-0.5">

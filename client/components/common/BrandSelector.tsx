@@ -1,6 +1,6 @@
 /**
  * BrandSelector Component
- * 
+ *
  * Brand/workspace switcher for dashboards.
  * Syncs selected brand across dashboard views.
  */
@@ -42,7 +42,7 @@ export function BrandSelector({
   className,
 }: BrandSelectorProps) {
   const [open, setOpen] = useState(false);
-  
+
   const selectedBrand = brands.find((b) => b.id === selectedBrandId);
 
   return (
@@ -69,7 +69,7 @@ export function BrandSelector({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      
+
       <PopoverContent className="w-[200px] p-0">
         <Command>
           <CommandInput placeholder="Search brands..." />
@@ -87,7 +87,7 @@ export function BrandSelector({
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    selectedBrandId === brand.id ? "opacity-100" : "opacity-0"
+                    selectedBrandId === brand.id ? "opacity-100" : "opacity-0",
                   )}
                 />
                 <div className="flex items-center gap-2">

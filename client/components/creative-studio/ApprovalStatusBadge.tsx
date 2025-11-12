@@ -5,7 +5,12 @@
 
 import { CheckCircle, Clock, XCircle, FileText } from "lucide-react";
 
-export type ApprovalStatus = "draft" | "pending_approval" | "approved" | "rejected" | "scheduled";
+export type ApprovalStatus =
+  | "draft"
+  | "pending_approval"
+  | "approved"
+  | "rejected"
+  | "scheduled";
 
 interface ApprovalStatusBadgeProps {
   status: ApprovalStatus;

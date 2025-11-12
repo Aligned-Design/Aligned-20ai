@@ -1,14 +1,14 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { TableCard } from '@/components/DashboardSystem';
-import { Users } from 'lucide-react';
+import type { Meta, StoryObj } from "@storybook/react";
+import { TableCard } from "@/components/DashboardSystem";
+import { Users } from "lucide-react";
 
 const meta: Meta<typeof TableCard> = {
-  title: 'DashboardSystem/TableCard',
+  title: "DashboardSystem/TableCard",
   component: TableCard,
   parameters: {
-    layout: 'padded',
+    layout: "padded",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 };
 
 export default meta;
@@ -25,17 +25,21 @@ const SampleTable = () => (
     </thead>
     <tbody>
       {[
-        { name: 'John Doe', email: 'john@example.com', status: 'Active' },
-        { name: 'Jane Smith', email: 'jane@example.com', status: 'Active' },
-        { name: 'Bob Johnson', email: 'bob@example.com', status: 'Pending' },
+        { name: "John Doe", email: "john@example.com", status: "Active" },
+        { name: "Jane Smith", email: "jane@example.com", status: "Active" },
+        { name: "Bob Johnson", email: "bob@example.com", status: "Pending" },
       ].map((row, i) => (
         <tr key={i} className="border-b border-slate-100 dark:border-slate-800">
           <td className="py-3 px-4 text-sm">{row.name}</td>
           <td className="py-3 px-4 text-sm">{row.email}</td>
           <td className="py-3 px-4 text-sm text-right">
-            <span className={`px-2 py-1 rounded-full text-xs ${
-              row.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-            }`}>
+            <span
+              className={`px-2 py-1 rounded-full text-xs ${
+                row.status === "Active"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-yellow-100 text-yellow-700"
+              }`}
+            >
               {row.status}
             </span>
           </td>
@@ -48,8 +52,8 @@ const SampleTable = () => (
 // Default Table
 export const Default: Story = {
   args: {
-    title: 'User Accounts',
-    description: 'Active users in the system',
+    title: "User Accounts",
+    description: "Active users in the system",
     icon: Users,
     children: <SampleTable />,
   },
@@ -58,8 +62,8 @@ export const Default: Story = {
 // Loading State
 export const Loading: Story = {
   args: {
-    title: 'Loading Table',
-    description: 'Fetching data...',
+    title: "Loading Table",
+    description: "Fetching data...",
     isLoading: true,
     children: <div />,
   },
@@ -68,10 +72,10 @@ export const Loading: Story = {
 // Error State
 export const Error: Story = {
   args: {
-    title: 'Table Error',
-    description: 'Failed to load',
-    error: new Error('Failed to fetch table data'),
-    onRetry: () => alert('Retrying...'),
+    title: "Table Error",
+    description: "Failed to load",
+    error: new Error("Failed to fetch table data"),
+    onRetry: () => alert("Retrying..."),
     children: <div />,
   },
 };
@@ -79,10 +83,10 @@ export const Error: Story = {
 // Empty State
 export const Empty: Story = {
   args: {
-    title: 'No Data',
-    description: 'No users found',
+    title: "No Data",
+    description: "No users found",
     isEmpty: true,
-    emptyMessage: 'No users match your filters',
+    emptyMessage: "No users match your filters",
     children: <div />,
   },
 };
@@ -90,14 +94,14 @@ export const Empty: Story = {
 // Dark Mode
 export const DarkMode: Story = {
   args: {
-    title: 'User Accounts',
-    description: 'Active users in the system',
+    title: "User Accounts",
+    description: "Active users in the system",
     icon: Users,
     children: <SampleTable />,
   },
   parameters: {
     backgrounds: {
-      default: 'dark',
+      default: "dark",
     },
   },
   decorators: [

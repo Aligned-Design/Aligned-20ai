@@ -51,7 +51,9 @@ export function ApprovalHistoryPanel({ design }: ApprovalHistoryPanelProps) {
   }
 
   // Sort by timestamp (most recent first)
-  events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  events.sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+  );
 
   if (events.length === 0) {
     return (

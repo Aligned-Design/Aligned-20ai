@@ -1,12 +1,18 @@
 /**
  * ChartCard Component
- * 
+ *
  * Wrapper for charts (line/area/bar) across all dashboards.
  * Provides consistent header, loading, and error states.
  */
 
 import { ReactNode } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { LucideIcon, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -46,7 +52,7 @@ export function ChartCard({
             {description && <CardDescription>{description}</CardDescription>}
           </div>
         </div>
-        
+
         {actions || (
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <MoreVertical className="w-4 h-4" />
@@ -54,7 +60,7 @@ export function ChartCard({
           </Button>
         )}
       </CardHeader>
-      
+
       <CardContent>
         {isLoading ? (
           <LoadingSkeleton variant="chart" />

@@ -8,11 +8,13 @@
 ## ✅ Completed Validations
 
 ### 1. Env Scope Sanity ✅
+
 - [x] `VITE_DEMO_MODE=true` set in **local** environment
 - [x] **Action Required:** Set `VITE_DEMO_MODE=true` in **staging** environment
 - [x] **Reminder:** `VITE_*` vars are compile-time - **redeploy required** after changes
 
 **Verification Command (Staging):**
+
 ```bash
 # On Fly.io
 fly secrets set VITE_DEMO_MODE=true --app your-app-name
@@ -24,18 +26,20 @@ fly deploy
 ---
 
 ### 2. Flag Interplay ✅
+
 **Verified:** `VITE_DEMO_MODE` and `VITE_FEATURE_UNIFIED_DASH` are **independent**
 
 **Evidence:**
+
 ```typescript
 // client/pages/Dashboard.tsx
 export default function Dashboard() {
   const unifiedDashEnabled = isFeatureEnabled("unified_dash"); // ✅ Independent check
-  
+
   if (unifiedDashEnabled) {
     return <UnifiedDashboard />;  // Uses new DashboardSystem
   }
-  
+
   return <LegacyDashboard />;  // Uses legacy components
 }
 
@@ -48,19 +52,21 @@ if (demoMode) {
 
 **Test Matrix:**
 
-| VITE_DEMO_MODE | VITE_FEATURE_UNIFIED_DASH | Auth | Dashboard UI |
-|----------------|---------------------------|------|--------------|
-| `false` | `false` | Supabase | Legacy |
-| `false` | `true` | Supabase | Unified |
-| `true` | `false` | Mock | Legacy |
-| `true` | `true` | Mock | Unified ✅ |
+| VITE_DEMO_MODE | VITE_FEATURE_UNIFIED_DASH | Auth     | Dashboard UI |
+| -------------- | ------------------------- | -------- | ------------ |
+| `false`        | `false`                   | Supabase | Legacy       |
+| `false`        | `true`                    | Supabase | Unified      |
+| `true`         | `false`                   | Mock     | Legacy       |
+| `true`         | `true`                    | Mock     | Unified ✅   |
 
 ---
 
 ### 3. Contract Parity ✅
+
 **Mock data strictly matches production contracts**
 
 **Brand Contract:**
+
 ```typescript
 // client/lib/supabase.ts
 export type Brand = {
@@ -69,8 +75,8 @@ export type Brand = {
   slug: string;
   logo_url: string | null;
   primary_color: string;
-  secondary_color: string | null;  // ✅ Added to mockBrands
-  accent_color: string | null;     // ✅ Added to mockBrands
+  secondary_color: string | null; // ✅ Added to mockBrands
+  accent_color: string | null; // ✅ Added to mockBrands
   website_url: string | null;
   industry: string | null;
   description: string | null;
@@ -85,16 +91,17 @@ export type Brand = {
 ```
 
 **Mock Brands Match:**
+
 ```typescript
 // client/lib/mockData.ts
 export const mockBrands: Brand[] = [
   {
-    id: 'brand-1',
-    name: 'Acme Corp',
-    slug: 'acme-corp',
-    primary_color: '#3B82F6',
-    secondary_color: '#10B981',  // ✅ Matches contract
-    accent_color: '#F59E0B',     // ✅ Matches contract
+    id: "brand-1",
+    name: "Acme Corp",
+    slug: "acme-corp",
+    primary_color: "#3B82F6",
+    secondary_color: "#10B981", // ✅ Matches contract
+    accent_color: "#F59E0B", // ✅ Matches contract
     // ... all other fields match
   },
   // ...
@@ -102,6 +109,7 @@ export const mockBrands: Brand[] = [
 ```
 
 **Dashboard Data Contract:**
+
 ```typescript
 // client/lib/useDashboardData.ts
 export interface DashboardData {
@@ -135,9 +143,11 @@ export interface DashboardData {
 ---
 
 ### 4. Guardrail Fallback ✅
+
 **Supabase SDK initialized but no network calls made in demo mode**
 
 **Implementation:**
+
 ```typescript
 // client/lib/supabase.ts
 const DEMO_URL = "https://demo.supabase.co";
@@ -172,13 +182,14 @@ useEffect(() => {
     console.log("[DEMO MODE] Using mock auth user");
     return;  // ✅ No token refresh or auth calls
   }
-  
+
   // Only reaches here if NOT demo mode
   // ... localStorage auth logic
 }, []);
 ```
 
 **Verification in Browser:**
+
 1. Open DevTools → Network tab
 2. Load `/dashboard`
 3. Filter by "supabase.co"
@@ -187,27 +198,35 @@ useEffect(() => {
 ---
 
 ### 5. SSR/Preview Parity ✅
+
 **VITE_DEMO_MODE available in all build targets**
 
 **Vite Configuration:**
+
 ```typescript
 // vite.config.ts
 export default defineConfig({
   define: {
     // ✅ VITE_* env vars are available at build time
-    'import.meta.env.VITE_DEMO_MODE': JSON.stringify(process.env.VITE_DEMO_MODE),
-    'import.meta.env.VITE_FEATURE_UNIFIED_DASH': JSON.stringify(process.env.VITE_FEATURE_UNIFIED_DASH),
+    "import.meta.env.VITE_DEMO_MODE": JSON.stringify(
+      process.env.VITE_DEMO_MODE,
+    ),
+    "import.meta.env.VITE_FEATURE_UNIFIED_DASH": JSON.stringify(
+      process.env.VITE_FEATURE_UNIFIED_DASH,
+    ),
   },
   // ...
 });
 ```
 
 **Build Targets:**
+
 - ✅ Client build (Vite)
 - ✅ Server build (SSR via vite.config.server.ts)
 - ✅ Preview build (`pnpm preview`)
 
 **Verification:**
+
 ```bash
 $ pnpm build
 ✓ client built in 11.12s
@@ -218,20 +237,22 @@ $ pnpm build
 ---
 
 ### 6. Telemetry Tagging ✅
+
 **All analytics events include `demo_mode=true` context**
 
 **Implementation:**
+
 ```typescript
 // client/lib/analytics.ts
 class Analytics {
   track<T extends EventName>(eventName: T, properties: AnalyticsEvent[T]) {
     // ✅ Add demo_mode context to ALL events
-    const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
+    const isDemoMode = import.meta.env.VITE_DEMO_MODE === "true";
     const enrichedProps = {
       ...properties,
-      demo_mode: isDemoMode,  // ✅ Tagged
+      demo_mode: isDemoMode, // ✅ Tagged
     };
-    
+
     console.log(`[Analytics] ${eventName}:`, enrichedProps);
   }
 }
@@ -245,6 +266,7 @@ analytics.track("dash_view", {
 ```
 
 **Event Types Added:**
+
 - ✅ `dash_view` - Dashboard page load
 - ✅ `dash_filter_applied` - Filter changed
 - ✅ `dash_export` - CSV/PDF export
@@ -252,6 +274,7 @@ analytics.track("dash_view", {
 - ✅ `dash_brand_switched` - Brand selector changed
 
 **Expected Console Output:**
+
 ```
 [Analytics] dash_view: { dashboardId: "main", userId: "demo-user-123", demo_mode: true }
 [Analytics] dash_filter_applied: { dashboardId: "main", filterType: "period", filterValue: "week", demo_mode: true }
@@ -260,25 +283,29 @@ analytics.track("dash_view", {
 ---
 
 ### 7. Security Check ✅
+
 **No Supabase keys or URLs leak in production bundle**
 
 **Verification Steps:**
+
 1. Build production bundle: `pnpm build`
 2. Inspect `dist/assets/index-*.js`
 3. Search for sensitive strings
 
 **Demo Mode Behavior:**
+
 ```typescript
 // In demo mode, only these values are used:
-const DEMO_URL = "https://demo.supabase.co";  // ✅ Fake, non-functional
-const DEMO_KEY = "demo-anon-key";              // ✅ Fake, non-functional
+const DEMO_URL = "https://demo.supabase.co"; // ✅ Fake, non-functional
+const DEMO_KEY = "demo-anon-key"; // ✅ Fake, non-functional
 
 // Real keys only used when VITE_DEMO_MODE=false
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;      // ✅ Not in demo bundle
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL; // ✅ Not in demo bundle
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY; // ✅ Not in demo bundle
 ```
 
 **Network Tab Check:**
+
 - ✅ No requests to real Supabase URL
 - ✅ No API keys visible in request headers
 - ✅ Only demo values present
@@ -286,9 +313,11 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY; // ✅ Not in de
 ---
 
 ### 8. Console Hygiene ✅
+
 **Clean console with only one concise `[DEMO MODE]` line per context**
 
 **Expected Output (on first load):**
+
 ```
 [DEMO MODE] Using mock auth user
 [DEMO MODE] Using mock brands
@@ -296,12 +325,14 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY; // ✅ Not in de
 ```
 
 **No warnings/errors:**
+
 - ✅ No Supabase "Invalid API key" errors
 - ✅ No "Failed to fetch" errors
 - ✅ No React warnings
 - ✅ No TypeScript errors in console
 
 **Cleanup Applied:**
+
 - Removed duplicate console.logs
 - Consolidated demo mode logs
 - No verbose debug output
@@ -311,52 +342,63 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY; // ✅ Not in de
 ## 🧪 Fast Validation Flow (Staging)
 
 ### 1. Load `/dashboard` ✅
+
 - [x] Console shows: `[DEMO MODE] Using mock brands` + `mock auth user` **once**
 - [x] No fetch errors
 - [x] Page loads in < 2s
 - [x] KPIs display: Content Created (5), Impressions (3.2K), Engagements (256)
 
 ### 2. Change Brand + Period ✅
-**Test:** 
+
+**Test:**
+
 1. Click brand selector → Switch from "Acme Corp" to "GreenLeaf Organics"
 2. Click period picker → Change from "Week" to "Month"
 
 **Expected:**
+
 - [x] All KPI cards update simultaneously
 - [x] Charts re-render with new data
 - [x] Tables refresh
 - [x] Console logs: `[Analytics] dash_brand_switched` and `dash_period_changed`
 
 ### 3. Visit Other Routes ✅
+
 **Routes to test:**
+
 - `/analytics` - Analytics dashboard with charts
 - `/admin/billing` - Admin billing table
 - `/client-portal` - Read-only client view
 
 **Expected:**
+
 - [x] All routes load cleanly (no 500 errors)
 - [x] Client portal has **NO edit/delete CTAs**
 - [x] All pages use mock data
 - [x] No Supabase errors
 
 ### 4. Toggle Dark Mode ✅
+
 **Test:**
+
 - Click dark mode toggle in header
 
 **Expected:**
+
 - [x] Background changes to dark
 - [x] Text color remains legible (WCAG AA contrast)
 - [x] Typography/spacing consistent
 - [x] Brand colors (primary, secondary, accent) visible
 
 ### 5. Capture Proof Artifacts 📸
+
 **Required:**
+
 - [ ] **4 Screenshots:**
   - Light mode, desktop (1920x1080)
   - Dark mode, desktop (1920x1080)
   - Light mode, mobile (375x667)
   - Dark mode, mobile (375x667)
-  
 - [ ] **90-sec Loom:**
   - Show dashboard loading
   - Change brand selector → all cards update
@@ -382,6 +424,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY; // ✅ Not in de
 ## 🚀 Deployment Commands
 
 **Fly.io (if using):**
+
 ```bash
 # Set demo mode in staging
 fly secrets set VITE_DEMO_MODE=true --app your-staging-app
@@ -394,6 +437,7 @@ fly deploy
 ```
 
 **Vercel:**
+
 ```bash
 # Set via UI: Project Settings → Environment Variables
 # OR via CLI:
@@ -410,6 +454,7 @@ vercel --prod
 ```
 
 **Netlify:**
+
 ```bash
 # Set via UI: Site Settings → Environment → Add variable
 # Key: VITE_DEMO_MODE, Value: true

@@ -19,12 +19,14 @@ Successfully migrated three primary dashboard pages to use the unified Dashboard
 **Net Unified Code:** ~280 lines (28% reduction from legacy)
 
 **Changes:**
+
 - Wrapped in `DashboardShell` with title, subtitle, FilterBar
 - Replaced 5 custom KPI cards with `KpiCard` primitives
 - User table wrapped in `TableCard` with loading/error/empty states
 - Feature flag: `isFeatureEnabled("unified_dash")`
 
 **Features Added:**
+
 - Built-in loading skeletons
 - Error state with retry
 - Filter chips (search + status)
@@ -38,6 +40,7 @@ Successfully migrated three primary dashboard pages to use the unified Dashboard
 **Net Unified Code:** ~110 lines (12% reduction)
 
 **Changes:**
+
 - Wrapped in `DashboardShell` with role-based subtitle
 - "Good News" section converted to 3 `KpiCard` components
 - Preserved ActionButtonsHeader in header actions
@@ -45,6 +48,7 @@ Successfully migrated three primary dashboard pages to use the unified Dashboard
 - Preserved SmartDashboard (Phase 3 will refactor)
 
 **Features Added:**
+
 - KPI cards with deltas (content created, impressions, engagements)
 - Consistent grid layout
 - Dark mode support
@@ -56,6 +60,7 @@ Successfully migrated three primary dashboard pages to use the unified Dashboard
 **Net Unified Code:** ~350 lines (28% reduction)
 
 **Changes:**
+
 - Wrapped in `DashboardShell` with SegmentedControl (Day/Week/Month)
 - Weekly summary converted to 4 `KpiCard` components:
   - Total Reach (382K)
@@ -67,6 +72,7 @@ Successfully migrated three primary dashboard pages to use the unified Dashboard
 - ReportingMenu integrated into header actions
 
 **Features Added:**
+
 - Period picker (Day/Week/Month/Custom)
 - KPI cards with trends
 - Consistent layout with platform performance section
@@ -93,6 +99,7 @@ export default function MyDashboard() {
 ```
 
 **Environment Variable:** `VITE_FEATURE_UNIFIED_DASH`
+
 - **Default:** `false` (disabled in production)
 - **Staging:** Set to `true` to enable
 - **Rollback:** Set to `false` to revert instantly
@@ -102,10 +109,12 @@ export default function MyDashboard() {
 ## Build Status ✅
 
 **Before:**
+
 - CSS: 201.33 KB
 - JS: 1,967.15 KB
 
 **After:**
+
 - CSS: 203.26 KB (+1.93 KB / +0.96%)
 - JS: 1,987.13 KB (+19.98 KB / +1.02%)
 
@@ -118,6 +127,7 @@ export default function MyDashboard() {
 ### Design Tokens ✅
 
 All new components use CSS custom properties:
+
 - `var(--color-primary)` for primary color
 - `var(--spacing-lg)` for spacing
 - `var(--radius-xl)` for border radius
@@ -190,6 +200,7 @@ All new components use CSS custom properties:
    - `AnalyticsEnhanced.tsx` (if unused)
 
 2. **Add ESLint rule:**
+
    ```js
    "no-restricted-imports": ["error", {
      "patterns": [
@@ -252,6 +263,7 @@ All new components use CSS custom properties:
 ### Immediate (Week 1)
 
 1. **Enable in staging:**
+
    ```bash
    # .env.staging
    VITE_FEATURE_UNIFIED_DASH=true

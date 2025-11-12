@@ -1,6 +1,6 @@
 /**
  * FilterBar Component
- * 
+ *
  * Consistent filter controls for dashboards.
  * Handles platform, status, tags, and custom filters.
  */
@@ -44,19 +44,19 @@ export function FilterBar({
       className={cn(
         "flex flex-wrap items-center gap-2",
         "min-h-[var(--spacing-xl)]",
-        className
+        className,
       )}
       role="region"
       aria-label="Active filters"
     >
       {/* Filter controls (dropdowns, etc.) */}
       {children}
-      
+
       {/* Active filter chips */}
       {hasFilters && (
         <>
           <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2" />
-          
+
           {activeFilters.map((filter) => (
             <button
               key={`${filter.type}-${filter.value}`}
@@ -69,7 +69,7 @@ export function FilterBar({
                 "text-[var(--font-size-body-sm)] font-[var(--font-weight-medium)]",
                 "hover:bg-purple-200 dark:hover:bg-purple-900/30",
                 "transition-colors duration-[var(--animation-duration-quick)]",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]",
               )}
               aria-label={`Remove ${filter.label} filter`}
             >
@@ -77,7 +77,7 @@ export function FilterBar({
               <X className="w-3 h-3" />
             </button>
           ))}
-          
+
           <Button
             variant="ghost"
             size="sm"

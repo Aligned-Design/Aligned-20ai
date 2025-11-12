@@ -1,6 +1,6 @@
 /**
  * DashboardHeader Component
- * 
+ *
  * Standard header for all dashboards.
  * Anatomy: Title → Period Picker → Brand Switcher → Filter Bar
  */
@@ -36,7 +36,7 @@ export function DashboardHeader({
       className={cn(
         "border-b border-[var(--color-border)] dark:border-slate-700",
         "bg-white dark:bg-slate-900",
-        className
+        className,
       )}
     >
       {/* Top row: Title + Period + Brand + Actions */}
@@ -55,28 +55,24 @@ export function DashboardHeader({
             </p>
           )}
         </div>
-        
+
         {/* Right: Controls */}
         <div className="flex flex-wrap items-center gap-3">
           {/* Period Picker */}
           {period && onPeriodChange && (
             <SegmentedControl value={period} onChange={onPeriodChange} />
           )}
-          
+
           {/* Brand Switcher */}
           {brandSelector}
-          
+
           {/* Custom Actions */}
           {actions}
         </div>
       </div>
-      
+
       {/* Bottom row: Filters (if present) */}
-      {filterBar && (
-        <div className="px-6 pb-4">
-          {filterBar}
-        </div>
-      )}
+      {filterBar && <div className="px-6 pb-4">{filterBar}</div>}
     </div>
   );
 }

@@ -47,7 +47,7 @@ if (!isDemoMode() && !isValidHttpUrl(supabaseUrl)) {
 
 export const supabase = createClient(
   isDemoMode() ? DEMO_URL : supabaseUrl,
-  isDemoMode() ? DEMO_KEY : supabaseAnonKey
+  isDemoMode() ? DEMO_KEY : supabaseAnonKey,
 );
 
 export type Brand = {

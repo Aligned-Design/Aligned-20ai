@@ -21,6 +21,7 @@ TypeError: Failed to fetch
 ## ✅ Fix Applied
 
 ### 1. Updated BrandContext.tsx
+
 Added demo mode check before making Supabase calls:
 
 ```typescript
@@ -56,6 +57,7 @@ const fetchBrands = async () => {
 ```
 
 ### 2. Updated AuthContext.tsx
+
 Added demo mode user to bypass Supabase auth:
 
 ```typescript
@@ -83,7 +85,9 @@ useEffect(() => {
 ```
 
 ### 3. Mock Data Provider (Already Created)
+
 `client/lib/mockData.ts` provides:
+
 - `mockBrands` (2 brands: Acme Corp, GreenLeaf Organics)
 - `mockUser` (Demo User)
 - `mockContent` (3 content items)
@@ -131,6 +135,7 @@ VITE_DEMO_MODE=true
 ```
 
 **Where to set it:**
+
 - **Fly.io:** `fly secrets set VITE_DEMO_MODE=true`
 - **Vercel:** Environment Variables → Add `VITE_DEMO_MODE=true`
 - **Netlify:** Site settings → Environment → Add `VITE_DEMO_MODE=true`
@@ -162,6 +167,7 @@ After deployment with `VITE_DEMO_MODE=true`:
 When you have valid Supabase credentials:
 
 1. Set these environment variables:
+
    ```bash
    VITE_SUPABASE_URL=https://your-project.supabase.co
    VITE_SUPABASE_ANON_KEY=your-anon-key-here
@@ -182,6 +188,7 @@ When you have valid Supabase credentials:
 - **No file uploads:** Uploads won't persist
 
 **Demo mode is intended for:**
+
 - ✅ Urgent demos/presentations
 - ✅ Testing UI/UX without database
 - ✅ Staging deployments without Supabase setup
@@ -192,12 +199,14 @@ When you have valid Supabase credentials:
 ## ✅ Status Update
 
 **Before Fix:**
+
 - ❌ Dashboard crashed with "Failed to fetch"
 - ❌ BrandContext failed to load
 - ❌ Auth context failed
 - ❌ All pages inaccessible
 
 **After Fix:**
+
 - ✅ Dashboard loads successfully
 - ✅ Mock brands available
 - ✅ Mock user authenticated

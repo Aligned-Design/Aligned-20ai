@@ -80,8 +80,8 @@ function UnifiedAdminBilling() {
     try {
       setLoading(true);
       // Mock data - replace with actual API call to /api/admin/billing
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       const mockData: AdminBillingData = {
         summary: {
           activeUsers: 145,
@@ -100,8 +100,12 @@ function UnifiedAdminBilling() {
             monthlyValue: 597,
             daysPastDue: 8,
             retryAttemptsRemaining: 1,
-            lastPaymentAttempt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            nextRetryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+            lastPaymentAttempt: new Date(
+              Date.now() - 2 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
+            nextRetryDate: new Date(
+              Date.now() + 5 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
           },
           {
             id: "2",
@@ -567,7 +571,9 @@ function UserRow({
   getStatusColor?: (status: "active" | "past_due" | "archived") => string;
   formatCurrency: (amount: number) => string;
 }) {
-  const defaultGetStatusColor = (status: "active" | "past_due" | "archived"): string => {
+  const defaultGetStatusColor = (
+    status: "active" | "past_due" | "archived",
+  ): string => {
     switch (status) {
       case "active":
         return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300";
@@ -591,12 +597,16 @@ function UserRow({
 
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-1">
-            <p className="font-medium text-gray-900 dark:text-slate-100">{user.name}</p>
+            <p className="font-medium text-gray-900 dark:text-slate-100">
+              {user.name}
+            </p>
             <Badge className={colorFn(user.planStatus)}>
               {user.planStatus}
             </Badge>
           </div>
-          <p className="text-sm text-gray-600 dark:text-slate-400">{user.email}</p>
+          <p className="text-sm text-gray-600 dark:text-slate-400">
+            {user.email}
+          </p>
 
           {user.planStatus !== "active" && (
             <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 dark:text-slate-500">
@@ -619,11 +629,15 @@ function UserRow({
 
       <div className="flex items-center gap-6">
         <div className="text-right">
-          <p className="text-sm text-gray-600 dark:text-slate-400">Monthly Value</p>
+          <p className="text-sm text-gray-600 dark:text-slate-400">
+            Monthly Value
+          </p>
           <p className="font-bold text-gray-900 dark:text-slate-100">
             {formatCurrency(user.monthlyValue)}
           </p>
-          <p className="text-xs text-gray-500 dark:text-slate-500">{user.brandCount} brands</p>
+          <p className="text-xs text-gray-500 dark:text-slate-500">
+            {user.brandCount} brands
+          </p>
         </div>
 
         {user.planStatus !== "active" && (

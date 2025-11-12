@@ -400,14 +400,30 @@ function OverviewSection({ data }: { data: ClientDashboardData }) {
               title="Total Reach"
               value={formatNumber(data.metrics.totalReach)}
               description="Last 28 days"
-              delta={data.metrics.growth.reach ? { value: data.metrics.growth.reach, trend: data.metrics.growth.reach > 0 ? "up" : "down", label: "vs previous period" } : undefined}
+              delta={
+                data.metrics.growth.reach
+                  ? {
+                      value: data.metrics.growth.reach,
+                      trend: data.metrics.growth.reach > 0 ? "up" : "down",
+                      label: "vs previous period",
+                    }
+                  : undefined
+              }
               icon={Eye}
             />
             <UnifiedKpiCard
               title="Engagement Rate"
               value={`${data.metrics.engagementRate}%`}
               description="Average"
-              delta={data.metrics.growth.engagement ? { value: data.metrics.growth.engagement, trend: data.metrics.growth.engagement > 0 ? "up" : "down", label: "vs previous period" } : undefined}
+              delta={
+                data.metrics.growth.engagement
+                  ? {
+                      value: data.metrics.growth.engagement,
+                      trend: data.metrics.growth.engagement > 0 ? "up" : "down",
+                      label: "vs previous period",
+                    }
+                  : undefined
+              }
               icon={Heart}
             />
             <UnifiedKpiCard
@@ -420,7 +436,15 @@ function OverviewSection({ data }: { data: ClientDashboardData }) {
               title="Followers"
               value={formatNumber(data.metrics.followers)}
               description="Total across platforms"
-              delta={data.metrics.growth.followers ? { value: data.metrics.growth.followers, trend: data.metrics.growth.followers > 0 ? "up" : "down", label: "vs previous period" } : undefined}
+              delta={
+                data.metrics.growth.followers
+                  ? {
+                      value: data.metrics.growth.followers,
+                      trend: data.metrics.growth.followers > 0 ? "up" : "down",
+                      label: "vs previous period",
+                    }
+                  : undefined
+              }
               icon={Users}
             />
           </>

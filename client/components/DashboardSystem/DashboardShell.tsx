@@ -1,6 +1,6 @@
 /**
  * DashboardShell Component
- * 
+ *
  * Main container for all dashboards.
  * Provides consistent 12-column grid, header, and responsive layout.
  */
@@ -37,7 +37,9 @@ export function DashboardShell({
   children,
 }: DashboardShellProps) {
   return (
-    <div className={cn("min-h-screen bg-slate-50 dark:bg-slate-950", className)}>
+    <div
+      className={cn("min-h-screen bg-slate-50 dark:bg-slate-950", className)}
+    >
       {/* Header */}
       <DashboardHeader
         title={title}
@@ -48,7 +50,7 @@ export function DashboardShell({
         filterBar={filterBar}
         actions={headerActions}
       />
-      
+
       {/* Main Content Grid */}
       <main
         className={cn(
@@ -57,12 +59,12 @@ export function DashboardShell({
           // Read-only variant styling
           variant === "read-only" && "pointer-events-none opacity-90",
           // Demo variant styling
-          variant === "demo" && "relative"
+          variant === "demo" && "relative",
         )}
         role="main"
       >
         {children}
-        
+
         {/* Demo watermark */}
         {variant === "demo" && (
           <div className="fixed bottom-4 right-4 px-3 py-1.5 bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 text-xs font-medium rounded-full">

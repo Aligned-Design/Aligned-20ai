@@ -1,6 +1,6 @@
 /**
  * PeriodPicker Component
- * 
+ *
  * Enhanced period selector with custom date range support.
  * Used across dashboards for consistent time filtering.
  */
@@ -8,7 +8,11 @@
 import { useState } from "react";
 import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { PeriodOption } from "@/components/DashboardSystem";
 import { cn } from "@/lib/utils";
 
@@ -54,14 +58,14 @@ export function PeriodPicker({
           className={cn(
             "justify-start text-left font-normal",
             !value && "text-muted-foreground",
-            className
+            className,
           )}
         >
           <Calendar className="mr-2 h-4 w-4" />
           {periodLabels[value]}
         </Button>
       </PopoverTrigger>
-      
+
       <PopoverContent className="w-auto p-0" align="start">
         <div className="p-3 space-y-2">
           {Object.entries(periodLabels).map(([period, label]) => (
@@ -74,7 +78,7 @@ export function PeriodPicker({
               {label}
             </Button>
           ))}
-          
+
           {/* Custom date range picker would go here */}
           {value === "custom" && (
             <div className="pt-3 border-t border-slate-200 dark:border-slate-700">

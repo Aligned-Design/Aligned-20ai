@@ -33,23 +33,49 @@ const SHORTCUTS: Shortcut[] = [
 
   // Navigation
   { keys: ["Tab"], description: "Next element", category: "Navigation" },
-  { keys: ["Shift", "Tab"], description: "Previous element", category: "Navigation" },
-  { keys: ["↑", "↓", "←", "→"], description: "Move element 1px", category: "Navigation" },
-  { keys: ["Shift", "↑"], description: "Move element 10px", category: "Navigation" },
+  {
+    keys: ["Shift", "Tab"],
+    description: "Previous element",
+    category: "Navigation",
+  },
+  {
+    keys: ["↑", "↓", "←", "→"],
+    description: "Move element 1px",
+    category: "Navigation",
+  },
+  {
+    keys: ["Shift", "↑"],
+    description: "Move element 10px",
+    category: "Navigation",
+  },
 
   // Zoom
   { keys: ["⌘", "+"], description: "Zoom in", category: "Navigation" },
   { keys: ["⌘", "-"], description: "Zoom out", category: "Navigation" },
   { keys: ["⌘", "0"], description: "Fit to screen", category: "Navigation" },
-  { keys: ["⌘", "Shift", "0"], description: "Reset zoom 100%", category: "Navigation" },
+  {
+    keys: ["⌘", "Shift", "0"],
+    description: "Reset zoom 100%",
+    category: "Navigation",
+  },
 
   // Actions
   { keys: ["⌘", "Enter"], description: "Send to queue", category: "Actions" },
-  { keys: ["⌘", "Shift", "S"], description: "Schedule post", category: "Actions" },
-  { keys: ["⌘", "Shift", "P"], description: "Publish now", category: "Actions" },
+  {
+    keys: ["⌘", "Shift", "S"],
+    description: "Schedule post",
+    category: "Actions",
+  },
+  {
+    keys: ["⌘", "Shift", "P"],
+    description: "Publish now",
+    category: "Actions",
+  },
 ];
 
-export function KeyboardShortcutsPanel({ onClose }: KeyboardShortcutsPanelProps) {
+export function KeyboardShortcutsPanel({
+  onClose,
+}: KeyboardShortcutsPanelProps) {
   const categories = ["General", "Editing", "Navigation", "Actions"] as const;
 
   return (
@@ -100,9 +126,16 @@ export function KeyboardShortcutsPanel({ onClose }: KeyboardShortcutsPanelProps)
                         </span>
                         <div className="flex items-center gap-1">
                           {shortcut.keys.map((key, keyIdx) => (
-                            <span key={keyIdx} className="flex items-center gap-1">
+                            <span
+                              key={keyIdx}
+                              className="flex items-center gap-1"
+                            >
                               <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs font-mono font-bold text-slate-700 shadow-sm">
-                                {key === "⌘" ? <Command className="w-3 h-3" /> : key}
+                                {key === "⌘" ? (
+                                  <Command className="w-3 h-3" />
+                                ) : (
+                                  key
+                                )}
                               </kbd>
                               {keyIdx < shortcut.keys.length - 1 && (
                                 <span className="text-slate-400">+</span>
@@ -111,7 +144,7 @@ export function KeyboardShortcutsPanel({ onClose }: KeyboardShortcutsPanelProps)
                           ))}
                         </div>
                       </div>
-                    )
+                    ),
                   )}
                 </div>
               </div>
@@ -122,7 +155,15 @@ export function KeyboardShortcutsPanel({ onClose }: KeyboardShortcutsPanelProps)
         {/* Footer */}
         <div className="p-6 border-t border-slate-200 bg-slate-50">
           <p className="text-xs text-slate-600 text-center">
-            Press <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-xs font-mono">⌘</kbd> + <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-xs font-mono">/</kbd> anytime to show this panel
+            Press{" "}
+            <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-xs font-mono">
+              ⌘
+            </kbd>{" "}
+            +{" "}
+            <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-xs font-mono">
+              /
+            </kbd>{" "}
+            anytime to show this panel
           </p>
         </div>
       </div>

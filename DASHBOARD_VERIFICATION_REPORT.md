@@ -23,6 +23,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
 ```
 
 **Environment Variable:** `VITE_FEATURE_UNIFIED_DASH`
+
 - **Priority:** localStorage > environment > defaults
 - **Production Default:** ❌ `false` (disabled)
 - **Staging Target:** ✅ `true` (to be enabled)
@@ -30,16 +31,17 @@ const DEFAULT_FLAGS: FeatureFlags = {
 
 ### Pages Migrated: ✅ 3 of 4 Targets
 
-| Route | Page | Wrapped in DashboardShell? | Uses Primitives? | Feature Flag? | Legacy Preserved? | Status |
-|-------|------|----------------------------|------------------|---------------|-------------------|--------|
-| `/admin/billing` | AdminBilling.tsx | ✅ Yes | ✅ Yes (5× KpiCard, TableCard) | ✅ Yes | ✅ Yes | ✅ **PASS** |
-| `/dashboard` | Dashboard.tsx | ✅ Yes | ✅ Yes (3× KpiCard) | ✅ Yes | ✅ Yes | ✅ **PASS** |
-| `/analytics` | Analytics.tsx | ✅ Yes | ✅ Yes (4× KpiCard) | ✅ Yes | ✅ Yes | ✅ **PASS** |
-| `/client-portal` | ClientPortal.tsx | ❌ No | ❌ No (custom KPICard) | ❌ No | N/A | ❌ **NOT MIGRATED** |
+| Route            | Page             | Wrapped in DashboardShell? | Uses Primitives?               | Feature Flag? | Legacy Preserved? | Status              |
+| ---------------- | ---------------- | -------------------------- | ------------------------------ | ------------- | ----------------- | ------------------- |
+| `/admin/billing` | AdminBilling.tsx | ✅ Yes                     | ✅ Yes (5× KpiCard, TableCard) | ✅ Yes        | ✅ Yes            | ✅ **PASS**         |
+| `/dashboard`     | Dashboard.tsx    | ✅ Yes                     | ✅ Yes (3× KpiCard)            | ✅ Yes        | ✅ Yes            | ✅ **PASS**         |
+| `/analytics`     | Analytics.tsx    | ✅ Yes                     | ✅ Yes (4× KpiCard)            | ✅ Yes        | ✅ Yes            | ✅ **PASS**         |
+| `/client-portal` | ClientPortal.tsx | ❌ No                      | ❌ No (custom KPICard)         | ❌ No         | N/A               | ❌ **NOT MIGRATED** |
 
 ### Primitives Usage: ✅ PASS
 
 **AdminBilling.tsx:**
+
 ```typescript
 import {
   DashboardShell,
@@ -61,6 +63,7 @@ import {
 ```
 
 **Dashboard.tsx:**
+
 ```typescript
 import { DashboardShell, KpiCard } from "@/components/DashboardSystem";
 
@@ -71,8 +74,14 @@ import { DashboardShell, KpiCard } from "@/components/DashboardSystem";
 ```
 
 **Analytics.tsx:**
+
 ```typescript
-import { DashboardShell, KpiCard, SegmentedControl, type PeriodOption } from "@/components/DashboardSystem";
+import {
+  DashboardShell,
+  KpiCard,
+  SegmentedControl,
+  type PeriodOption,
+} from "@/components/DashboardSystem";
 
 // 4 KpiCard instances:
 // - Total Reach (382K, +13.2%)
@@ -105,6 +114,7 @@ function LegacyMyDashboard() { /* Original implementation */ }
 ### Legacy Preservation: ✅ PASS
 
 All three pages retain their legacy implementation:
+
 - `LegacyAdminBilling()`
 - `LegacyDashboard()`
 - `LegacyAnalytics()`
@@ -118,6 +128,7 @@ All three pages retain their legacy implementation:
 **Status:** Cannot verify without running application.
 
 **Required Testing:**
+
 - [ ] Set `VITE_FEATURE_UNIFIED_DASH=true` in staging
 - [ ] Navigate to `/dashboard`, `/analytics`, `/admin/billing`
 - [ ] Verify period picker updates all KPI cards simultaneously
@@ -138,6 +149,7 @@ All three pages retain their legacy implementation:
 ### Return Shape: ⚠️ DEVIATES FROM SPEC
 
 **Expected (from prompt):**
+
 ```typescript
 {
   kpis: Array<{ key, label, value, delta?, spark? }>,
@@ -148,6 +160,7 @@ All three pages retain their legacy implementation:
 ```
 
 **Actual (current implementation):**
+
 ```typescript
 {
   kpis: DashboardKpi[],           // ✅ id, title, value, delta, sparkline
@@ -171,7 +184,14 @@ All three pages retain their legacy implementation:
 ### React Query Keys: ✅ PASS
 
 ```typescript
-const queryKey = ["dashboard", filters.brandId, filters.period, filters.platformFilters, filters.statusFilters, filters.dateRange];
+const queryKey = [
+  "dashboard",
+  filters.brandId,
+  filters.period,
+  filters.platformFilters,
+  filters.statusFilters,
+  filters.dateRange,
+];
 ```
 
 **Format:** `['dashboard', brandId, period, ...filters]` ✅ Matches spec
@@ -205,17 +225,17 @@ export interface DashboardData {
   series: Record<string, Array<{ x: number | string; y: number }>>;
   topItems: Array<{
     id: string;
-    title: string;  // Changed from "name"
+    title: string; // Changed from "name"
     metric: number; // Changed from "value"
     meta?: Record<string, any>; // Changed from "metadata"
   }>;
   activity: Array<{
     id: string;
-    ts: string;     // Changed from "timestamp"
-    type: string;   // Added
+    ts: string; // Changed from "timestamp"
+    type: string; // Added
     actor?: string; // Added
     target?: string; // Added
-    meta?: any;     // Changed from "metadata"
+    meta?: any; // Changed from "metadata"
   }>;
 }
 ```
@@ -226,12 +246,12 @@ export interface DashboardData {
 
 ### Legacy Components Still Present: ❌
 
-| Component | Location | In Use? | Should Delete? | Status |
-|-----------|----------|---------|----------------|--------|
-| `HeroMetricCard.tsx` | `client/components/dashboard/` | ❌ No | ✅ Yes | ❌ **EXISTS** |
-| `AnalyticsPanel.tsx` | `client/components/dashboard/` | ✅ Yes (Calendar.tsx) | ✅ Yes | ❌ **IN USE** |
-| `DashboardEnhanced.tsx` | `client/pages/` | ❓ Unknown | ✅ Yes (if unused) | ❌ **EXISTS** |
-| `AnalyticsEnhanced.tsx` | `client/pages/` | ❓ Unknown | ✅ Yes (if unused) | ❌ **EXISTS** |
+| Component               | Location                       | In Use?               | Should Delete?     | Status        |
+| ----------------------- | ------------------------------ | --------------------- | ------------------ | ------------- |
+| `HeroMetricCard.tsx`    | `client/components/dashboard/` | ❌ No                 | ✅ Yes             | ❌ **EXISTS** |
+| `AnalyticsPanel.tsx`    | `client/components/dashboard/` | ✅ Yes (Calendar.tsx) | ✅ Yes             | ❌ **IN USE** |
+| `DashboardEnhanced.tsx` | `client/pages/`                | ❓ Unknown            | ✅ Yes (if unused) | ❌ **EXISTS** |
+| `AnalyticsEnhanced.tsx` | `client/pages/`                | ❓ Unknown            | ✅ Yes (if unused) | ❌ **EXISTS** |
 
 ### AnalyticsPanel Usage:
 
@@ -246,6 +266,7 @@ export interface DashboardData {
 ### ESLint Rule: ❌ NOT IMPLEMENTED
 
 **Expected Rule:**
+
 ```javascript
 // eslint.config.js
 rules: {
@@ -280,6 +301,7 @@ rules: {
 **Status:** ClientPortal.tsx has NOT been migrated to DashboardSystem.
 
 **Current Implementation:**
+
 - ❌ Does not import from `@/components/DashboardSystem`
 - ❌ Uses custom `KPICard` component (local definition)
 - ❌ Does not use `DashboardShell`
@@ -308,6 +330,7 @@ import { DashboardShell, KpiCard } from "@/components/DashboardSystem";
 **Status:** No Storybook stories found for DashboardSystem primitives.
 
 **Expected Stories:**
+
 ```
 stories/DashboardSystem/
   ├─ KpiCard.stories.tsx
@@ -322,6 +345,7 @@ stories/DashboardSystem/
 ```
 
 **Each story should cover:**
+
 - Light mode
 - Dark mode
 - Loading state
@@ -341,6 +365,7 @@ Create Storybook stories for all primitives to enable visual regression testing 
 **Required Testing:**
 
 ### Accessibility
+
 - [ ] Keyboard navigation (Tab, Enter, Escape, Arrow keys)
 - [ ] Focus order: Header → Filters → Cards → Tables
 - [ ] ARIA labels on all icons
@@ -350,6 +375,7 @@ Create Storybook stories for all primitives to enable visual regression testing 
 - [ ] Run Lighthouse Accessibility (target: ≥ 95)
 
 ### Performance
+
 - [ ] LCP < 2.0s
 - [ ] INP < 150ms
 - [ ] CLS < 0.1
@@ -365,6 +391,7 @@ Create Storybook stories for all primitives to enable visual regression testing 
 **Status:** Cannot verify without running application and monitoring telemetry.
 
 **Expected Events:**
+
 - `dash_view` - Page load
 - `dash_filter_applied` - Filter change
 - `dash_export` - Export action
@@ -393,6 +420,7 @@ return <LegacyMyDashboard />; // Original version
 ```
 
 **Runtime Testing Required:**
+
 - [ ] Set `VITE_FEATURE_UNIFIED_DASH=true` → verify unified version renders
 - [ ] Set `VITE_FEATURE_UNIFIED_DASH=false` → verify legacy version renders
 - [ ] Toggle flag via `localStorage.setItem("featureFlags", '{"unified_dash":true}')` → verify immediate switch
@@ -404,19 +432,20 @@ return <LegacyMyDashboard />; // Original version
 
 ### Summary of Blocking Issues:
 
-| Category | Issue | Severity | Blocking Deploy? |
-|----------|-------|----------|------------------|
-| Data Contract | useDashboardData doesn't match spec | Medium | ⚠️ Recommend Fix |
-| Legacy Cleanup | AnalyticsPanel still in use | High | ❌ **YES** |
-| Legacy Cleanup | ESLint rule not added | Medium | ⚠️ Recommend Fix |
-| ClientPortal | Not migrated | High | ❌ **YES** (if in scope) |
-| Storybook | No stories created | Medium | ⚠️ Recommend Fix |
-| A11y/Perf QA | Not tested | High | ❌ **YES** |
-| Telemetry | Not instrumented | Low | ⚠️ Nice to Have |
+| Category       | Issue                               | Severity | Blocking Deploy?         |
+| -------------- | ----------------------------------- | -------- | ------------------------ |
+| Data Contract  | useDashboardData doesn't match spec | Medium   | ⚠️ Recommend Fix         |
+| Legacy Cleanup | AnalyticsPanel still in use         | High     | ❌ **YES**               |
+| Legacy Cleanup | ESLint rule not added               | Medium   | ⚠️ Recommend Fix         |
+| ClientPortal   | Not migrated                        | High     | ❌ **YES** (if in scope) |
+| Storybook      | No stories created                  | Medium   | ⚠️ Recommend Fix         |
+| A11y/Perf QA   | Not tested                          | High     | ❌ **YES**               |
+| Telemetry      | Not instrumented                    | Low      | ⚠️ Nice to Have          |
 
 ### Deployment Readiness: ❌ NOT READY
 
 **Blocking Issues:**
+
 1. ❌ Legacy components still in use (AnalyticsPanel in Calendar.tsx)
 2. ❌ A11y/Performance testing not completed
 3. ❌ ClientPortal not migrated (if required for Phase 2)
@@ -427,20 +456,15 @@ return <LegacyMyDashboard />; // Original version
 ### Recommended Actions Before Deploy:
 
 **Must Fix (Blocking):**
+
 1. Migrate Calendar.tsx to stop using AnalyticsPanel
 2. Run A11y audit (axe, Lighthouse)
 3. Run performance tests (LCP, INP, CLS)
 4. Decide if ClientPortal is in Phase 2 scope; migrate if yes
 
-**Should Fix (Recommended):**
-5. Fix useDashboardData to match data contract spec
-6. Create Storybook stories for visual regression
-7. Add ESLint no-restricted-imports rule
-8. Delete legacy components (HeroMetricCard, DashboardEnhanced, AnalyticsEnhanced)
+**Should Fix (Recommended):** 5. Fix useDashboardData to match data contract spec 6. Create Storybook stories for visual regression 7. Add ESLint no-restricted-imports rule 8. Delete legacy components (HeroMetricCard, DashboardEnhanced, AnalyticsEnhanced)
 
-**Nice to Have:**
-9. Instrument telemetry events
-10. Enable flag in staging for 48h monitoring
+**Nice to Have:** 9. Instrument telemetry events 10. Enable flag in staging for 48h monitoring
 
 ---
 
@@ -467,6 +491,7 @@ return <LegacyMyDashboard />; // Original version
 ### Deployment Status: 🔴 NOT READY
 
 **Recommended Timeline:**
+
 - **Week 1:** Fix blocking issues (legacy cleanup, ClientPortal, A11y/Perf)
 - **Week 2:** Fix recommended issues (data contract, Storybook, ESLint)
 - **Week 3:** Enable in staging for monitoring

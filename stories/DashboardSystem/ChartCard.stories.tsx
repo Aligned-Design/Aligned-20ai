@@ -1,41 +1,41 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { ChartCard } from '@/components/DashboardSystem';
-import { ChartWrapper } from '@/components/charts/ChartWrapper';
-import { TrendingUp, BarChart3 } from 'lucide-react';
+import type { Meta, StoryObj } from "@storybook/react";
+import { ChartCard } from "@/components/DashboardSystem";
+import { ChartWrapper } from "@/components/charts/ChartWrapper";
+import { TrendingUp, BarChart3 } from "lucide-react";
 
 const meta: Meta<typeof ChartCard> = {
-  title: 'DashboardSystem/ChartCard',
+  title: "DashboardSystem/ChartCard",
   component: ChartCard,
   parameters: {
-    layout: 'padded',
+    layout: "padded",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 };
 
 export default meta;
 type Story = StoryObj<typeof ChartCard>;
 
 const mockData = [
-  { x: 'Mon', y: 4200 },
-  { x: 'Tue', y: 5100 },
-  { x: 'Wed', y: 4800 },
-  { x: 'Thu', y: 6200 },
-  { x: 'Fri', y: 7100 },
-  { x: 'Sat', y: 5900 },
-  { x: 'Sun', y: 6400 },
+  { x: "Mon", y: 4200 },
+  { x: "Tue", y: 5100 },
+  { x: "Wed", y: 4800 },
+  { x: "Thu", y: 6200 },
+  { x: "Fri", y: 7100 },
+  { x: "Sat", y: 5900 },
+  { x: "Sun", y: 6400 },
 ];
 
 // Default Line Chart
 export const LineChart: Story = {
   args: {
-    title: 'Impressions Over Time',
-    description: 'Weekly performance',
+    title: "Impressions Over Time",
+    description: "Weekly performance",
     icon: TrendingUp,
     children: (
       <ChartWrapper
         type="line"
         data={mockData}
-        dataKeys={['y']}
+        dataKeys={["y"]}
         xAxisKey="x"
         ariaLabel="Impressions trend chart"
       />
@@ -46,14 +46,14 @@ export const LineChart: Story = {
 // Area Chart
 export const AreaChart: Story = {
   args: {
-    title: 'Engagement Trend',
-    description: 'Last 7 days',
+    title: "Engagement Trend",
+    description: "Last 7 days",
     icon: BarChart3,
     children: (
       <ChartWrapper
         type="area"
         data={mockData}
-        dataKeys={['y']}
+        dataKeys={["y"]}
         xAxisKey="x"
         ariaLabel="Engagement trend chart"
       />
@@ -64,13 +64,13 @@ export const AreaChart: Story = {
 // Bar Chart
 export const BarChart: Story = {
   args: {
-    title: 'Daily Posts',
-    description: 'Posts published per day',
+    title: "Daily Posts",
+    description: "Posts published per day",
     children: (
       <ChartWrapper
         type="bar"
         data={mockData}
-        dataKeys={['y']}
+        dataKeys={["y"]}
         xAxisKey="x"
         ariaLabel="Daily posts bar chart"
       />
@@ -81,8 +81,8 @@ export const BarChart: Story = {
 // Loading State
 export const Loading: Story = {
   args: {
-    title: 'Loading Chart',
-    description: 'Fetching data...',
+    title: "Loading Chart",
+    description: "Fetching data...",
     isLoading: true,
     children: <div />,
   },
@@ -91,10 +91,10 @@ export const Loading: Story = {
 // Error State
 export const Error: Story = {
   args: {
-    title: 'Chart Error',
-    description: 'Failed to load',
-    error: new Error('Failed to fetch chart data'),
-    onRetry: () => alert('Retrying...'),
+    title: "Chart Error",
+    description: "Failed to load",
+    error: new Error("Failed to fetch chart data"),
+    onRetry: () => alert("Retrying..."),
     children: <div />,
   },
 };
@@ -102,14 +102,14 @@ export const Error: Story = {
 // Dark Mode
 export const DarkMode: Story = {
   args: {
-    title: 'Revenue Trend',
-    description: 'Last 30 days',
+    title: "Revenue Trend",
+    description: "Last 30 days",
     icon: TrendingUp,
     children: (
       <ChartWrapper
         type="line"
         data={mockData}
-        dataKeys={['y']}
+        dataKeys={["y"]}
         xAxisKey="x"
         ariaLabel="Revenue trend chart"
       />
@@ -117,7 +117,7 @@ export const DarkMode: Story = {
   },
   parameters: {
     backgrounds: {
-      default: 'dark',
+      default: "dark",
     },
   },
   decorators: [

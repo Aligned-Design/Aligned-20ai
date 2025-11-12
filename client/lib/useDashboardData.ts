@@ -1,9 +1,9 @@
 /**
  * useDashboardData Hook
- * 
+ *
  * Centralized data fetching for all dashboards.
  * Wraps React Query with standardized keys and provides loading/error/data states.
- * 
+ *
  * Usage:
  * const { kpis, series, topItems, activity, isLoading, error, refetch } = useDashboardData({
  *   brandId: '123',
@@ -60,18 +60,21 @@ export interface DashboardData {
   }>;
 }
 
-async function fetchDashboardData(filters: DashboardFilters): Promise<DashboardData> {
+async function fetchDashboardData(
+  filters: DashboardFilters,
+): Promise<DashboardData> {
   // TODO: Replace with actual API call
   // For now, return mock data for development
-  
+
   const params = new URLSearchParams();
   if (filters.brandId) params.append("brandId", filters.brandId);
   if (filters.period) params.append("period", filters.period);
-  if (filters.platformFilters) params.append("platforms", filters.platformFilters.join(","));
-  
+  if (filters.platformFilters)
+    params.append("platforms", filters.platformFilters.join(","));
+
   // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
   // Mock data - Now matches spec exactly
   return {
     kpis: [
@@ -123,11 +126,36 @@ async function fetchDashboardData(filters: DashboardFilters): Promise<DashboardD
       ],
     },
     topItems: [
-      { id: "1", title: "Summer Sale Campaign", metric: 12500, meta: { platform: "instagram" } },
-      { id: "2", title: "Product Launch", metric: 9800, meta: { platform: "tiktok" } },
-      { id: "3", title: "Brand Awareness", metric: 7600, meta: { platform: "facebook" } },
-      { id: "4", title: "Tutorial Video Series", metric: 6200, meta: { platform: "youtube" } },
-      { id: "5", title: "Customer Testimonials", metric: 5100, meta: { platform: "linkedin" } },
+      {
+        id: "1",
+        title: "Summer Sale Campaign",
+        metric: 12500,
+        meta: { platform: "instagram" },
+      },
+      {
+        id: "2",
+        title: "Product Launch",
+        metric: 9800,
+        meta: { platform: "tiktok" },
+      },
+      {
+        id: "3",
+        title: "Brand Awareness",
+        metric: 7600,
+        meta: { platform: "facebook" },
+      },
+      {
+        id: "4",
+        title: "Tutorial Video Series",
+        metric: 6200,
+        meta: { platform: "youtube" },
+      },
+      {
+        id: "5",
+        title: "Customer Testimonials",
+        metric: 5100,
+        meta: { platform: "linkedin" },
+      },
     ],
     activity: [
       {
@@ -173,16 +201,13 @@ export function useDashboardData(filters: DashboardFilters = {}) {
     status: filters.statusFilters?.sort(),
     dateRange: filters.dateRange,
   });
-  
+
   const queryKey = ["dash", filters.brandId, filters.period, filtersHash];
-  
-  const {
-    data,
-    isLoading,
-    error,
-    refetch,
-    isFetching,
-  } = useQuery<DashboardData, Error>({
+
+  const { data, isLoading, error, refetch, isFetching } = useQuery<
+    DashboardData,
+    Error
+  >({
     queryKey,
     queryFn: () => fetchDashboardData(filters),
     staleTime: 1000 * 60 * 5, // 5 minutes

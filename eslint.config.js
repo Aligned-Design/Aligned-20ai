@@ -38,11 +38,12 @@ export default tseslint.config(
                 "**/legacy-dashboard/**",
                 "**/old-analytics/**",
               ],
-              message: "Legacy dashboard components and paths are deprecated. Use primitives from @/components/DashboardSystem instead.",
+              message:
+                "Legacy dashboard components and paths are deprecated. Use primitives from @/components/DashboardSystem instead.",
             },
           ],
         },
       ],
     },
-  }
+  },
 );

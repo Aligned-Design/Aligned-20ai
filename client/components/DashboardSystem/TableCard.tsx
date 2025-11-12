@@ -1,12 +1,18 @@
 /**
  * TableCard Component
- * 
+ *
  * Sortable/paginated table shell for dashboards.
  * Provides consistent table UI with loading and error states.
  */
 
 import { ReactNode } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 import { LoadingSkeleton } from "./LoadingSkeleton";
@@ -52,7 +58,7 @@ export function TableCard({
         </div>
         {actions}
       </CardHeader>
-      
+
       <CardContent>
         {isLoading ? (
           <LoadingSkeleton variant="table" count={5} />
@@ -65,9 +71,7 @@ export function TableCard({
         ) : isEmpty ? (
           <EmptyState title={emptyMessage} />
         ) : (
-          <div className="relative w-full overflow-auto">
-            {children}
-          </div>
+          <div className="relative w-full overflow-auto">{children}</div>
         )}
       </CardContent>
     </Card>

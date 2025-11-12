@@ -123,28 +123,22 @@ All components use CSS custom properties from `client/styles/tokens.css`:
 ### Colors
 
 ```css
---color-primary: #3D0FD6
---color-surface: #F9FAFB (light) / #1E293B (dark)
---color-foreground: #111827 (light) / #F1F5F9 (dark)
---color-border: #E5E7EB
---color-muted: #6B7280
+--color-primary: #3d0fd6 --color-surface: #f9fafb (light) / #1e293b (dark)
+  --color-foreground: #111827 (light) / #f1f5f9 (dark) --color-border: #e5e7eb
+  --color-muted: #6b7280;
 ```
 
 ### Spacing (4px base unit)
 
 ```css
---spacing-xs: 4px
---spacing-sm: 8px
---spacing-md: 16px
---spacing-lg: 24px
---spacing-xl: 32px
+--spacing-xs: 4px --spacing-sm: 8px --spacing-md: 16px --spacing-lg: 24px
+  --spacing-xl: 32px;
 ```
 
 ### Card Styling
 
 ```css
---radius-xl: 12px (card corners)
---shadow-base: Elevation 1 (card shadow)
+--radius-xl: 12px (card corners) --shadow-base: Elevation 1 (card shadow);
 ```
 
 ---
@@ -202,13 +196,13 @@ All components use CSS custom properties from `client/styles/tokens.css`:
 
 ## Performance Targets
 
-| Metric | Target | Status |
-|--------|--------|--------|
-| First Contentful Paint (FCP) | < 1.5s | ✅ To be measured post-migration |
-| Largest Contentful Paint (LCP) | < 2.0s | ✅ To be measured post-migration |
-| Time to Interactive (TTI) | < 3.0s | ✅ To be measured post-migration |
-| Interaction to Next Paint (INP) | < 150ms | ✅ To be measured post-migration |
-| Bundle Size (DashboardSystem) | < 50KB gzip | ✅ Estimated ~30KB |
+| Metric                          | Target      | Status                           |
+| ------------------------------- | ----------- | -------------------------------- |
+| First Contentful Paint (FCP)    | < 1.5s      | ✅ To be measured post-migration |
+| Largest Contentful Paint (LCP)  | < 2.0s      | ✅ To be measured post-migration |
+| Time to Interactive (TTI)       | < 3.0s      | ✅ To be measured post-migration |
+| Interaction to Next Paint (INP) | < 150ms     | ✅ To be measured post-migration |
+| Bundle Size (DashboardSystem)   | < 50KB gzip | ✅ Estimated ~30KB               |
 
 ---
 
@@ -288,7 +282,9 @@ export default function AdminBilling() {
       <h1 className="text-3xl font-bold">Billing Dashboard</h1>
       <div className="grid grid-cols-3 gap-6">
         <Card>
-          <CardHeader><CardTitle>Total Revenue</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Total Revenue</CardTitle>
+          </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">$12,450</div>
           </CardContent>
@@ -305,7 +301,11 @@ export default function AdminBilling() {
 
 ```tsx
 // AdminBilling.tsx (80 lines)
-import { DashboardShell, KpiCard, TableCard } from "@/components/DashboardSystem";
+import {
+  DashboardShell,
+  KpiCard,
+  TableCard,
+} from "@/components/DashboardSystem";
 import { useDashboardData } from "@/lib/useDashboardData";
 
 export default function AdminBilling() {
@@ -324,7 +324,7 @@ export default function AdminBilling() {
       {kpis.map((kpi) => (
         <KpiCard key={kpi.id} {...kpi} />
       ))}
-      
+
       <TableCard title="User Accounts" isLoading={isLoading} error={error}>
         <UserTable users={topItems} />
       </TableCard>
@@ -334,6 +334,7 @@ export default function AdminBilling() {
 ```
 
 **Benefits:**
+
 - ✅ 70 lines removed (47% reduction)
 - ✅ Consistent layout
 - ✅ Built-in loading/error states
@@ -391,13 +392,13 @@ export default function AdminBilling() {
 
 ## Success Metrics (Post-Migration)
 
-| Metric | Baseline | Target | Status |
-|--------|----------|--------|--------|
-| Code Lines | ~8,000 | ~5,000 | 🔄 Pending migration |
-| Page Load (P95) | 3.2s | < 2.0s | 🔄 Pending migration |
-| Accessibility Score | 85 | 95+ | ✅ Built-in to components |
-| Bundle Size | - | < 50KB | ✅ ~30KB estimated |
-| Duplicate Components | 15+ | 0 | 🔄 Pending migration |
+| Metric               | Baseline | Target | Status                    |
+| -------------------- | -------- | ------ | ------------------------- |
+| Code Lines           | ~8,000   | ~5,000 | 🔄 Pending migration      |
+| Page Load (P95)      | 3.2s     | < 2.0s | 🔄 Pending migration      |
+| Accessibility Score  | 85       | 95+    | ✅ Built-in to components |
+| Bundle Size          | -        | < 50KB | ✅ ~30KB estimated        |
+| Duplicate Components | 15+      | 0      | 🔄 Pending migration      |
 
 ---
 

@@ -184,8 +184,7 @@ export function CommentThreadPanel({
           <div className="mb-2 text-xs text-slate-600 flex items-center justify-between">
             <span className="flex items-center gap-1">
               <Reply className="w-3 h-3" />
-              Replying to{" "}
-              {comments.find((c) => c.id === replyingTo)?.userName}
+              Replying to {comments.find((c) => c.id === replyingTo)?.userName}
             </span>
             <button
               onClick={() => setReplyingTo(null)}

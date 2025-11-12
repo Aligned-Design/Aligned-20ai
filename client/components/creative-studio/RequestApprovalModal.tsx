@@ -15,7 +15,12 @@ interface RequestApprovalModalProps {
 
 // Mock team members - in production, fetch from API
 const TEAM_MEMBERS = [
-  { id: "user-1", name: "Sarah Johnson", role: "Content Manager", avatar: "SJ" },
+  {
+    id: "user-1",
+    name: "Sarah Johnson",
+    role: "Content Manager",
+    avatar: "SJ",
+  },
   { id: "user-2", name: "Mike Chen", role: "Creative Director", avatar: "MC" },
   { id: "user-3", name: "Emily Davis", role: "Brand Manager", avatar: "ED" },
   { id: "user-4", name: "Alex Rivera", role: "Marketing Lead", avatar: "AR" },
@@ -33,7 +38,7 @@ export function RequestApprovalModal({
     setSelectedReviewers((prev) =>
       prev.includes(userId)
         ? prev.filter((id) => id !== userId)
-        : [...prev, userId]
+        : [...prev, userId],
     );
   };
 
@@ -55,7 +60,9 @@ export function RequestApprovalModal({
               <Send className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900">Request Approval</h2>
+              <h2 className="text-lg font-bold text-slate-900">
+                Request Approval
+              </h2>
               <p className="text-sm text-slate-600">{designName}</p>
             </div>
           </div>
@@ -97,7 +104,9 @@ export function RequestApprovalModal({
                     {member.avatar}
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="font-semibold text-slate-900">{member.name}</p>
+                    <p className="font-semibold text-slate-900">
+                      {member.name}
+                    </p>
                     <p className="text-xs text-slate-600">{member.role}</p>
                   </div>
                   {selectedReviewers.includes(member.id) && (

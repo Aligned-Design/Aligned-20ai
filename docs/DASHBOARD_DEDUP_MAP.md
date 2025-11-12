@@ -23,22 +23,22 @@ This document maps all existing dashboard pages and components to the new **Dash
 
 ### Full Dashboards (User-Facing)
 
-| Page | Route | Type | Current Components | Migration Status |
-|------|-------|------|-------------------|------------------|
-| `Dashboard.tsx` | `/dashboard` | Main user dashboard | ActionButtonsHeader, DashboardWidgets, SmartDashboard | 🔴 Needs migration |
-| `DashboardEnhanced.tsx` | N/A (unused?) | Enhanced variant | ActionButtonsHeader, GoodNews, Retention components | ⚠️ Candidate for removal |
-| `Analytics.tsx` | `/analytics` | Analytics overview | SmartDashboard, PlatformMetricsCarousel, AnalyticsAdvisor | 🔴 Needs migration |
-| `AnalyticsEnhanced.tsx` | N/A (unused?) | Power-user analytics | SmartDashboard, ActionableInsights, RootCauseAnalysis | ⚠️ Candidate for removal |
-| `ClientPortal.tsx` | `/client-portal/:token` | Client-facing | ClientAnalyticsDashboard, CollaborativeApprovalFlow | 🟡 Partial migration |
-| `AdminBilling.tsx` | `/billing` (admin) | Admin billing | Custom KPI cards, tables | 🔴 Needs migration |
+| Page                    | Route                   | Type                 | Current Components                                        | Migration Status         |
+| ----------------------- | ----------------------- | -------------------- | --------------------------------------------------------- | ------------------------ |
+| `Dashboard.tsx`         | `/dashboard`            | Main user dashboard  | ActionButtonsHeader, DashboardWidgets, SmartDashboard     | 🔴 Needs migration       |
+| `DashboardEnhanced.tsx` | N/A (unused?)           | Enhanced variant     | ActionButtonsHeader, GoodNews, Retention components       | ⚠️ Candidate for removal |
+| `Analytics.tsx`         | `/analytics`            | Analytics overview   | SmartDashboard, PlatformMetricsCarousel, AnalyticsAdvisor | 🔴 Needs migration       |
+| `AnalyticsEnhanced.tsx` | N/A (unused?)           | Power-user analytics | SmartDashboard, ActionableInsights, RootCauseAnalysis     | ⚠️ Candidate for removal |
+| `ClientPortal.tsx`      | `/client-portal/:token` | Client-facing        | ClientAnalyticsDashboard, CollaborativeApprovalFlow       | 🟡 Partial migration     |
+| `AdminBilling.tsx`      | `/billing` (admin)      | Admin billing        | Custom KPI cards, tables                                  | 🔴 Needs migration       |
 
 ### Specialized Dashboards
 
-| Page | Route | Type | Notes |
-|------|-------|------|-------|
-| `Reporting.tsx` | `/reporting` | Report management | Not a full dashboard; uses reporting UI |
-| `InsightsROI.tsx` | `/insights-roi` | ROI metrics | Uses ROIDashboard component |
-| `BrandSnapshot.tsx` | `/brand-snapshot` | Brand metrics | Specialized view; low priority |
+| Page                | Route             | Type              | Notes                                   |
+| ------------------- | ----------------- | ----------------- | --------------------------------------- |
+| `Reporting.tsx`     | `/reporting`      | Report management | Not a full dashboard; uses reporting UI |
+| `InsightsROI.tsx`   | `/insights-roi`   | ROI metrics       | Uses ROIDashboard component             |
+| `BrandSnapshot.tsx` | `/brand-snapshot` | Brand metrics     | Specialized view; low priority          |
 
 ---
 
@@ -46,27 +46,27 @@ This document maps all existing dashboard pages and components to the new **Dash
 
 ### Analytics Dashboard Components
 
-| Component | Location | Used By | Overlaps With | Recommendation |
-|-----------|----------|---------|---------------|----------------|
-| **SmartDashboard** | `components/analytics/` | Dashboard.tsx, Analytics.tsx, AnalyticsEnhanced.tsx | DashboardSystem KpiCard/ChartCard | ✅ **Keep** but refactor to use DashboardSystem primitives internally |
-| **ClientAnalyticsDashboard** | `components/analytics/` | ClientPortal.tsx | SmartDashboard | ✅ **Keep** but refactor to use DashboardSystem primitives |
-| **ROIDashboard** | `components/retention/` | InsightsROI.tsx | SmartDashboard (different metrics) | ✅ **Keep** (domain-specific) |
+| Component                    | Location                | Used By                                             | Overlaps With                      | Recommendation                                                        |
+| ---------------------------- | ----------------------- | --------------------------------------------------- | ---------------------------------- | --------------------------------------------------------------------- |
+| **SmartDashboard**           | `components/analytics/` | Dashboard.tsx, Analytics.tsx, AnalyticsEnhanced.tsx | DashboardSystem KpiCard/ChartCard  | ✅ **Keep** but refactor to use DashboardSystem primitives internally |
+| **ClientAnalyticsDashboard** | `components/analytics/` | ClientPortal.tsx                                    | SmartDashboard                     | ✅ **Keep** but refactor to use DashboardSystem primitives            |
+| **ROIDashboard**             | `components/retention/` | InsightsROI.tsx                                     | SmartDashboard (different metrics) | ✅ **Keep** (domain-specific)                                         |
 
 ### Dashboard Widget Components
 
-| Component | Location | Used By | Replace With |
-|-----------|----------|---------|--------------|
-| **DashboardWidgets** | `components/dashboard/` | Dashboard.tsx | ActivityFeedCard, custom widgets |
-| **AnalyticsPanel** | `components/dashboard/` | Multiple | KpiCard grid |
-| **HeroMetricCard** | `components/dashboard/` | Analytics | KpiCard (large variant) |
-| **PlatformMetricsCarousel** | `components/dashboard/` | Analytics, AnalyticsEnhanced | ChartCard with carousel wrapper |
-| **AnalyticsCharts** | `components/dashboard/` | Multiple | ChartWrapper |
+| Component                   | Location                | Used By                      | Replace With                     |
+| --------------------------- | ----------------------- | ---------------------------- | -------------------------------- |
+| **DashboardWidgets**        | `components/dashboard/` | Dashboard.tsx                | ActivityFeedCard, custom widgets |
+| **AnalyticsPanel**          | `components/dashboard/` | Multiple                     | KpiCard grid                     |
+| **HeroMetricCard**          | `components/dashboard/` | Analytics                    | KpiCard (large variant)          |
+| **PlatformMetricsCarousel** | `components/dashboard/` | Analytics, AnalyticsEnhanced | ChartCard with carousel wrapper  |
+| **AnalyticsCharts**         | `components/dashboard/` | Multiple                     | ChartWrapper                     |
 
 ### Admin/Specialized Dashboards
 
-| Component | Location | Purpose | Action |
-|-----------|----------|---------|--------|
-| **AIMetricsDashboard** | `components/admin/` | Admin AI metrics | Migrate to DashboardSystem |
+| Component                        | Location                    | Purpose          | Action                     |
+| -------------------------------- | --------------------------- | ---------------- | -------------------------- |
+| **AIMetricsDashboard**           | `components/admin/`         | Admin AI metrics | Migrate to DashboardSystem |
 | **MultiClientApprovalDashboard** | `components/collaboration/` | Agency approvals | Migrate to DashboardSystem |
 
 ---
@@ -163,7 +163,7 @@ export default function AdminBilling() {
   return (
     <div className="p-6 bg-slate-50">
       <h1 className="text-3xl font-bold mb-6">Billing Dashboard</h1>
-      
+
       <div className="grid grid-cols-3 gap-6 mb-6">
         <Card>
           <CardHeader>
@@ -178,7 +178,9 @@ export default function AdminBilling() {
       </div>
 
       <Card>
-        <CardHeader><CardTitle>User Accounts</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>User Accounts</CardTitle>
+        </CardHeader>
         <CardContent>
           {isLoading ? <LoadingSpinner /> : <UserTable users={users} />}
         </CardContent>
@@ -192,7 +194,11 @@ export default function AdminBilling() {
 
 ```tsx
 // AdminBilling.tsx (80 lines)
-import { DashboardShell, KpiCard, TableCard } from "@/components/DashboardSystem";
+import {
+  DashboardShell,
+  KpiCard,
+  TableCard,
+} from "@/components/DashboardSystem";
 import { useDashboardData } from "@/lib/useDashboardData";
 
 export default function AdminBilling() {
@@ -228,6 +234,7 @@ export default function AdminBilling() {
 ```
 
 **Benefits**:
+
 - ✅ **70 lines removed** (~47% code reduction)
 - ✅ **Consistent layout** with all other dashboards
 - ✅ **Built-in loading/error states**
@@ -305,8 +312,8 @@ Use this checklist for each dashboard page migration:
 
 ```ts
 // .env
-VITE_FEATURE_UNIFIED_DASH=false  // Prod: disabled by default
-VITE_FEATURE_UNIFIED_DASH=true   // Staging: enabled for testing
+VITE_FEATURE_UNIFIED_DASH = false; // Prod: disabled by default
+VITE_FEATURE_UNIFIED_DASH = true; // Staging: enabled for testing
 ```
 
 ### Incremental Rollout
@@ -325,23 +332,23 @@ VITE_FEATURE_UNIFIED_DASH=true   // Staging: enabled for testing
 Monitor these events during rollout:
 
 ```ts
-dash_view              // Dashboard page load
-dash_filter_applied    // User applied filter
-dash_export            // User exported data
-dash_card_expand       // User expanded chart
-dash_error             // Error state rendered
-dash_load_time         // Page load duration
+dash_view; // Dashboard page load
+dash_filter_applied; // User applied filter
+dash_export; // User exported data
+dash_card_expand; // User expanded chart
+dash_error; // Error state rendered
+dash_load_time; // Page load duration
 ```
 
 ### Success Metrics
 
-| Metric | Baseline | Target |
-|--------|----------|--------|
-| Page Load Time (P95) | 3.2s | < 2.0s |
-| Time to Interactive | 4.5s | < 3.0s |
-| Interaction Latency | 200ms | < 150ms |
-| Accessibility Score | 85 | 95+ |
-| Code Lines (all dashboards) | ~8,000 | ~5,000 |
+| Metric                      | Baseline | Target  |
+| --------------------------- | -------- | ------- |
+| Page Load Time (P95)        | 3.2s     | < 2.0s  |
+| Time to Interactive         | 4.5s     | < 3.0s  |
+| Interaction Latency         | 200ms    | < 150ms |
+| Accessibility Score         | 85       | 95+     |
+| Code Lines (all dashboards) | ~8,000   | ~5,000  |
 
 ---
 
