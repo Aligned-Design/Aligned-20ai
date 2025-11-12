@@ -230,5 +230,13 @@
     "description": "Review and approve your content.",
     "noindex": true,
     "whiteLabel": true
+  },
+  {
+    "path": "/client-portal/:token",
+    "visibility": "client",
+    "title": "Client Portal Access",
+    "description": "Accessing your client portal...",
+    "noindex": true,
+    "whiteLabel": true
   }
 ]

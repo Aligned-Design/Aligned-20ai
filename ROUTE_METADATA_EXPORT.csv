@@ -32,3 +32,4 @@ Path,Visibility,Title,Description,Noindex,White Label
 /client-settings,user,"Client Settings | Aligned AI","Client access and preferences.",YES,NO
 /billing,user,"Billing | Aligned AI","Subscription and payments.",YES,NO
 /client-portal,client,"Client Portal","Review and approve your content.",YES,YES
+/client-portal/:token,client,"Client Portal Access","Accessing your client portal...",YES,YES
