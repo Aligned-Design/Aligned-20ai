@@ -39,37 +39,49 @@ import Billing from "./pages/Billing";
 
 const queryClient = new QueryClient();
 
-// Protected route wrapper that checks authentication and onboarding status
+// Protected route wrapper - handles authentication and routing
 function ProtectedRoutes() {
   const { isAuthenticated, onboardingStep } = useAuth();
 
-  // If authenticated and in onboarding, show onboarding flow (accessible at /onboarding)
-  if (isAuthenticated && onboardingStep) {
-    return <Onboarding />;
-  }
-
-  // If not authenticated, redirect to landing page
-  if (!isAuthenticated) {
-    return <Index />;
-  }
-
-  // If authenticated and completed onboarding, show protected routes
   return (
     <Routes>
-      {/* Onboarding Route - explicitly accessible at /onboarding */}
-      <Route path="/onboarding" element={<Onboarding />} />
-      {/* Auth Routes - redirect to onboarding or dashboard */}
-      <Route path="/login" element={<Onboarding />} />
-      <Route path="/signup" element={<Onboarding />} />
-      {/* Core Navigation */}
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/" element={<Dashboard />} />
+      {/* Landing page - accessible to all, shown when not authenticated */}
+      <Route path="/" element={isAuthenticated ? <Dashboard /> : <Index />} />
+
+      {/* Onboarding flow - shown when authenticated but onboarding not complete */}
+      <Route
+        path="/onboarding"
+        element={
+          isAuthenticated && onboardingStep ? <Onboarding /> : <Index />
+        }
+      />
+
+      {/* Auth aliases */}
+      <Route
+        path="/login"
+        element={
+          isAuthenticated && onboardingStep ? <Onboarding /> : <Index />
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          isAuthenticated && onboardingStep ? <Onboarding /> : <Index />
+        }
+      />
+
+      {/* Protected routes - only show when authenticated and onboarding complete */}
+      <Route
+        path="/dashboard"
+        element={isAuthenticated && !onboardingStep ? <Dashboard /> : <Index />}
+      />
       <Route path="/calendar" element={<Calendar />} />
       <Route path="/content-queue" element={<ContentQueue />} />
       <Route path="/queue" element={<ContentQueue />} />
       <Route path="/approvals" element={<Approvals />} />
       <Route path="/creative-studio" element={<CreativeStudio />} />
       <Route path="/content-generator" element={<ContentGenerator />} />
+
       {/* Strategy Navigation */}
       <Route path="/campaigns" element={<Campaigns />} />
       <Route path="/brands" element={<Brands />} />
@@ -82,16 +94,19 @@ function ProtectedRoutes() {
       <Route path="/reports" element={<Reporting />} />
       <Route path="/paid-ads" element={<PaidAds />} />
       <Route path="/ads" element={<PaidAds />} />
+
       {/* Assets Navigation */}
       <Route path="/library" element={<LibraryPage />} />
       <Route path="/client-portal" element={<ClientPortal />} />
       <Route path="/events" element={<Events />} />
       <Route path="/reviews" element={<Reviews />} />
       <Route path="/linked-accounts" element={<LinkedAccounts />} />
+
       {/* Settings */}
       <Route path="/settings" element={<Settings />} />
       <Route path="/client-settings" element={<ClientSettings />} />
       <Route path="/billing" element={<Billing />} />
+
       {/* Catch-all - show 404 page */}
       <Route path="*" element={<NotFound />} />
     </Routes>
