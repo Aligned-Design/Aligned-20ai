@@ -31,6 +31,7 @@ export const ROUTE_METADATA: Record<string, RouteMetadata> = {
     title: 'Aligned AI - AI-Powered Content Creation for Agencies & Brands',
     description: 'Transform your content workflow with AI. Aligned AI handles planning, writing, scheduling, and reporting so you can focus on what matters.',
     noindex: false,
+    ogImage: 'https://www.aligned-bydesign.com/og-home.jpg',
   },
   '/about': {
     path: '/about',
@@ -45,6 +46,7 @@ export const ROUTE_METADATA: Record<string, RouteMetadata> = {
     title: 'Features - AI Content, Scheduling & Analytics | Aligned AI',
     description: 'Explore AI content generation, smart scheduling, real-time analytics, collaboration tools, and more.',
     noindex: false,
+    ogImage: 'https://www.aligned-bydesign.com/og-features.jpg',
   },
   '/integrations': {
     path: '/integrations',
@@ -87,6 +89,7 @@ export const ROUTE_METADATA: Record<string, RouteMetadata> = {
     title: 'Pricing - Simple, Scalable Plans | Aligned AI',
     description: 'Start at $199/mo per brand. Scale smarter with agency pricing. No hidden fees.',
     noindex: false,
+    ogImage: 'https://www.aligned-bydesign.com/og-pricing.jpg',
   },
 
   // ========================================
