@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { ClientAnalyticsDashboard } from "@/components/analytics";
 import {
   Select,
   SelectContent,
@@ -456,71 +457,40 @@ function OverviewSection({ data }: { data: ClientDashboardData }) {
 
 function AnalyticsSection({ data }: { data: ClientDashboardData }) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [explainMode, setExplainMode] = useState(false);
 
   return (
     <div className="space-y-6">
-      {/* Analytics Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Shareable Analytics</h2>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="explain-toggle" className="text-sm">
-              Explain this
-            </Label>
-            <Switch
-              id="explain-toggle"
-              checked={explainMode}
-              onCheckedChange={setExplainMode}
-            />
+      {/* Use new Client Analytics Dashboard */}
+      <ClientAnalyticsDashboard
+        brandName={data.brandInfo.name}
+        agencyName={data.agencyInfo.name}
+      />
+
+      {/* Share Actions */}
+      <Card className="border-2 border-indigo-200">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-bold text-slate-900 mb-1">
+                Share Your Performance
+              </h3>
+              <p className="text-sm text-slate-600">
+                Create a shareable link or download your analytics report
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={() => setShareDialogOpen(true)} className="gap-2">
+                <Share2 className="h-4 w-4" />
+                Create Share Link
+              </Button>
+              <Button variant="outline" className="gap-2">
+                <Download className="h-4 w-4" />
+                Export PDF
+              </Button>
+            </div>
           </div>
-          <Button onClick={() => setShareDialogOpen(true)} className="gap-2">
-            <Share2 className="h-4 w-4" />
-            Create Share Link
-          </Button>
-          <Button variant="outline" className="gap-2">
-            <Download className="h-4 w-4" />
-            Export PDF
-          </Button>
-        </div>
-      </div>
-
-      {/* Analytics Content */}
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="channels">Channels</TabsTrigger>
-          <TabsTrigger value="top-content">Top Content</TabsTrigger>
-          <TabsTrigger value="growth">Growth</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          {explainMode && (
-            <Card className="bg-blue-50 border-blue-200">
-              <CardContent className="pt-6">
-                <div className="flex gap-3">
-                  <Sparkles className="h-5 w-5 text-blue-500 mt-0.5" />
-                  <div>
-                    <h4 className="font-medium text-blue-900 mb-1">
-                      AI Summary
-                    </h4>
-                    <p className="text-blue-800 text-sm">
-                      Reels drove +31% engagement vs images. Best time: Thu 3–5
-                      pm. Keep testimonial stories weekly. Your audience
-                      responds best to behind-the-scenes content and educational
-                      carousels.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* ...existing code... */}
-        </TabsContent>
-
-        {/* ...existing code... */}
-      </Tabs>
+        </CardContent>
+      </Card>
 
       {/* Share Dialog */}
       {shareDialogOpen && (
