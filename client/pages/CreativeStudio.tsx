@@ -1066,39 +1066,69 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
           />
 
           {/* Canvas */}
-          <CreativeStudioCanvas
-            design={state.design}
-            selectedItemId={state.selectedItemId}
-            zoom={state.zoom}
-            onSelectItem={handleSelectItem}
-            onUpdateItem={handleUpdateItem}
-            onUpdateDesign={handleUpdateDesign}
-            onAddElement={handleAddElement}
-            onRotateItem={handleRotateItem}
-            onDeleteItem={handleDeleteItem}
-          />
+          <div className="relative flex-1">
+            <CreativeStudioCanvas
+              design={state.design}
+              selectedItemId={state.selectedItemId}
+              zoom={state.zoom}
+              onSelectItem={handleSelectItem}
+              onUpdateItem={handleUpdateItem}
+              onUpdateDesign={handleUpdateDesign}
+              onAddElement={handleAddElement}
+              onRotateItem={handleRotateItem}
+              onDeleteItem={handleDeleteItem}
+            />
 
-          {/* Right Sidebar Container */}
-          {state.showBrandKit && (
-            <div className="flex flex-col h-full">
-              <CreativeStudioBrandKit
-                brand={brand}
-                onSelectColor={(color) => {
-                  handleSelectColor(color);
-                }}
-                onSelectFont={(font) => {
-                  if (state.selectedItemId) {
-                    handleUpdateItem(state.selectedItemId, { fontFamily: font });
-                  }
-                }}
-                onSelectLogo={() => {
-                  if (brand?.logoUrl) {
-                    handleAddImage();
-                  }
-                }}
+            {/* Floating Text Toolbar */}
+            {state.selectedItemId && (() => {
+              const item = state.design?.items.find(i => i.id === state.selectedItemId);
+              return item?.type === 'text' ? (
+                <TextFormattingToolbar
+                  item={item}
+                  onUpdate={(updates) => handleUpdateItem(state.selectedItemId!, updates)}
+                  position={{ x: item.x + item.width / 2, y: item.y }}
+                />
+              ) : null;
+            })()}
+
+            {/* Canvas Zoom Controls */}
+            <CanvasZoomControls
+              zoom={state.zoom}
+              onZoomIn={handleZoomIn}
+              onZoomOut={handleZoomOut}
+              onFitToScreen={handleFitToScreen}
+              onReset={() => setState(prev => ({ ...prev, zoom: 100 }))}
+              className="absolute bottom-4 right-4"
+            />
+
+            {/* Live Editing Indicators */}
+            {activeUsers.length > 0 && (
+              <LiveEditingIndicators
+                activeUsers={activeUsers}
+                className="absolute top-4 right-4"
               />
-              <CreativeStudioAdvisor brand={brand} design={state.design} />
-            </div>
+            )}
+          </div>
+
+          {/* Right Sidebar Container - New Tabbed Design */}
+          {state.showBrandKit && (
+            <TabbedRightSidebar
+              brand={brand}
+              design={state.design}
+              onSelectColor={handleSelectColor}
+              onSelectFont={(font) => {
+                if (state.selectedItemId) {
+                  handleUpdateItem(state.selectedItemId, { fontFamily: font });
+                }
+              }}
+              onSelectLogo={() => {
+                if (brand?.logoUrl) {
+                  handleAddImage();
+                }
+              }}
+              onClose={() => setState((prev) => ({ ...prev, showBrandKit: false }))}
+              isCollapsible={true}
+            />
           )}
         </div>
       </div>
