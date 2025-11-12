@@ -256,41 +256,38 @@ export function MonthCalendarView({
               </span>
 
               {day.posts.length > 0 && day.isCurrentMonth && (
-                <div className="mt-auto space-y-1">
-                  {day.posts.slice(0, 2).map((post) => {
+                <div className="mt-auto flex flex-wrap gap-1.5 items-center justify-start">
+                  {day.posts.slice(0, 3).map((post) => {
                     const Icon = PLATFORM_ICONS[post.platform];
-                    const statusColors = {
-                      draft: "bg-slate-100 text-slate-700",
-                      reviewing: "bg-amber-100 text-amber-700",
-                      approved: "bg-green-100 text-green-700",
-                      scheduled: "bg-blue-100 text-blue-700",
-                    };
+                    const statusIndicator =
+                      post.status === "draft"
+                        ? "🔲"
+                        : post.status === "reviewing"
+                          ? "🔄"
+                          : post.status === "approved"
+                            ? "✓"
+                            : "📅";
                     return (
-                      <div key={post.id} className="bg-white/60 rounded p-1.5 border border-indigo-100/40 text-left">
-                        <div className="flex items-start gap-1 mb-0.5">
-                          <Icon className="w-3 h-3 text-indigo-600 flex-shrink-0 mt-0.5" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-bold text-slate-900 line-clamp-1 leading-tight">
-                              {post.title}
-                            </p>
-                          </div>
+                      <div
+                        key={post.id}
+                        className="relative group cursor-pointer"
+                        title={`${post.title} - ${post.platform}`}
+                      >
+                        <div className="flex items-center gap-0.5 bg-white/70 rounded-md px-1.5 py-1 border border-indigo-200/50 hover:border-indigo-400/70 transition-all hover:shadow-sm">
+                          <Icon className="w-3 h-3 text-indigo-600" />
+                          <span className="text-xs font-bold text-slate-700">{statusIndicator}</span>
                         </div>
-                        <p className="text-xs text-slate-500 line-clamp-2 leading-tight ml-4">
-                          {post.excerpt}
-                        </p>
-                        <div className="flex items-center gap-1 mt-0.5 ml-4">
-                          <span className="text-xs text-slate-500">{post.scheduledTime}</span>
-                          <span className={`text-xs font-bold rounded px-1.5 py-0.5 ${statusColors[post.status]}`}>
-                            {post.status === "draft" ? "Draft" : post.status === "reviewing" ? "Review" : post.status === "approved" ? "✓" : "📅"}
-                          </span>
+                        {/* Tooltip on hover */}
+                        <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-slate-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 font-medium shadow-lg">
+                          {post.title}
                         </div>
                       </div>
                     );
                   })}
-                  {day.posts.length > 2 && (
-                    <p className="text-xs text-indigo-600 font-bold group-hover:text-indigo-700 px-2">
-                      +{day.posts.length - 2} more
-                    </p>
+                  {day.posts.length > 3 && (
+                    <div className="text-xs font-bold text-indigo-600 group-hover:text-indigo-700 transition-colors">
+                      +{day.posts.length - 3}
+                    </div>
                   )}
                 </div>
               )}
