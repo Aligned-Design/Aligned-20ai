@@ -52,6 +52,7 @@ import {
   X,
   ChevronRight,
   Sparkles,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -253,6 +254,16 @@ export default function ClientPortal() {
                 label: "Updates",
                 icon: <MessageSquare className="h-4 w-4" />,
               },
+              {
+                id: "questions",
+                label: "Questions",
+                icon: <HelpCircle className="h-4 w-4" />,
+              },
+              {
+                id: "feedback-history",
+                label: "Feedback Impact",
+                icon: <TrendingUp className="h-4 w-4" />,
+              },
             ].map((item) => (
               <button
                 key={item.id}
@@ -297,6 +308,15 @@ export default function ClientPortal() {
         {activeSection === "events" && <EventsSection />}
         {activeSection === "messages" && (
           <MessagesSection data={dashboardData} />
+        )}
+        {activeSection === "questions" && (
+          <ClientQAChat
+            clientId={dashboardData.brandInfo.name}
+            agencyName={dashboardData.agencyInfo.name}
+          />
+        )}
+        {activeSection === "feedback-history" && (
+          <FeedbackImpactTimeline clientId={dashboardData.brandInfo.name} />
         )}
       </div>
 
