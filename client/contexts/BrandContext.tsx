@@ -16,7 +16,13 @@ const BrandContext = createContext<BrandContextType | undefined>(undefined);
 const DEFAULT_BRAND: Brand = {
   id: 'default-brand',
   name: 'Aligned by Design',
+  slug: 'aligned-by-design',
+  logo_url: null,
+  website_url: 'https://aligned-bydesign.com',
+  industry: 'Marketing',
   primary_color: '#8B5CF6',
+  secondary_color: null,
+  accent_color: null,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
 };
