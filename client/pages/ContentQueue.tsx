@@ -213,6 +213,8 @@ export default function ContentQueue() {
 
   // Filter posts
   const filteredPosts = allPosts.filter((post) => {
+    // Filter by status from URL if provided
+    if (statusFilter && post.status !== statusFilter) return false;
     if (selectedBrand && post.brand !== selectedBrand) return false;
     if (selectedPlatforms.length > 0) {
       const platformNames: Record<string, string> = {
