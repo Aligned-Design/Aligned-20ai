@@ -280,14 +280,24 @@ export function MonthCalendarView({
                               ? "📅"
                               : "⚠️";
                     return (
-                      <button
+                      <div
                         key={post.id}
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setPreviewPost(post);
                           setShowPreview(true);
                         }}
                         className="relative group cursor-pointer"
+                        role="button"
+                        tabIndex={0}
                         title={`Click to preview: ${post.title}`}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.stopPropagation();
+                            setPreviewPost(post);
+                            setShowPreview(true);
+                          }
+                        }}
                       >
                         <div className="flex items-center gap-0.5 bg-white/70 rounded-md px-1.5 py-1 border border-indigo-200/50 hover:border-indigo-400/70 transition-all hover:shadow-sm">
                           <Icon className="w-3 h-3 text-indigo-600" />
@@ -297,7 +307,7 @@ export function MonthCalendarView({
                         <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-slate-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 font-medium shadow-lg">
                           {post.title}
                         </div>
-                      </button>
+                      </div>
                     );
                   })}
                   {day.posts.length > 3 && (
