@@ -4,9 +4,9 @@ import { CalendarAccordion } from "@/components/dashboard/CalendarAccordion";
 import { MonthCalendarView } from "@/components/dashboard/MonthCalendarView";
 import { DayViewHourly } from "@/components/dashboard/DayViewHourly";
 import { SchedulingAdvisor } from "@/components/dashboard/SchedulingAdvisor";
-import { AnalyticsPanel } from "@/components/dashboard/AnalyticsPanel";
 import { FirstVisitTooltip } from "@/components/dashboard/FirstVisitTooltip";
-import { X, Filter } from "lucide-react";
+import { KpiCard } from "@/components/DashboardSystem";
+import { X, Filter, TrendingUp, Users, Target, Activity } from "lucide-react";
 import { useWorkspace } from "@/contexts/WorkspaceContext";
 
 type ViewType = "day" | "week" | "month";
