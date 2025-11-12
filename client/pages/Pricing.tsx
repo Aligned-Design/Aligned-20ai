@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UnauthenticatedLayout } from "@/components/layout/UnauthenticatedLayout";
+import SiteHeader from "@/components/site/SiteHeader";
+import SiteFooter from "@/components/site/SiteFooter";
 import { Check, Sparkles, ArrowRight, HelpCircle } from "lucide-react";
 import {
   Accordion,
@@ -30,6 +32,7 @@ export default function Pricing() {
 
   return (
     <UnauthenticatedLayout>
+      <SiteHeader />
       {/* Hero Section */}
       <section className="min-h-[60vh] bg-gradient-to-b from-purple-50 via-white to-gray-50 pt-32 pb-16 px-4 sm:px-6 md:px-8 relative overflow-hidden">
         {/* Background Effects */}
@@ -444,6 +447,8 @@ export default function Pricing() {
           </p>
         </div>
       </section>
+
+      <SiteFooter />
     </UnauthenticatedLayout>
   );
 }
