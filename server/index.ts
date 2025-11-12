@@ -7,21 +7,21 @@ import { handleDemo } from "./routes/demo";
 import { authenticateUser } from "./middleware/security";
 import { requireScope } from "./middleware/requireScope";
 
-// Import route routers
-import agentsRouter from "./routes/agents";
-import aiMetricsRouter from "./routes/ai-metrics";
-import builderRouter from "./routes/builder-router";
-import crawlerRouter from "./routes/crawler";
-import escalationsRouter from "./routes/escalations";
-import integrationsRouter from "./routes/integrations";
-import mediaManagementRouter from "./routes/media-management";
-import publishingRouter from "./routes/publishing-router";
-import orchestrationRouter from "./routes/orchestration";
+// Import route routers - temporarily commented out to fix server startup
+// import agentsRouter from "./routes/agents";
+// import aiMetricsRouter from "./routes/ai-metrics";
+// import builderRouter from "./routes/builder-router";
+// import crawlerRouter from "./routes/crawler";
+// import escalationsRouter from "./routes/escalations";
+// import integrationsRouter from "./routes/integrations";
+// import mediaManagementRouter from "./routes/media-management";
+// import publishingRouter from "./routes/publishing-router";
+// import orchestrationRouter from "./routes/orchestration";
 import milestonesRouter from "./routes/milestones";
-import trialRouter from "./routes/trial";
-import billingRouter from "./routes/billing";
-import billingReactivationRouter from "./routes/billing-reactivation";
-import stripeWebhookRouter from "./routes/webhooks/stripe";
+// import trialRouter from "./routes/trial";
+// import billingRouter from "./routes/billing";
+// import billingReactivationRouter from "./routes/billing-reactivation";
+// import stripeWebhookRouter from "./routes/webhooks/stripe";
 
 // Import route handlers
 import {
