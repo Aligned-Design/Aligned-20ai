@@ -17,7 +17,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   studio_align_tools: false,
   ai_copy_v1: false,
   ai_palette_v1: false,
-  unified_dash: false, // Disabled by default; enable incrementally
+  unified_dash: true, // Enabled by default - production version
 };
 
 /**

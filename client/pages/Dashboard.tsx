@@ -7,16 +7,14 @@
 import { useAuth } from "@/lib/auth";
 import { useCan } from "@/lib/auth";
 import { useNavigate, Link } from "react-router-dom";
-import { isFeatureEnabled } from "@/lib/featureFlags";
 import { analytics } from "@/lib/analytics";
 import { useEffect } from "react";
-import AppLayout from "@/components/layout/AppLayout";
 import ActionButtonsHeader from "@/components/dashboard/ActionButtonsHeader";
 import DashboardWidgets from "@/components/dashboard/DashboardWidgets";
 import AlignedAISummary from "@/components/dashboard/AlignedAISummary";
 import SmartDashboard from "@/components/analytics/SmartDashboard";
 import { DashboardShell, KpiCard } from "@/components/DashboardSystem";
-import { Sparkles, TrendingUp, MessageSquare, Clock } from "lucide-react";
+import { Sparkles, TrendingUp, MessageSquare } from "lucide-react";
 
 export default function Dashboard() {
   const unifiedDashEnabled = isFeatureEnabled("unified_dash");
