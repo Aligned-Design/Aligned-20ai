@@ -1,5 +1,15 @@
-import { db } from '@db';
+import { supabase } from './dbClient';
 import type { MilestoneKey } from '../../client/lib/milestones';
+
+interface MilestoneRecord {
+  id: string;
+  workspace_id: string;
+  key: MilestoneKey;
+  unlocked_at: string;
+  acknowledged_at?: string;
+  created_at: string;
+  updated_at: string;
+}
 
 /**
  * Unlock a milestone for a workspace (idempotent)
@@ -10,27 +20,33 @@ import type { MilestoneKey } from '../../client/lib/milestones';
 export async function unlockMilestone(workspaceId: string, key: MilestoneKey) {
   try {
     // Check if already unlocked
-    const existing = await db.query.milestones.findFirst({
-      where: (milestones, { eq, and }) =>
-        and(
-          eq(milestones.workspaceId, workspaceId),
-          eq(milestones.key, key)
-        ),
-    });
+    const { data: existing, error: checkError } = await supabase
+      .from('milestones')
+      .select('*')
+      .eq('workspace_id', workspaceId)
+      .eq('key', key)
+      .maybeSingle();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      throw checkError;
+    }
 
     if (existing) {
       return existing; // Already unlocked - idempotent
     }
 
     // Create new milestone
-    const [milestone] = await db
-      .insert(db.schema.milestones)
-      .values({
-        workspaceId,
+    const { data: milestone, error } = await supabase
+      .from('milestones')
+      .insert({
+        workspace_id: workspaceId,
         key,
-        unlockedAt: new Date(),
+        unlocked_at: new Date().toISOString(),
       })
-      .returning();
+      .select()
+      .single();
+
+    if (error) throw error;
 
     // TODO: Notify clients via WebSocket when available
     // ws.publish(`milestones:${workspaceId}`, { key });
@@ -54,15 +70,18 @@ export async function isMilestoneUnlocked(
   key: MilestoneKey
 ): Promise<boolean> {
   try {
-    const milestone = await db.query.milestones.findFirst({
-      where: (milestones, { eq, and }) =>
-        and(
-          eq(milestones.workspaceId, workspaceId),
-          eq(milestones.key, key)
-        ),
-    });
+    const { data, error } = await supabase
+      .from('milestones')
+      .select('id')
+      .eq('workspace_id', workspaceId)
+      .eq('key', key)
+      .maybeSingle();
 
-    return !!milestone;
+    if (error && error.code !== 'PGRST116') {
+      throw error;
+    }
+
+    return !!data;
   } catch (err) {
     console.error(`[Milestone] Failed to check ${key}:`, err);
     return false;
@@ -73,12 +92,17 @@ export async function isMilestoneUnlocked(
  * Get all milestones for a workspace
  * @param workspaceId - The workspace ID
  */
-export async function getMilestones(workspaceId: string) {
+export async function getMilestones(workspaceId: string): Promise<MilestoneRecord[]> {
   try {
-    return await db.query.milestones.findMany({
-      where: (milestones, { eq }) => eq(milestones.workspaceId, workspaceId),
-      orderBy: (milestones, { desc }) => [desc(milestones.unlockedAt)],
-    });
+    const { data, error } = await supabase
+      .from('milestones')
+      .select('*')
+      .eq('workspace_id', workspaceId)
+      .order('unlocked_at', { ascending: false });
+
+    if (error) throw error;
+
+    return data || [];
   } catch (err) {
     console.error('[Milestone] Failed to fetch milestones:', err);
     return [];
@@ -92,15 +116,13 @@ export async function getMilestones(workspaceId: string) {
  */
 export async function acknowledgeMilestone(workspaceId: string, key: MilestoneKey) {
   try {
-    await db
-      .update(db.schema.milestones)
-      .set({ acknowledgedAt: new Date() })
-      .where(
-        db.and(
-          db.eq(db.schema.milestones.workspaceId, workspaceId),
-          db.eq(db.schema.milestones.key, key)
-        )
-      );
+    const { error } = await supabase
+      .from('milestones')
+      .update({ acknowledged_at: new Date().toISOString() })
+      .eq('workspace_id', workspaceId)
+      .eq('key', key);
+
+    if (error) throw error;
 
     console.log(`[Milestone] Acknowledged ${key} for workspace ${workspaceId}`);
   } catch (err) {
