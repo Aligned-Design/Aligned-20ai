@@ -252,7 +252,7 @@ export function GrowthLineChart({
         <Line
           type="monotone"
           dataKey="current"
-          stroke="#8b5cf6"
+          stroke={CHART_COLORS.primary}
           strokeWidth={2}
           dot={{ r: 3 }}
         />
@@ -260,7 +260,7 @@ export function GrowthLineChart({
           <Line
             type="monotone"
             dataKey="previous"
-            stroke="#d1d5db"
+            stroke={CHART_COLORS.muted}
             strokeWidth={2}
             strokeDasharray="5 5"
             dot={{ r: 3 }}
