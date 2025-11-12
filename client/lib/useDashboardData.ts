@@ -26,44 +26,38 @@ export interface DashboardFilters {
   };
 }
 
+// Data Contract - Matches spec exactly
 export interface DashboardKpi {
-  id: string;
-  title: string;
-  value: string | number;
-  delta?: {
-    value: number;
-    trend: "up" | "down" | "neutral";
-    label?: string;
-  };
-  sparkline?: number[];
-}
-
-export interface DashboardSeries {
-  id: string;
-  name: string;
-  data: Array<{ x: string; y: number }>;
-}
-
-export interface DashboardTopItem {
-  id: string;
-  name: string;
-  value: number;
-  metadata?: Record<string, any>;
-}
-
-export interface DashboardActivity {
-  id: string;
-  title: string;
-  description?: string;
-  timestamp: string;
-  metadata?: Record<string, any>;
+  key: string;
+  label: string;
+  value: number | string;
+  delta?: number;
+  spark?: number[];
 }
 
 export interface DashboardData {
-  kpis: DashboardKpi[];
-  series: DashboardSeries[];
-  topItems: DashboardTopItem[];
-  activity: DashboardActivity[];
+  kpis: Array<{
+    key: string;
+    label: string;
+    value: number | string;
+    delta?: number;
+    spark?: number[];
+  }>;
+  series: Record<string, Array<{ x: number | string; y: number }>>;
+  topItems: Array<{
+    id: string;
+    title: string;
+    metric: number;
+    meta?: Record<string, any>;
+  }>;
+  activity: Array<{
+    id: string;
+    ts: string;
+    type: string;
+    actor?: string;
+    target?: string;
+    meta?: any;
+  }>;
 }
 
 async function fetchDashboardData(filters: DashboardFilters): Promise<DashboardData> {
@@ -78,69 +72,109 @@ async function fetchDashboardData(filters: DashboardFilters): Promise<DashboardD
   // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  // Mock data
+  // Mock data - Now matches spec exactly
   return {
     kpis: [
       {
-        id: "impressions",
-        title: "Total Impressions",
+        key: "impressions",
+        label: "Total Impressions",
         value: "45.2K",
-        delta: { value: 12.5, trend: "up", label: "vs last week" },
-        sparkline: [40, 45, 42, 48, 50, 45, 52],
+        delta: 12.5,
+        spark: [40, 45, 42, 48, 50, 45, 52],
       },
       {
-        id: "engagement",
-        title: "Engagement Rate",
+        key: "engagement",
+        label: "Engagement Rate",
         value: "12.5%",
-        delta: { value: 2.3, trend: "up", label: "vs last week" },
-        sparkline: [10, 11, 11.5, 12, 11.8, 12.2, 12.5],
+        delta: 2.3,
+        spark: [10, 11, 11.5, 12, 11.8, 12.2, 12.5],
       },
       {
-        id: "posts",
-        title: "Posts Published",
+        key: "posts",
+        label: "Posts Published",
         value: 24,
-        delta: { value: -8, trend: "down", label: "vs last week" },
+        delta: -8,
       },
-    ],
-    series: [
       {
-        id: "impressions_series",
-        name: "Impressions",
-        data: [
-          { x: "Mon", y: 4200 },
-          { x: "Tue", y: 5100 },
-          { x: "Wed", y: 4800 },
-          { x: "Thu", y: 6200 },
-          { x: "Fri", y: 7100 },
-          { x: "Sat", y: 5900 },
-          { x: "Sun", y: 6400 },
-        ],
+        key: "followers",
+        label: "New Followers",
+        value: 1847,
+        delta: 3.9,
       },
     ],
+    series: {
+      impressions: [
+        { x: "Mon", y: 4200 },
+        { x: "Tue", y: 5100 },
+        { x: "Wed", y: 4800 },
+        { x: "Thu", y: 6200 },
+        { x: "Fri", y: 7100 },
+        { x: "Sat", y: 5900 },
+        { x: "Sun", y: 6400 },
+      ],
+      engagement: [
+        { x: "Mon", y: 380 },
+        { x: "Tue", y: 420 },
+        { x: "Wed", y: 390 },
+        { x: "Thu", y: 510 },
+        { x: "Fri", y: 580 },
+        { x: "Sat", y: 450 },
+        { x: "Sun", y: 520 },
+      ],
+    },
     topItems: [
-      { id: "1", name: "Summer Sale Campaign", value: 12500 },
-      { id: "2", name: "Product Launch", value: 9800 },
-      { id: "3", name: "Brand Awareness", value: 7600 },
+      { id: "1", title: "Summer Sale Campaign", metric: 12500, meta: { platform: "instagram" } },
+      { id: "2", title: "Product Launch", metric: 9800, meta: { platform: "tiktok" } },
+      { id: "3", title: "Brand Awareness", metric: 7600, meta: { platform: "facebook" } },
+      { id: "4", title: "Tutorial Video Series", metric: 6200, meta: { platform: "youtube" } },
+      { id: "5", title: "Customer Testimonials", metric: 5100, meta: { platform: "linkedin" } },
     ],
     activity: [
       {
         id: "1",
-        title: "Post published",
-        description: "Instagram carousel went live",
-        timestamp: "2 hours ago",
+        ts: "2025-11-12T10:30:00Z",
+        type: "post_published",
+        actor: "user_123",
+        target: "post_456",
+        meta: { platform: "instagram", postType: "carousel" },
       },
       {
         id: "2",
-        title: "Campaign approved",
-        description: "Summer Sale Campaign ready to launch",
-        timestamp: "5 hours ago",
+        ts: "2025-11-12T08:15:00Z",
+        type: "campaign_approved",
+        actor: "user_789",
+        target: "campaign_101",
+        meta: { campaignName: "Summer Sale Campaign" },
+      },
+      {
+        id: "3",
+        ts: "2025-11-11T16:45:00Z",
+        type: "content_created",
+        actor: "user_123",
+        target: "draft_789",
+        meta: { contentType: "video" },
+      },
+      {
+        id: "4",
+        ts: "2025-11-11T14:20:00Z",
+        type: "comment_replied",
+        actor: "user_456",
+        target: "comment_234",
+        meta: { platform: "facebook", sentiment: "positive" },
       },
     ],
   };
 }
 
 export function useDashboardData(filters: DashboardFilters = {}) {
-  const queryKey = ["dashboard", filters.brandId, filters.period, filters.platformFilters, filters.statusFilters, filters.dateRange];
+  // Generate stable query key hash from filters
+  const filtersHash = JSON.stringify({
+    platforms: filters.platformFilters?.sort(),
+    status: filters.statusFilters?.sort(),
+    dateRange: filters.dateRange,
+  });
+  
+  const queryKey = ["dash", filters.brandId, filters.period, filtersHash];
   
   const {
     data,
@@ -157,7 +191,7 @@ export function useDashboardData(filters: DashboardFilters = {}) {
 
   return {
     kpis: data?.kpis || [],
-    series: data?.series || [],
+    series: data?.series || {},
     topItems: data?.topItems || [],
     activity: data?.activity || [],
     isLoading,

@@ -24,6 +24,17 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "@typescript-eslint/no-unused-vars": "off",
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["**/HeroMetricCard*", "**/AnalyticsPanel*", "**/AnalyticsCharts*"],
+              message: "Legacy dashboard components are deprecated. Use primitives from @/components/DashboardSystem instead.",
+            },
+          ],
+        },
+      ],
     },
   }
 );
