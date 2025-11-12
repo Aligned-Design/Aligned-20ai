@@ -62,6 +62,7 @@ import {
 } from "@shared/client-portal";
 import { WorkflowTracker } from "@/components/workflow/WorkflowTracker";
 import { WorkflowAction } from "@shared/workflow";
+import { getStoredClientToken, getBrandIdFromToken } from "@/lib/client-portal-auth";
 
 export default function ClientPortal() {
   const [dashboardData, setDashboardData] =
@@ -78,7 +79,17 @@ export default function ClientPortal() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/client/dashboard");
+
+      // Get brand ID from token
+      const brandId = getBrandIdFromToken();
+
+      if (!brandId) {
+        console.error("No brand ID in token");
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(`/api/client/dashboard?brandId=${brandId}`);
       if (response.ok) {
         const data = await response.json();
         setDashboardData(data as unknown);

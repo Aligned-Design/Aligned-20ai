@@ -13,6 +13,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { BrandProvider } from "@/contexts/BrandContext";
 import MilestoneCelebrator from "@/components/MilestoneCelebrator";
 import { SEOHead } from "@/components/seo";
+import { ClientPortalRoute } from "@/components/auth/ClientPortalRoute";
 import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
@@ -364,12 +365,22 @@ function ProtectedRoutes() {
           </ProtectedRoute>
         }
       />
+
+      {/* Client Portal - Token-based authentication */}
+      <Route
+        path="/client-portal/:token"
+        element={
+          <ClientPortalRoute>
+            <ClientPortal />
+          </ClientPortalRoute>
+        }
+      />
       <Route
         path="/client-portal"
         element={
-          <ProtectedRoute>
+          <ClientPortalRoute>
             <ClientPortal />
-          </ProtectedRoute>
+          </ClientPortalRoute>
         }
       />
       <Route
