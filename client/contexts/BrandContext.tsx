@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase, Brand } from "@/lib/supabase";
 import { useAuth } from "./AuthContext";
+import { isDemoMode, mockBrands } from "@/lib/mockData";
 
 type BrandContextType = {
   brands: Brand[];
@@ -38,6 +39,15 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
       // Set default brand for logged-in users without brand data
       setBrands([DEFAULT_BRAND]);
       setCurrentBrand(DEFAULT_BRAND);
+      setLoading(false);
+      return;
+    }
+
+    // Use mock data in demo mode to avoid Supabase fetch errors
+    if (isDemoMode()) {
+      console.log("[DEMO MODE] Using mock brands");
+      setBrands(mockBrands);
+      setCurrentBrand(mockBrands[0]);
       setLoading(false);
       return;
     }
