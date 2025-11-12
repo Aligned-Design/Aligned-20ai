@@ -7,6 +7,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { ClientAnalyticsDashboard } from "@/components/analytics";
+import {
+  FeedbackImpactTimeline,
+  CollaborativeApprovalFlow,
+  ClientQAChat,
+  ApprovalSLATracker,
+} from "@/components/collaboration";
 import {
   Select,
   SelectContent,
@@ -45,6 +52,7 @@ import {
   X,
   ChevronRight,
   Sparkles,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -54,6 +62,12 @@ import {
 } from "@shared/client-portal";
 import { WorkflowTracker } from "@/components/workflow/WorkflowTracker";
 import { WorkflowAction } from "@shared/workflow";
+import {
+  getStoredClientToken,
+  getBrandIdFromToken,
+} from "@/lib/client-portal-auth";
+import { isFeatureEnabled } from "@/lib/featureFlags";
+import { KpiCard as UnifiedKpiCard } from "@/components/DashboardSystem";
 
 export default function ClientPortal() {
   const [dashboardData, setDashboardData] =
@@ -70,10 +84,20 @@ export default function ClientPortal() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/client/dashboard");
+
+      // Get brand ID from token
+      const brandId = getBrandIdFromToken();
+
+      if (!brandId) {
+        console.error("No brand ID in token");
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(`/api/client/dashboard?brandId=${brandId}`);
       if (response.ok) {
         const data = await response.json();
-        setDashboardData(data as unknown);
+        setDashboardData(data.data || data);
       }
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
@@ -246,6 +270,16 @@ export default function ClientPortal() {
                 label: "Updates",
                 icon: <MessageSquare className="h-4 w-4" />,
               },
+              {
+                id: "questions",
+                label: "Questions",
+                icon: <HelpCircle className="h-4 w-4" />,
+              },
+              {
+                id: "feedback-history",
+                label: "Feedback Impact",
+                icon: <TrendingUp className="h-4 w-4" />,
+              },
             ].map((item) => (
               <button
                 key={item.id}
@@ -290,6 +324,15 @@ export default function ClientPortal() {
         {activeSection === "events" && <EventsSection />}
         {activeSection === "messages" && (
           <MessagesSection data={dashboardData} />
+        )}
+        {activeSection === "questions" && (
+          <ClientQAChat
+            clientId={dashboardData.brandInfo.name}
+            agencyName={dashboardData.agencyInfo.name}
+          />
+        )}
+        {activeSection === "feedback-history" && (
+          <FeedbackImpactTimeline clientId={dashboardData.brandInfo.name} />
         )}
       </div>
 
@@ -345,41 +388,101 @@ function ActionChip({
 }
 
 function OverviewSection({ data }: { data: ClientDashboardData }) {
+  const unifiedDashEnabled = isFeatureEnabled("unified_dash");
+
   return (
     <div className="space-y-8">
       {/* KPIs Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <KPICard
-          title="Total Reach"
-          value={formatNumber(data.metrics.totalReach)}
-          subtitle="Last 28 days"
-          growth={data.metrics.growth.reach}
-          icon={<Eye className="h-6 w-6" />}
-          color="blue"
-        />
-        <KPICard
-          title="Engagement Rate"
-          value={`${data.metrics.engagementRate}%`}
-          subtitle="Average"
-          growth={data.metrics.growth.engagement}
-          icon={<Heart className="h-6 w-6" />}
-          color="red"
-        />
-        <KPICard
-          title="Posts Published"
-          value={data.metrics.postsThisMonth.toString()}
-          subtitle="This month"
-          icon={<FileText className="h-6 w-6" />}
-          color="green"
-        />
-        <KPICard
-          title="Followers"
-          value={formatNumber(data.metrics.followers)}
-          subtitle="Total across platforms"
-          growth={data.metrics.growth.followers}
-          icon={<Users className="h-6 w-6" />}
-          color="purple"
-        />
+        {unifiedDashEnabled ? (
+          <>
+            <UnifiedKpiCard
+              title="Total Reach"
+              value={formatNumber(data.metrics.totalReach)}
+              description="Last 28 days"
+              delta={
+                data.metrics.growth.reach
+                  ? {
+                      value: data.metrics.growth.reach,
+                      trend: data.metrics.growth.reach > 0 ? "up" : "down",
+                      label: "vs previous period",
+                    }
+                  : undefined
+              }
+              icon={Eye}
+            />
+            <UnifiedKpiCard
+              title="Engagement Rate"
+              value={`${data.metrics.engagementRate}%`}
+              description="Average"
+              delta={
+                data.metrics.growth.engagement
+                  ? {
+                      value: data.metrics.growth.engagement,
+                      trend: data.metrics.growth.engagement > 0 ? "up" : "down",
+                      label: "vs previous period",
+                    }
+                  : undefined
+              }
+              icon={Heart}
+            />
+            <UnifiedKpiCard
+              title="Posts Published"
+              value={data.metrics.postsThisMonth.toString()}
+              description="This month"
+              icon={FileText}
+            />
+            <UnifiedKpiCard
+              title="Followers"
+              value={formatNumber(data.metrics.followers)}
+              description="Total across platforms"
+              delta={
+                data.metrics.growth.followers
+                  ? {
+                      value: data.metrics.growth.followers,
+                      trend: data.metrics.growth.followers > 0 ? "up" : "down",
+                      label: "vs previous period",
+                    }
+                  : undefined
+              }
+              icon={Users}
+            />
+          </>
+        ) : (
+          <>
+            <KPICard
+              title="Total Reach"
+              value={formatNumber(data.metrics.totalReach)}
+              subtitle="Last 28 days"
+              growth={data.metrics.growth.reach}
+              icon={<Eye className="h-6 w-6" />}
+              color="blue"
+            />
+            <KPICard
+              title="Engagement Rate"
+              value={`${data.metrics.engagementRate}%`}
+              subtitle="Average"
+              growth={data.metrics.growth.engagement}
+              icon={<Heart className="h-6 w-6" />}
+              color="red"
+            />
+            <KPICard
+              title="Posts Published"
+              value={data.metrics.postsThisMonth.toString()}
+              subtitle="This month"
+              icon={<FileText className="h-6 w-6" />}
+              color="green"
+            />
+            <KPICard
+              title="Followers"
+              value={formatNumber(data.metrics.followers)}
+              subtitle="Total across platforms"
+              growth={data.metrics.growth.followers}
+              icon={<Users className="h-6 w-6" />}
+              color="purple"
+            />
+          </>
+        )}
       </div>
 
       {/* Upcoming Posts */}
@@ -456,71 +559,43 @@ function OverviewSection({ data }: { data: ClientDashboardData }) {
 
 function AnalyticsSection({ data }: { data: ClientDashboardData }) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [explainMode, setExplainMode] = useState(false);
 
   return (
     <div className="space-y-6">
-      {/* Analytics Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Shareable Analytics</h2>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="explain-toggle" className="text-sm">
-              Explain this
-            </Label>
-            <Switch
-              id="explain-toggle"
-              checked={explainMode}
-              onCheckedChange={setExplainMode}
-            />
+      {/* Use new Client Analytics Dashboard */}
+      <ClientAnalyticsDashboard
+        brandName={data.brandInfo.name}
+        agencyName={data.agencyInfo.name}
+      />
+
+      {/* Share Actions */}
+      <Card className="border-2 border-indigo-200">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-bold text-slate-900 mb-1">
+                Share Your Performance
+              </h3>
+              <p className="text-sm text-slate-600">
+                Create a shareable link or download your analytics report
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setShareDialogOpen(true)}
+                className="gap-2"
+              >
+                <Share2 className="h-4 w-4" />
+                Create Share Link
+              </Button>
+              <Button variant="outline" className="gap-2">
+                <Download className="h-4 w-4" />
+                Export PDF
+              </Button>
+            </div>
           </div>
-          <Button onClick={() => setShareDialogOpen(true)} className="gap-2">
-            <Share2 className="h-4 w-4" />
-            Create Share Link
-          </Button>
-          <Button variant="outline" className="gap-2">
-            <Download className="h-4 w-4" />
-            Export PDF
-          </Button>
-        </div>
-      </div>
-
-      {/* Analytics Content */}
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="channels">Channels</TabsTrigger>
-          <TabsTrigger value="top-content">Top Content</TabsTrigger>
-          <TabsTrigger value="growth">Growth</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          {explainMode && (
-            <Card className="bg-blue-50 border-blue-200">
-              <CardContent className="pt-6">
-                <div className="flex gap-3">
-                  <Sparkles className="h-5 w-5 text-blue-500 mt-0.5" />
-                  <div>
-                    <h4 className="font-medium text-blue-900 mb-1">
-                      AI Summary
-                    </h4>
-                    <p className="text-blue-800 text-sm">
-                      Reels drove +31% engagement vs images. Best time: Thu 3–5
-                      pm. Keep testimonial stories weekly. Your audience
-                      responds best to behind-the-scenes content and educational
-                      carousels.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* ...existing code... */}
-        </TabsContent>
-
-        {/* ...existing code... */}
-      </Tabs>
+        </CardContent>
+      </Card>
 
       {/* Share Dialog */}
       {shareDialogOpen && (

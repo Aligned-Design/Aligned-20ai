@@ -16,7 +16,22 @@ import { ScheduleModal } from "@/components/dashboard/ScheduleModal";
 import { PlatformSelectorModal } from "@/components/dashboard/PlatformSelectorModal";
 import { BackgroundPickerModal } from "@/components/dashboard/BackgroundPickerModal";
 import { ElementsDrawer } from "@/components/dashboard/ElementsDrawer";
-import { Menu, Download, Share2, Send, Calendar, Save, X, Zap, Eye, Layout, Layers, Image as ImageIcon } from "lucide-react";
+import {
+  Menu,
+  Download,
+  Share2,
+  Send,
+  Calendar,
+  Save,
+  X,
+  Zap,
+  Eye,
+  Layout,
+  Layers,
+  Image as ImageIcon,
+  MessageSquare,
+  History,
+} from "lucide-react";
 import {
   Design,
   CanvasItem,
@@ -35,6 +50,20 @@ import { useWorkspace } from "@/contexts/WorkspaceContext";
 import { generateCaptions } from "@/lib/generateCaption";
 import { isFeatureEnabled } from "@/lib/featureFlags";
 import { ElementSidebar } from "@/components/dashboard/ElementSidebar";
+
+// New Creative Studio Components
+import { TabbedRightSidebar } from "@/components/creative-studio/TabbedRightSidebar";
+import { CanvasZoomControls } from "@/components/creative-studio/CanvasZoomControls";
+import { TextFormattingToolbar } from "@/components/creative-studio/TextFormattingToolbar";
+import { ApprovalStatusBadge } from "@/components/creative-studio/ApprovalStatusBadge";
+import { RequestApprovalModal } from "@/components/creative-studio/RequestApprovalModal";
+import { ApprovalButtons } from "@/components/creative-studio/ApprovalButtons";
+import { ApprovalHistoryPanel } from "@/components/creative-studio/ApprovalHistoryPanel";
+import { CommentThreadPanel } from "@/components/creative-studio/CommentThreadPanel";
+import { VersionHistoryTimeline } from "@/components/creative-studio/VersionHistoryTimeline";
+import { LiveEditingIndicators } from "@/components/creative-studio/LiveEditingIndicators";
+import { KeyboardShortcutsPanel } from "@/components/creative-studio/KeyboardShortcutsPanel";
+import { MobileToolbar } from "@/components/creative-studio/MobileToolbar";
 
 const AUTOSAVE_DELAY = 3000; // 3 seconds
 
@@ -72,12 +101,24 @@ export default function CreativeStudio() {
 
   // Elements drawer
   const [showElementsDrawer, setShowElementsDrawer] = useState(false);
-  const [activeDrawerSection, setActiveDrawerSection] = useState<"elements" | "templates" | "background" | "media">("elements");
+  const [activeDrawerSection, setActiveDrawerSection] = useState<
+    "elements" | "templates" | "background" | "media"
+  >("elements");
   const [showBackgroundModal, setShowBackgroundModal] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
 
   // Track unsaved changes
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // New features state
+  const [showRequestApproval, setShowRequestApproval] = useState(false);
+  const [showApprovalHistory, setShowApprovalHistory] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
+  const [activeUsers, setActiveUsers] = useState<
+    Array<{ userId: string; userName: string; isEditing: boolean }>
+  >([]);
 
   const { toast } = useToast();
 
@@ -131,9 +172,16 @@ export default function CreativeStudio() {
       } else if (e.key === "Delete" && state.selectedItemId) {
         e.preventDefault();
         handleDeleteItem();
-      } else if ((e.ctrlKey || e.metaKey) && e.key === "r" && state.selectedItemId) {
+      } else if (
+        (e.ctrlKey || e.metaKey) &&
+        e.key === "r" &&
+        state.selectedItemId
+      ) {
         e.preventDefault();
         handleRotateItem(45);
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "/") {
+        e.preventDefault();
+        setShowKeyboardShortcuts(true);
       }
     };
 
@@ -141,8 +189,15 @@ export default function CreativeStudio() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [state.design, state.selectedItemId]);
 
-  const handleStartDesign = (mode: "ai" | "template" | "scratch", format: DesignFormat) => {
-    const newDesign = createInitialDesign(format, brand?.brandId || "default", "");
+  const handleStartDesign = (
+    mode: "ai" | "template" | "scratch",
+    format: DesignFormat,
+  ) => {
+    const newDesign = createInitialDesign(
+      format,
+      brand?.brandId || "default",
+      "",
+    );
     setState((prev) => ({
       ...prev,
       design: newDesign,
@@ -174,7 +229,7 @@ export default function CreativeStudio() {
       if (!prev.design) return prev;
 
       const updatedItems = prev.design.items.map((item) =>
-        item.id === itemId ? { ...item, ...updates } : item
+        item.id === itemId ? { ...item, ...updates } : item,
       );
 
       const updatedDesign: Design = {
@@ -283,7 +338,9 @@ export default function CreativeStudio() {
 
   const handleSelectColor = (color: string) => {
     if (state.selectedItemId && state.design) {
-      const item = state.design.items.find((i) => i.id === state.selectedItemId);
+      const item = state.design.items.find(
+        (i) => i.id === state.selectedItemId,
+      );
       if (item) {
         const updates: Partial<CanvasItem> = {};
         if (item.type === "text") {
@@ -338,57 +395,75 @@ export default function CreativeStudio() {
     });
 
     toast({
-    title: "Image Added",
-    description: "Click and drag to reposition or resize",
-  });
-};
+      title: "Image Added",
+      description: "Click and drag to reposition or resize",
+    });
+  };
 
-const handleAddElement = (elementType: string, defaultProps: Record<string, any>, x: number, y: number) => {
-  setState((prev) => {
-    if (!prev.design) return prev;
+  const handleAddElement = (
+    elementType: string,
+    defaultProps: Record<string, any>,
+    x: number,
+    y: number,
+  ) => {
+    setState((prev) => {
+      if (!prev.design) return prev;
 
-    // Default dimensions based on element type
-    const defaultDimensions: Record<string, { width: number; height: number }> = {
-      text: { width: 200, height: 100 },
-      image: { width: 300, height: 300 },
-      logo: { width: 120, height: 120 },
-      shape: { width: 150, height: 150 },
-      button: { width: 150, height: 50 },
-      icon: { width: 100, height: 100 },
-    };
+      // Default dimensions based on element type
+      const defaultDimensions: Record<
+        string,
+        { width: number; height: number }
+      > = {
+        text: { width: 200, height: 100 },
+        image: { width: 300, height: 300 },
+        logo: { width: 120, height: 120 },
+        shape: { width: 150, height: 150 },
+        button: { width: 150, height: 50 },
+        icon: { width: 100, height: 100 },
+      };
 
-    const dimensions = defaultDimensions[elementType] || { width: 150, height: 150 };
+      const dimensions = defaultDimensions[elementType] || {
+        width: 150,
+        height: 150,
+      };
 
-    const newItem: CanvasItem = {
-      id: `${elementType}-${Date.now()}`,
-      type: elementType === "text" ? "text" : elementType === "image" || elementType === "logo" ? "image" : elementType === "shape" ? "shape" : "text",
-      x: Math.max(0, x - dimensions.width / 2),
-      y: Math.max(0, y - dimensions.height / 2),
-      width: dimensions.width,
-      height: dimensions.height,
-      rotation: 0,
-      zIndex: prev.design.items.length,
-      ...defaultProps,
-    };
+      const newItem: CanvasItem = {
+        id: `${elementType}-${Date.now()}`,
+        type:
+          elementType === "text"
+            ? "text"
+            : elementType === "image" || elementType === "logo"
+              ? "image"
+              : elementType === "shape"
+                ? "shape"
+                : "text",
+        x: Math.max(0, x - dimensions.width / 2),
+        y: Math.max(0, y - dimensions.height / 2),
+        width: dimensions.width,
+        height: dimensions.height,
+        rotation: 0,
+        zIndex: prev.design.items.length,
+        ...defaultProps,
+      };
 
-    const updatedItems = [...prev.design.items, newItem];
-    const updatedDesign: Design = {
-      ...prev.design,
-      items: updatedItems,
-      updatedAt: new Date().toISOString(),
-    };
+      const updatedItems = [...prev.design.items, newItem];
+      const updatedDesign: Design = {
+        ...prev.design,
+        items: updatedItems,
+        updatedAt: new Date().toISOString(),
+      };
 
-    return {
-      ...pushToHistory(prev, updatedDesign),
-      selectedItemId: newItem.id,
-    };
-  });
+      return {
+        ...pushToHistory(prev, updatedDesign),
+        selectedItemId: newItem.id,
+      };
+    });
 
-  toast({
-    title: "Element Added",
-    description: "Click and drag to reposition, or use the toolbar to edit",
-  });
-};
+    toast({
+      title: "Element Added",
+      description: "Click and drag to reposition, or use the toolbar to edit",
+    });
+  };
 
   // Wrapper for ElementsDrawer which calls (elementType, x, y)
   const handleElementDrag = (elementType: string, x: number, y: number) => {
@@ -447,14 +522,19 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
     }));
 
     setHasUnsavedChanges(false);
-    const tags = [brand?.brandId, state.design.campaignId].filter(Boolean).join(", ");
+    const tags = [brand?.brandId, state.design.campaignId]
+      .filter(Boolean)
+      .join(", ");
     toast({
       title: "✅ Saved to Library",
       description: `${state.design.name} · Added tags: ${tags || "creative-studio"}`,
     });
 
     // Telemetry
-    console.log("[telemetry] save_to_library", { designId: state.design.id, timestamp: new Date().toISOString() });
+    console.log("[telemetry] save_to_library", {
+      designId: state.design.id,
+      timestamp: new Date().toISOString(),
+    });
   };
 
   const handleSaveAsDraft = () => {
@@ -472,7 +552,9 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
 
     setState((prev) => ({
       ...prev,
-      design: prev.design ? { ...prev.design, lastSaveAction: "saveAsDraft" } : null,
+      design: prev.design
+        ? { ...prev.design, lastSaveAction: "saveAsDraft" }
+        : null,
     }));
 
     setHasUnsavedChanges(false);
@@ -481,7 +563,10 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
       description: `${state.design.name} · Ready for editing`,
     });
 
-    console.log("[telemetry] save_as_draft", { designId: state.design.id, timestamp: new Date().toISOString() });
+    console.log("[telemetry] save_as_draft", {
+      designId: state.design.id,
+      timestamp: new Date().toISOString(),
+    });
   };
 
   const handleSaveCreateVariant = () => {
@@ -506,7 +591,10 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
       description: `${variant.name} · Based on ${state.design.name}`,
     });
 
-    console.log("[telemetry] save_create_variant", { originalId: state.design.id, variantId: variant.id });
+    console.log("[telemetry] save_create_variant", {
+      originalId: state.design.id,
+      variantId: variant.id,
+    });
   };
 
   const handleSendToQueue = () => {
@@ -514,7 +602,9 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
 
     setState((prev) => ({
       ...prev,
-      design: prev.design ? { ...prev.design, lastSaveAction: "sendToQueue" } : null,
+      design: prev.design
+        ? { ...prev.design, lastSaveAction: "sendToQueue" }
+        : null,
     }));
 
     toast({
@@ -545,7 +635,9 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
 
     setState((prev) => ({
       ...prev,
-      design: prev.design ? { ...prev.design, lastSaveAction: "sendPublishNow" } : null,
+      design: prev.design
+        ? { ...prev.design, lastSaveAction: "sendPublishNow" }
+        : null,
     }));
 
     toast({
@@ -561,7 +653,10 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
     setShowPlatformSelector(true);
   };
 
-  const handleConfirmMultiplePlatforms = (platforms: string[], createVariants: boolean) => {
+  const handleConfirmMultiplePlatforms = (
+    platforms: string[],
+    createVariants: boolean,
+  ) => {
     if (!state.design) return;
 
     setState((prev) => ({
@@ -580,7 +675,11 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
       description: `${state.design.name} → ${platforms.join(", ")}${createVariants ? " (optimized)" : ""}`,
     });
 
-    console.log("[telemetry] send_multiple_platforms", { designId: state.design.id, platforms, createVariants });
+    console.log("[telemetry] send_multiple_platforms", {
+      designId: state.design.id,
+      platforms,
+      createVariants,
+    });
   };
 
   const handleOpenContentQueue = () => {
@@ -592,7 +691,12 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
     setShowScheduleModal(true);
   };
 
-  const handleConfirmSchedule = (date: string, time: string, autoPublish: boolean, platforms: string[]) => {
+  const handleConfirmSchedule = (
+    date: string,
+    time: string,
+    autoPublish: boolean,
+    platforms: string[],
+  ) => {
     if (!state.design) return;
 
     setState((prev) => ({
@@ -614,12 +718,18 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
       description: `${state.design.name} · ${date} at ${time} → ${platforms.join(", ")}`,
     });
 
-    console.log("[telemetry] schedule", { designId: state.design.id, date, time, platforms });
+    console.log("[telemetry] schedule", {
+      designId: state.design.id,
+      date,
+      time,
+      platforms,
+    });
   };
 
   const handleViewCalendar = () => {
     // Navigate to calendar with date selected
-    const date = state.design?.scheduledDate || new Date().toISOString().split("T")[0];
+    const date =
+      state.design?.scheduledDate || new Date().toISOString().split("T")[0];
     window.location.href = `/calendar?date=${date}`;
   };
 
@@ -628,7 +738,8 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
     setState((prev) => ({ ...prev, showAdvisor: true }));
     toast({
       title: "💡 Best Time Tips",
-      description: "Check the Advisor panel on the right for AI-powered timing recommendations",
+      description:
+        "Check the Advisor panel on the right for AI-powered timing recommendations",
     });
   };
 
@@ -649,7 +760,10 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
       description: `"${state.design.name}" �� "${newName}"`,
     });
 
-    console.log("[telemetry] rename_asset", { designId: state.design.id, newName });
+    console.log("[telemetry] rename_asset", {
+      designId: state.design.id,
+      newName,
+    });
   };
 
   const handleDownload = () => {
@@ -663,7 +777,9 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
 
     setState((prev) => ({
       ...prev,
-      design: prev.design ? { ...prev.design, lastSaveAction: "download" } : null,
+      design: prev.design
+        ? { ...prev.design, lastSaveAction: "download" }
+        : null,
     }));
 
     console.log("[telemetry] download", { designId: state.design.id });
@@ -683,7 +799,10 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
       description: `${item.type} rotated to ${newRotation}°`,
     });
 
-    console.log("[telemetry] rotate_item", { itemId: state.selectedItemId, rotation: newRotation });
+    console.log("[telemetry] rotate_item", {
+      itemId: state.selectedItemId,
+      rotation: newRotation,
+    });
   };
 
   const handleDeleteItem = () => {
@@ -713,6 +832,120 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
     });
 
     console.log("[telemetry] delete_item", { itemId, itemType });
+  };
+
+  // Approval workflow handlers
+  const handleRequestApproval = async (
+    reviewers: string[],
+    message?: string,
+  ) => {
+    if (!state.design) return;
+
+    handleUpdateDesign({
+      approvalStatus: "pending_approval",
+      approvalRequestedBy: user?.id,
+      approvalRequestedAt: new Date().toISOString(),
+    });
+
+    toast({
+      title: "�� Approval Requested",
+      description: `Sent to ${reviewers.length} reviewer(s)`,
+    });
+
+    setShowRequestApproval(false);
+    console.log("[telemetry] request_approval", {
+      designId: state.design.id,
+      reviewers,
+    });
+  };
+
+  const handleApprove = async (notes?: string) => {
+    if (!state.design) return;
+
+    handleUpdateDesign({
+      approvalStatus: "approved",
+      approvedBy: user?.id,
+      approvedAt: new Date().toISOString(),
+    });
+
+    toast({
+      title: "✅ Design Approved",
+      description: "Ready to schedule and publish",
+    });
+
+    console.log("[telemetry] approve_design", {
+      designId: state.design.id,
+      notes,
+    });
+  };
+
+  const handleReject = async (reason: string) => {
+    if (!state.design) return;
+
+    handleUpdateDesign({
+      approvalStatus: "rejected",
+      rejectedBy: user?.id,
+      rejectedAt: new Date().toISOString(),
+      rejectionReason: reason,
+    });
+
+    toast({
+      title: "Design Rejected",
+      description: "Creator will be notified",
+    });
+
+    console.log("[telemetry] reject_design", {
+      designId: state.design.id,
+      reason,
+    });
+  };
+
+  // Comment handlers
+  const handleAddComment = (
+    text: string,
+    elementId?: string,
+    parentId?: string,
+  ) => {
+    if (!state.design) return;
+
+    toast({
+      title: "💬 Comment Added",
+      description: "Your comment has been posted",
+    });
+
+    console.log("[telemetry] add_comment", {
+      designId: state.design.id,
+      text,
+      elementId,
+      parentId,
+    });
+  };
+
+  // Version history handlers
+  const handleRestoreVersion = async (versionId: string) => {
+    if (!state.design) return;
+
+    toast({
+      title: "⏮️ Version Restored",
+      description: "Design reverted to previous state",
+    });
+
+    console.log("[telemetry] restore_version", {
+      designId: state.design.id,
+      versionId,
+    });
+  };
+
+  const handlePreviewVersion = (version: any) => {
+    toast({
+      title: "👁️ Version Preview",
+      description: "Viewing previous version",
+    });
+  };
+
+  // Fit to screen handler
+  const handleFitToScreen = () => {
+    setState((prev) => ({ ...prev, zoom: 100 }));
   };
 
   const handleChangeBackground = (backgroundColor: string) => {
@@ -762,7 +995,7 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
           onSelectTemplate={(template) => {
             // Generate AI captions for the template
             const captions = generateCaptions(brand, null);
-            const tpl = template.design || {} as any;
+            const tpl = template.design || ({} as any);
             const format = tpl.format || "social_square";
             const width = tpl.width || 1080;
             const height = tpl.height || 1080;
@@ -794,7 +1027,8 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
           onStartAI={() => {
             toast({
               title: "✨ Coming Soon",
-              description: "AI-powered design generation will be available in Phase 1.5",
+              description:
+                "AI-powered design generation will be available in Phase 1.5",
             });
           }}
           onCancel={() => {
@@ -811,134 +1045,227 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
     <MainLayout>
       <FirstVisitTooltip page="studio">
         <div className="flex flex-col h-[calc(100vh-4rem)] bg-white">
-        {/* Header */}
-        <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-white/60">
-          <div className="p-4 sm:p-6">
-            <div className="flex items-center justify-between gap-4 mb-4">
-              <div className="flex-1">
-                <input
-                  type="text"
-                  value={state.design.name}
-                  onChange={(e) =>
-                    handleUpdateDesign({ name: e.target.value })
-                  }
-                  className="text-2xl font-black text-slate-900 bg-transparent border-none outline-none"
+          {/* Header */}
+          <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-white/60">
+            <div className="p-4 sm:p-6">
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <div className="flex items-center gap-3 flex-1">
+                  <input
+                    type="text"
+                    value={state.design.name}
+                    onChange={(e) =>
+                      handleUpdateDesign({ name: e.target.value })
+                    }
+                    className="text-2xl font-black text-slate-900 bg-transparent border-none outline-none"
+                  />
+                  {/* Approval Status Badge */}
+                  <ApprovalStatusBadge
+                    status={state.design.approvalStatus || "draft"}
+                    showIcon={true}
+                  />
+                </div>
+                <div className="text-right">
+                  {isSaving ? (
+                    <p className="text-xs text-amber-600 font-semibold">
+                      Saving...
+                    </p>
+                  ) : lastSaved ? (
+                    <p className="text-xs text-slate-500">
+                      Saved at {lastSaved}
+                    </p>
+                  ) : null}
+                </div>
+                <button
+                  onClick={handleCancel}
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-all"
+                >
+                  <X className="w-5 h-5 text-slate-600" />
+                </button>
+              </div>
+
+              {/* Action Buttons Header */}
+              <div className="flex items-center justify-between gap-4">
+                <ActionButtonsHeader
+                  hasUnsavedChanges={hasUnsavedChanges}
+                  hasCaption={state.design.items.some(
+                    (item) => item.type === "text",
+                  )}
+                  hasMedia={state.design.items.some(
+                    (item) => item.type === "image",
+                  )}
+                  hasSchedule={!!state.design.scheduledDate}
+                  scheduledTime={state.design.scheduledTime}
+                  lastSaveAction={state.design.lastSaveAction}
+                  onSaveToLibrary={handleSaveToLibrary}
+                  onSaveAsDraft={handleSaveAsDraft}
+                  onSaveCreateVariant={handleSaveCreateVariant}
+                  onRenameAsset={handleRenameAsset}
+                  onDownload={handleDownload}
+                  onSendToQueue={handleSendToQueue}
+                  onSendPublishNow={handleSendPublishNow}
+                  onSendMultiplePlatforms={handleSendMultiplePlatforms}
+                  onOpenContentQueue={handleOpenContentQueue}
+                  onSchedule={handleSchedule}
+                  onScheduleAutoPublish={() => {
+                    setShowScheduleModal(true);
+                  }}
+                  onViewCalendar={handleViewCalendar}
+                  onBestTimeSuggestions={handleBestTimeSuggestions}
+                  userRole={user?.role}
                 />
-              </div>
-              <div className="text-right">
-                {isSaving ? (
-                  <p className="text-xs text-amber-600 font-semibold">Saving...</p>
-                ) : lastSaved ? (
-                  <p className="text-xs text-slate-500">Saved at {lastSaved}</p>
-                ) : null}
-              </div>
-              <button
-                onClick={handleCancel}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-all"
-              >
-                <X className="w-5 h-5 text-slate-600" />
-              </button>
-            </div>
 
-            {/* Action Buttons Header */}
-            <div className="flex items-center justify-between gap-4">
-              <ActionButtonsHeader
-                hasUnsavedChanges={hasUnsavedChanges}
-                hasCaption={state.design.items.some((item) => item.type === "text")}
-                hasMedia={state.design.items.some((item) => item.type === "image")}
-                hasSchedule={!!state.design.scheduledDate}
-                scheduledTime={state.design.scheduledTime}
-                lastSaveAction={state.design.lastSaveAction}
-                onSaveToLibrary={handleSaveToLibrary}
-                onSaveAsDraft={handleSaveAsDraft}
-                onSaveCreateVariant={handleSaveCreateVariant}
-                onRenameAsset={handleRenameAsset}
-                onDownload={handleDownload}
-                onSendToQueue={handleSendToQueue}
-                onSendPublishNow={handleSendPublishNow}
-                onSendMultiplePlatforms={handleSendMultiplePlatforms}
-                onOpenContentQueue={handleOpenContentQueue}
-                onSchedule={handleSchedule}
-                onScheduleAutoPublish={() => {
-                  setShowScheduleModal(true);
-                }}
-                onViewCalendar={handleViewCalendar}
-                onBestTimeSuggestions={handleBestTimeSuggestions}
-                userRole={user?.role}
-              />
+                {/* Utility Buttons */}
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => setShowSmartResize(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg font-bold hover:bg-purple-200 transition-all"
+                  >
+                    <Zap className="w-4 h-4" />
+                    Smart Resize
+                  </button>
+                  <button
+                    onClick={() => setShowPlatformPreview(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-pink-100 text-pink-700 rounded-lg font-bold hover:bg-pink-200 transition-all"
+                  >
+                    <Eye className="w-4 h-4" />
+                    Preview
+                  </button>
 
+                  {/* Request Approval */}
+                  {state.design.approvalStatus === "draft" && (
+                    <button
+                      onClick={() => setShowRequestApproval(true)}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-bold hover:bg-blue-200 transition-all"
+                    >
+                      <Send className="w-4 h-4" />
+                      Request Approval
+                    </button>
+                  )}
 
-              {/* Utility Buttons */}
-              <div className="flex gap-2 flex-wrap">
-                <button
-                  onClick={() => setShowSmartResize(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg font-bold hover:bg-purple-200 transition-all"
-                >
-                  <Zap className="w-4 h-4" />
-                  Smart Resize
-                </button>
-                <button
-                  onClick={() => setShowPlatformPreview(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-pink-100 text-pink-700 rounded-lg font-bold hover:bg-pink-200 transition-all"
-                >
-                  <Eye className="w-4 h-4" />
-                  Preview
-                </button>
-                <button
-                  onClick={() =>
-                    setState((prev) => ({ ...prev, showBrandKit: !prev.showBrandKit }))
-                  }
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition-all"
-                >
-                  <Share2 className="w-4 h-4" />
-                  {state.showBrandKit ? "Hide Brand Kit" : "Show Brand Kit"}
-                </button>
+                  {/* Comments */}
+                  <button
+                    onClick={() => setShowComments(!showComments)}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg font-bold hover:bg-green-200 transition-all"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Comments{" "}
+                    {state.design.commentCount
+                      ? `(${state.design.commentCount})`
+                      : ""}
+                  </button>
+
+                  {/* Version History */}
+                  <button
+                    onClick={() => setShowVersionHistory(!showVersionHistory)}
+                    className="flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg font-bold hover:bg-indigo-200 transition-all"
+                  >
+                    <History className="w-4 h-4" />
+                    Versions
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      setState((prev) => ({
+                        ...prev,
+                        showBrandKit: !prev.showBrandKit,
+                      }))
+                    }
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition-all"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    {state.showBrandKit ? "Hide Brand Kit" : "Show Brand Kit"}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Main Editor Area */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* Element Sidebar - Compact Icon Menu with Zoom & Undo/Redo */}
-          <ElementSidebar
-            onCategoryClick={(categoryId) => {
-              setActiveDrawerSection(categoryId as "elements" | "templates" | "background" | "media");
-              setShowElementsDrawer(true);
-            }}
-            activeCategory={showElementsDrawer ? activeDrawerSection : undefined}
-            onZoomIn={handleZoomIn}
-            onZoomOut={handleZoomOut}
-            onUndo={handleUndo}
-            onRedo={handleRedo}
-            canUndo={state.historyIndex > 0}
-            canRedo={state.historyIndex < state.history.length - 1}
-          />
+          {/* Main Editor Area */}
+          <div className="flex-1 flex overflow-hidden">
+            {/* Element Sidebar - Compact Icon Menu with Zoom & Undo/Redo */}
+            <ElementSidebar
+              onCategoryClick={(categoryId) => {
+                setActiveDrawerSection(
+                  categoryId as
+                    | "elements"
+                    | "templates"
+                    | "background"
+                    | "media",
+                );
+                setShowElementsDrawer(true);
+              }}
+              activeCategory={
+                showElementsDrawer ? activeDrawerSection : undefined
+              }
+              onZoomIn={handleZoomIn}
+              onZoomOut={handleZoomOut}
+              onUndo={handleUndo}
+              onRedo={handleRedo}
+              canUndo={state.historyIndex > 0}
+              canRedo={state.historyIndex < state.history.length - 1}
+            />
 
-          {/* Canvas */}
-          <CreativeStudioCanvas
-            design={state.design}
-            selectedItemId={state.selectedItemId}
-            zoom={state.zoom}
-            onSelectItem={handleSelectItem}
-            onUpdateItem={handleUpdateItem}
-            onUpdateDesign={handleUpdateDesign}
-            onAddElement={handleAddElement}
-            onRotateItem={handleRotateItem}
-            onDeleteItem={handleDeleteItem}
-          />
+            {/* Canvas */}
+            <div className="relative flex-1">
+              <CreativeStudioCanvas
+                design={state.design}
+                selectedItemId={state.selectedItemId}
+                zoom={state.zoom}
+                onSelectItem={handleSelectItem}
+                onUpdateItem={handleUpdateItem}
+                onUpdateDesign={handleUpdateDesign}
+                onAddElement={handleAddElement}
+                onRotateItem={handleRotateItem}
+                onDeleteItem={handleDeleteItem}
+              />
 
-          {/* Right Sidebar Container */}
-          {state.showBrandKit && (
-            <div className="flex flex-col h-full">
-              <CreativeStudioBrandKit
+              {/* Floating Text Toolbar */}
+              {state.selectedItemId &&
+                (() => {
+                  const item = state.design?.items.find(
+                    (i) => i.id === state.selectedItemId,
+                  );
+                  return item?.type === "text" ? (
+                    <TextFormattingToolbar
+                      item={item}
+                      onUpdate={(updates) =>
+                        handleUpdateItem(state.selectedItemId!, updates)
+                      }
+                      position={{ x: item.x + item.width / 2, y: item.y }}
+                    />
+                  ) : null;
+                })()}
+
+              {/* Canvas Zoom Controls */}
+              <CanvasZoomControls
+                zoom={state.zoom}
+                onZoomIn={handleZoomIn}
+                onZoomOut={handleZoomOut}
+                onFitToScreen={handleFitToScreen}
+                onReset={() => setState((prev) => ({ ...prev, zoom: 100 }))}
+                className="absolute bottom-4 right-4"
+              />
+
+              {/* Live Editing Indicators */}
+              {activeUsers.length > 0 && (
+                <LiveEditingIndicators
+                  activeUsers={activeUsers}
+                  className="absolute top-4 right-4"
+                />
+              )}
+            </div>
+
+            {/* Right Sidebar Container - New Tabbed Design */}
+            {state.showBrandKit && (
+              <TabbedRightSidebar
                 brand={brand}
-                onSelectColor={(color) => {
-                  handleSelectColor(color);
-                }}
+                design={state.design}
+                onSelectColor={handleSelectColor}
                 onSelectFont={(font) => {
                   if (state.selectedItemId) {
-                    handleUpdateItem(state.selectedItemId, { fontFamily: font });
+                    handleUpdateItem(state.selectedItemId, {
+                      fontFamily: font,
+                    });
                   }
                 }}
                 onSelectLogo={() => {
@@ -946,12 +1273,14 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
                     handleAddImage();
                   }
                 }}
+                onClose={() =>
+                  setState((prev) => ({ ...prev, showBrandKit: false }))
+                }
+                isCollapsible={true}
               />
-              <CreativeStudioAdvisor brand={brand} design={state.design} />
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
       </FirstVisitTooltip>
 
       {/* Smart Resize Modal */}
@@ -977,9 +1306,13 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
       {/* Color Picker Modal */}
       {showColorPicker && (
         <ColorPickerModal
-          brandColors={[brand?.primaryColor, brand?.secondaryColor, ...(brand?.colorPalette || [])].filter(
-            Boolean
-          ) as string[]}
+          brandColors={
+            [
+              brand?.primaryColor,
+              brand?.secondaryColor,
+              ...(brand?.colorPalette || []),
+            ].filter(Boolean) as string[]
+          }
           onSelectColor={(color) => {
             handleSelectColor(color);
             setShowColorPicker(false);
@@ -1069,6 +1402,35 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
           activeSection={activeDrawerSection}
         />
       )}
+
+      {/* Request Approval Modal */}
+      {showRequestApproval && state.design && (
+        <RequestApprovalModal
+          designName={state.design.name || "Untitled Design"}
+          onConfirm={handleRequestApproval}
+          onClose={() => setShowRequestApproval(false)}
+        />
+      )}
+
+      {/* Keyboard Shortcuts Panel */}
+      {showKeyboardShortcuts && (
+        <KeyboardShortcutsPanel
+          onClose={() => setShowKeyboardShortcuts(false)}
+        />
+      )}
+
+      {/* Mobile Toolbar (shows on mobile devices) */}
+      <div className="lg:hidden">
+        <MobileToolbar
+          onAddText={handleAddText}
+          onAddImage={handleAddImage}
+          onAddShape={() => handleAddShape("rectangle")}
+          onShowColors={() => setShowColorPicker(true)}
+          onShowLayers={() => {}}
+          onSave={handleSaveToLibrary}
+          onShare={() => setShowPlatformPreview(true)}
+        />
+      </div>
     </MainLayout>
   );
 }

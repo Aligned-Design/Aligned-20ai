@@ -15,7 +15,16 @@
 import OpenAI from "openai";
 import { BrandFidelityScore } from "../../client/types/agent-config";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+let openaiClient: OpenAI | null = null;
+
+function getOpenAI(): OpenAI {
+  if (!openaiClient) {
+    openaiClient = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY || "sk-placeholder",
+    });
+  }
+  return openaiClient;
+}
 
 interface BrandKit {
   tone_keywords?: string[];
@@ -127,7 +136,7 @@ async function scoreToneAlignment(
   // If we have brand embedding, use semantic similarity
   if (brandEmbedding && process.env.OPENAI_API_KEY) {
     try {
-      const response = await openai.embeddings.create({
+      const response = await getOpenAI().embeddings.create({
         model: "text-embedding-ada-002",
         input: combinedText,
       });

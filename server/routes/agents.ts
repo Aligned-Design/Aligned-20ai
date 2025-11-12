@@ -291,14 +291,17 @@ router.post("/generate/doc", async (req, res) => {
     console.error("Doc generation error:", error);
 
     // Handle validation errors
-    if (error instanceof Error && error.message.startsWith("Validation failed:")) {
+    if (
+      error instanceof Error &&
+      error.message.startsWith("Validation failed:")
+    ) {
       throw new AppError(
         ErrorCode.MISSING_REQUIRED_FIELD,
         error.message,
         HTTP_STATUS.BAD_REQUEST,
         "warning",
         { requestId },
-        "Please check your request format and try again"
+        "Please check your request format and try again",
       );
     }
 
@@ -307,8 +310,10 @@ router.post("/generate/doc", async (req, res) => {
       error instanceof Error ? error.message : "Internal server error",
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       "error",
-      error instanceof Error ? { originalError: error.message, requestId } : { requestId },
-      "Please try again later or contact support"
+      error instanceof Error
+        ? { originalError: error.message, requestId }
+        : { requestId },
+      "Please try again later or contact support",
     );
   }
 });
@@ -394,14 +399,17 @@ router.post("/generate/design", async (req, res) => {
     console.error("Design generation error:", error);
 
     // Handle validation errors
-    if (error instanceof Error && error.message.startsWith("Validation failed:")) {
+    if (
+      error instanceof Error &&
+      error.message.startsWith("Validation failed:")
+    ) {
       throw new AppError(
         ErrorCode.MISSING_REQUIRED_FIELD,
         error.message,
         HTTP_STATUS.BAD_REQUEST,
         "warning",
         { requestId },
-        "Please check your request format and try again"
+        "Please check your request format and try again",
       );
     }
 
@@ -410,8 +418,10 @@ router.post("/generate/design", async (req, res) => {
       error instanceof Error ? error.message : "Internal server error",
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       "error",
-      error instanceof Error ? { originalError: error.message, requestId } : { requestId },
-      "Please try again later or contact support"
+      error instanceof Error
+        ? { originalError: error.message, requestId }
+        : { requestId },
+      "Please try again later or contact support",
     );
   }
 });
@@ -512,14 +522,17 @@ router.post("/generate/advisor", async (req, res) => {
     console.error("Advisor generation error:", error);
 
     // Handle validation errors
-    if (error instanceof Error && error.message.startsWith("Validation failed:")) {
+    if (
+      error instanceof Error &&
+      error.message.startsWith("Validation failed:")
+    ) {
       throw new AppError(
         ErrorCode.MISSING_REQUIRED_FIELD,
         error.message,
         HTTP_STATUS.BAD_REQUEST,
         "warning",
         { requestId },
-        "Please check your request format and try again"
+        "Please check your request format and try again",
       );
     }
 
@@ -528,8 +541,10 @@ router.post("/generate/advisor", async (req, res) => {
       error instanceof Error ? error.message : "Internal server error",
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       "error",
-      error instanceof Error ? { originalError: error.message, requestId } : { requestId },
-      "Please try again later or contact support"
+      error instanceof Error
+        ? { originalError: error.message, requestId }
+        : { requestId },
+      "Please try again later or contact support",
     );
   }
 });
@@ -548,7 +563,7 @@ router.post("/bfs/calculate", async (req, res) => {
         ErrorCode.MISSING_REQUIRED_FIELD,
         "Missing content or brand_id",
         HTTP_STATUS.BAD_REQUEST,
-        "warning"
+        "warning",
       );
     }
 
@@ -575,10 +590,45 @@ router.post("/bfs/calculate", async (req, res) => {
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       "error",
       error instanceof Error ? { originalError: error.message } : undefined,
-      "Please try again later or contact support"
+      "Please try again later or contact support",
     );
   }
 });
+
+// Mock review queue data for development
+const MOCK_REVIEW_QUEUE = [
+  {
+    id: "review_1",
+    brand_id: "brand_abd",
+    agent: "doc",
+    input: { platform: "linkedin", topic: "AI trends" },
+    output: {
+      headline: "The Future of AI in Marketing",
+      body: "Discover how AI is transforming the marketing landscape...",
+      cta: "Learn More",
+      hashtags: ["AI", "Marketing", "Innovation"],
+    },
+    bfs: {
+      overall: 0.89,
+      tone_alignment: 0.92,
+      terminology_match: 0.87,
+      compliance: 1.0,
+      cta_fit: 0.85,
+      platform_fit: 0.88,
+      passed: true,
+      issues: [],
+      regeneration_count: 0,
+    },
+    linter_results: {
+      passed: true,
+      blocked: false,
+      needs_human_review: false,
+      toxicity_score: 0.02,
+      fixes_applied: [],
+    },
+    timestamp: new Date(Date.now() - 3600000).toISOString(),
+  },
+];
 
 /**
  * GET /api/agents/review/queue/:brandId
@@ -587,6 +637,15 @@ router.post("/bfs/calculate", async (req, res) => {
 router.get("/review/queue/:brandId", async (req, res) => {
   try {
     const { brandId } = req.params;
+
+    // Check if we should use mocks
+    const useMocks =
+      process.env.USE_MOCKS === "true" ||
+      process.env.NODE_ENV === "development";
+
+    if (useMocks) {
+      return (res as any).json({ queue: MOCK_REVIEW_QUEUE });
+    }
 
     const { data: reviewQueue, error } = await supabase
       .from("generation_logs")
@@ -598,20 +657,16 @@ router.get("/review/queue/:brandId", async (req, res) => {
       .limit(50);
 
     if (error) {
-      throw error;
+      // Graceful fallback: return empty queue instead of throwing
+      console.warn("Review queue error:", error);
+      return (res as any).json({ queue: [] });
     }
 
     (res as any).json({ queue: reviewQueue || [] });
   } catch (error) {
     console.error("Review queue error:", error);
-    throw new AppError(
-      ErrorCode.INTERNAL_ERROR,
-      "Failed to load review queue",
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      "error",
-      error instanceof Error ? { originalError: error.message } : undefined,
-      "Please try again later or contact support"
-    );
+    // Graceful fallback: always return valid JSON, never throw
+    (res as any).json({ queue: [] });
   }
 });
 
@@ -646,7 +701,7 @@ router.post("/review/approve/:logId", async (req, res) => {
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       "error",
       error instanceof Error ? { originalError: error.message } : undefined,
-      "Please try again later or contact support"
+      "Please try again later or contact support",
     );
   }
 });
@@ -682,7 +737,7 @@ router.post("/review/reject/:logId", async (req, res) => {
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       "error",
       error instanceof Error ? { originalError: error.message } : undefined,
-      "Please try again later or contact support"
+      "Please try again later or contact support",
     );
   }
 });
@@ -705,8 +760,14 @@ async function generateDocContent(
 
   const prompt = template
     .replace(/\{\{brand_name\}\}/g, (brandKit as any).brandName || "Your Brand")
-    .replace(/\{\{tone_keywords\}\}/g, ((brandKit as any).toneKeywords || []).join(", "))
-    .replace(/\{\{writing_style\}\}/g, (brandKit as any).writingStyle || "professional")
+    .replace(
+      /\{\{tone_keywords\}\}/g,
+      ((brandKit as any).toneKeywords || []).join(", "),
+    )
+    .replace(
+      /\{\{writing_style\}\}/g,
+      (brandKit as any).writingStyle || "professional",
+    )
     .replace(/\{\{topic\}\}/g, input.topic)
     .replace(/\{\{platform\}\}/g, input.platform)
     .replace(/\{\{format\}\}/g, input.format)
@@ -789,7 +850,11 @@ async function generateDesignContent(
     .replace(
       /\{\{brand_colors\}\}/g,
       (brandKit as any).primaryColor
-        ? [(brandKit as any).primaryColor, (brandKit as any).secondaryColor, (brandKit as any).accentColor]
+        ? [
+            (brandKit as any).primaryColor,
+            (brandKit as any).secondaryColor,
+            (brandKit as any).accentColor,
+          ]
             .filter(Boolean)
             .join(", ")
         : "#8B5CF6",

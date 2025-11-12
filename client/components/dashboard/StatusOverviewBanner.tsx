@@ -1,4 +1,11 @@
-import { AlertCircle, Clock, Edit3, CheckCircle2, TrendingUp } from "lucide-react";
+import {
+  AlertCircle,
+  Clock,
+  Edit3,
+  CheckCircle2,
+  TrendingUp,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface StatusCard {
   id: string;
@@ -14,9 +21,14 @@ interface StatusCard {
 
 interface StatusOverviewBannerProps {
   onStatusClick?: (statusId: string) => void;
+  navigateToQueue?: boolean;
 }
 
-export function StatusOverviewBanner({ onStatusClick }: StatusOverviewBannerProps) {
+export function StatusOverviewBanner({
+  onStatusClick,
+  navigateToQueue = false,
+}: StatusOverviewBannerProps) {
+  const navigate = useNavigate();
   const statuses: StatusCard[] = [
     {
       id: "reviewing",
@@ -68,13 +80,18 @@ export function StatusOverviewBanner({ onStatusClick }: StatusOverviewBannerProp
   ];
 
   const handleClick = (statusId: string) => {
-    if (onStatusClick) {
-      onStatusClick(statusId);
-    }
-    // Scroll to section with ID
-    const element = document.getElementById(`status-${statusId}`);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (navigateToQueue) {
+      // Navigate to content queue with status filter
+      navigate(`/content-queue?status=${statusId}`);
+    } else {
+      // Original behavior: scroll to section
+      if (onStatusClick) {
+        onStatusClick(statusId);
+      }
+      const element = document.getElementById(`status-${statusId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   };
 
@@ -84,7 +101,7 @@ export function StatusOverviewBanner({ onStatusClick }: StatusOverviewBannerProp
         <button
           key={status.id}
           onClick={() => handleClick(status.id)}
-          className={`group relative p-4 rounded-lg transition-all duration-300 border hover:shadow-lg hover:scale-105 active:scale-95 ${status.bgColor} ${status.borderColor}`}
+          className={`group relative p-4 rounded-lg transition-all duration-300 border cursor-pointer hover:shadow-lg hover:-translate-y-1 active:scale-95 ${status.bgColor} ${status.borderColor} hover:border-current`}
         >
           {/* Priority/Urgent badge */}
           {status.priority && (
@@ -100,7 +117,9 @@ export function StatusOverviewBanner({ onStatusClick }: StatusOverviewBannerProp
 
           {/* Content */}
           <div className="flex items-start gap-2 mb-2">
-            <div className={`flex-shrink-0 ${status.color} group-hover:scale-110 transition-transform duration-300`}>
+            <div
+              className={`flex-shrink-0 ${status.color} group-hover:scale-110 transition-transform duration-300`}
+            >
               {status.icon}
             </div>
             <div className="text-left flex-1">

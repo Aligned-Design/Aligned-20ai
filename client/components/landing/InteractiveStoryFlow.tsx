@@ -2,7 +2,9 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { CheckCircle, Zap, Edit3, Calendar, BarChart3 } from "lucide-react";
 
 export function InteractiveStoryFlow() {
-  const { ref: containerRef, isVisible } = useScrollAnimation({ threshold: 0.3 });
+  const { ref: containerRef, isVisible } = useScrollAnimation({
+    threshold: 0.3,
+  });
 
   const steps = [
     {
@@ -39,8 +41,14 @@ export function InteractiveStoryFlow() {
       {/* Premium animated background with multiple orbs */}
       <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-indigo-100/25 rounded-full blur-3xl animate-gradient-shift"></div>
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-slate-200/15 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: "1s" }}></div>
-        <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-indigo-50/20 rounded-full blur-3xl animate-float-soft" style={{ animationDelay: "2s" }}></div>
+        <div
+          className="absolute bottom-0 right-1/4 w-80 h-80 bg-slate-200/15 rounded-full blur-3xl animate-pulse-glow"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/3 left-1/4 w-64 h-64 bg-indigo-50/20 rounded-full blur-3xl animate-float-soft"
+          style={{ animationDelay: "2s" }}
+        ></div>
         {/* Light reflection */}
         <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-white/10"></div>
       </div>
@@ -57,7 +65,8 @@ export function InteractiveStoryFlow() {
             From Chaos to Alignment
           </h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Watch your marketing transform as you scroll. This is what Aligned does every single day.
+            Watch your marketing transform as you scroll. This is what Aligned
+            does every single day.
           </p>
         </div>
 
@@ -106,7 +115,9 @@ export function InteractiveStoryFlow() {
                       isVisible ? "w-12" : "w-0"
                     }`}
                     style={{
-                      transitionDelay: isVisible ? `${idx * 150 + 400}ms` : "0ms",
+                      transitionDelay: isVisible
+                        ? `${idx * 150 + 400}ms`
+                        : "0ms",
                     }}
                   ></div>
                 </div>
@@ -144,7 +155,8 @@ export function InteractiveStoryFlow() {
             With Aligned:
           </p>
           <p className="text-2xl sm:text-3xl font-black text-indigo-600 group-hover:text-indigo-800 transition-colors">
-            "Everything's organized. My voice is consistent. I actually have evenings back."
+            "Everything's organized. My voice is consistent. I actually have
+            evenings back."
           </p>
         </div>
 

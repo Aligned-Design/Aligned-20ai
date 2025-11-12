@@ -9,6 +9,7 @@ export interface FeatureFlags {
   studio_align_tools: boolean; // Advanced alignment & snap-to-grid
   ai_copy_v1: boolean; // AI content generator
   ai_palette_v1: boolean; // AI palette generator
+  unified_dash: boolean; // Unified Dashboard System (DashboardSystem components)
 }
 
 const DEFAULT_FLAGS: FeatureFlags = {
@@ -16,6 +17,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   studio_align_tools: false,
   ai_copy_v1: false,
   ai_palette_v1: false,
+  unified_dash: true, // Enabled by default - production version
 };
 
 /**
@@ -27,16 +29,21 @@ export function getFeatureFlags(): FeatureFlags {
 
   // Check environment variables
   if (import.meta.env.VITE_FEATURE_STUDIO_SIDEBAR !== undefined) {
-    flags.studio_sidebar = import.meta.env.VITE_FEATURE_STUDIO_SIDEBAR === "true";
+    flags.studio_sidebar =
+      import.meta.env.VITE_FEATURE_STUDIO_SIDEBAR === "true";
   }
   if (import.meta.env.VITE_FEATURE_STUDIO_ALIGN_TOOLS !== undefined) {
-    flags.studio_align_tools = import.meta.env.VITE_FEATURE_STUDIO_ALIGN_TOOLS === "true";
+    flags.studio_align_tools =
+      import.meta.env.VITE_FEATURE_STUDIO_ALIGN_TOOLS === "true";
   }
   if (import.meta.env.VITE_FEATURE_AI_COPY_V1 !== undefined) {
     flags.ai_copy_v1 = import.meta.env.VITE_FEATURE_AI_COPY_V1 === "true";
   }
   if (import.meta.env.VITE_FEATURE_AI_PALETTE_V1 !== undefined) {
     flags.ai_palette_v1 = import.meta.env.VITE_FEATURE_AI_PALETTE_V1 === "true";
+  }
+  if (import.meta.env.VITE_FEATURE_UNIFIED_DASH !== undefined) {
+    flags.unified_dash = import.meta.env.VITE_FEATURE_UNIFIED_DASH === "true";
   }
 
   // Check localStorage

@@ -17,7 +17,10 @@ export function ProblemSection() {
       {/* Premium background animation with multiple layers */}
       <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-slate-200/15 rounded-full blur-3xl animate-pulse-glow"></div>
-        <div className="absolute bottom-0 left-1/4 w-72 h-72 bg-indigo-100/10 rounded-full blur-3xl animate-float-soft" style={{ animationDelay: "1s" }}></div>
+        <div
+          className="absolute bottom-0 left-1/4 w-72 h-72 bg-indigo-100/10 rounded-full blur-3xl animate-float-soft"
+          style={{ animationDelay: "1s" }}
+        ></div>
         <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-blue-100/10 rounded-full blur-3xl opacity-60"></div>
         {/* Light reflection overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-white/10"></div>
@@ -29,7 +32,9 @@ export function ProblemSection() {
           <div
             ref={contentRef}
             className={`transition-all duration-700 ${
-              contentVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"
+              contentVisible
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 -translate-x-12"
             }`}
           >
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-4 leading-tight">
@@ -41,11 +46,14 @@ export function ProblemSection() {
             </p>
 
             <p className="text-base sm:text-lg text-slate-700 mb-8 leading-relaxed">
-              You've got the vision. The voice. The brand everyone trusts. You just don't have the hours left to hold it all together.
+              You've got the vision. The voice. The brand everyone trusts. You
+              just don't have the hours left to hold it all together.
             </p>
 
             <p className="text-base sm:text-lg text-slate-700 mb-8 leading-relaxed">
-              We built Aligned to give you breathing room—without losing the creative edge, the client polish, or the human touch that make your work yours.
+              We built Aligned to give you breathing room—without losing the
+              creative edge, the client polish, or the human touch that make
+              your work yours.
             </p>
 
             <div className="space-y-4 hidden">
@@ -53,15 +61,23 @@ export function ProblemSection() {
                 <span className="text-slate-900 font-bold text-lg">🎨</span>
                 <div>
                   <p className="font-bold text-slate-900">Brand chaos</p>
-                  <p className="text-sm text-slate-600">Every client needs a different tone, style, voice—and keeping them separate is a full-time job.</p>
+                  <p className="text-sm text-slate-600">
+                    Every client needs a different tone, style, voice—and
+                    keeping them separate is a full-time job.
+                  </p>
                 </div>
               </div>
 
               <div className="flex gap-3">
                 <span className="text-slate-900 font-bold text-lg">⏸️</span>
                 <div>
-                  <p className="font-bold text-slate-900">Approval bottlenecks</p>
-                  <p className="text-sm text-slate-600">Clients ghost. Feedback arrives late. Revisions pile up. Nothing ships on time.</p>
+                  <p className="font-bold text-slate-900">
+                    Approval bottlenecks
+                  </p>
+                  <p className="text-sm text-slate-600">
+                    Clients ghost. Feedback arrives late. Revisions pile up.
+                    Nothing ships on time.
+                  </p>
                 </div>
               </div>
 
@@ -69,7 +85,10 @@ export function ProblemSection() {
                 <span className="text-slate-900 font-bold text-lg">🔄</span>
                 <div>
                   <p className="font-bold text-slate-900">Manual overload</p>
-                  <p className="text-sm text-slate-600">Content creation, scheduling, platform management—it's all happening in different tabs and apps.</p>
+                  <p className="text-sm text-slate-600">
+                    Content creation, scheduling, platform management—it's all
+                    happening in different tabs and apps.
+                  </p>
                 </div>
               </div>
 
@@ -77,7 +96,10 @@ export function ProblemSection() {
                 <span className="text-slate-900 font-bold text-lg">📊</span>
                 <div>
                   <p className="font-bold text-slate-900">Reporting fatigue</p>
-                  <p className="text-sm text-slate-600">Data everywhere. No story. Clients don't understand impact. Neither do you.</p>
+                  <p className="text-sm text-slate-600">
+                    Data everywhere. No story. Clients don't understand impact.
+                    Neither do you.
+                  </p>
                 </div>
               </div>
             </div>
@@ -87,7 +109,9 @@ export function ProblemSection() {
           <div
             ref={ziaRef}
             className={`flex flex-col items-center justify-center gap-6 transition-all duration-700 ${
-              ziaVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-12"
+              ziaVisible
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 translate-x-12"
             }`}
           >
             <ZiaMascot size="md" className="animate-float" />
@@ -96,7 +120,9 @@ export function ProblemSection() {
               <p className="text-base sm:text-lg font-medium text-slate-900 italic mb-3 group-hover:text-indigo-800 transition-colors leading-relaxed">
                 "One system away from freedom, darling—and I've got the map."
               </p>
-              <cite className="text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition-colors not-italic">✨ Zia</cite>
+              <cite className="text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition-colors not-italic">
+                ✨ Zia
+              </cite>
             </blockquote>
           </div>
         </div>
@@ -107,7 +133,9 @@ export function ProblemSection() {
             <p className="text-base font-medium text-slate-900 italic mb-3 group-hover:text-indigo-800 transition-colors leading-relaxed">
               "One system away from freedom, darling—and I've got the map."
             </p>
-            <cite className="text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition-colors not-italic">✨ Zia</cite>
+            <cite className="text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition-colors not-italic">
+              ✨ Zia
+            </cite>
           </blockquote>
         </div>
       </div>

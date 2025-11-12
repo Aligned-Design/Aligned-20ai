@@ -7,7 +7,7 @@
  * - Retrieving collaboration logs and learnings
  */
 
-import type { Router, Request, Response } from "express";
+import { Router, Request, Response } from "express";
 import { executePipelineCycle } from "../lib/pipeline-orchestrator";
 import type { CollaborationContext } from "../lib/collaboration-artifacts";
 import {
@@ -20,8 +20,7 @@ import {
  * Create and register orchestration routes
  */
 function createOrchestrationRouter(): Router {
-  const express = require("express");
-  const router = express.Router();
+  const router = Router();
 
   /**
    * POST /pipeline/execute
@@ -232,40 +231,37 @@ function createOrchestrationRouter(): Router {
    * POST /brand-history/summary
    * Get weekly summary from BrandHistory
    */
-  router.post(
-    "/brand-history/summary",
-    async (req: Request, res: Response) => {
-      try {
-        const { brandId, days = 7 } = req.body;
+  router.post("/brand-history/summary", async (req: Request, res: Response) => {
+    try {
+      const { brandId, days = 7 } = req.body;
 
-        if (!brandId) {
-          return res.status(400).json({
-            error: "brandId is required",
-          });
-        }
-
-        return res.status(200).json({
-          success: true,
-          brandId,
-          period: `Last ${days} days`,
-          summary: {
-            totalCycles: 0,
-            successPatterns: [],
-            improvements: [],
-            trends: [],
-            recommendations: [],
-          },
-          message:
-            "Brand history would be summarized from database in production",
-        });
-      } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-          error: "Failed to retrieve brand history summary",
+      if (!brandId) {
+        return res.status(400).json({
+          error: "brandId is required",
         });
       }
+
+      return res.status(200).json({
+        success: true,
+        brandId,
+        period: `Last ${days} days`,
+        summary: {
+          totalCycles: 0,
+          successPatterns: [],
+          improvements: [],
+          trends: [],
+          recommendations: [],
+        },
+        message:
+          "Brand history would be summarized from database in production",
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        error: "Failed to retrieve brand history summary",
+      });
     }
-  );
+  });
 
   /**
    * GET /health

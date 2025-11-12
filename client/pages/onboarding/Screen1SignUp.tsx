@@ -7,15 +7,19 @@ export default function Screen1SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"agency" | "single_business">("single_business");
+  const [role, setRole] = useState<"agency" | "single_business">(
+    "single_business",
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!name.trim()) newErrors.name = "Name is required";
     if (!email.trim()) newErrors.email = "Email is required";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = "Invalid email";
-    if (password.length < 6) newErrors.password = "Password must be at least 6 characters";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      newErrors.email = "Invalid email";
+    if (password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -35,16 +39,24 @@ export default function Screen1SignUp() {
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-600 to-blue-600 mb-4">
             <span className="text-white font-black text-lg">A</span>
           </div>
-          <h1 className="text-4xl font-black text-slate-900 mb-3">Welcome to Aligned</h1>
-          <p className="text-slate-600 font-medium mb-1">Marketing that stays true to your brand.</p>
-          <p className="text-slate-500 text-sm">Let's get you set up in under 3 minutes.</p>
+          <h1 className="text-4xl font-black text-slate-900 mb-3">
+            Welcome to Aligned
+          </h1>
+          <p className="text-slate-600 font-medium mb-1">
+            Marketing that stays true to your brand.
+          </p>
+          <p className="text-slate-500 text-sm">
+            Let's get you set up in under 3 minutes.
+          </p>
         </div>
 
         {/* Sign-Up Form */}
         <div className="bg-white/50 backdrop-blur-xl rounded-2xl border border-white/60 p-8 space-y-5 mb-6">
           {/* Name */}
           <div>
-            <label className="block text-sm font-bold text-slate-900 mb-2">Your Name</label>
+            <label className="block text-sm font-bold text-slate-900 mb-2">
+              Your Name
+            </label>
             <input
               type="text"
               value={name}
@@ -56,12 +68,16 @@ export default function Screen1SignUp() {
                   : "border-slate-200 bg-white/50 focus:border-indigo-500 focus:bg-white"
               }`}
             />
-            {errors.name && <p className="text-xs text-red-600 mt-1">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-xs text-red-600 mt-1">{errors.name}</p>
+            )}
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-bold text-slate-900 mb-2">Email Address</label>
+            <label className="block text-sm font-bold text-slate-900 mb-2">
+              Email Address
+            </label>
             <input
               type="email"
               value={email}
@@ -73,12 +89,16 @@ export default function Screen1SignUp() {
                   : "border-slate-200 bg-white/50 focus:border-indigo-500 focus:bg-white"
               }`}
             />
-            {errors.email && <p className="text-xs text-red-600 mt-1">{errors.email}</p>}
+            {errors.email && (
+              <p className="text-xs text-red-600 mt-1">{errors.email}</p>
+            )}
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-bold text-slate-900 mb-2">Password</label>
+            <label className="block text-sm font-bold text-slate-900 mb-2">
+              Password
+            </label>
             <input
               type="password"
               value={password}
@@ -90,12 +110,16 @@ export default function Screen1SignUp() {
                   : "border-slate-200 bg-white/50 focus:border-indigo-500 focus:bg-white"
               }`}
             />
-            {errors.password && <p className="text-xs text-red-600 mt-1">{errors.password}</p>}
+            {errors.password && (
+              <p className="text-xs text-red-600 mt-1">{errors.password}</p>
+            )}
           </div>
 
           {/* Role Toggle */}
           <div>
-            <label className="block text-sm font-bold text-slate-900 mb-3">What describes you best?</label>
+            <label className="block text-sm font-bold text-slate-900 mb-3">
+              What describes you best?
+            </label>
             <div className="flex gap-3">
               <button
                 onClick={() => setRole("single_business")}
@@ -133,7 +157,10 @@ export default function Screen1SignUp() {
         {/* Footer Text */}
         <p className="text-xs text-slate-500 text-center mt-6">
           Already have an account?{" "}
-          <a href="#" className="text-indigo-600 font-bold hover:text-indigo-700">
+          <a
+            href="#"
+            className="text-indigo-600 font-bold hover:text-indigo-700"
+          >
             Sign in
           </a>
         </p>

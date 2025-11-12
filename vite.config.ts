@@ -7,8 +7,20 @@ export default defineConfig({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      "/api": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/health": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
     fs: {
-      allow: ["./client", "./shared"],
+      allow: ["./client", "./shared", "./config"],
       deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
     },
   },
@@ -28,7 +40,10 @@ export default defineConfig({
             if (id.includes("three") || id.includes("@react-three")) {
               return "vendor-graphics";
             }
-            if (id.includes("@tanstack/react-query") || id.includes("recharts")) {
+            if (
+              id.includes("@tanstack/react-query") ||
+              id.includes("recharts")
+            ) {
               return "vendor-data";
             }
             if (id.includes("react-hook-form") || id.includes("zod")) {

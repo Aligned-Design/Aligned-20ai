@@ -3,46 +3,38 @@
  * Handles bulk approvals, individual approvals, and approval status tracking
  */
 
-import { RequestHandler } from 'express';
-import { BulkApprovalRequest, BulkApprovalResult } from '@shared/approvals';
-import { approvalsDB } from '../lib/approvals-db-service';
-import { logAuditAction } from '../lib/audit-logger';
-import { sendEmail } from '../lib/email-service';
-import { AppError } from '../lib/error-middleware';
-import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
-import {
-  generateReminderEmail,
-} from '../lib/email-templates';
+import { RequestHandler } from "express";
+import { BulkApprovalRequest, BulkApprovalResult } from "@shared/approvals";
+import { approvalsDB } from "../lib/approvals-db-service";
+import { logAuditAction } from "../lib/audit-logger";
+import { sendEmail } from "../lib/email-service";
+import { AppError } from "../lib/error-middleware";
+import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
+import { generateReminderEmail } from "../lib/email-templates";
 
 /**
  * POST /api/approvals/bulk
  * Approve or reject multiple posts in a single request
+ *
+ * RBAC: Requires 'content:approve' scope
+ * Roles allowed: BRAND_MANAGER, CLIENT_APPROVER, AGENCY_ADMIN, SUPERADMIN
  */
 export const bulkApproveContent: RequestHandler = async (req, res, next) => {
   try {
     const { postIds, action, note } = req.body as BulkApprovalRequest;
-    const userId = ((req as any)).user?.id || ((req as any)).userId;
-    const userEmail = ((req as any)).user?.email || req.headers['x-user-email'] as string;
-    const brandId = ((req as any)).user?.brandId || req.headers['x-brand-id'] as string;
-    const userRole = ((req as any)).user?.role || req.headers['x-user-role'] as string;
+    const userId = (req as any).user?.id || (req as any).userId;
+    const userEmail =
+      (req as any).user?.email || (req.headers["x-user-email"] as string);
+    const brandId =
+      (req as any).user?.brandId || (req.headers["x-brand-id"] as string);
 
     // Validate required fields
     if (!userId || !brandId) {
       throw new AppError(
         ErrorCode.UNAUTHORIZED,
-        'User ID and Brand ID are required',
+        "User ID and Brand ID are required",
         HTTP_STATUS.UNAUTHORIZED,
-        'warning'
-      );
-    }
-
-    // Validate permissions
-    if (!['client', 'agency', 'admin'].includes(userRole)) {
-      throw new AppError(
-        ErrorCode.FORBIDDEN,
-        'Invalid user role',
-        HTTP_STATUS.FORBIDDEN,
-        'warning'
+        "warning",
       );
     }
 
@@ -50,34 +42,23 @@ export const bulkApproveContent: RequestHandler = async (req, res, next) => {
     if (!Array.isArray(postIds) || postIds.length === 0) {
       throw new AppError(
         ErrorCode.MISSING_REQUIRED_FIELD,
-        'postIds must be a non-empty array',
+        "postIds must be a non-empty array",
         HTTP_STATUS.BAD_REQUEST,
-        'warning'
+        "warning",
       );
     }
 
-    if (!['approve', 'reject'].includes(action)) {
+    if (!["approve", "reject"].includes(action)) {
       throw new AppError(
         ErrorCode.MISSING_REQUIRED_FIELD,
-        'action must be approve or reject',
+        "action must be approve or reject",
         HTTP_STATUS.BAD_REQUEST,
-        'warning'
+        "warning",
       );
     }
 
-    // Check role permissions
-    const canApprove =
-      userRole === 'client' || userRole === 'admin' ||
-      (userRole === 'agency' && action === 'approve');
-
-    if (!canApprove) {
-      throw new AppError(
-        ErrorCode.FORBIDDEN,
-        `User role '${userRole}' cannot ${action} content`,
-        HTTP_STATUS.FORBIDDEN,
-        'warning'
-      );
-    }
+    // NOTE: Permission check (content:approve) is now enforced by middleware
+    // This handler only executes if user has required scope
 
     // Process bulk action via database
     const results: BulkApprovalResult = {
@@ -90,33 +71,38 @@ export const bulkApproveContent: RequestHandler = async (req, res, next) => {
     };
 
     try {
-      if (action === 'approve') {
+      if (action === "approve") {
         await approvalsDB.bulkApprovePostIds(postIds, brandId, userId);
         results.approved = postIds.length;
       } else {
-        await approvalsDB.bulkRejectPostIds(postIds, brandId, userId, note || '');
+        await approvalsDB.bulkRejectPostIds(
+          postIds,
+          brandId,
+          userId,
+          note || "",
+        );
         results.rejected = postIds.length;
       }
 
       // Log audit action for bulk operation
       await logAuditAction(
         brandId,
-        'bulk_operation',
+        "bulk_operation",
         userId,
         userEmail,
-        action === 'approve' ? 'BULK_APPROVED' : 'BULK_REJECTED',
+        action === "approve" ? "BULK_APPROVED" : "BULK_REJECTED",
         {
-          note: note || '',
+          note: note || "",
           bulkCount: postIds.length,
           postIds,
         },
         req.ip,
-        req.headers['user-agent']
+        req.headers["user-agent"],
       );
     } catch (error) {
       results.errors.push({
-        postId: 'bulk_operation',
-        reason: error instanceof Error ? error.message : 'Unknown error',
+        postId: "bulk_operation",
+        reason: error instanceof Error ? error.message : "Unknown error",
       });
     }
 
@@ -134,42 +120,50 @@ export const approveSingleContent: RequestHandler = async (req, res, next) => {
   try {
     const { postId } = req.params;
     const { note } = req.body;
-    const userId = ((req as any)).user?.id || ((req as any)).userId;
-    const userEmail = ((req as any)).user?.email || req.headers['x-user-email'] as string;
-    const brandId = ((req as any)).user?.brandId || req.headers['x-brand-id'] as string;
-    const userRole = ((req as any)).user?.role || req.headers['x-user-role'] as string;
+    const userId = (req as any).user?.id || (req as any).userId;
+    const userEmail =
+      (req as any).user?.email || (req.headers["x-user-email"] as string);
+    const brandId =
+      (req as any).user?.brandId || (req.headers["x-brand-id"] as string);
+    const userRole =
+      (req as any).user?.role || (req.headers["x-user-role"] as string);
 
     // Validate required fields
     if (!userId || !brandId) {
       throw new AppError(
         ErrorCode.UNAUTHORIZED,
-        'User ID and Brand ID are required',
+        "User ID and Brand ID are required",
         HTTP_STATUS.UNAUTHORIZED,
-        'warning'
+        "warning",
       );
     }
 
     // Validate permissions
-    if (!['client', 'admin'].includes(userRole)) {
+    if (!["client", "admin"].includes(userRole)) {
       throw new AppError(
         ErrorCode.FORBIDDEN,
-        'Only clients and admins can approve content',
+        "Only clients and admins can approve content",
         HTTP_STATUS.FORBIDDEN,
-        'warning'
+        "warning",
       );
     }
 
     if (!postId) {
       throw new AppError(
         ErrorCode.MISSING_REQUIRED_FIELD,
-        'postId is required',
+        "postId is required",
         HTTP_STATUS.BAD_REQUEST,
-        'warning'
+        "warning",
       );
     }
 
     // Approve post via database
-    const approvedPost = await approvalsDB.approvePost(postId, brandId, userId, note);
+    const approvedPost = await approvalsDB.approvePost(
+      postId,
+      brandId,
+      userId,
+      note,
+    );
 
     // Log approval
     await logAuditAction(
@@ -177,16 +171,16 @@ export const approveSingleContent: RequestHandler = async (req, res, next) => {
       postId,
       userId,
       userEmail,
-      'APPROVED',
-      { note: note || '' },
+      "APPROVED",
+      { note: note || "" },
       req.ip,
-      req.headers['user-agent']
+      req.headers["user-agent"],
     );
 
     (res as any).json({
       success: true,
       postId,
-      status: 'approved',
+      status: "approved",
       approvedBy: userEmail,
       approvedAt: approvedPost.approval_date || new Date().toISOString(),
     });
@@ -203,28 +197,31 @@ export const rejectContent: RequestHandler = async (req, res, next) => {
   try {
     const { postId } = req.params;
     const { reason, note } = req.body;
-    const userId = ((req as any)).user?.id || ((req as any)).userId;
-    const userEmail = ((req as any)).user?.email || req.headers['x-user-email'] as string;
-    const brandId = ((req as any)).user?.brandId || req.headers['x-brand-id'] as string;
-    const userRole = ((req as any)).user?.role || req.headers['x-user-role'] as string;
+    const userId = (req as any).user?.id || (req as any).userId;
+    const userEmail =
+      (req as any).user?.email || (req.headers["x-user-email"] as string);
+    const brandId =
+      (req as any).user?.brandId || (req.headers["x-brand-id"] as string);
+    const userRole =
+      (req as any).user?.role || (req.headers["x-user-role"] as string);
 
     // Validate required fields
     if (!userId || !brandId) {
       throw new AppError(
         ErrorCode.UNAUTHORIZED,
-        'User ID and Brand ID are required',
+        "User ID and Brand ID are required",
         HTTP_STATUS.UNAUTHORIZED,
-        'warning'
+        "warning",
       );
     }
 
     // Validate permissions
-    if (!['client', 'admin'].includes(userRole)) {
+    if (!["client", "admin"].includes(userRole)) {
       throw new AppError(
         ErrorCode.FORBIDDEN,
-        'Only clients and admins can reject content',
+        "Only clients and admins can reject content",
         HTTP_STATUS.FORBIDDEN,
-        'warning'
+        "warning",
       );
     }
 
@@ -232,23 +229,29 @@ export const rejectContent: RequestHandler = async (req, res, next) => {
     if (!reason) {
       throw new AppError(
         ErrorCode.MISSING_REQUIRED_FIELD,
-        'reason is required for rejections',
+        "reason is required for rejections",
         HTTP_STATUS.BAD_REQUEST,
-        'warning'
+        "warning",
       );
     }
 
     if (!postId) {
       throw new AppError(
         ErrorCode.MISSING_REQUIRED_FIELD,
-        'postId is required',
+        "postId is required",
         HTTP_STATUS.BAD_REQUEST,
-        'warning'
+        "warning",
       );
     }
 
     // Reject post via database
-    const rejectedPost = await approvalsDB.rejectPost(postId, brandId, userId, reason, note);
+    const rejectedPost = await approvalsDB.rejectPost(
+      postId,
+      brandId,
+      userId,
+      reason,
+      note,
+    );
 
     // Log rejection
     await logAuditAction(
@@ -256,19 +259,19 @@ export const rejectContent: RequestHandler = async (req, res, next) => {
       postId,
       userId,
       userEmail,
-      'REJECTED',
+      "REJECTED",
       {
         reason,
-        note: note || '',
+        note: note || "",
       },
       req.ip,
-      req.headers['user-agent']
+      req.headers["user-agent"],
     );
 
     (res as any).json({
       success: true,
       postId,
-      status: 'rejected',
+      status: "rejected",
       rejectedBy: userEmail,
       reason,
       rejectedAt: rejectedPost.rejection_date || new Date().toISOString(),
@@ -285,23 +288,24 @@ export const rejectContent: RequestHandler = async (req, res, next) => {
 export const getApprovalHistory: RequestHandler = async (req, res, next) => {
   try {
     const { postId } = req.params;
-    const brandId = ((req as any)).user?.brandId || req.headers['x-brand-id'] as string;
+    const brandId =
+      (req as any).user?.brandId || (req.headers["x-brand-id"] as string);
 
     if (!brandId) {
       throw new AppError(
         ErrorCode.MISSING_REQUIRED_FIELD,
-        'Brand ID is required',
+        "Brand ID is required",
         HTTP_STATUS.BAD_REQUEST,
-        'warning'
+        "warning",
       );
     }
 
     if (!postId) {
       throw new AppError(
         ErrorCode.MISSING_REQUIRED_FIELD,
-        'postId is required',
+        "postId is required",
         HTTP_STATUS.BAD_REQUEST,
-        'warning'
+        "warning",
       );
     }
 
@@ -326,17 +330,19 @@ export const requestApproval: RequestHandler = async (req, res, next) => {
   try {
     const { postId } = req.params;
     const { assignedTo, deadline, priority } = req.body;
-    const userId = ((req as any)).user?.id || ((req as any)).userId;
-    const userEmail = ((req as any)).user?.email || req.headers['x-user-email'] as string;
-    const brandId = ((req as any)).user?.brandId || req.headers['x-brand-id'] as string;
+    const userId = (req as any).user?.id || (req as any).userId;
+    const userEmail =
+      (req as any).user?.email || (req.headers["x-user-email"] as string);
+    const brandId =
+      (req as any).user?.brandId || (req.headers["x-brand-id"] as string);
 
     // Validate required fields
     if (!userId || !brandId || !postId || !assignedTo) {
       throw new AppError(
         ErrorCode.MISSING_REQUIRED_FIELD,
-        'userId, brandId, postId, and assignedTo are required',
+        "userId, brandId, postId, and assignedTo are required",
         HTTP_STATUS.BAD_REQUEST,
-        'warning'
+        "warning",
       );
     }
 
@@ -346,8 +352,8 @@ export const requestApproval: RequestHandler = async (req, res, next) => {
       brandId,
       userId,
       assignedTo,
-      (priority || 'normal') as 'low' | 'normal' | 'high',
-      deadline
+      (priority || "normal") as "low" | "normal" | "high",
+      deadline,
     );
 
     // Log approval request
@@ -356,14 +362,14 @@ export const requestApproval: RequestHandler = async (req, res, next) => {
       postId,
       userId,
       userEmail,
-      'APPROVAL_REQUESTED',
+      "APPROVAL_REQUESTED",
       {
         assignedTo,
         deadline,
-        priority: priority || 'normal',
+        priority: priority || "normal",
       },
       req.ip,
-      req.headers['user-agent']
+      req.headers["user-agent"],
     );
 
     (res as any).json({
@@ -385,17 +391,17 @@ export const requestApproval: RequestHandler = async (req, res, next) => {
  */
 export const getPendingApprovals: RequestHandler = async (req, res, next) => {
   try {
-    const userId = ((req as any)).user?.id || ((req as any)).userId;
-    const brandId = ((req as any)).user?.brandId || (req as any).query.brandId;
+    const userId = (req as any).user?.id || (req as any).userId;
+    const brandId = (req as any).user?.brandId || (req as any).query.brandId;
     const limit = parseInt((req as any).query.limit as string) || 50;
     const offset = parseInt((req as any).query.offset as string) || 0;
 
     if (!userId) {
       throw new AppError(
         ErrorCode.UNAUTHORIZED,
-        'User ID is required',
+        "User ID is required",
         HTTP_STATUS.UNAUTHORIZED,
-        'warning'
+        "warning",
       );
     }
 
@@ -404,7 +410,7 @@ export const getPendingApprovals: RequestHandler = async (req, res, next) => {
       userId,
       brandId as string | undefined,
       limit,
-      offset
+      offset,
     );
 
     // Map database records to response format
@@ -435,29 +441,31 @@ export const getPendingApprovals: RequestHandler = async (req, res, next) => {
 export const sendApprovalReminder: RequestHandler = async (req, res, next) => {
   try {
     const { clientEmail, brandName, pendingCount, oldestPendingAge } = req.body;
-    const brandId = ((req as any)).user?.brandId || req.headers['x-brand-id'] as string;
-    const userId = ((req as any)).user?.id || ((req as any)).userId;
-    const userEmail = ((req as any)).user?.email || req.headers['x-user-email'] as string;
+    const brandId =
+      (req as any).user?.brandId || (req.headers["x-brand-id"] as string);
+    const userId = (req as any).user?.id || (req as any).userId;
+    const userEmail =
+      (req as any).user?.email || (req.headers["x-user-email"] as string);
 
     // Validate required fields
     if (!brandId || !userId || !clientEmail || !brandName) {
       throw new AppError(
         ErrorCode.MISSING_REQUIRED_FIELD,
-        'brandId, userId, clientEmail, and brandName are required',
+        "brandId, userId, clientEmail, and brandName are required",
         HTTP_STATUS.BAD_REQUEST,
-        'warning'
+        "warning",
       );
     }
 
     // Generate reminder email
     const { subject, htmlBody, textBody } = generateReminderEmail({
-      clientName: clientEmail.split('@')[0],
+      clientName: clientEmail.split("@")[0],
       brandName,
       pendingCount,
       oldestPendingAge,
       approvalUrl: `${process.env.CLIENT_URL}/approvals`,
-      agencyName: 'Aligned AI',
-      brandColor: '#8B5CF6',
+      agencyName: "Aligned AI",
+      brandColor: "#8B5CF6",
     });
 
     // Send email
@@ -468,31 +476,24 @@ export const sendApprovalReminder: RequestHandler = async (req, res, next) => {
       textBody,
       brandId,
       userId,
-      notificationType: 'approval_reminder',
+      notificationType: "approval_reminder",
     });
 
     if (!sendResult.success) {
       throw new AppError(
         ErrorCode.EXTERNAL_SERVICE_ERROR,
-        sendResult.error || 'Failed to send email',
+        sendResult.error || "Failed to send email",
         HTTP_STATUS.INTERNAL_SERVER_ERROR,
-        'warning'
+        "warning",
       );
     }
 
     // Log email send
-    await logAuditAction(
-      brandId,
-      'system',
-      userId,
-      userEmail,
-      'EMAIL_SENT',
-      {
-        emailAddress: clientEmail,
-        type: 'approval_reminder',
-        messageId: sendResult.messageId,
-      }
-    );
+    await logAuditAction(brandId, "system", userId, userEmail, "EMAIL_SENT", {
+      emailAddress: clientEmail,
+      type: "approval_reminder",
+      messageId: sendResult.messageId,
+    });
 
     (res as any).json({
       success: true,

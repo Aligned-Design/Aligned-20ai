@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { ArrowRight, Loader } from "lucide-react";
+import { ArrowRight, Loader, ChevronRight, Check } from "lucide-react";
 import { extractColorsFromImage, ColorSwatch } from "@/lib/colorExtraction";
 import { PalettePreview } from "@/components/onboarding/PalettePreview";
+import { Progress } from "@/components/ui/progress";
 
 interface BrandFormData {
+  brandName: string;
   businessDescription: string;
   tone: string[];
   audience: string;
@@ -26,7 +28,49 @@ const TONE_OPTIONS = [
   { label: "Approachable", emoji: "🤝" },
 ];
 
-const COLOR_PRESETS = ["#312E81", "#B9F227", "#3B82F6", "#EC4899", "#F59E0B"];
+// Color theme palettes - each palette has 2-3 colors
+const COLOR_THEMES = [
+  {
+    name: "Professional",
+    colors: ["#1F2937", "#3B82F6", "#E5E7EB"],
+    emoji: "💼",
+  },
+  {
+    name: "Vibrant",
+    colors: ["#312E81", "#B9F227", "#EC4899"],
+    emoji: "🌈",
+  },
+  {
+    name: "Modern",
+    colors: ["#0F172A", "#06B6D4", "#F43F5E"],
+    emoji: "✨",
+  },
+  {
+    name: "Earthy",
+    colors: ["#92400E", "#D97706", "#F3E8FF"],
+    emoji: "🌿",
+  },
+  {
+    name: "Tech",
+    colors: ["#1E293B", "#8B5CF6", "#10B981"],
+    emoji: "🚀",
+  },
+  {
+    name: "Bold",
+    colors: ["#7C2D12", "#DC2626", "#FBBF24"],
+    emoji: "⚡",
+  },
+  {
+    name: "Minimal",
+    colors: ["#000000", "#FFFFFF", "#64748B"],
+    emoji: "◇",
+  },
+  {
+    name: "Creative",
+    colors: ["#EC4899", "#A855F7", "#0EA5E9"],
+    emoji: "🎨",
+  },
+];
 
 const AUDIENCE_OPTIONS = [
   "Startups & SMBs",
@@ -44,8 +88,9 @@ const GOAL_OPTIONS = [
 ];
 
 export default function Screen3BrandIntake() {
-  const { setOnboardingStep, setBrandSnapshot } = useAuth();
+  const { user, setOnboardingStep, setBrandSnapshot } = useAuth();
   const [form, setForm] = useState<BrandFormData>({
+    brandName: user?.businessName || "",
     businessDescription: "",
     tone: [],
     audience: "",
@@ -53,8 +98,24 @@ export default function Screen3BrandIntake() {
     colors: [],
     logo: null,
   });
-  const [screenState, setScreenState] = useState<ScreenState>({ step: "questions" });
+  const [screenState, setScreenState] = useState<ScreenState>({
+    step: "questions",
+  });
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Calculate progress percentage
+  const calculateProgress = () => {
+    let score = 0;
+    if (form.brandName) score += 20;
+    if (form.businessDescription) score += 20;
+    if (form.tone.length > 0) score += 15;
+    if (form.audience) score += 15;
+    if (form.goal) score += 15;
+    if (form.colors.length > 0) score += 15;
+    return score;
+  };
+
+  const progressPercent = calculateProgress();
 
   const toggleTone = (tone: string) => {
     setForm((prev) => ({
@@ -97,29 +158,53 @@ export default function Screen3BrandIntake() {
 
   const handleRegenerateVariants = async () => {
     // In a real app, this would regenerate variants
-    // For now, just keep the extracted swatches
   };
 
   const generateBrandSnapshot = async () => {
     setIsGenerating(true);
+
     // Simulate AI generation delay
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2500));
 
     const snapshot = {
-      voice: form.businessDescription.slice(0, 50) + "...",
+      name: form.brandName || "Your Brand",
+      voice:
+        form.businessDescription.slice(0, 150) || "Professional and engaging",
       tone: form.tone.length > 0 ? form.tone : ["Professional"],
       audience: form.audience || "Mixed",
       goal: form.goal || "Strengthen brand consistency",
       colors: form.colors.length > 0 ? form.colors : ["#312E81", "#B9F227"],
       logo: form.logo ? URL.createObjectURL(form.logo) : undefined,
+      industry: user?.industry,
+      extractedMetadata: {
+        keywords: ["innovation", "quality", "trust"],
+        coreMessaging: [
+          "We deliver value through innovation",
+          "Customer success is our priority",
+          "Built for the modern world",
+        ],
+        dos: [
+          "Always maintain brand consistency",
+          "Use approved color palette",
+          "Include clear call-to-action",
+          "Engage authentically with audience",
+        ],
+        donts: [
+          "Don't use off-brand colors or fonts",
+          "Avoid overly promotional language",
+          "Don't post without review if approval required",
+          "Avoid controversial topics unrelated to brand",
+        ],
+      },
     };
 
     setBrandSnapshot(snapshot);
     setIsGenerating(false);
-    setOnboardingStep(3.5);
+    setOnboardingStep(4);
   };
 
-  const isComplete = form.businessDescription.trim() && form.tone.length > 0 && form.audience && form.goal;
+  // Minimum viable: just brand name required
+  const canProceed = form.brandName.trim().length > 0;
 
   // Show palette preview if in palette step and swatches exist
   if (screenState.step === "palette" && form.extractedSwatches) {
@@ -127,9 +212,12 @@ export default function Screen3BrandIntake() {
       <div className="min-h-screen bg-gradient-to-b from-indigo-50/30 via-white to-blue-50/20 p-4">
         <div className="max-w-2xl mx-auto pt-6">
           <div className="text-center mb-10">
-            <h1 className="text-3xl font-black text-slate-900 mb-2">Your Brand Colors</h1>
+            <h1 className="text-3xl font-black text-slate-900 mb-2">
+              Your Brand Colors
+            </h1>
             <p className="text-slate-600 font-medium">
-              We've extracted these colors from your logo. Adjust or confirm to use them.
+              We've extracted these colors from your logo. Adjust or confirm to
+              use them.
             </p>
           </div>
 
@@ -156,36 +244,95 @@ export default function Screen3BrandIntake() {
     <div className="min-h-screen bg-gradient-to-b from-indigo-50/30 via-white to-blue-50/20 p-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-10 pt-6">
+        <div className="text-center mb-8 pt-6">
           <h1 className="text-3xl font-black text-slate-900 mb-2">
-            Let's build your brand foundation
+            Build Your Brand Foundation
           </h1>
           <p className="text-slate-600 font-medium">
-            This helps your content and AI stay on brand from day one.
+            Help your content and AI stay on brand from day one
           </p>
         </div>
 
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-bold text-slate-700">
+              {progressPercent}% Complete
+            </span>
+            <span className="text-xs text-slate-500">
+              {progressPercent === 100
+                ? "🎉 All set!"
+                : "Fill in what you know"}
+            </span>
+          </div>
+          <Progress value={progressPercent} className="h-2" />
+        </div>
+
         {/* Form */}
-        <div className="space-y-8 mb-8">
-          {/* Q1: Business Description */}
+        <div className="space-y-6 mb-8">
+          {/* Q1: Brand Name (Required) */}
+          <div className="bg-white/50 backdrop-blur-xl rounded-2xl border-2 border-indigo-200 p-6">
+            <div className="flex items-start justify-between mb-3">
+              <label className="block text-sm font-black text-slate-900">
+                1️⃣ Brand Name <span className="text-red-500">*</span>
+              </label>
+              {form.brandName && (
+                <div className="flex items-center gap-1 text-green-600">
+                  <Check className="w-4 h-4" />
+                  <span className="text-xs font-bold">Done</span>
+                </div>
+              )}
+            </div>
+            <input
+              type="text"
+              value={form.brandName}
+              onChange={(e) => setForm({ ...form, brandName: e.target.value })}
+              placeholder="E.g., Aligned AI"
+              className="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-white/50 focus:border-indigo-500 focus:outline-none text-sm font-medium"
+            />
+          </div>
+
+          {/* Q2: Business Description (Optional) */}
           <div className="bg-white/50 backdrop-blur-xl rounded-2xl border border-white/60 p-6">
-            <label className="block text-sm font-black text-slate-900 mb-3">
-              1️⃣ Describe your business in one line
-            </label>
+            <div className="flex items-start justify-between mb-3">
+              <label className="block text-sm font-black text-slate-900">
+                2️⃣ Describe your business in one line{" "}
+                <span className="text-slate-500 font-normal">(Optional)</span>
+              </label>
+              {form.businessDescription && (
+                <div className="flex items-center gap-1 text-green-600">
+                  <Check className="w-4 h-4" />
+                  <span className="text-xs font-bold">Done</span>
+                </div>
+              )}
+            </div>
             <textarea
               value={form.businessDescription}
-              onChange={(e) => setForm({ ...form, businessDescription: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, businessDescription: e.target.value })
+              }
               placeholder="E.g., We help agencies create on-brand content at scale using AI..."
               className="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-white/50 focus:border-indigo-500 focus:outline-none text-sm font-medium resize-none"
               rows={3}
             />
           </div>
 
-          {/* Q2: Tone */}
+          {/* Q3: Tone (Optional) */}
           <div className="bg-white/50 backdrop-blur-xl rounded-2xl border border-white/60 p-6">
-            <label className="block text-sm font-black text-slate-900 mb-4">
-              2️⃣ What's your tone?
-            </label>
+            <div className="flex items-start justify-between mb-4">
+              <label className="block text-sm font-black text-slate-900">
+                3️⃣ What's your tone?{" "}
+                <span className="text-slate-500 font-normal">(Optional)</span>
+              </label>
+              {form.tone.length > 0 && (
+                <div className="flex items-center gap-1 text-green-600">
+                  <Check className="w-4 h-4" />
+                  <span className="text-xs font-bold">
+                    {form.tone.length} selected
+                  </span>
+                </div>
+              )}
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {TONE_OPTIONS.map((option) => (
                 <button
@@ -204,11 +351,20 @@ export default function Screen3BrandIntake() {
             </div>
           </div>
 
-          {/* Q3: Audience */}
+          {/* Q4: Audience (Optional) */}
           <div className="bg-white/50 backdrop-blur-xl rounded-2xl border border-white/60 p-6">
-            <label className="block text-sm font-black text-slate-900 mb-3">
-              3️⃣ Who's your audience?
-            </label>
+            <div className="flex items-start justify-between mb-3">
+              <label className="block text-sm font-black text-slate-900">
+                4️⃣ Who's your audience?{" "}
+                <span className="text-slate-500 font-normal">(Optional)</span>
+              </label>
+              {form.audience && (
+                <div className="flex items-center gap-1 text-green-600">
+                  <Check className="w-4 h-4" />
+                  <span className="text-xs font-bold">Done</span>
+                </div>
+              )}
+            </div>
             <select
               value={form.audience}
               onChange={(e) => setForm({ ...form, audience: e.target.value })}
@@ -223,11 +379,20 @@ export default function Screen3BrandIntake() {
             </select>
           </div>
 
-          {/* Q4: Goal */}
+          {/* Q5: Goal (Optional) */}
           <div className="bg-white/50 backdrop-blur-xl rounded-2xl border border-white/60 p-6">
-            <label className="block text-sm font-black text-slate-900 mb-4">
-              4️⃣ What's your key goal?
-            </label>
+            <div className="flex items-start justify-between mb-4">
+              <label className="block text-sm font-black text-slate-900">
+                5️⃣ What's your key goal?{" "}
+                <span className="text-slate-500 font-normal">(Optional)</span>
+              </label>
+              {form.goal && (
+                <div className="flex items-center gap-1 text-green-600">
+                  <Check className="w-4 h-4" />
+                  <span className="text-xs font-bold">Done</span>
+                </div>
+              )}
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {GOAL_OPTIONS.map((option) => (
                 <button
@@ -246,11 +411,20 @@ export default function Screen3BrandIntake() {
             </div>
           </div>
 
-          {/* Q5: Logo Upload */}
+          {/* Q6: Logo Upload (Optional) */}
           <div className="bg-white/50 backdrop-blur-xl rounded-2xl border border-white/60 p-6">
-            <label className="block text-sm font-black text-slate-900 mb-3">
-              5️⃣ Upload your logo (Optional)
-            </label>
+            <div className="flex items-start justify-between mb-3">
+              <label className="block text-sm font-black text-slate-900">
+                6️⃣ Upload your logo{" "}
+                <span className="text-slate-500 font-normal">(Optional)</span>
+              </label>
+              {form.logo && (
+                <div className="flex items-center gap-1 text-green-600">
+                  <Check className="w-4 h-4" />
+                  <span className="text-xs font-bold">Done</span>
+                </div>
+              )}
+            </div>
             <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-indigo-400 transition-colors cursor-pointer">
               <input
                 type="file"
@@ -267,48 +441,127 @@ export default function Screen3BrandIntake() {
                       alt="Logo preview"
                       className="w-16 h-16 object-contain mb-2"
                     />
-                    <p className="text-sm font-bold text-slate-700">{form.logo.name}</p>
+                    <p className="text-sm font-bold text-slate-700">
+                      {form.logo.name}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Click to change
+                    </p>
                   </div>
                 ) : (
                   <div>
                     <p className="text-2xl mb-2">📸</p>
-                    <p className="text-sm font-bold text-slate-700">Click to upload</p>
-                    <p className="text-xs text-slate-500">PNG, JPG up to 5MB</p>
+                    <p className="text-sm font-bold text-slate-700">
+                      Click to upload
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      PNG, JPG up to 5MB • AI will extract your brand colors
+                    </p>
                   </div>
                 )}
               </label>
             </div>
           </div>
 
-          {/* Q6: Colors */}
+          {/* Q7: Colors (Optional) */}
           <div className="bg-white/50 backdrop-blur-xl rounded-2xl border border-white/60 p-6">
-            <label className="block text-sm font-black text-slate-900 mb-4">
-              6️⃣ Choose your colors or let AI pick from logo
-            </label>
-            <div className="flex flex-wrap gap-3">
-              {COLOR_PRESETS.map((color) => (
+            <div className="flex items-start justify-between mb-4">
+              <label className="block text-sm font-black text-slate-900">
+                7️⃣ Choose a color theme{" "}
+                <span className="text-slate-500 font-normal">(Optional)</span>
+              </label>
+              {form.colors.length > 0 && (
+                <div className="flex items-center gap-1 text-green-600">
+                  <Check className="w-4 h-4" />
+                  <span className="text-xs font-bold">
+                    {form.colors.length} colors
+                  </span>
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-slate-600 mb-4">
+              Pick a pre-made palette or upload a logo for AI color extraction
+            </p>
+
+            {/* Theme Palettes */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {COLOR_THEMES.map((theme) => (
                 <button
-                  key={color}
-                  onClick={() => toggleColor(color)}
-                  className={`w-12 h-12 rounded-lg border-3 transition-all ${
-                    form.colors.includes(color)
-                      ? "border-slate-900 shadow-md"
-                      : "border-slate-200 hover:border-slate-400"
+                  key={theme.name}
+                  onClick={() => setForm({ ...form, colors: theme.colors })}
+                  className={`p-3 rounded-lg border-2 transition-all text-center ${
+                    form.colors.length === theme.colors.length &&
+                    theme.colors.every((c) => form.colors.includes(c))
+                      ? "bg-indigo-100 border-indigo-500"
+                      : "bg-white/50 border-slate-200 hover:border-slate-300"
                   }`}
-                  style={{ backgroundColor: color }}
-                  title={color}
-                />
+                >
+                  <div className="text-xl mb-2">{theme.emoji}</div>
+                  <p className="text-xs font-bold text-slate-700 mb-2">
+                    {theme.name}
+                  </p>
+                  <div className="flex gap-1 justify-center">
+                    {theme.colors.map((color) => (
+                      <div
+                        key={color}
+                        className="w-4 h-4 rounded border border-slate-300"
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
+                  </div>
+                </button>
               ))}
             </div>
+
+            {/* Selected Colors Preview */}
+            {form.colors.length > 0 && (
+              <div className="border-t pt-4 mt-4">
+                <p className="text-xs font-bold text-slate-700 mb-3">
+                  Selected Colors:
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {form.colors.map((color) => (
+                    <div
+                      key={color}
+                      className="flex flex-col items-center gap-1"
+                    >
+                      <div
+                        className="w-12 h-12 rounded-lg border-2 border-slate-900 shadow-md"
+                        style={{ backgroundColor: color }}
+                      />
+                      <code className="text-xs font-mono text-slate-600">
+                        {color}
+                      </code>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setForm({ ...form, colors: [] })}
+                  className="text-xs text-slate-600 hover:text-slate-900 mt-3 font-medium underline"
+                >
+                  Clear selection
+                </button>
+              </div>
+            )}
           </div>
+        </div>
+
+        {/* Info Box */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8">
+          <p className="text-xs text-blue-800 font-medium">
+            💡 <strong>Pro tip:</strong> You only need to fill in your brand
+            name to continue. The more details you provide, the better AI will
+            understand your brand. You can always refine this later from
+            Settings → Brand Profile.
+          </p>
         </div>
 
         {/* CTA Button */}
         <button
           onClick={generateBrandSnapshot}
-          disabled={!isComplete || isGenerating}
+          disabled={!canProceed || isGenerating}
           className={`w-full px-6 py-4 font-black rounded-lg transition-all flex items-center justify-center gap-2 group ${
-            isComplete && !isGenerating
+            canProceed && !isGenerating
               ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white hover:shadow-lg"
               : "bg-slate-200 text-slate-500 cursor-not-allowed"
           }`}
@@ -320,8 +573,8 @@ export default function Screen3BrandIntake() {
             </>
           ) : (
             <>
-              Generate My Brand Guide
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              Generate My Brand DNA
+              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </>
           )}
         </button>

@@ -5,19 +5,457 @@ import { AnalyticsAdvisor } from "@/components/dashboard/AnalyticsAdvisor";
 import { ReportingMenu } from "@/components/dashboard/ReportingMenu";
 import { ReportSettingsModal } from "@/components/dashboard/ReportSettingsModal";
 import { EmailReportDialog } from "@/components/dashboard/EmailReportDialog";
-import { PlatformMetrics, AnalyticsInsight, DATE_RANGES } from "@/types/analytics";
-import { Calendar, BarChart3 } from "lucide-react";
+import {
+  PlatformMetrics,
+  AnalyticsInsight,
+  DATE_RANGES,
+} from "@/types/analytics";
+import {
+  Calendar,
+  BarChart3,
+  TrendingUp,
+  Users,
+  Target,
+  Activity,
+} from "lucide-react";
 import { useState } from "react";
 import { useWorkspace } from "@/contexts/WorkspaceContext";
+import { isFeatureEnabled } from "@/lib/featureFlags";
+import {
+  DashboardShell,
+  KpiCard,
+  SegmentedControl,
+  type PeriodOption,
+} from "@/components/DashboardSystem";
 
 export default function Analytics() {
+  const unifiedDashEnabled = isFeatureEnabled("unified_dash");
+
+  if (unifiedDashEnabled) {
+    return <UnifiedAnalytics />;
+  }
+
+  return <LegacyAnalytics />;
+}
+
+// ============================================================================
+// NEW: Unified Dashboard System Version
+// ============================================================================
+
+function UnifiedAnalytics() {
+  const { currentWorkspace } = useWorkspace();
+  const [period, setPeriod] = useState<PeriodOption>("week");
+  const [showReportSettings, setShowReportSettings] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+
+  const platformMetrics = getMockPlatformMetrics();
+  const insights = getMockInsights();
+
+  const handleReportSettings = () => {
+    setShowReportSettings(true);
+  };
+
+  const handleRunReport = () => {
+    alert("Generating report...");
+  };
+
+  const handleEmailReport = () => {
+    setShowEmailDialog(true);
+  };
+
+  return (
+    <DashboardShell
+      title="Analytics"
+      subtitle={`${currentWorkspace?.logo || ""} ${currentWorkspace?.name || ""} — Cross-platform performance insights and AI-powered recommendations`}
+      period={period}
+      onPeriodChange={setPeriod}
+      headerActions={
+        <ReportingMenu
+          onSettings={handleReportSettings}
+          onRun={handleRunReport}
+          onEmail={handleEmailReport}
+          dateRangeLabel={
+            period === "day"
+              ? "Today"
+              : period === "week"
+                ? "This Week"
+                : "This Month"
+          }
+        />
+      }
+    >
+      {/* Weekly Summary KPI Cards */}
+      <KpiCard
+        title="Total Reach"
+        value="382K"
+        delta={{ value: 13.2, trend: "up", label: "vs last week" }}
+        icon={TrendingUp}
+      />
+
+      <KpiCard
+        title="Total Engagement"
+        value="20.5K"
+        delta={{ value: 10.4, trend: "up", label: "vs last week" }}
+        icon={Activity}
+      />
+
+      <KpiCard
+        title="Avg Engagement Rate"
+        value="5.4%"
+        delta={{ value: 0.8, trend: "up", label: "vs last week" }}
+        icon={Target}
+      />
+
+      <KpiCard
+        title="New Followers"
+        value="1,847"
+        delta={{ value: 3.9, trend: "up", label: "vs last week" }}
+        icon={Users}
+      />
+
+      {/* Platform Performance Section - Full Width */}
+      <div className="col-span-full">
+        <div className="flex items-center gap-2 mb-6">
+          <BarChart3 className="w-5 h-5 text-purple-600" />
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100">
+            Platform Performance
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {platformMetrics.map((platform) => (
+            <div
+              key={platform.platform}
+              className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-white/60 dark:border-slate-700 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:shadow-md transition-all duration-300"
+            >
+              <PlatformMetricsCarousel platform={platform} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* AI Insights & Top Opportunities - Full Width */}
+      <div className="col-span-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1">
+          <AnalyticsAdvisor insights={insights} />
+        </div>
+
+        <div className="lg:col-span-2">
+          <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-white/60 dark:border-slate-700 hover:bg-white/70 dark:hover:bg-slate-800/70 transition-all duration-300">
+            <h3 className="text-lg font-black text-slate-900 dark:text-slate-100 mb-4">
+              Top Opportunities
+            </h3>
+
+            <div className="space-y-3">
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-emerald-50/50 dark:bg-emerald-900/20 border border-emerald-200/50 dark:border-emerald-800/50">
+                <span className="text-lg flex-shrink-0">💡</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                    Shift to Video Content
+                  </p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                    Video posts generate 3× more engagement. Reallocate budget
+                    to Reels/TikTok.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50/50 dark:bg-amber-900/20 border border-amber-200/50 dark:border-amber-800/50">
+                <span className="text-lg flex-shrink-0">🎯</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                    Optimize Post Timing
+                  </p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                    Friday 9-11 AM sees 42 avg engagements. Reschedule
+                    low-performing day content.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/50">
+                <span className="text-lg flex-shrink-0">📈</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                    Leverage Trending Audio
+                  </p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                    TikTok trending sounds deliver 2.5× reach. Implement
+                    trending audio strategy.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modals */}
+      <ReportSettingsModal
+        isOpen={showReportSettings}
+        onClose={() => setShowReportSettings(false)}
+        onSave={(settings) => {
+          alert(`Report settings saved: ${settings.name}`);
+          setShowReportSettings(false);
+        }}
+      />
+
+      <EmailReportDialog
+        isOpen={showEmailDialog}
+        onClose={() => setShowEmailDialog(false)}
+        onSend={(emails) => {
+          alert(`Report sent to: ${emails.join(", ")}`);
+          setShowEmailDialog(false);
+        }}
+        dateRangeLabel={
+          period === "day"
+            ? "Today"
+            : period === "week"
+              ? "This Week"
+              : "This Month"
+        }
+      />
+    </DashboardShell>
+  );
+}
+
+// ============================================================================
+// LEGACY: Original Implementation (kept for rollback)
+// ============================================================================
+
+function LegacyAnalytics() {
   const { currentWorkspace } = useWorkspace();
   const [dateRange, setDateRange] = useState(DATE_RANGES[0]);
   const [showReportSettings, setShowReportSettings] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
 
-  // Mock platform metrics data
-  const platformMetrics: PlatformMetrics[] = [
+  const platformMetrics = getMockPlatformMetrics();
+  const insights = getMockInsights();
+
+  const handleReportSettings = () => {
+    setShowReportSettings(true);
+  };
+
+  const handleRunReport = () => {
+    alert("Generating report...");
+  };
+
+  const handleEmailReport = () => {
+    setShowEmailDialog(true);
+  };
+
+  return (
+    <MainLayout>
+      <FirstVisitTooltip page="analytics">
+        <div className="min-h-screen bg-gradient-to-b from-indigo-50/30 via-white to-blue-50/20">
+          <div className="p-4 sm:p-6 md:p-8">
+            {/* Page Header with Reporting Button */}
+            <div className="mb-8 flex items-start justify-between gap-4">
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-2">
+                  Analytics
+                </h1>
+                <p className="text-slate-600 text-xs sm:text-sm font-medium">
+                  {currentWorkspace?.logo} {currentWorkspace?.name} —
+                  Cross-platform performance insights and AI-powered
+                  recommendations
+                </p>
+              </div>
+              <ReportingMenu
+                onSettings={handleReportSettings}
+                onRun={handleRunReport}
+                onEmail={handleEmailReport}
+                dateRangeLabel={dateRange.label}
+              />
+            </div>
+
+            {/* Date Range Selector */}
+            <div className="mb-8 flex flex-wrap gap-2 sm:gap-3">
+              {DATE_RANGES.map((range) => (
+                <button
+                  key={range.label}
+                  onClick={() => setDateRange(range)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 ${
+                    dateRange.label === range.label
+                      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
+                      : "bg-white/50 border border-white/60 text-slate-700 hover:border-indigo-300/50 hover:bg-white/70"
+                  }`}
+                >
+                  <Calendar className="w-4 h-4" />
+                  {range.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Platform Metrics Carousel Grid */}
+            <div className="mb-12">
+              <div className="flex items-center gap-2 mb-6">
+                <BarChart3 className="w-5 h-5 text-indigo-600" />
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                  Platform Performance
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {platformMetrics.map((platform) => (
+                  <div
+                    key={platform.platform}
+                    className="bg-white/50 backdrop-blur-xl rounded-2xl p-6 border border-white/60 hover:bg-white/70 hover:shadow-md transition-all duration-300"
+                  >
+                    <PlatformMetricsCarousel platform={platform} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* AI Insights Panel */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-1">
+                <AnalyticsAdvisor insights={insights} />
+              </div>
+
+              {/* Key Takeaways */}
+              <div className="lg:col-span-2 space-y-4">
+                <div className="bg-white/50 backdrop-blur-xl rounded-2xl p-6 border border-white/60 hover:bg-white/70 transition-all duration-300">
+                  <h3 className="text-lg font-black text-slate-900 mb-4">
+                    Weekly Summary
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-lg bg-emerald-50/50 border border-emerald-200/50">
+                      <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1">
+                        Total Reach
+                      </p>
+                      <p className="text-2xl sm:text-3xl font-black text-slate-900">
+                        382K
+                      </p>
+                      <p className="text-xs text-emerald-600 font-medium mt-2">
+                        ↑ 13.2% vs last week
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-pink-50/50 border border-pink-200/50">
+                      <p className="text-xs font-bold text-pink-700 uppercase tracking-wider mb-1">
+                        Total Engagement
+                      </p>
+                      <p className="text-2xl sm:text-3xl font-black text-slate-900">
+                        20.5K
+                      </p>
+                      <p className="text-xs text-pink-600 font-medium mt-2">
+                        ↑ 10.4% vs last week
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-blue-50/50 border border-blue-200/50">
+                      <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1">
+                        Avg Engagement Rate
+                      </p>
+                      <p className="text-2xl sm:text-3xl font-black text-slate-900">
+                        5.4%
+                      </p>
+                      <p className="text-xs text-blue-600 font-medium mt-2">
+                        ↑ 0.8% vs last week
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-purple-50/50 border border-purple-200/50">
+                      <p className="text-xs font-bold text-purple-700 uppercase tracking-wider mb-1">
+                        New Followers
+                      </p>
+                      <p className="text-2xl sm:text-3xl font-black text-slate-900">
+                        1,847
+                      </p>
+                      <p className="text-xs text-purple-600 font-medium mt-2">
+                        ↑ 3.9% vs last week
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Top Opportunities */}
+                <div className="bg-white/50 backdrop-blur-xl rounded-2xl p-6 border border-white/60 hover:bg-white/70 transition-all duration-300">
+                  <h3 className="text-lg font-black text-slate-900 mb-4">
+                    Top Opportunities
+                  </h3>
+
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-emerald-50/50 border border-emerald-200/50">
+                      <span className="text-lg flex-shrink-0">💡</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-900">
+                          Shift to Video Content
+                        </p>
+                        <p className="text-xs text-slate-600 mt-1">
+                          Video posts generate 3× more engagement. Reallocate
+                          budget to Reels/TikTok.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50/50 border border-amber-200/50">
+                      <span className="text-lg flex-shrink-0">🎯</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-900">
+                          Optimize Post Timing
+                        </p>
+                        <p className="text-xs text-slate-600 mt-1">
+                          Friday 9-11 AM sees 42 avg engagements. Reschedule
+                          low-performing day content.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50/50 border border-blue-200/50">
+                      <span className="text-lg flex-shrink-0">📈</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-900">
+                          Leverage Trending Audio
+                        </p>
+                        <p className="text-xs text-slate-600 mt-1">
+                          TikTok trending sounds deliver 2.5× reach. Implement
+                          trending audio strategy.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </FirstVisitTooltip>
+
+      {/* Modals */}
+      <ReportSettingsModal
+        isOpen={showReportSettings}
+        onClose={() => setShowReportSettings(false)}
+        onSave={(settings) => {
+          alert(`Report settings saved: ${settings.name}`);
+          setShowReportSettings(false);
+        }}
+      />
+
+      <EmailReportDialog
+        isOpen={showEmailDialog}
+        onClose={() => setShowEmailDialog(false)}
+        onSend={(emails) => {
+          alert(
+            `Report sent to: ${emails.join(", ")}\nDate Range: ${dateRange.label}`,
+          );
+          setShowEmailDialog(false);
+        }}
+        dateRangeLabel={dateRange.label}
+      />
+    </MainLayout>
+  );
+}
+
+// ============================================================================
+// Shared Mock Data Functions
+// ============================================================================
+
+function getMockPlatformMetrics(): PlatformMetrics[] {
+  return [
     {
       platform: "facebook",
       icon: "📘",
@@ -229,9 +667,10 @@ export default function Analytics() {
       },
     },
   ];
+}
 
-  // Mock AI insights
-  const insights: AnalyticsInsight[] = [
+function getMockInsights(): AnalyticsInsight[] {
+  return [
     {
       id: "1",
       platform: "Instagram",
@@ -293,196 +732,4 @@ export default function Analytics() {
       type: "suggestion",
     },
   ];
-
-  const handleReportSettings = () => {
-    setShowReportSettings(true);
-  };
-
-  const handleRunReport = () => {
-    alert("Generating report...");
-    // TODO: Implement report generation
-  };
-
-  const handleEmailReport = () => {
-    setShowEmailDialog(true);
-  };
-
-  return (
-    <MainLayout>
-      <FirstVisitTooltip page="analytics">
-        <div className="min-h-screen bg-gradient-to-b from-indigo-50/30 via-white to-blue-50/20">
-        <div className="p-4 sm:p-6 md:p-8">
-          {/* Page Header with Reporting Button */}
-          <div className="mb-8 flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-2">Analytics</h1>
-              <p className="text-slate-600 text-xs sm:text-sm font-medium">
-                {currentWorkspace?.logo} {currentWorkspace?.name} — Cross-platform performance insights and AI-powered recommendations
-              </p>
-            </div>
-            <ReportingMenu
-              onSettings={handleReportSettings}
-              onRun={handleRunReport}
-              onEmail={handleEmailReport}
-              dateRangeLabel={dateRange.label}
-            />
-          </div>
-
-          {/* Date Range Selector */}
-          <div className="mb-8 flex flex-wrap gap-2 sm:gap-3">
-            {DATE_RANGES.map((range) => (
-              <button
-                key={range.label}
-                onClick={() => setDateRange(range)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 ${
-                  dateRange.label === range.label
-                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
-                    : "bg-white/50 border border-white/60 text-slate-700 hover:border-indigo-300/50 hover:bg-white/70"
-                }`}
-              >
-                <Calendar className="w-4 h-4" />
-                {range.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Platform Metrics Carousel Grid */}
-          <div className="mb-12">
-            <div className="flex items-center gap-2 mb-6">
-              <BarChart3 className="w-5 h-5 text-indigo-600" />
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900">
-                Platform Performance
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {platformMetrics.map((platform) => (
-                <div
-                  key={platform.platform}
-                  className="bg-white/50 backdrop-blur-xl rounded-2xl p-6 border border-white/60 hover:bg-white/70 hover:shadow-md transition-all duration-300"
-                >
-                  <PlatformMetricsCarousel platform={platform} />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* AI Insights Panel */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1">
-              <AnalyticsAdvisor insights={insights} />
-            </div>
-
-            {/* Key Takeaways */}
-            <div className="lg:col-span-2 space-y-4">
-              <div className="bg-white/50 backdrop-blur-xl rounded-2xl p-6 border border-white/60 hover:bg-white/70 transition-all duration-300">
-                <h3 className="text-lg font-black text-slate-900 mb-4">Weekly Summary</h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-lg bg-emerald-50/50 border border-emerald-200/50">
-                    <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1">
-                      Total Reach
-                    </p>
-                    <p className="text-2xl sm:text-3xl font-black text-slate-900">
-                      382K
-                    </p>
-                    <p className="text-xs text-emerald-600 font-medium mt-2">↑ 13.2% vs last week</p>
-                  </div>
-
-                  <div className="p-4 rounded-lg bg-pink-50/50 border border-pink-200/50">
-                    <p className="text-xs font-bold text-pink-700 uppercase tracking-wider mb-1">
-                      Total Engagement
-                    </p>
-                    <p className="text-2xl sm:text-3xl font-black text-slate-900">
-                      20.5K
-                    </p>
-                    <p className="text-xs text-pink-600 font-medium mt-2">↑ 10.4% vs last week</p>
-                  </div>
-
-                  <div className="p-4 rounded-lg bg-blue-50/50 border border-blue-200/50">
-                    <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1">
-                      Avg Engagement Rate
-                    </p>
-                    <p className="text-2xl sm:text-3xl font-black text-slate-900">
-                      5.4%
-                    </p>
-                    <p className="text-xs text-blue-600 font-medium mt-2">↑ 0.8% vs last week</p>
-                  </div>
-
-                  <div className="p-4 rounded-lg bg-purple-50/50 border border-purple-200/50">
-                    <p className="text-xs font-bold text-purple-700 uppercase tracking-wider mb-1">
-                      New Followers
-                    </p>
-                    <p className="text-2xl sm:text-3xl font-black text-slate-900">
-                      1,847
-                    </p>
-                    <p className="text-xs text-purple-600 font-medium mt-2">↑ 3.9% vs last week</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Top Opportunities */}
-              <div className="bg-white/50 backdrop-blur-xl rounded-2xl p-6 border border-white/60 hover:bg-white/70 transition-all duration-300">
-                <h3 className="text-lg font-black text-slate-900 mb-4">Top Opportunities</h3>
-
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-emerald-50/50 border border-emerald-200/50">
-                    <span className="text-lg flex-shrink-0">💡</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-slate-900">Shift to Video Content</p>
-                      <p className="text-xs text-slate-600 mt-1">
-                        Video posts generate 3× more engagement. Reallocate budget to Reels/TikTok.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50/50 border border-amber-200/50">
-                    <span className="text-lg flex-shrink-0">🎯</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-slate-900">Optimize Post Timing</p>
-                      <p className="text-xs text-slate-600 mt-1">
-                        Friday 9-11 AM sees 42 avg engagements. Reschedule low-performing day content.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50/50 border border-blue-200/50">
-                    <span className="text-lg flex-shrink-0">📈</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-slate-900">Leverage Trending Audio</p>
-                      <p className="text-xs text-slate-600 mt-1">
-                        TikTok trending sounds deliver 2.5× reach. Implement trending audio strategy.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      </FirstVisitTooltip>
-
-      {/* Modals */}
-      <ReportSettingsModal
-        isOpen={showReportSettings}
-        onClose={() => setShowReportSettings(false)}
-        onSave={(settings) => {
-          alert(`Report settings saved: ${settings.name}`);
-          setShowReportSettings(false);
-        }}
-      />
-
-      <EmailReportDialog
-        isOpen={showEmailDialog}
-        onClose={() => setShowEmailDialog(false)}
-        onSend={(emails) => {
-          alert(`Report sent to: ${emails.join(", ")}\nDate Range: ${dateRange.label}`);
-          setShowEmailDialog(false);
-        }}
-        dateRangeLabel={dateRange.label}
-      />
-    </MainLayout>
-  );
 }

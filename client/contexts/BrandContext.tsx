@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase, Brand} from "@/lib/supabase";
+import { supabase, Brand } from "@/lib/supabase";
 import { useAuth } from "./AuthContext";
+import { isDemoMode, mockBrands } from "@/lib/mockData";
 
 type BrandContextType = {
   brands: Brand[];
@@ -12,6 +13,21 @@ type BrandContextType = {
 
 const BrandContext = createContext<BrandContextType | undefined>(undefined);
 
+// Default brand when no brands are available
+const DEFAULT_BRAND: Brand = {
+  id: "default-brand",
+  name: "Aligned by Design",
+  slug: "aligned-by-design",
+  logo_url: null,
+  website_url: "https://aligned-bydesign.com",
+  industry: "Marketing",
+  primary_color: "#8B5CF6",
+  secondary_color: null,
+  accent_color: null,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+};
+
 export function BrandProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -20,8 +36,18 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
 
   const fetchBrands = async () => {
     if (!user) {
-      setBrands([]);
-      setCurrentBrand(null);
+      // Set default brand for logged-in users without brand data
+      setBrands([DEFAULT_BRAND]);
+      setCurrentBrand(DEFAULT_BRAND);
+      setLoading(false);
+      return;
+    }
+
+    // Use mock data in demo mode to avoid Supabase fetch errors
+    if (isDemoMode()) {
+      console.log("[DEMO MODE] Using mock brands");
+      setBrands(mockBrands);
+      setCurrentBrand(mockBrands[0]);
       setLoading(false);
       return;
     }
@@ -33,8 +59,9 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
         .eq("user_id", user.id);
 
       if (!memberData || memberData.length === 0) {
-        setBrands([]);
-        setCurrentBrand(null);
+        // No brands found - use default
+        setBrands([DEFAULT_BRAND]);
+        setCurrentBrand(DEFAULT_BRAND);
         setLoading(false);
         return;
       }
@@ -46,12 +73,17 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
         .in("id", brandIds)
         .order("name");
 
-      setBrands(brandsData || []);
+      setBrands(brandsData || [DEFAULT_BRAND]);
       if (brandsData && brandsData.length > 0 && !currentBrand) {
         setCurrentBrand(brandsData[0]);
+      } else if (!brandsData || brandsData.length === 0) {
+        setCurrentBrand(DEFAULT_BRAND);
       }
     } catch (error) {
       console.error("Error fetching brands:", error);
+      // On error, fallback to default brand
+      setBrands([DEFAULT_BRAND]);
+      setCurrentBrand(DEFAULT_BRAND);
     } finally {
       setLoading(false);
     }

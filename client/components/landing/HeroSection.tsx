@@ -31,7 +31,10 @@ export function HeroSection({ onCTA }: HeroSectionProps) {
         {/* Secondary blue glow */}
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-200/20 to-blue-100/10 rounded-full blur-3xl animate-pulse-glow"></div>
         {/* Accent lime glow (subtle) */}
-        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-lime-200/5 rounded-full blur-3xl animate-float-soft" style={{ animationDelay: "1s" }}></div>
+        <div
+          className="absolute top-1/2 right-1/3 w-64 h-64 bg-lime-200/5 rounded-full blur-3xl animate-float-soft"
+          style={{ animationDelay: "1s" }}
+        ></div>
         {/* Light reflection overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent rounded-3xl opacity-20"></div>
       </div>
@@ -40,25 +43,40 @@ export function HeroSection({ onCTA }: HeroSectionProps) {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Left: Copy with staggered animation */}
           <div className="flex flex-col justify-center space-y-6">
-            <div className="animate-slide-up" style={{ animationDelay: "0.1s" }}>
+            <div
+              className="animate-slide-up"
+              style={{ animationDelay: "0.1s" }}
+            >
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 mb-4 leading-tight">
                 You built your agency for stories, not spreadsheets.
               </h1>
             </div>
 
-            <div className="animate-slide-up" style={{ animationDelay: "0.15s" }}>
+            <div
+              className="animate-slide-up"
+              style={{ animationDelay: "0.15s" }}
+            >
               <p className="text-lg sm:text-xl text-indigo-600 font-bold mb-6">
-                Now the work never stops, the tabs never close, and "done" always feels just out of reach. That's where we come in.
+                Now the work never stops, the tabs never close, and "done"
+                always feels just out of reach. That's where we come in.
               </p>
             </div>
 
-            <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
+            <div
+              className="animate-slide-up"
+              style={{ animationDelay: "0.2s" }}
+            >
               <p className="text-base sm:text-lg text-slate-700 mb-8 leading-relaxed">
-                Aligned handles your content — the planning, writing, scheduling, and reporting — so you can get back to the work only you can do.
+                Aligned handles your content — the planning, writing,
+                scheduling, and reporting — so you can get back to the work only
+                you can do.
               </p>
             </div>
 
-            <div className="animate-slide-up" style={{ animationDelay: "0.25s" }}>
+            <div
+              className="animate-slide-up"
+              style={{ animationDelay: "0.25s" }}
+            >
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-sm font-bold text-slate-700">
                 <div className="flex items-center gap-2">
                   <span className="text-lime-500">✓</span> Brand Management
@@ -75,7 +93,10 @@ export function HeroSection({ onCTA }: HeroSectionProps) {
               </div>
             </div>
 
-            <div className="animate-slide-up" style={{ animationDelay: "0.4s" }}>
+            <div
+              className="animate-slide-up"
+              style={{ animationDelay: "0.4s" }}
+            >
               <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 <button
                   onClick={() => handleCTA("hero")}
@@ -91,7 +112,10 @@ export function HeroSection({ onCTA }: HeroSectionProps) {
               </div>
             </div>
 
-            <div className="animate-slide-up" style={{ animationDelay: "0.5s" }}>
+            <div
+              className="animate-slide-up"
+              style={{ animationDelay: "0.5s" }}
+            >
               <p className="text-sm sm:text-base text-slate-600 font-medium">
                 We keep it moving so you can keep it meaningful.
               </p>
@@ -99,16 +123,25 @@ export function HeroSection({ onCTA }: HeroSectionProps) {
           </div>
 
           {/* Right: Premium Dashboard Visual */}
-          <div className="relative h-96 md:h-full flex items-center justify-center animate-slide-up-slow" style={{ animationDelay: "0.3s" }}>
+          <div
+            className="relative h-96 md:h-full flex items-center justify-center animate-slide-up-slow"
+            style={{ animationDelay: "0.3s" }}
+          >
             <DashboardVisual />
           </div>
         </div>
 
         {/* Mobile Zia Bubble */}
-        <div className="md:hidden mt-12 flex justify-center animate-fade-in-up" style={{ animationDelay: "0.8s" }}>
+        <div
+          className="md:hidden mt-12 flex justify-center animate-fade-in-up"
+          style={{ animationDelay: "0.8s" }}
+        >
           <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-indigo-300/50 p-5 max-w-sm shadow-xl shadow-indigo-200/30 inline-block hover:shadow-2xl hover:shadow-indigo-300/40 transition-all hover:bg-white/70 hover:border-indigo-400/60 group">
             <p className="text-sm font-medium text-slate-700 text-center leading-relaxed">
-              ✨ <span className="font-semibold text-indigo-700 group-hover:text-indigo-900 transition-colors">"Hold your horses, darling—just aligning things."</span>
+              ✨{" "}
+              <span className="font-semibold text-indigo-700 group-hover:text-indigo-900 transition-colors">
+                "Hold your horses, darling—just aligning things."
+              </span>
             </p>
           </div>
         </div>

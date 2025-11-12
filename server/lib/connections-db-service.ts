@@ -5,7 +5,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { Platform } from "@shared/publishing";
-import { parsePlatformConnection } from "@/types/guards";
+import { parsePlatformConnection } from "../types/guards";
 
 const supabaseUrl =
   process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
@@ -332,7 +332,8 @@ export class ConnectionsDBService {
 
     const stats = {
       total: data?.length || 0,
-      connected: data?.filter((d: unknown) => d.status === "connected").length || 0,
+      connected:
+        data?.filter((d: unknown) => d.status === "connected").length || 0,
       expired: data?.filter((d: unknown) => d.status === "expired").length || 0,
       revoked: data?.filter((d: unknown) => d.status === "revoked").length || 0,
       platforms: [...new Set(data?.map((d: unknown) => d.platform) || [])],

@@ -1,15 +1,15 @@
-import { Facebook, Twitter, Instagram, Linkedin, Music, Youtube, MapPin } from "lucide-react";
-
-interface Post {
-  id: string;
-  title: string;
-  platform: "linkedin" | "instagram" | "facebook" | "twitter" | "tiktok" | "youtube" | "pinterest";
-  status: "draft" | "reviewing" | "approved" | "scheduled";
-  scheduledTime: string;
-  excerpt: string;
-  brand?: string;
-  campaign?: string;
-}
+import { useState } from "react";
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Music,
+  Youtube,
+  MapPin,
+} from "lucide-react";
+import { PostPreviewModal } from "./PostPreviewModal";
+import { Post } from "@/types/post";
 
 interface DayData {
   date: number;
@@ -44,10 +44,12 @@ const MONTH_DATA: DayData[] = [
         title: "Product Launch",
         platform: "linkedin",
         status: "scheduled",
-        scheduledTime: "9:00 AM",
-        excerpt: "Excited to announce our latest features that will transform your workflow.",
+        excerpt:
+          "Excited to announce our latest features that will transform your workflow.",
         brand: "Aligned-20AI",
         campaign: "Product Launch",
+        createdDate: "2024-11-01",
+        scheduledDate: "2024-11-02",
       },
     ],
     isCurrentMonth: true,
@@ -61,20 +63,22 @@ const MONTH_DATA: DayData[] = [
         title: "Behind the Scenes",
         platform: "instagram",
         status: "scheduled",
-        scheduledTime: "2:30 PM",
         excerpt: "Meet the team working magic behind the scenes! 🎥✨",
         brand: "Aligned-20AI",
         campaign: "Brand Awareness",
+        createdDate: "2024-11-01",
+        scheduledDate: "2024-11-04",
       },
       {
         id: "3",
         title: "Weekly Tips",
         platform: "twitter",
-        status: "approved",
-        scheduledTime: "10:00 AM",
+        status: "published",
         excerpt: "Pro tip: Try this workflow hack to save hours weekly...",
         brand: "Brand B",
         campaign: "Customer Spotlight",
+        createdDate: "2024-11-03",
+        scheduledDate: "2024-11-04",
       },
     ],
     isCurrentMonth: true,
@@ -87,11 +91,11 @@ const MONTH_DATA: DayData[] = [
         id: "4",
         title: "Customer Story",
         platform: "facebook",
-        status: "reviewing",
-        scheduledTime: "11:00 AM",
+        status: "draft",
         excerpt: "How our client increased conversions by 45% in 90 days",
         brand: "Aligned-20AI",
         campaign: "Customer Spotlight",
+        createdDate: "2024-11-04",
       },
     ],
     isCurrentMonth: true,
@@ -105,10 +109,12 @@ const MONTH_DATA: DayData[] = [
         title: "TikTok Challenge",
         platform: "tiktok",
         status: "scheduled",
-        scheduledTime: "3:00 PM",
-        excerpt: "Join the #CreativeChallenge and show us your best content! 🎬",
+        excerpt:
+          "Join the #CreativeChallenge and show us your best content! ���",
         brand: "Aligned-20AI",
         campaign: "Product Launch",
+        createdDate: "2024-11-06",
+        scheduledDate: "2024-11-08",
       },
     ],
     isCurrentMonth: true,
@@ -120,11 +126,13 @@ const MONTH_DATA: DayData[] = [
         id: "6",
         title: "Video Demo",
         platform: "youtube",
-        status: "approved",
-        scheduledTime: "1:00 PM",
-        excerpt: "Full walkthrough of our new dashboard and all its powerful features.",
+        status: "published",
+        excerpt:
+          "Full walkthrough of our new dashboard and all its powerful features.",
         brand: "Brand B",
         campaign: "Product Launch",
+        createdDate: "2024-11-07",
+        scheduledDate: "2024-11-09",
       },
     ],
     isCurrentMonth: true,
@@ -138,10 +146,11 @@ const MONTH_DATA: DayData[] = [
         title: "Design Inspiration",
         platform: "pinterest",
         status: "scheduled",
-        scheduledTime: "4:00 PM",
         excerpt: "30 stunning design layouts to inspire your next campaign",
         brand: "Aligned-20AI",
         campaign: "Holiday Promo",
+        createdDate: "2024-11-09",
+        scheduledDate: "2024-11-11",
       },
     ],
     isCurrentMonth: true,
@@ -158,10 +167,11 @@ const MONTH_DATA: DayData[] = [
         title: "Team Highlights",
         platform: "linkedin",
         status: "scheduled",
-        scheduledTime: "9:00 AM",
         excerpt: "Team feature...",
         brand: "Aligned-20AI",
         campaign: "Brand Awareness",
+        createdDate: "2024-11-14",
+        scheduledDate: "2024-11-16",
       },
     ],
     isCurrentMonth: true,
@@ -197,6 +207,9 @@ export function MonthCalendarView({
   filterPlatforms = [],
   filterCampaign = null,
 }: MonthCalendarViewProps) {
+  const [previewPost, setPreviewPost] = useState<Post | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+
   const filteredDays = MONTH_DATA.map((day) => ({
     ...day,
     posts: day.posts.filter((post) => {
@@ -211,7 +224,8 @@ export function MonthCalendarView({
           youtube: "YouTube",
           pinterest: "Pinterest",
         };
-        if (!filterPlatforms.includes(platformNames[post.platform])) return false;
+        if (!filterPlatforms.includes(platformNames[post.platform]))
+          return false;
       }
       if (filterCampaign && post.campaign !== filterCampaign) return false;
       return true;
@@ -228,13 +242,18 @@ export function MonthCalendarView({
         {/* Month header */}
         <div className="mb-6 pb-4 border-b border-indigo-200/40">
           <h3 className="text-lg font-black text-slate-900">November 2024</h3>
-          <p className="text-xs text-slate-600 font-medium">Click a day to see details</p>
+          <p className="text-xs text-slate-600 font-medium">
+            Click a day to see details
+          </p>
         </div>
 
         {/* Week day headers */}
         <div className="grid grid-cols-7 gap-2 mb-2">
           {weekDays.map((day) => (
-            <div key={day} className="text-center text-xs font-black text-slate-600 py-2">
+            <div
+              key={day}
+              className="text-center text-xs font-black text-slate-600 py-2"
+            >
               {day}
             </div>
           ))}
@@ -251,46 +270,63 @@ export function MonthCalendarView({
                   : "bg-slate-100/30 border-slate-200/30 opacity-50"
               }`}
             >
-              <span className={`text-xs font-bold ${day.isCurrentMonth ? "text-slate-900" : "text-slate-500"}`}>
+              <span
+                className={`text-xs font-bold ${day.isCurrentMonth ? "text-slate-900" : "text-slate-500"}`}
+              >
                 {day.date}
               </span>
 
               {day.posts.length > 0 && day.isCurrentMonth && (
-                <div className="mt-auto space-y-1">
-                  {day.posts.slice(0, 2).map((post) => {
+                <div className="mt-auto flex flex-wrap gap-1.5 items-center justify-start">
+                  {day.posts.slice(0, 3).map((post) => {
                     const Icon = PLATFORM_ICONS[post.platform];
-                    const statusColors = {
-                      draft: "bg-slate-100 text-slate-700",
-                      reviewing: "bg-amber-100 text-amber-700",
-                      approved: "bg-green-100 text-green-700",
-                      scheduled: "bg-blue-100 text-blue-700",
-                    };
+                    const statusIndicator =
+                      post.status === "draft"
+                        ? "🔲"
+                        : post.status === "reviewing"
+                          ? "🔄"
+                          : post.status === "published"
+                            ? "✓"
+                            : post.status === "scheduled"
+                              ? "📅"
+                              : "⚠️";
                     return (
-                      <div key={post.id} className="bg-white/60 rounded p-1.5 border border-indigo-100/40 text-left">
-                        <div className="flex items-start gap-1 mb-0.5">
-                          <Icon className="w-3 h-3 text-indigo-600 flex-shrink-0 mt-0.5" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-bold text-slate-900 line-clamp-1 leading-tight">
-                              {post.title}
-                            </p>
-                          </div>
-                        </div>
-                        <p className="text-xs text-slate-500 line-clamp-2 leading-tight ml-4">
-                          {post.excerpt}
-                        </p>
-                        <div className="flex items-center gap-1 mt-0.5 ml-4">
-                          <span className="text-xs text-slate-500">{post.scheduledTime}</span>
-                          <span className={`text-xs font-bold rounded px-1.5 py-0.5 ${statusColors[post.status]}`}>
-                            {post.status === "draft" ? "Draft" : post.status === "reviewing" ? "Review" : post.status === "approved" ? "✓" : "📅"}
+                      <div
+                        key={post.id}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPreviewPost(post);
+                          setShowPreview(true);
+                        }}
+                        className="relative group cursor-pointer"
+                        role="button"
+                        tabIndex={0}
+                        title={`Click to preview: ${post.title}`}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.stopPropagation();
+                            setPreviewPost(post);
+                            setShowPreview(true);
+                          }
+                        }}
+                      >
+                        <div className="flex items-center gap-0.5 bg-white/70 rounded-md px-1.5 py-1 border border-indigo-200/50 hover:border-indigo-400/70 transition-all hover:shadow-sm">
+                          <Icon className="w-3 h-3 text-indigo-600" />
+                          <span className="text-xs font-bold text-slate-700">
+                            {statusIndicator}
                           </span>
+                        </div>
+                        {/* Tooltip on hover */}
+                        <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-slate-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 font-medium shadow-lg">
+                          {post.title}
                         </div>
                       </div>
                     );
                   })}
-                  {day.posts.length > 2 && (
-                    <p className="text-xs text-indigo-600 font-bold group-hover:text-indigo-700 px-2">
-                      +{day.posts.length - 2} more
-                    </p>
+                  {day.posts.length > 3 && (
+                    <div className="text-xs font-bold text-indigo-600 group-hover:text-indigo-700 transition-colors">
+                      +{day.posts.length - 3}
+                    </div>
                   )}
                 </div>
               )}
@@ -304,6 +340,13 @@ export function MonthCalendarView({
           ))}
         </div>
       </div>
+
+      {/* Post Preview Modal */}
+      <PostPreviewModal
+        post={previewPost}
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+      />
     </div>
   );
 }

@@ -1,0 +1,18 @@
+/**
+ * Shimmer Animation for Loading Skeletons
+ * Used by DashboardSystem LoadingSkeleton component
+ */
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Apply to loading skeleton elements */
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}

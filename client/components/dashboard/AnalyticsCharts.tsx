@@ -11,7 +11,6 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  
 } from "recharts";
 import {
   ChartContainer,
@@ -20,6 +19,20 @@ import {
   ChartConfig,
 } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
+
+/**
+ * Chart Color Constants - Sourced from Design Tokens
+ * Using CSS custom properties for consistency across themes
+ */
+const CHART_COLORS = {
+  primary: "var(--color-primary)", // #3D0FD6 - Primary brand color
+  success: "var(--color-success)", // #12B76A - Success/positive trend
+  warning: "var(--color-warning)", // #F59E0B - Warning/alert
+  error: "var(--color-error)", // #DC2626 - Error/negative trend
+  info: "var(--color-info)", // #2563EB - Info state
+  muted: "var(--color-muted)", // #6B7280 - Secondary/comparison
+  slate400: "var(--color-slate-400)", // #94A3B8 - Accent
+} as const;
 
 // Reach/Engagement Area Chart
 interface TrendData {
@@ -31,7 +44,7 @@ interface TrendData {
 export function TrendAreaChart({
   data,
   dataKey = "value",
-  color = "#8b5cf6",
+  color = CHART_COLORS.primary,
   className,
 }: {
   data: TrendData[];
@@ -79,7 +92,7 @@ export function TrendAreaChart({
 // Mini Sparkline (small trend indicator)
 export function Sparkline({
   data,
-  color = "#8b5cf6",
+  color = CHART_COLORS.primary,
   className,
 }: {
   data: number[];
@@ -220,11 +233,11 @@ export function GrowthLineChart({
   const chartConfig: ChartConfig = {
     current: {
       label: "Current Period",
-      color: "#8b5cf6",
+      color: CHART_COLORS.primary,
     },
     previous: {
       label: "Previous Period",
-      color: "#d1d5db",
+      color: CHART_COLORS.muted,
     },
   };
 
@@ -238,7 +251,7 @@ export function GrowthLineChart({
         <Line
           type="monotone"
           dataKey="current"
-          stroke="#8b5cf6"
+          stroke={CHART_COLORS.primary}
           strokeWidth={2}
           dot={{ r: 3 }}
         />
@@ -246,7 +259,7 @@ export function GrowthLineChart({
           <Line
             type="monotone"
             dataKey="previous"
-            stroke="#d1d5db"
+            stroke={CHART_COLORS.muted}
             strokeWidth={2}
             strokeDasharray="5 5"
             dot={{ r: 3 }}
