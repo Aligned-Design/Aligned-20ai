@@ -136,7 +136,7 @@ async function scoreToneAlignment(
   // If we have brand embedding, use semantic similarity
   if (brandEmbedding && process.env.OPENAI_API_KEY) {
     try {
-      const response = await openai.embeddings.create({
+      const response = await getOpenAI().embeddings.create({
         model: "text-embedding-ada-002",
         input: combinedText,
       });
