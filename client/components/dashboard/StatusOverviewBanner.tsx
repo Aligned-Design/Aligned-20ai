@@ -1,4 +1,5 @@
 import { AlertCircle, Clock, Edit3, CheckCircle2, TrendingUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface StatusCard {
   id: string;
@@ -14,9 +15,11 @@ interface StatusCard {
 
 interface StatusOverviewBannerProps {
   onStatusClick?: (statusId: string) => void;
+  navigateToQueue?: boolean;
 }
 
-export function StatusOverviewBanner({ onStatusClick }: StatusOverviewBannerProps) {
+export function StatusOverviewBanner({ onStatusClick, navigateToQueue = false }: StatusOverviewBannerProps) {
+  const navigate = useNavigate();
   const statuses: StatusCard[] = [
     {
       id: "reviewing",
