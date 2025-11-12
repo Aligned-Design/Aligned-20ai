@@ -1,5 +1,3 @@
-import { Facebook, Twitter, Instagram, Linkedin, Music, Youtube, MapPin } from "lucide-react";
-
 import { useState } from "react";
 import {
   Facebook,
