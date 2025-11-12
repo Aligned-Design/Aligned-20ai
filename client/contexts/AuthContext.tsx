@@ -6,6 +6,10 @@ export interface OnboardingUser {
   email: string;
   password: string;
   role: "agency" | "single_business";
+  plan?: "trial" | "base" | "agency";
+  trial_published_count?: number;
+  trial_started_at?: string;
+  trial_expires_at?: string;
   accountType?: string;
   workspaceName?: string;
   clientCount?: number;
@@ -70,7 +74,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const stored = localStorage.getItem("aligned_user");
       if (stored) {
         try {
-          setUser(JSON.parse(stored));
+          const parsedUser = JSON.parse(stored);
+          // Check if user signed up with trial query param
+          const urlParams = new URLSearchParams(window.location.search);
+          if (urlParams.get("trial")) {
+            parsedUser.plan = "trial";
+            parsedUser.trial_published_count = 0;
+            const now = new Date();
+            parsedUser.trial_started_at = now.toISOString();
+            parsedUser.trial_expires_at = new Date(
+              now.getTime() + 7 * 24 * 60 * 60 * 1000,
+            ).toISOString();
+          }
+          setUser(parsedUser);
         } catch (err) {
           console.warn(
             "Failed to parse aligned_user, clearing corrupted localStorage key",
@@ -98,58 +114,75 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         try {
           setOnboardingStep(JSON.parse(storedStep));
         } catch (err) {
-          console.warn(
-            "Failed to parse aligned_onboarding_step, clearing corrupted key",
-            err,
-          );
+          console.warn("Failed to parse onboarding_step, clearing key", err);
           localStorage.removeItem("aligned_onboarding_step");
         }
       }
     } catch (err) {
-      console.error("Error reading auth localStorage", err);
+      console.error("Unexpected error loading auth state:", err);
     }
   }, []);
 
+  // Persist to localStorage on change
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("aligned_user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("aligned_user");
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (brandSnapshot) {
+      localStorage.setItem("aligned_brand", JSON.stringify(brandSnapshot));
+    } else {
+      localStorage.removeItem("aligned_brand");
+    }
+  }, [brandSnapshot]);
+
+  useEffect(() => {
+    if (onboardingStep !== null) {
+      localStorage.setItem(
+        "aligned_onboarding_step",
+        JSON.stringify(onboardingStep),
+      );
+    } else {
+      localStorage.removeItem("aligned_onboarding_step");
+    }
+  }, [onboardingStep]);
+
   const signUp = (newUser: Partial<OnboardingUser>) => {
-    const user: OnboardingUser = {
-      id: `user-${Date.now()}`,
+    // Check for trial mode from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const isTrial = urlParams.get("trial") === "7";
+
+    const userData: OnboardingUser = {
+      id: Date.now().toString(),
       name: newUser.name || "",
       email: newUser.email || "",
       password: newUser.password || "",
       role: newUser.role || "single_business",
+      plan: isTrial ? "trial" : "base",
+      ...(isTrial && {
+        trial_published_count: 0,
+        trial_started_at: new Date().toISOString(),
+        trial_expires_at: new Date(
+          Date.now() + 7 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+      }),
       ...newUser,
     };
-    setUser(user);
-    localStorage.setItem("aligned_user", JSON.stringify(user));
-    setOnboardingStep(1);
-    localStorage.setItem("aligned_onboarding_step", "1");
+
+    setUser(userData);
+    setOnboardingStep(2);
   };
 
   const updateUser = (updates: Partial<OnboardingUser>) => {
-    if (user) {
-      const updated = { ...user, ...updates };
-      setUser(updated);
-      localStorage.setItem("aligned_user", JSON.stringify(updated));
-    }
-  };
-
-  const handleSetBrandSnapshot = (snapshot: BrandSnapshot) => {
-    setBrandSnapshot(snapshot);
-    localStorage.setItem("aligned_brand", JSON.stringify(snapshot));
-  };
-
-  const handleSetOnboardingStep = (step: OnboardingStep) => {
-    setOnboardingStep(step);
-    if (step) {
-      localStorage.setItem("aligned_onboarding_step", JSON.stringify(step));
-    } else {
-      localStorage.removeItem("aligned_onboarding_step");
-    }
+    setUser((prev) => (prev ? { ...prev, ...updates } : null));
   };
 
   const completeOnboarding = () => {
     setOnboardingStep(null);
-    localStorage.removeItem("aligned_onboarding_step");
   };
 
   const logout = () => {
@@ -170,8 +203,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         isAuthenticated: !!user,
         signUp,
         updateUser,
-        setBrandSnapshot: handleSetBrandSnapshot,
-        setOnboardingStep: handleSetOnboardingStep,
+        setBrandSnapshot,
+        setOnboardingStep,
         completeOnboarding,
         logout,
       }}
@@ -184,7 +217,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
