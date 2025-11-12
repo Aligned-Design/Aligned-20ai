@@ -17,7 +17,7 @@ import { requireScope } from "./middleware/requireScope";
 // import mediaManagementRouter from "./routes/media-management";
 // import publishingRouter from "./routes/publishing-router";
 // import orchestrationRouter from "./routes/orchestration";
-import milestonesRouter from "./routes/milestones";
+// import milestonesRouter from "./routes/milestones";
 // import trialRouter from "./routes/trial";
 // import billingRouter from "./routes/billing";
 // import billingReactivationRouter from "./routes/billing-reactivation";
