@@ -45,7 +45,7 @@ interface TrendData {
 export function TrendAreaChart({
   data,
   dataKey = "value",
-  color = "#8b5cf6",
+  color = CHART_COLORS.primary,
   className,
 }: {
   data: TrendData[];
