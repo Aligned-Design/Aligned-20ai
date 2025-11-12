@@ -92,7 +92,7 @@ export function StatusOverviewBanner({ onStatusClick, navigateToQueue = false }:
         <button
           key={status.id}
           onClick={() => handleClick(status.id)}
-          className={`group relative p-4 rounded-lg transition-all duration-300 border hover:shadow-lg hover:scale-105 active:scale-95 ${status.bgColor} ${status.borderColor}`}
+          className={`group relative p-4 rounded-lg transition-all duration-300 border cursor-pointer hover:shadow-lg hover:-translate-y-1 active:scale-95 ${status.bgColor} ${status.borderColor} hover:border-current`}
         >
           {/* Priority/Urgent badge */}
           {status.priority && (
