@@ -1,169 +1,50 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  LayoutDashboard,
-  Building2,
-  Calendar,
-  FileText,
-  BarChart3,
-  Settings,
-  Brain,
-  Users,
-  Zap,
-  ImageIcon,
-  CreditCard,
-  LogOut,
-  Search,
-  CalendarPlus,
-  Star,
-  CheckCircle2,
-  Plus,
-  Sparkles,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+/**
+ * Main application layout
+ * Provides sidebar, header, and main content area
+ */
+
+import { ReactNode } from 'react';
+import { MainNavigation } from './MainNavigation';
+import { Header } from './Header';
+import { useCan } from '@/lib/auth/useCan';
 
 interface AppLayoutProps {
-  children: React.ReactNode;
-  userRole?: "agency" | "client";
+  children: ReactNode;
+  brandName?: string;
   onLogout?: () => void;
 }
 
 export function AppLayout({
   children,
-  userRole = "agency",
+  brandName = "Aligned AI",
   onLogout,
 }: AppLayoutProps) {
-  const location = useLocation();
-  const currentPath = location.pathname;
-
-  const agencyNavItems = [
-    // Dashboard & Brands
-    { path: "/", label: "Overview", icon: LayoutDashboard },
-    { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { path: "/brands", label: "Brands", icon: Building2 },
-
-    // Content Management
-    { path: "/content", label: "Content", icon: FileText, badge: 3 },
-    { path: "/content/create", label: "Create Post", icon: Plus },
-    { path: "/content/generator", label: "AI Generator", icon: Sparkles },
-    { path: "/calendar", label: "Calendar", icon: Calendar },
-    { path: "/events", label: "Events", icon: CalendarPlus },
-    { path: "/review-queue", label: "Review Queue", icon: CheckCircle2 },
-
-    // Analytics & Intelligence
-    { path: "/analytics/brand_1", label: "Analytics", icon: BarChart3 },
-    { path: "/brand-intelligence", label: "Intelligence", icon: Brain },
-    { path: "/reviews", label: "Reviews", icon: Star },
-
-    // Admin & Settings
-    { path: "/integrations", label: "Integrations", icon: Zap },
-    { path: "/media", label: "Media", icon: ImageIcon },
-    { path: "/team", label: "Team", icon: Users },
-    { path: "/billing", label: "Billing", icon: CreditCard },
-    { path: "/settings", label: "Settings", icon: Settings },
-  ];
-
-  const clientNavItems = [
-    { path: "/client", label: "Overview", icon: LayoutDashboard },
-    { path: "/client/analytics", label: "Analytics", icon: BarChart3 },
-    { path: "/client/approvals", label: "Approvals", icon: FileText, badge: 2 },
-  ];
-
-  const navItems = userRole === "agency" ? agencyNavItems : clientNavItems;
+  // Determine layout based on permissions
+  const canManageBrand = useCan('brand:manage');
 
   return (
-    <div className="flex h-screen bg-[var(--surface-1)]">
+    <div className="flex h-screen bg-white">
       {/* Sidebar */}
-      <div className="w-64 bg-[var(--indigo-deep)] text-white border-r border-[rgba(255,255,255,0.06)] flex flex-col">
-        {/* Logo */}
-        <div className="p-6 border-b border-gray-800">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#071025] rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">AI</span>
-            </div>
-            <div>
-              <h2 className="font-semibold text-white">Aligned AI</h2>
-              <p className="text-xs text-slate-400 capitalize">
-                {userRole} Portal
-              </p>
-            </div>
+      <aside className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col">
+        <MainNavigation brandName={brandName} />
+      </aside>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="border-b border-gray-200 bg-white">
+          <Header onLogout={onLogout} />
+        </header>
+
+        {/* Page content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-8">
+            {children}
           </div>
-        </div>
-
-        {/* Search - Agency only */}
-        {userRole === "agency" && (
-          <div className="p-4 border-b border-gray-800">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full pl-10 pr-4 py-2 text-sm border border-[rgba(255,255,255,0.06)] rounded-md bg-[var(--indigo-deep)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent-lime)] focus:border-transparent"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive =
-              currentPath === item.path ||
-              (item.path !== "/" && currentPath.startsWith(item.path));
-
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-[var(--indigo-mid)] text-white border border-[rgba(255,255,255,0.06)]"
-                    : "text-white/90 hover:bg-[var(--indigo-mid)]/20 hover:text-white",
-                )}
-              >
-                <Icon className="h-5 w-5" />
-                <span className="flex-1">{item.label}</span>
-                {item.badge && (
-                  <Badge variant="destructive" className="text-xs">
-                    {item.badge}
-                  </Badge>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* User Menu */}
-        <div className="p-4 border-t border-gray-800">
-          <div className="flex items-center gap-3 p-2 mb-3">
-            <div className="w-8 h-8 bg-slate-600 rounded-full flex items-center justify-center">
-              <span className="text-xs font-semibold text-white">JD</span>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-white">John Doe</p>
-              <p className="text-xs text-slate-400">john@agency.com</p>
-            </div>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full gap-2"
-            onClick={onLogout}
-          >
-            <LogOut className="h-4 w-4" />
-            Sign Out
-          </Button>
-        </div>
+        </main>
       </div>
-
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-auto bg-gray-50">
-        {children}
-      </main>
     </div>
   );
 }
+
+export default AppLayout;

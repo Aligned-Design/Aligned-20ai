@@ -1,37 +1,49 @@
-import React from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import LoginPage from '@/pages/Login';
+/**
+ * Protected route component
+ * Checks authentication and optionally verifies permissions
+ */
+
+import { ReactNode } from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '@/lib/auth/useAuth';
+import { useCan } from '@/lib/auth/useCan';
+import type { Scope } from '@/lib/auth/useCan';
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
-  requiredRole?: 'agency' | 'client';
+  children: ReactNode;
+  requiredScope?: Scope;
+  fallback?: ReactNode;
 }
 
-export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
-  const { isAuthenticated, userRole, loading } = useAuth();
+export function ProtectedRoute({
+  children,
+  requiredScope,
+  fallback,
+}: ProtectedRouteProps) {
+  const { isAuthenticated, user } = useAuth();
+  const hasPermission = useCan(requiredScope || 'brand:view');
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
+  // Not authenticated - redirect to login
   if (!isAuthenticated) {
-    return <LoginPage />;
+    return <Navigate to="/" replace />;
   }
 
-  if (requiredRole && userRole !== requiredRole) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+  // Has authentication but missing required permission
+  if (requiredScope && !hasPermission) {
+    return fallback ? (
+      <>{fallback}</>
+    ) : (
+      <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
-          <p className="text-gray-600">You don't have permission to access this page.</p>
+          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
+          <p className="text-gray-600">You don't have permission to view this page.</p>
         </div>
       </div>
     );
   }
 
+  // All checks passed
   return <>{children}</>;
 }
+
+export default ProtectedRoute;
