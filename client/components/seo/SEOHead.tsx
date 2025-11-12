@@ -1,11 +1,13 @@
 /**
  * SEO Head Component
  * Dynamically manages page titles, meta descriptions, and SEO tags
+ * Integrates with route metadata and domain detection
  */
 
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getRouteMetadata } from '@/lib/route-metadata';
+import { getCanonicalUrl, getOgImageUrl, getDomainContext } from '@/lib/domain-detection';
 
 interface SEOHeadProps {
   title?: string;
@@ -21,24 +23,31 @@ export function SEOHead({
   description,
   noindex,
   canonicalUrl,
-  ogImage = '/og-default.jpg',
+  ogImage,
   ogType = 'website',
 }: SEOHeadProps) {
   const location = useLocation();
   const routeMetadata = getRouteMetadata(location.pathname);
+  const domainContext = getDomainContext();
 
   // Use props or fall back to route metadata
   const finalTitle = title || routeMetadata?.title || 'Aligned AI';
   const finalDescription =
     description ||
     routeMetadata?.description ||
-    'AI-powered content creation platform';
-  const finalNoindex = noindex ?? routeMetadata?.noindex ?? false;
+    'AI-powered content creation platform for agencies and brands';
+  
+  // Noindex logic: use prop, or route metadata, or auto-detect based on visibility
+  const shouldNoindex = noindex ?? routeMetadata?.noindex ?? (routeMetadata?.visibility !== 'public');
+  
   const finalCanonical =
     canonicalUrl ||
     routeMetadata?.canonicalUrl ||
-    `https://www.aligned-bydesign.com${location.pathname}`;
-  const finalOgImage = ogImage;
+    getCanonicalUrl(location.pathname);
+  
+  const finalOgImage = getOgImageUrl(
+    ogImage || routeMetadata?.ogImage || '/og-default.jpg'
+  );
 
   useEffect(() => {
     // Update page title
@@ -46,7 +55,7 @@ export function SEOHead({
 
     // Update or create meta tags
     updateMetaTag('description', finalDescription);
-    updateMetaTag('robots', finalNoindex ? 'noindex, nofollow' : 'index, follow');
+    updateMetaTag('robots', shouldNoindex ? 'noindex, nofollow' : 'index, follow');
 
     // Update canonical link
     updateCanonicalLink(finalCanonical);
@@ -64,13 +73,23 @@ export function SEOHead({
     updateMetaTag('twitter:title', finalTitle, 'name');
     updateMetaTag('twitter:description', finalDescription, 'name');
     updateMetaTag('twitter:image', finalOgImage, 'name');
+
+    // Add viewport meta tag for responsive design
+    updateMetaTag('viewport', 'width=device-width, initial-scale=1.0', 'name');
+
+    // Add theme color based on context
+    const themeColor = domainContext.isWhiteLabel 
+      ? getComputedStyle(document.documentElement).getPropertyValue('--brand-primary') || '#8B5CF6'
+      : '#8B5CF6';
+    updateMetaTag('theme-color', themeColor, 'name');
   }, [
     finalTitle,
     finalDescription,
-    finalNoindex,
+    shouldNoindex,
     finalCanonical,
     finalOgImage,
     ogType,
+    domainContext.isWhiteLabel,
   ]);
 
   return null; // This component only manages head tags

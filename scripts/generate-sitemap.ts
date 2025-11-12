@@ -1,59 +1,77 @@
 /**
- * Sitemap Generation Script
+ * Sitemap Generator
  * Generates sitemap.xml from route metadata
- * 
- * Usage: tsx scripts/generate-sitemap.ts
+ * Run with: npx tsx scripts/generate-sitemap.ts
  */
 
 import { writeFileSync } from 'fs';
-import { getPublicRoutes } from '../client/lib/route-metadata';
+import { join } from 'path';
+import { ROUTE_METADATA } from '../client/lib/route-metadata';
 
 const BASE_URL = 'https://www.aligned-bydesign.com';
-const OUTPUT_PATH = 'public/sitemap.xml';
+const OUTPUT_PATH = join(process.cwd(), 'public', 'sitemap.xml');
+
+interface SitemapUrl {
+  loc: string;
+  lastmod: string;
+  changefreq: string;
+  priority: string;
+}
 
 function generateSitemap(): string {
-  const publicRoutes = getPublicRoutes();
-  const currentDate = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Get all public routes (indexable)
+  const publicRoutes = Object.values(ROUTE_METADATA).filter(
+    (route) => route.visibility === 'public' && !route.noindex
+  );
 
-  const urlEntries = publicRoutes.map((route) => {
-    const priority = route.path === '/' ? '1.0' : '0.8';
-    const changefreq =
-      route.path === '/privacy' || route.path === '/terms'
-        ? 'yearly'
-        : route.path === '/features' || route.path === '/integrations'
-        ? 'weekly'
-        : 'monthly';
+  // Map routes to sitemap URLs
+  const urls: SitemapUrl[] = publicRoutes.map((route) => ({
+    loc: `${BASE_URL}${route.path}`,
+    lastmod: today,
+    changefreq: getChangeFreq(route.path),
+    priority: getPriority(route.path),
+  }));
 
-    return `  <url>
-    <loc>${BASE_URL}${route.path}</loc>
-    <lastmod>${currentDate}</lastmod>
-    <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>
-  </url>`;
-  }).join('\n\n');
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
+  // Generate XML
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-  
-${urlEntries}
+  ${urls.map((url) => `
+  <url>
+    <loc>${url.loc}</loc>
+    <lastmod>${url.lastmod}</lastmod>
+    <changefreq>${url.changefreq}</changefreq>
+    <priority>${url.priority}</priority>
+  </url>`).join('')}
+</urlset>`;
 
-</urlset>
-`;
+  return xml;
 }
 
-function main() {
-  try {
-    const sitemap = generateSitemap();
-    writeFileSync(OUTPUT_PATH, sitemap, 'utf-8');
-    console.log(`✅ Sitemap generated successfully at ${OUTPUT_PATH}`);
-    console.log(`📄 Included ${getPublicRoutes().length} public routes`);
-  } catch (error) {
-    console.error('❌ Failed to generate sitemap:', error);
-    process.exit(1);
-  }
+function getChangeFreq(path: string): string {
+  if (path === '/') return 'weekly';
+  if (path === '/pricing') return 'monthly';
+  if (path === '/features') return 'weekly';
+  if (path === '/integrations') return 'weekly';
+  if (path === '/privacy' || path === '/terms') return 'yearly';
+  return 'monthly';
 }
 
-main();
+function getPriority(path: string): string {
+  if (path === '/') return '1.0';
+  if (path === '/features' || path === '/pricing' || path === '/integrations') return '0.9';
+  if (path === '/about' || path === '/contact') return '0.8';
+  if (path === '/help') return '0.7';
+  if (path === '/privacy' || path === '/terms') return '0.5';
+  return '0.6';
+}
+
+// Generate and write sitemap
+const sitemap = generateSitemap();
+writeFileSync(OUTPUT_PATH, sitemap, 'utf-8');
+console.log('✅ Sitemap generated successfully at:', OUTPUT_PATH);
+console.log(`📊 Total URLs: ${Object.values(ROUTE_METADATA).filter(r => r.visibility === 'public' && !r.noindex).length}`);
