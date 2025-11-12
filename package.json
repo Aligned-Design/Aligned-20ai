@@ -29,6 +29,7 @@
     "validate:security": "tsx server/scripts/validate-security.ts",
     "verify:supabase": "tsx server/utils/verify-supabase-setup.ts",
     "security:check": "npm audit && npm run validate:security",
+    "test:agents:latency": "tsx scripts/smoke-agents.ts",
     "predeploy": "npm run security:check && npm run typecheck && npm run lint && npm run test"
   },
   "dependencies": {
