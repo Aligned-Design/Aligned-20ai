@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Users,
   Heart,
@@ -10,8 +10,8 @@ import {
   MessageCircle,
   Sparkles,
   Eye,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface PerformanceMetric {
   icon: React.ReactNode;
@@ -30,7 +30,7 @@ interface TopPost {
   date: string;
   reach: number;
   engagement: number;
-  sentiment: 'positive' | 'neutral' | 'mixed';
+  sentiment: "positive" | "neutral" | "mixed";
 }
 
 interface ClientAnalyticsDashboardProps {
@@ -39,62 +39,63 @@ interface ClientAnalyticsDashboardProps {
   className?: string;
 }
 
-export function ClientAnalyticsDashboard({ 
-  brandName, 
-  agencyName, 
-  className 
+export function ClientAnalyticsDashboard({
+  brandName,
+  agencyName,
+  className,
 }: ClientAnalyticsDashboardProps) {
   const performanceMetrics: PerformanceMetric[] = [
     {
       icon: <Users className="h-6 w-6" />,
-      label: 'Followers',
-      value: '8,250',
+      label: "Followers",
+      value: "8,250",
       change: 3,
-      color: 'text-purple-600 bg-purple-100',
-      explanation: 'You gained 240 new followers this month',
+      color: "text-purple-600 bg-purple-100",
+      explanation: "You gained 240 new followers this month",
     },
     {
       icon: <Heart className="h-6 w-6" />,
-      label: 'Average Engagement',
-      value: '245',
+      label: "Average Engagement",
+      value: "245",
       change: 12,
-      color: 'text-pink-600 bg-pink-100',
-      explanation: 'likes/post (customers love your content!)',
+      color: "text-pink-600 bg-pink-100",
+      explanation: "likes/post (customers love your content!)",
     },
     {
       icon: <ExternalLink className="h-6 w-6" />,
-      label: 'Link Clicks',
-      value: '1,200',
+      label: "Link Clicks",
+      value: "1,200",
       change: 45,
-      color: 'text-blue-600 bg-blue-100',
-      explanation: 'People clicking through to your website',
+      color: "text-blue-600 bg-blue-100",
+      explanation: "People clicking through to your website",
     },
     {
       icon: <MessageCircle className="h-6 w-6" />,
-      label: 'Comments',
-      value: '156',
+      label: "Comments",
+      value: "156",
       change: 18,
-      color: 'text-green-600 bg-green-100',
-      explanation: 'Customers love your authentic tone!',
+      color: "text-green-600 bg-green-100",
+      explanation: "Customers love your authentic tone!",
     },
   ];
 
   const topPost: TopPost = {
-    id: '1',
-    thumbnail: '/placeholder.svg',
-    caption: 'Behind the scenes: How we create custom designs for every client...',
-    platform: 'Instagram',
-    date: 'Nov 15, 2024',
+    id: "1",
+    thumbnail: "/placeholder.svg",
+    caption:
+      "Behind the scenes: How we create custom designs for every client...",
+    platform: "Instagram",
+    date: "Nov 15, 2024",
     reach: 12400,
     engagement: 892,
-    sentiment: 'positive',
+    sentiment: "positive",
   };
 
   const brandFidelityTrend = {
     current: 92,
     previous: 87,
     improvement: 5,
-    example: 'Your comments are 18% more positive since we adjusted tone',
+    example: "Your comments are 18% more positive since we adjusted tone",
   };
 
   return (
@@ -115,15 +116,14 @@ export function ClientAnalyticsDashboard({
           <Card key={idx} className="hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className={cn('p-3 rounded-full', metric.color)}>
+                <div className={cn("p-3 rounded-full", metric.color)}>
                   {metric.icon}
                 </div>
                 <Badge
-                  variant={metric.change > 0 ? 'default' : 'secondary'}
+                  variant={metric.change > 0 ? "default" : "secondary"}
                   className="gap-1 bg-green-50 text-green-700 border-green-200"
                 >
-                  <TrendingUp className="h-3 w-3" />
-                  +{metric.change}%
+                  <TrendingUp className="h-3 w-3" />+{metric.change}%
                 </Badge>
               </div>
               <div>
@@ -264,19 +264,23 @@ export function ClientAnalyticsDashboard({
             {/* Details */}
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-3">
-                <Badge variant="default" className="gap-1 bg-green-100 text-green-700 border-green-200">
-                  <TrendingUp className="h-3 w-3" />
-                  +{brandFidelityTrend.improvement}% improvement
+                <Badge
+                  variant="default"
+                  className="gap-1 bg-green-100 text-green-700 border-green-200"
+                >
+                  <TrendingUp className="h-3 w-3" />+
+                  {brandFidelityTrend.improvement}% improvement
                 </Badge>
                 <span className="text-sm text-slate-600">
                   vs last month ({brandFidelityTrend.previous}%)
                 </span>
               </div>
-              
+
               <p className="text-slate-700 mb-3 leading-relaxed">
-                Your brand voice is becoming more consistent and authentic across all platforms.
+                Your brand voice is becoming more consistent and authentic
+                across all platforms.
               </p>
-              
+
               <div className="p-3 bg-white rounded-lg border border-indigo-200">
                 <p className="text-sm text-indigo-900">
                   <strong>Example:</strong> {brandFidelityTrend.example}

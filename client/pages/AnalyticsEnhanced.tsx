@@ -1,24 +1,24 @@
-import { useState } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
-import { FirstVisitTooltip } from '@/components/dashboard/FirstVisitTooltip';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { 
+import { useState } from "react";
+import { MainLayout } from "@/components/layout/MainLayout";
+import { FirstVisitTooltip } from "@/components/dashboard/FirstVisitTooltip";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
   SmartDashboard,
   ActionableInsights,
   GoalContentBridge,
   RootCauseAnalysis,
   SmartRefreshSettings,
   mockMetricChanges,
-} from '@/components/analytics';
-import { PlatformMetricsCarousel } from '@/components/dashboard/PlatformMetricsCarousel';
-import { ReportingMenu } from '@/components/dashboard/ReportingMenu';
-import { ReportSettingsModal } from '@/components/dashboard/ReportSettingsModal';
-import { EmailReportDialog } from '@/components/dashboard/EmailReportDialog';
-import { PlatformMetrics, DATE_RANGES } from '@/types/analytics';
-import { Calendar, Settings as SettingsIcon, TrendingUp } from 'lucide-react';
-import { useWorkspace } from '@/contexts/WorkspaceContext';
+} from "@/components/analytics";
+import { PlatformMetricsCarousel } from "@/components/dashboard/PlatformMetricsCarousel";
+import { ReportingMenu } from "@/components/dashboard/ReportingMenu";
+import { ReportSettingsModal } from "@/components/dashboard/ReportSettingsModal";
+import { EmailReportDialog } from "@/components/dashboard/EmailReportDialog";
+import { PlatformMetrics, DATE_RANGES } from "@/types/analytics";
+import { Calendar, Settings as SettingsIcon, TrendingUp } from "lucide-react";
+import { useWorkspace } from "@/contexts/WorkspaceContext";
 
 export default function AnalyticsEnhanced() {
   const { currentWorkspace } = useWorkspace();
@@ -26,7 +26,9 @@ export default function AnalyticsEnhanced() {
   const [showReportSettings, setShowReportSettings] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showRefreshSettings, setShowRefreshSettings] = useState(false);
-  const [userRole] = useState<'first_time' | 'power_user' | 'client'>('first_time');
+  const [userRole] = useState<"first_time" | "power_user" | "client">(
+    "first_time",
+  );
   const [showRootCause, setShowRootCause] = useState(true);
 
   // Mock platform metrics data
@@ -83,7 +85,7 @@ export default function AnalyticsEnhanced() {
 
   const handleRefresh = async () => {
     // Implement refresh logic
-    console.log('Refreshing analytics data...');
+    console.log("Refreshing analytics data...");
   };
 
   return (
@@ -98,7 +100,8 @@ export default function AnalyticsEnhanced() {
                   Analytics
                 </h1>
                 <p className="text-slate-600 text-xs sm:text-sm font-medium">
-                  {currentWorkspace?.logo} {currentWorkspace?.name} — Smart, actionable insights
+                  {currentWorkspace?.logo} {currentWorkspace?.name} — Smart,
+                  actionable insights
                 </p>
               </div>
               <div className="flex gap-2">
@@ -154,7 +157,7 @@ export default function AnalyticsEnhanced() {
                 <RootCauseAnalysis
                   changes={mockMetricChanges}
                   onDismiss={(metric) => {
-                    console.log('Dismissed:', metric);
+                    console.log("Dismissed:", metric);
                     setShowRootCause(false);
                   }}
                 />
@@ -242,7 +245,9 @@ export default function AnalyticsEnhanced() {
         isOpen={showEmailDialog}
         onClose={() => setShowEmailDialog(false)}
         onSend={(emails) => {
-          alert(`Report sent to: ${emails.join(", ")}\nDate Range: ${dateRange.label}`);
+          alert(
+            `Report sent to: ${emails.join(", ")}\nDate Range: ${dateRange.label}`,
+          );
           setShowEmailDialog(false);
         }}
         dateRangeLabel={dateRange.label}

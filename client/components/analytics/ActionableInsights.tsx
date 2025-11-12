@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Sparkles,
   Play,
@@ -11,19 +11,19 @@ import {
   TrendingUp,
   ChevronRight,
   Check,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface ActionableInsight {
   id: string;
   title: string;
   description: string;
   evidence: string;
-  impact: 'high' | 'medium' | 'low';
+  impact: "high" | "medium" | "low";
   actions: {
     label: string;
-    type: 'primary' | 'secondary' | 'preview';
+    type: "primary" | "secondary" | "preview";
     route?: string;
     previewData?: unknown;
   }[];
@@ -39,106 +39,115 @@ export function ActionableInsights({ className }: ActionableInsightsProps) {
   const navigate = useNavigate();
   const [insights, setInsights] = useState<ActionableInsight[]>([
     {
-      id: '1',
-      title: '🎬 Reels outperform carousels 3:1',
-      description: 'Your video content drives significantly more engagement than static posts.',
-      evidence: 'Reels avg 1.2K engagement vs carousels 400',
-      impact: 'high',
+      id: "1",
+      title: "🎬 Reels outperform carousels 3:1",
+      description:
+        "Your video content drives significantly more engagement than static posts.",
+      evidence: "Reels avg 1.2K engagement vs carousels 400",
+      impact: "high",
       actions: [
         {
-          label: 'Try This',
-          type: 'primary',
-          route: '/creative-studio?preset=reels',
+          label: "Try This",
+          type: "primary",
+          route: "/creative-studio?preset=reels",
         },
         {
-          label: 'Preview Examples',
-          type: 'preview',
-          previewData: { contentType: 'reels' },
+          label: "Preview Examples",
+          type: "preview",
+          previewData: { contentType: "reels" },
         },
         {
-          label: 'Dismiss',
-          type: 'secondary',
+          label: "Dismiss",
+          type: "secondary",
         },
       ],
     },
     {
-      id: '2',
-      title: '📅 Wednesday posts underperform',
-      description: 'Posts published on Wednesdays average 28% lower engagement.',
-      evidence: 'Wed avg: 22 engagement vs Fri avg: 42',
-      impact: 'high',
+      id: "2",
+      title: "📅 Wednesday posts underperform",
+      description:
+        "Posts published on Wednesdays average 28% lower engagement.",
+      evidence: "Wed avg: 22 engagement vs Fri avg: 42",
+      impact: "high",
       actions: [
         {
-          label: 'Adjust Schedule',
-          type: 'primary',
-          route: '/calendar',
+          label: "Adjust Schedule",
+          type: "primary",
+          route: "/calendar",
         },
         {
-          label: 'Learn More',
-          type: 'secondary',
+          label: "Learn More",
+          type: "secondary",
         },
         {
-          label: 'Dismiss',
-          type: 'secondary',
+          label: "Dismiss",
+          type: "secondary",
         },
       ],
     },
     {
-      id: '3',
-      title: '🎵 Trending sounds boost reach 2.5×',
-      description: 'Posts using trending audio get significantly more views than original audio.',
-      evidence: 'Trending audio: 28K avg reach vs Original: 11K',
-      impact: 'medium',
+      id: "3",
+      title: "🎵 Trending sounds boost reach 2.5×",
+      description:
+        "Posts using trending audio get significantly more views than original audio.",
+      evidence: "Trending audio: 28K avg reach vs Original: 11K",
+      impact: "medium",
       actions: [
         {
-          label: 'Trending Audio Ideas',
-          type: 'primary',
-          route: '/creative-studio?audio=trending',
+          label: "Trending Audio Ideas",
+          type: "primary",
+          route: "/creative-studio?audio=trending",
         },
         {
-          label: 'Preview',
-          type: 'preview',
+          label: "Preview",
+          type: "preview",
         },
         {
-          label: 'Dismiss',
-          type: 'secondary',
+          label: "Dismiss",
+          type: "secondary",
         },
       ],
     },
   ]);
 
-  const [feedbackGiven, setFeedbackGiven] = useState<Record<string, 'acted' | 'dismissed'>>({});
+  const [feedbackGiven, setFeedbackGiven] = useState<
+    Record<string, "acted" | "dismissed">
+  >({});
 
-  const handleAction = (insightId: string, actionType: 'primary' | 'secondary' | 'preview', route?: string) => {
-    if (actionType === 'primary' && route) {
+  const handleAction = (
+    insightId: string,
+    actionType: "primary" | "secondary" | "preview",
+    route?: string,
+  ) => {
+    if (actionType === "primary" && route) {
       // Mark as acted on
-      setFeedbackGiven(prev => ({ ...prev, [insightId]: 'acted' }));
-      setInsights(prev => prev.map(i => 
-        i.id === insightId ? { ...i, acted: true } : i
-      ));
+      setFeedbackGiven((prev) => ({ ...prev, [insightId]: "acted" }));
+      setInsights((prev) =>
+        prev.map((i) => (i.id === insightId ? { ...i, acted: true } : i)),
+      );
 
       // Track analytics
       if (window.posthog) {
-        window.posthog.capture('insight_acted', { insightId });
+        window.posthog.capture("insight_acted", { insightId });
       }
 
       // Navigate to route
       navigate(route);
-    } else if (actionType === 'secondary' && actionType !== 'preview') {
+    } else if (actionType === "secondary" && actionType !== "preview") {
       // Dismiss insight
-      setFeedbackGiven(prev => ({ ...prev, [insightId]: 'dismissed' }));
-      setInsights(prev => prev.map(i => 
-        i.id === insightId ? { ...i, dismissed: true } : i
-      ));
+      setFeedbackGiven((prev) => ({ ...prev, [insightId]: "dismissed" }));
+      setInsights((prev) =>
+        prev.map((i) => (i.id === insightId ? { ...i, dismissed: true } : i)),
+      );
 
       // Track analytics
       if (window.posthog) {
-        window.posthog.capture('insight_dismissed', { insightId });
+        window.posthog.capture("insight_dismissed", { insightId });
       }
     }
   };
 
-  const visibleInsights = insights.filter(i => !i.dismissed);
+  const visibleInsights = insights.filter((i) => !i.dismissed);
 
   if (visibleInsights.length === 0) {
     return (
@@ -153,7 +162,9 @@ export function ActionableInsights({ className }: ActionableInsightsProps) {
           <div className="text-center py-8 text-slate-500">
             <Check className="h-12 w-12 mx-auto mb-3 text-green-500" />
             <p className="font-medium">All caught up!</p>
-            <p className="text-sm">No new insights right now. Check back soon.</p>
+            <p className="text-sm">
+              No new insights right now. Check back soon.
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -176,15 +187,16 @@ export function ActionableInsights({ className }: ActionableInsightsProps) {
 
       <div className="space-y-4">
         {visibleInsights.map((insight) => {
-          const hasActed = insight.acted || feedbackGiven[insight.id] === 'acted';
+          const hasActed =
+            insight.acted || feedbackGiven[insight.id] === "acted";
 
           return (
             <Card
               key={insight.id}
               className={cn(
-                'transition-all duration-200',
-                hasActed ? 'opacity-60 bg-slate-50' : 'hover:shadow-md',
-                insight.impact === 'high' && 'border-l-4 border-l-amber-500'
+                "transition-all duration-200",
+                hasActed ? "opacity-60 bg-slate-50" : "hover:shadow-md",
+                insight.impact === "high" && "border-l-4 border-l-amber-500",
               )}
             >
               <CardContent className="p-6">
@@ -202,13 +214,16 @@ export function ActionableInsights({ className }: ActionableInsightsProps) {
                       </div>
 
                       {hasActed && (
-                        <Badge variant="outline" className="gap-1 bg-green-50 text-green-700 border-green-200">
+                        <Badge
+                          variant="outline"
+                          className="gap-1 bg-green-50 text-green-700 border-green-200"
+                        >
                           <ThumbsUp className="h-3 w-3" />
                           Acted On
                         </Badge>
                       )}
 
-                      {insight.impact === 'high' && !hasActed && (
+                      {insight.impact === "high" && !hasActed && (
                         <Badge variant="destructive" className="gap-1">
                           <TrendingUp className="h-3 w-3" />
                           High Impact
@@ -227,11 +242,17 @@ export function ActionableInsights({ className }: ActionableInsightsProps) {
                     {!hasActed && (
                       <div className="flex flex-wrap gap-2">
                         {insight.actions.map((action, idx) => {
-                          if (action.type === 'primary') {
+                          if (action.type === "primary") {
                             return (
                               <Button
                                 key={idx}
-                                onClick={() => handleAction(insight.id, 'primary', action.route)}
+                                onClick={() =>
+                                  handleAction(
+                                    insight.id,
+                                    "primary",
+                                    action.route,
+                                  )
+                                }
                                 className="gap-2"
                               >
                                 <Play className="h-4 w-4" />
@@ -241,12 +262,14 @@ export function ActionableInsights({ className }: ActionableInsightsProps) {
                             );
                           }
 
-                          if (action.type === 'preview') {
+                          if (action.type === "preview") {
                             return (
                               <Button
                                 key={idx}
                                 variant="outline"
-                                onClick={() => handleAction(insight.id, 'preview')}
+                                onClick={() =>
+                                  handleAction(insight.id, "preview")
+                                }
                                 className="gap-2"
                               >
                                 <Eye className="h-4 w-4" />
@@ -259,7 +282,9 @@ export function ActionableInsights({ className }: ActionableInsightsProps) {
                             <Button
                               key={idx}
                               variant="ghost"
-                              onClick={() => handleAction(insight.id, 'secondary')}
+                              onClick={() =>
+                                handleAction(insight.id, "secondary")
+                              }
                               className="gap-2 text-slate-600"
                             >
                               <X className="h-4 w-4" />

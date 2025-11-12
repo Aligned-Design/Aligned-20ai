@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Target,
   TrendingUp,
@@ -10,9 +10,9 @@ import {
   Zap,
   ChevronRight,
   Sparkles,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface ContentMix {
   type: string;
@@ -42,35 +42,36 @@ export function GoalContentBridge({ className }: GoalContentBridgeProps) {
   const navigate = useNavigate();
   const [goals] = useState<GoalData[]>([
     {
-      id: '1',
-      title: 'Reach 10k followers by Q1 2026',
+      id: "1",
+      title: "Reach 10k followers by Q1 2026",
       current: 7200,
       target: 10000,
-      unit: 'followers',
-      deadline: 'March 31, 2026',
+      unit: "followers",
+      deadline: "March 31, 2026",
       daysRemaining: 75,
-      recommendation: 'Post 3×/week (vs current 2×) + prioritize educational content',
+      recommendation:
+        "Post 3×/week (vs current 2×) + prioritize educational content",
       contentMix: [
         {
-          type: 'Educational',
-          emoji: '📚',
+          type: "Educational",
+          emoji: "📚",
           percentage: 40,
-          reason: 'tutorials, tips',
-          impactMetric: 'engagement +22%',
+          reason: "tutorials, tips",
+          impactMetric: "engagement +22%",
         },
         {
-          type: 'Emotional',
-          emoji: '❤️',
+          type: "Emotional",
+          emoji: "❤️",
           percentage: 30,
-          reason: 'storytelling',
-          impactMetric: 'follow growth +18%',
+          reason: "storytelling",
+          impactMetric: "follow growth +18%",
         },
         {
-          type: 'Promotional',
-          emoji: '🎯',
+          type: "Promotional",
+          emoji: "🎯",
           percentage: 30,
-          reason: 'offers',
-          impactMetric: 'conversion +12%',
+          reason: "offers",
+          impactMetric: "conversion +12%",
         },
       ],
     },
@@ -79,11 +80,11 @@ export function GoalContentBridge({ className }: GoalContentBridgeProps) {
   const handleSyncToContentPlan = (goalId: string) => {
     // Track analytics
     if (window.posthog) {
-      window.posthog.capture('goal_synced_to_plan', { goalId });
+      window.posthog.capture("goal_synced_to_plan", { goalId });
     }
 
     // Navigate to creative studio with preset
-    navigate('/creative-studio?goal=' + goalId);
+    navigate("/creative-studio?goal=" + goalId);
   };
 
   if (goals.length === 0) {
@@ -126,7 +127,9 @@ export function GoalContentBridge({ className }: GoalContentBridgeProps) {
 
       <div className="space-y-6">
         {goals.map((goal) => {
-          const progressPercentage = Math.round((goal.current / goal.target) * 100);
+          const progressPercentage = Math.round(
+            (goal.current / goal.target) * 100,
+          );
           const isOnTrack = progressPercentage >= 70;
 
           return (
@@ -150,7 +153,7 @@ export function GoalContentBridge({ className }: GoalContentBridgeProps) {
                   </div>
 
                   <Badge
-                    variant={isOnTrack ? 'default' : 'secondary'}
+                    variant={isOnTrack ? "default" : "secondary"}
                     className="gap-1"
                   >
                     <TrendingUp className="h-3 w-3" />
@@ -163,9 +166,12 @@ export function GoalContentBridge({ className }: GoalContentBridgeProps) {
                 {/* Progress Section */}
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-slate-600">Progress</span>
+                    <span className="text-sm font-medium text-slate-600">
+                      Progress
+                    </span>
                     <span className="text-sm font-bold text-slate-900">
-                      {goal.current.toLocaleString()} / {goal.target.toLocaleString()} {goal.unit}
+                      {goal.current.toLocaleString()} /{" "}
+                      {goal.target.toLocaleString()} {goal.unit}
                     </span>
                   </div>
                   <Progress value={progressPercentage} className="h-3" />
@@ -221,7 +227,10 @@ export function GoalContentBridge({ className }: GoalContentBridgeProps) {
                           </div>
                         </div>
                         <div className="flex-shrink-0">
-                          <Progress value={mix.percentage} className="h-2 w-16" />
+                          <Progress
+                            value={mix.percentage}
+                            className="h-2 w-16"
+                          />
                         </div>
                       </div>
                     ))}

@@ -479,7 +479,10 @@ function AnalyticsSection({ data }: { data: ClientDashboardData }) {
               </p>
             </div>
             <div className="flex gap-2">
-              <Button onClick={() => setShareDialogOpen(true)} className="gap-2">
+              <Button
+                onClick={() => setShareDialogOpen(true)}
+                className="gap-2"
+              >
                 <Share2 className="h-4 w-4" />
                 Create Share Link
               </Button>
