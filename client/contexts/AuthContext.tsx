@@ -22,12 +22,20 @@ export interface OnboardingUser {
 }
 
 export interface BrandSnapshot {
+  name?: string;
   voice: string;
   tone: string[];
   audience: string;
   goal: string;
   colors: string[];
   logo?: string;
+  industry?: string;
+  extractedMetadata?: {
+    keywords: string[];
+    coreMessaging: string[];
+    dos: string[];
+    donts: string[];
+  };
 }
 
 export type OnboardingStep = 1 | 2 | 3 | 3.5 | 4 | 4.5 | 5 | null;
