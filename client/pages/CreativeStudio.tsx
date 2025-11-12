@@ -930,7 +930,7 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
         <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-white/60">
           <div className="p-4 sm:p-6">
             <div className="flex items-center justify-between gap-4 mb-4">
-              <div className="flex-1">
+              <div className="flex items-center gap-3 flex-1">
                 <input
                   type="text"
                   value={state.design.name}
@@ -938,6 +938,11 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
                     handleUpdateDesign({ name: e.target.value })
                   }
                   className="text-2xl font-black text-slate-900 bg-transparent border-none outline-none"
+                />
+                {/* Approval Status Badge */}
+                <ApprovalStatusBadge
+                  status={state.design.approvalStatus || "draft"}
+                  showIcon={true}
                 />
               </div>
               <div className="text-right">
