@@ -283,10 +283,14 @@ export function MonthCalendarView({
                             ? "✓"
                             : "📅";
                     return (
-                      <div
+                      <button
                         key={post.id}
+                        onClick={() => {
+                          setPreviewPost(post);
+                          setShowPreview(true);
+                        }}
                         className="relative group cursor-pointer"
-                        title={`${post.title} - ${post.platform}`}
+                        title={`Click to preview: ${post.title}`}
                       >
                         <div className="flex items-center gap-0.5 bg-white/70 rounded-md px-1.5 py-1 border border-indigo-200/50 hover:border-indigo-400/70 transition-all hover:shadow-sm">
                           <Icon className="w-3 h-3 text-indigo-600" />
@@ -296,7 +300,7 @@ export function MonthCalendarView({
                         <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-slate-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10 font-medium shadow-lg">
                           {post.title}
                         </div>
-                      </div>
+                      </button>
                     );
                   })}
                   {day.posts.length > 3 && (
