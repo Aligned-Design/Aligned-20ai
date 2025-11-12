@@ -1,5 +1,17 @@
 import { Facebook, Twitter, Instagram, Linkedin, Music, Youtube, MapPin } from "lucide-react";
 
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Music,
+  Youtube,
+  MapPin,
+} from "lucide-react";
+import { useState } from "react";
+import { PostPreviewModal } from "./PostPreviewModal";
+
 interface Post {
   id: string;
   title: string;
