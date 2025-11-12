@@ -1,7 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Sparkles,
   TrendingUp,
@@ -9,9 +9,9 @@ import {
   CheckCircle,
   ChevronDown,
   ChevronUp,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useState } from 'react';
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface ToneProfile {
   name: string;
@@ -62,7 +62,12 @@ export function LearningMilestoneNotification({
   const [showPostComparison, setShowPostComparison] = useState(false);
 
   return (
-    <Card className={cn('border-2 border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50', className)}>
+    <Card
+      className={cn(
+        "border-2 border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50",
+        className,
+      )}
+    >
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
@@ -75,7 +80,8 @@ export function LearningMilestoneNotification({
               </Badge>
             </div>
             <CardTitle className="text-2xl font-black text-slate-900">
-              ✨ We've gotten {milestone.brandFidelityImprovement.improvement}% better at your brand voice
+              ✨ We've gotten {milestone.brandFidelityImprovement.improvement}%
+              better at your brand voice
             </CardTitle>
             <p className="text-slate-600 mt-2">
               Our AI has been learning from your content. Here's what improved.
@@ -96,7 +102,7 @@ export function LearningMilestoneNotification({
             <TrendingUp className="h-5 w-5 text-indigo-600" />
             Brand Fidelity Score
           </h3>
-          
+
           <div className="flex items-center gap-8">
             {/* Before Circle */}
             <div className="flex-shrink-0">
@@ -169,8 +175,8 @@ export function LearningMilestoneNotification({
             {/* Improvement Badge */}
             <div className="flex-1">
               <Badge className="gap-1 bg-green-100 text-green-700 border-green-200 text-lg px-4 py-2">
-                <TrendingUp className="h-4 w-4" />
-                +{milestone.brandFidelityImprovement.improvement}% Improvement
+                <TrendingUp className="h-4 w-4" />+
+                {milestone.brandFidelityImprovement.improvement}% Improvement
               </Badge>
             </div>
           </div>
@@ -225,18 +231,31 @@ export function LearningMilestoneNotification({
           {showDetails && (
             <div className="mt-4 space-y-3">
               {milestone.toneProfileChanges.map((tone, idx) => (
-                <div key={idx} className="bg-white rounded-lg p-4 border border-slate-200">
+                <div
+                  key={idx}
+                  className="bg-white rounded-lg p-4 border border-slate-200"
+                >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-slate-900">{tone.name}</span>
+                    <span className="font-medium text-slate-900">
+                      {tone.name}
+                    </span>
                     <div className="flex items-center gap-2 text-sm">
                       <span className="text-slate-600">{tone.before}%</span>
                       <ArrowRight className="h-3 w-3 text-slate-400" />
-                      <span className="font-bold text-indigo-600">{tone.after}%</span>
+                      <span className="font-bold text-indigo-600">
+                        {tone.after}%
+                      </span>
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Progress value={tone.before} className="h-2 flex-1 bg-slate-200" />
-                    <Progress value={tone.after} className="h-2 flex-1 bg-indigo-100" />
+                    <Progress
+                      value={tone.before}
+                      className="h-2 flex-1 bg-slate-200"
+                    />
+                    <Progress
+                      value={tone.after}
+                      className="h-2 flex-1 bg-indigo-100"
+                    />
                   </div>
                 </div>
               ))}
@@ -252,7 +271,9 @@ export function LearningMilestoneNotification({
               onClick={() => setShowPostComparison(!showPostComparison)}
               className="w-full justify-between p-0 h-auto hover:bg-transparent mb-4"
             >
-              <h3 className="font-bold text-slate-900">Example: Post We Improved</h3>
+              <h3 className="font-bold text-slate-900">
+                Example: Post We Improved
+              </h3>
               {showPostComparison ? (
                 <ChevronUp className="h-4 w-4" />
               ) : (
@@ -264,7 +285,9 @@ export function LearningMilestoneNotification({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Before */}
                 <div className="bg-slate-50 border-2 border-slate-300 rounded-lg p-4">
-                  <Badge variant="secondary" className="mb-3">Before</Badge>
+                  <Badge variant="secondary" className="mb-3">
+                    Before
+                  </Badge>
                   {milestone.postExample.beforePreview.thumbnail && (
                     <div className="w-full h-32 bg-slate-200 rounded-lg mb-3 overflow-hidden">
                       <img
@@ -284,7 +307,9 @@ export function LearningMilestoneNotification({
 
                 {/* After */}
                 <div className="bg-indigo-50 border-2 border-indigo-500 rounded-lg p-4">
-                  <Badge className="mb-3 bg-indigo-600">After (AI Optimized)</Badge>
+                  <Badge className="mb-3 bg-indigo-600">
+                    After (AI Optimized)
+                  </Badge>
                   {milestone.postExample.afterPreview.thumbnail && (
                     <div className="w-full h-32 bg-slate-200 rounded-lg mb-3 overflow-hidden">
                       <img
@@ -344,25 +369,28 @@ export const mockLearningMilestone: LearningMilestoneData = {
     after: 94,
     improvement: 23,
   },
-  topPerformerType: 'Reels + testimonials (now prioritized)',
-  audienceInsight: 'Your followers are 40% more likely to comment on educational content',
+  topPerformerType: "Reels + testimonials (now prioritized)",
+  audienceInsight:
+    "Your followers are 40% more likely to comment on educational content",
   toneProfileChanges: [
-    { name: 'Professional', before: 80, after: 75 },
-    { name: 'Warm', before: 60, after: 70 },
-    { name: 'Witty', before: 40, after: 65 },
+    { name: "Professional", before: 80, after: 75 },
+    { name: "Warm", before: 60, after: 70 },
+    { name: "Witty", before: 40, after: 65 },
   ],
   postExample: {
     beforePreview: {
-      thumbnail: '/placeholder.svg',
-      caption: 'Check out our new product features...',
+      thumbnail: "/placeholder.svg",
+      caption: "Check out our new product features...",
       engagement: 450,
     },
     afterPreview: {
-      thumbnail: '/placeholder.svg',
-      caption: "Behind the scenes: Here's how we built this feature based on YOUR feedback...",
+      thumbnail: "/placeholder.svg",
+      caption:
+        "Behind the scenes: Here's how we built this feature based on YOUR feedback...",
       engagement: 603,
     },
-    improvement: '+34%',
+    improvement: "+34%",
   },
-  whatChanged: 'Based on your top 30 posts, we learned you connect more with customers when you include personal stories.',
+  whatChanged:
+    "Based on your top 30 posts, we learned you connect more with customers when you include personal stories.",
 };

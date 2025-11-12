@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Clock,
   DollarSign,
@@ -9,8 +9,8 @@ import {
   Zap,
   BarChart3,
   CheckCircle,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface TimeSaving {
   category: string;
@@ -63,7 +63,7 @@ interface ROIDashboardProps {
 
 export function ROIDashboard({ data, className }: ROIDashboardProps) {
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn("space-y-6", className)}>
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-black text-slate-900 mb-2">
@@ -98,19 +98,32 @@ export function ROIDashboard({ data, className }: ROIDashboardProps) {
           {/* Breakdown */}
           <div className="space-y-3">
             {data.monthlyTimeSaved.breakdown.map((item, idx) => (
-              <div key={idx} className="bg-white rounded-lg p-4 border border-indigo-200">
+              <div
+                key={idx}
+                className="bg-white rounded-lg p-4 border border-indigo-200"
+              >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
-                    <div className={cn('w-10 h-10 rounded-full flex items-center justify-center', item.color)}>
+                    <div
+                      className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center",
+                        item.color,
+                      )}
+                    >
                       {item.icon}
                     </div>
-                    <span className="font-bold text-slate-900">{item.category}</span>
+                    <span className="font-bold text-slate-900">
+                      {item.category}
+                    </span>
                   </div>
                   <span className="text-2xl font-black text-indigo-600">
                     {item.hours}h
                   </span>
                 </div>
-                <Progress value={(item.hours / data.monthlyTimeSaved.total) * 100} className="h-2" />
+                <Progress
+                  value={(item.hours / data.monthlyTimeSaved.total) * 100}
+                  className="h-2"
+                />
               </div>
             ))}
           </div>
@@ -123,7 +136,8 @@ export function ROIDashboard({ data, className }: ROIDashboardProps) {
                   Dollar Value
                 </p>
                 <p className="text-xs text-green-700">
-                  {data.monthlyTimeSaved.total}h × ${data.monthlyTimeSaved.hourlyRate}/hour
+                  {data.monthlyTimeSaved.total}h × $
+                  {data.monthlyTimeSaved.hourlyRate}/hour
                 </p>
               </div>
               <p className="text-4xl font-black text-green-600">
@@ -188,9 +202,17 @@ export function ROIDashboard({ data, className }: ROIDashboardProps) {
           {/* Visual */}
           <div className="bg-white rounded-lg p-6 border border-green-200">
             <p className="text-center text-2xl font-black text-green-600 mb-4">
-              You've saved {data.roiComparison.multiple}× your subscription cost this month
+              You've saved {data.roiComparison.multiple}× your subscription cost
+              this month
             </p>
-            <Progress value={(data.roiComparison.timeSavedValue / data.roiComparison.subscriptionCost) * 100} className="h-4" />
+            <Progress
+              value={
+                (data.roiComparison.timeSavedValue /
+                  data.roiComparison.subscriptionCost) *
+                100
+              }
+              className="h-4"
+            />
           </div>
         </CardContent>
       </Card>
@@ -213,8 +235,8 @@ export function ROIDashboard({ data, className }: ROIDashboardProps) {
                 {data.engagementGrowth.engagementRate.current}%
               </p>
               <Badge className="gap-1 bg-pink-100 text-pink-700 border-pink-200">
-                <TrendingUp className="h-3 w-3" />
-                +{data.engagementGrowth.engagementRate.vsMonth1}% vs month 1
+                <TrendingUp className="h-3 w-3" />+
+                {data.engagementGrowth.engagementRate.vsMonth1}% vs month 1
               </Badge>
             </div>
 
@@ -226,8 +248,8 @@ export function ROIDashboard({ data, className }: ROIDashboardProps) {
                 {data.engagementGrowth.followers.current.toLocaleString()}
               </p>
               <Badge className="gap-1 bg-purple-100 text-purple-700 border-purple-200">
-                <TrendingUp className="h-3 w-3" />
-                +{data.engagementGrowth.followers.vsMonth1}% vs month 1
+                <TrendingUp className="h-3 w-3" />+
+                {data.engagementGrowth.followers.vsMonth1}% vs month 1
               </Badge>
             </div>
 
@@ -239,8 +261,8 @@ export function ROIDashboard({ data, className }: ROIDashboardProps) {
                 {data.engagementGrowth.reach.current.toLocaleString()}
               </p>
               <Badge className="gap-1 bg-blue-100 text-blue-700 border-blue-200">
-                <TrendingUp className="h-3 w-3" />
-                +{data.engagementGrowth.reach.vsMonth1}% vs month 1
+                <TrendingUp className="h-3 w-3" />+
+                {data.engagementGrowth.reach.vsMonth1}% vs month 1
               </Badge>
             </div>
           </div>
@@ -299,9 +321,7 @@ export function ROIDashboard({ data, className }: ROIDashboardProps) {
             <p className="text-5xl font-black mb-3">
               ~${data.vsHiring.annualSavings.toLocaleString()}
             </p>
-            <p className="text-sm opacity-90">
-              {data.vsHiring.description}
-            </p>
+            <p className="text-sm opacity-90">{data.vsHiring.description}</p>
           </div>
         </CardContent>
       </Card>
@@ -315,22 +335,22 @@ export const mockROIData: ROIData = {
     total: 18,
     breakdown: [
       {
-        category: 'AI Content Generation',
+        category: "AI Content Generation",
         hours: 12,
         icon: <Zap className="h-5 w-5 text-white" />,
-        color: 'bg-indigo-600',
+        color: "bg-indigo-600",
       },
       {
-        category: 'Design Templating',
+        category: "Design Templating",
         hours: 4,
         icon: <BarChart3 className="h-5 w-5 text-white" />,
-        color: 'bg-purple-600',
+        color: "bg-purple-600",
       },
       {
-        category: 'Analytics Review',
+        category: "Analytics Review",
         hours: 2,
         icon: <TrendingUp className="h-5 w-5 text-white" />,
-        color: 'bg-blue-600',
+        color: "bg-blue-600",
       },
     ],
     hourlyRate: 75,
@@ -356,12 +376,13 @@ export const mockROIData: ROIData = {
       current: 45200,
       vsMonth1: 28,
     },
-    attribution: '78% increase from optimized posting times (Aligned AI) + improved tone (AI learning)',
+    attribution:
+      "78% increase from optimized posting times (Aligned AI) + improved tone (AI learning)",
   },
   vsHiring: {
     socialMediaManager: 3500,
     alignedCost: 199,
     annualSavings: 40000,
-    description: 'You have a $40k social media team for $2,388/year',
+    description: "You have a $40k social media team for $2,388/year",
   },
 };

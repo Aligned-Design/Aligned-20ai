@@ -1,12 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import {
-  TrendingUp,
-  Palette,
-  FileText,
-  Sparkles,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { TrendingUp, Palette, FileText, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface VoiceProfile {
   trait: string;
@@ -43,9 +38,12 @@ interface BrandEvolutionVisualizationProps {
   className?: string;
 }
 
-export function BrandEvolutionVisualization({ data, className }: BrandEvolutionVisualizationProps) {
+export function BrandEvolutionVisualization({
+  data,
+  className,
+}: BrandEvolutionVisualizationProps) {
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn("space-y-6", className)}>
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-black text-slate-900 mb-2">
@@ -68,13 +66,19 @@ export function BrandEvolutionVisualization({ data, className }: BrandEvolutionV
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
             {/* Month 1 */}
             <div className="bg-white rounded-xl p-6 border border-slate-200">
-              <Badge variant="secondary" className="mb-4">Month 1</Badge>
+              <Badge variant="secondary" className="mb-4">
+                Month 1
+              </Badge>
               <div className="space-y-3">
                 {data.voiceProfile.map((trait, idx) => (
                   <div key={idx}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-slate-700">{trait.trait}</span>
-                      <span className="text-sm font-bold text-slate-900">{trait.month1}%</span>
+                      <span className="text-sm font-medium text-slate-700">
+                        {trait.trait}
+                      </span>
+                      <span className="text-sm font-bold text-slate-900">
+                        {trait.month1}%
+                      </span>
                     </div>
                     <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                       <div
@@ -94,9 +98,13 @@ export function BrandEvolutionVisualization({ data, className }: BrandEvolutionV
                 {data.voiceProfile.map((trait, idx) => (
                   <div key={idx}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-slate-900">{trait.trait}</span>
+                      <span className="text-sm font-medium text-slate-900">
+                        {trait.trait}
+                      </span>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-indigo-600">{trait.now}%</span>
+                        <span className="text-sm font-bold text-indigo-600">
+                          {trait.now}%
+                        </span>
                         <Badge className="text-xs gap-1 bg-green-100 text-green-700 border-green-200">
                           {trait.change}
                         </Badge>
@@ -122,9 +130,7 @@ export function BrandEvolutionVisualization({ data, className }: BrandEvolutionV
                 <h4 className="font-bold text-indigo-900 text-sm mb-1">
                   Key Insight
                 </h4>
-                <p className="text-indigo-800 text-sm">
-                  {data.insight}
-                </p>
+                <p className="text-indigo-800 text-sm">{data.insight}</p>
               </div>
             </div>
           </div>
@@ -143,7 +149,9 @@ export function BrandEvolutionVisualization({ data, className }: BrandEvolutionV
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Month 1 Colors */}
             <div>
-              <Badge variant="secondary" className="mb-4">Month 1</Badge>
+              <Badge variant="secondary" className="mb-4">
+                Month 1
+              </Badge>
               <div className="grid grid-cols-3 gap-3">
                 {data.colorEvolution.month1.map((color, idx) => (
                   <div key={idx} className="text-center">
@@ -170,7 +178,9 @@ export function BrandEvolutionVisualization({ data, className }: BrandEvolutionV
                       className="w-full h-20 rounded-lg mb-2 border-2 border-pink-500 shadow-lg"
                       style={{ backgroundColor: color.color }}
                     />
-                    <p className="text-xs font-medium text-slate-900">{color.name}</p>
+                    <p className="text-xs font-medium text-slate-900">
+                      {color.name}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -193,17 +203,25 @@ export function BrandEvolutionVisualization({ data, className }: BrandEvolutionV
         <CardContent>
           <div className="space-y-4">
             {data.contentPerformance.map((content, idx) => (
-              <div key={idx} className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+              <div
+                key={idx}
+                className="bg-slate-50 rounded-lg p-4 border border-slate-200"
+              >
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="font-bold text-slate-900">{content.type}</h4>
-                  <Badge className={cn(
-                    'gap-1',
-                    content.change > 0 ? 'bg-green-100 text-green-700 border-green-200' : 'bg-red-100 text-red-700 border-red-200'
-                  )}>
-                    {content.change > 0 ? '+' : ''}{content.change}%
+                  <Badge
+                    className={cn(
+                      "gap-1",
+                      content.change > 0
+                        ? "bg-green-100 text-green-700 border-green-200"
+                        : "bg-red-100 text-red-700 border-red-200",
+                    )}
+                  >
+                    {content.change > 0 ? "+" : ""}
+                    {content.change}%
                   </Badge>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-xs text-slate-600 mb-1">Month 1</p>
@@ -213,7 +231,9 @@ export function BrandEvolutionVisualization({ data, className }: BrandEvolutionV
                     <p className="text-xs text-slate-600">avg engagement</p>
                   </div>
                   <div>
-                    <p className="text-xs text-blue-700 mb-1 font-medium">Now</p>
+                    <p className="text-xs text-blue-700 mb-1 font-medium">
+                      Now
+                    </p>
                     <p className="text-2xl font-black text-blue-600">
                       {content.nowEngagement.toLocaleString()}
                     </p>
@@ -223,7 +243,12 @@ export function BrandEvolutionVisualization({ data, className }: BrandEvolutionV
 
                 {/* Visual Bar Comparison */}
                 <div className="mt-4 grid grid-cols-2 gap-2">
-                  <div className="h-2 bg-slate-300 rounded-full" style={{ width: `${(content.month1Engagement / content.nowEngagement) * 100}%` }} />
+                  <div
+                    className="h-2 bg-slate-300 rounded-full"
+                    style={{
+                      width: `${(content.month1Engagement / content.nowEngagement) * 100}%`,
+                    }}
+                  />
                   <div className="h-2 bg-blue-600 rounded-full" />
                 </div>
               </div>
@@ -259,43 +284,45 @@ export function BrandEvolutionVisualization({ data, className }: BrandEvolutionV
 // Example data
 export const mockBrandEvolutionData: BrandEvolutionData = {
   voiceProfile: [
-    { trait: 'Professional', month1: 80, now: 75, change: '-5%' },
-    { trait: 'Warm', month1: 60, now: 70, change: '+10%' },
-    { trait: 'Data-Driven', month1: 50, now: 65, change: '+15%' },
-    { trait: 'Witty', month1: 40, now: 55, change: '+15%' },
+    { trait: "Professional", month1: 80, now: 75, change: "-5%" },
+    { trait: "Warm", month1: 60, now: 70, change: "+10%" },
+    { trait: "Data-Driven", month1: 50, now: 65, change: "+15%" },
+    { trait: "Witty", month1: 40, now: 55, change: "+15%" },
   ],
   colorEvolution: {
     month1: [
-      { color: '#3B82F6', name: 'Blue' },
-      { color: '#6B7280', name: 'Gray' },
-      { color: '#1F2937', name: 'Dark Gray' },
+      { color: "#3B82F6", name: "Blue" },
+      { color: "#6B7280", name: "Gray" },
+      { color: "#1F2937", name: "Dark Gray" },
     ],
     now: [
-      { color: '#3B82F6', name: 'Blue' },
-      { color: '#F97316', name: 'Orange' },
-      { color: '#10B981', name: 'Green' },
+      { color: "#3B82F6", name: "Blue" },
+      { color: "#F97316", name: "Orange" },
+      { color: "#10B981", name: "Green" },
     ],
   },
   contentPerformance: [
     {
-      type: 'Blog-style Posts',
+      type: "Blog-style Posts",
       month1Engagement: 400,
       nowEngagement: 520,
       change: 30,
     },
     {
-      type: 'Testimonials + Reels',
+      type: "Testimonials + Reels",
       month1Engagement: 650,
       nowEngagement: 1200,
       change: 85,
     },
     {
-      type: 'Behind-the-Scenes',
+      type: "Behind-the-Scenes",
       month1Engagement: 320,
       nowEngagement: 890,
       change: 178,
     },
   ],
-  insight: 'Your brand is becoming more human and less corporate. Engagement +34% as a result.',
-  systemExplanation: 'Based on your top 100 posts and audience feedback, we updated how we generate content for you. Your audience responded positively to warmer tones and personal stories, so we adjusted the AI to prioritize these elements while maintaining your professional foundation.',
+  insight:
+    "Your brand is becoming more human and less corporate. Engagement +34% as a result.",
+  systemExplanation:
+    "Based on your top 100 posts and audience feedback, we updated how we generate content for you. Your audience responded positively to warmer tones and personal stories, so we adjusted the AI to prioritize these elements while maintaining your professional foundation.",
 };

@@ -1,11 +1,11 @@
-import { MainLayout } from '@/components/layout/MainLayout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MainLayout } from "@/components/layout/MainLayout";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ROIDashboard,
   mockROIData,
   BrandEvolutionVisualization,
   mockBrandEvolutionData,
-} from '@/components/retention';
+} from "@/components/retention";
 
 export default function InsightsROI() {
   return (

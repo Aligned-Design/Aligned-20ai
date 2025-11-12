@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Trophy,
   Share2,
@@ -9,13 +9,17 @@ import {
   Sparkles,
   X,
   ExternalLink,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { toast } from '@/hooks/use-toast';
-import confetti from 'canvas-confetti';
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
+import confetti from "canvas-confetti";
 
 interface WinData {
-  type: 'engagement_milestone' | 'personal_record' | 'weekly_win' | 'goal_achieved';
+  type:
+    | "engagement_milestone"
+    | "personal_record"
+    | "weekly_win"
+    | "goal_achieved";
   title: string;
   description: string;
   metric?: {
@@ -36,25 +40,32 @@ interface WinCelebrationProps {
   className?: string;
 }
 
-export function WinCelebration({ win, onDismiss, onShare, className }: WinCelebrationProps) {
+export function WinCelebration({
+  win,
+  onDismiss,
+  onShare,
+  className,
+}: WinCelebrationProps) {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     // Fire confetti on mount
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
     if (!prefersReducedMotion) {
       confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#4F46E5', '#818CF8', '#C7D2FE', '#FFD700'],
+        colors: ["#4F46E5", "#818CF8", "#C7D2FE", "#FFD700"],
       });
     }
 
     // Track analytics
     if (window.posthog) {
-      window.posthog.capture('win_celebrated', {
+      window.posthog.capture("win_celebrated", {
         type: win.type,
         metric: win.metric?.value,
       });
@@ -73,15 +84,15 @@ export function WinCelebration({ win, onDismiss, onShare, className }: WinCelebr
         // Fallback to clipboard
         navigator.clipboard.writeText(shareData.text);
         toast({
-          title: 'Copied to clipboard!',
-          description: 'Share your win on social media',
+          title: "Copied to clipboard!",
+          description: "Share your win on social media",
         });
       });
     } else {
       navigator.clipboard.writeText(shareData.text);
       toast({
-        title: 'Copied to clipboard!',
-        description: 'Share your win on social media',
+        title: "Copied to clipboard!",
+        description: "Share your win on social media",
       });
     }
 
@@ -91,7 +102,7 @@ export function WinCelebration({ win, onDismiss, onShare, className }: WinCelebr
 
     // Track analytics
     if (window.posthog) {
-      window.posthog.capture('win_shared', { type: win.type });
+      window.posthog.capture("win_shared", { type: win.type });
     }
   };
 
@@ -105,10 +116,12 @@ export function WinCelebration({ win, onDismiss, onShare, className }: WinCelebr
   if (!isVisible) return null;
 
   return (
-    <Card className={cn(
-      'border-2 border-amber-500 bg-gradient-to-br from-amber-50 to-yellow-50 shadow-2xl',
-      className
-    )}>
+    <Card
+      className={cn(
+        "border-2 border-amber-500 bg-gradient-to-br from-amber-50 to-yellow-50 shadow-2xl",
+        className,
+      )}
+    >
       <CardContent className="pt-6 pb-6">
         <div className="flex items-start gap-4">
           {/* Trophy Icon */}
@@ -126,9 +139,7 @@ export function WinCelebration({ win, onDismiss, onShare, className }: WinCelebr
                 <h3 className="text-2xl font-black text-slate-900 mb-1">
                   {win.title}
                 </h3>
-                <p className="text-slate-700 text-sm">
-                  {win.description}
-                </p>
+                <p className="text-slate-700 text-sm">{win.description}</p>
               </div>
               {onDismiss && (
                 <Button
@@ -173,9 +184,7 @@ export function WinCelebration({ win, onDismiss, onShare, className }: WinCelebr
                     <h4 className="font-bold text-blue-900 text-sm mb-1">
                       What made it work?
                     </h4>
-                    <p className="text-blue-800 text-sm">
-                      {win.reason}
-                    </p>
+                    <p className="text-blue-800 text-sm">{win.reason}</p>
                   </div>
                 </div>
               </div>
@@ -209,7 +218,11 @@ export function WinCelebration({ win, onDismiss, onShare, className }: WinCelebr
               </Button>
               {win.postUrl && (
                 <Button variant="outline" className="gap-2" asChild>
-                  <a href={win.postUrl} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={win.postUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <ExternalLink className="h-4 w-4" />
                     View Post
                   </a>
@@ -224,15 +237,19 @@ export function WinCelebration({ win, onDismiss, onShare, className }: WinCelebr
 }
 
 // Toast version for smaller wins
-export function celebrateWinToast(win: Pick<WinData, 'title' | 'description' | 'metric'>) {
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  
+export function celebrateWinToast(
+  win: Pick<WinData, "title" | "description" | "metric">,
+) {
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
   if (!prefersReducedMotion) {
     confetti({
       particleCount: 50,
       spread: 50,
       origin: { y: 0.7 },
-      colors: ['#4F46E5', '#818CF8'],
+      colors: ["#4F46E5", "#818CF8"],
     });
   }
 
@@ -248,45 +265,48 @@ export function celebrateWinToast(win: Pick<WinData, 'title' | 'description' | '
   });
 
   if (window.posthog) {
-    window.posthog.capture('win_toast_shown', { title: win.title });
+    window.posthog.capture("win_toast_shown", { title: win.title });
   }
 }
 
 // Example wins
 export const exampleWins: WinData[] = [
   {
-    type: 'engagement_milestone',
-    title: '🎉 Your post hit 1K likes!',
-    description: 'This is your most engaged post this month',
+    type: "engagement_milestone",
+    title: "🎉 Your post hit 1K likes!",
+    description: "This is your most engaged post this month",
     metric: {
-      label: 'Total Engagement',
-      value: '1,234',
-      comparison: '+156% vs average',
+      label: "Total Engagement",
+      value: "1,234",
+      comparison: "+156% vs average",
     },
-    shareText: 'Just hit 1K engagement with @AlignedAI. Here\'s the post that did it...',
-    postUrl: '/content-queue/post-123',
+    shareText:
+      "Just hit 1K engagement with @AlignedAI. Here's the post that did it...",
+    postUrl: "/content-queue/post-123",
   },
   {
-    type: 'personal_record',
-    title: '📈 This is your best-performing post!',
-    description: 'You just set a new personal record',
+    type: "personal_record",
+    title: "📈 This is your best-performing post!",
+    description: "You just set a new personal record",
     metric: {
-      label: 'Engagement',
-      value: '2.3K',
-      comparison: 'New Record!',
+      label: "Engagement",
+      value: "2.3K",
+      comparison: "New Record!",
     },
-    reason: 'High engagement because: Testimonial format + posted at 2 PM + featured customer story',
-    suggestedAction: 'Create 2 more posts like this next week',
+    reason:
+      "High engagement because: Testimonial format + posted at 2 PM + featured customer story",
+    suggestedAction: "Create 2 more posts like this next week",
   },
   {
-    type: 'weekly_win',
-    title: 'You crushed it this week! 🏆',
-    description: 'Your best week yet',
+    type: "weekly_win",
+    title: "You crushed it this week! 🏆",
+    description: "Your best week yet",
     metric: {
-      label: 'Weekly Engagement',
-      value: '8.9K',
-      comparison: '+45% vs last week',
+      label: "Weekly Engagement",
+      value: "8.9K",
+      comparison: "+45% vs last week",
     },
-    suggestedAction: 'Keep the momentum going - your audience is loving your content!',
+    suggestedAction:
+      "Keep the momentum going - your audience is loving your content!",
   },
 ];

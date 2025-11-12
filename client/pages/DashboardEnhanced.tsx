@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
-import { FirstVisitTooltip } from '@/components/dashboard/FirstVisitTooltip';
-import { GoodNews } from '@/components/dashboard/GoodNews';
-import { CalendarAccordion } from '@/components/dashboard/CalendarAccordion';
-import { ActionButtonsHeader } from '@/components/dashboard/ActionButtonsHeader';
-import { useWorkspace } from '@/contexts/WorkspaceContext';
+import { useState } from "react";
+import { MainLayout } from "@/components/layout/MainLayout";
+import { FirstVisitTooltip } from "@/components/dashboard/FirstVisitTooltip";
+import { GoodNews } from "@/components/dashboard/GoodNews";
+import { CalendarAccordion } from "@/components/dashboard/CalendarAccordion";
+import { ActionButtonsHeader } from "@/components/dashboard/ActionButtonsHeader";
+import { useWorkspace } from "@/contexts/WorkspaceContext";
 import {
   LearningMilestoneNotification,
   mockLearningMilestone,
@@ -12,7 +12,7 @@ import {
   exampleWins,
   SeasonalDipInsurance,
   summerSlumpWarning,
-} from '@/components/retention';
+} from "@/components/retention";
 
 export default function DashboardEnhanced() {
   const { currentWorkspace } = useWorkspace();
@@ -31,10 +31,12 @@ export default function DashboardEnhanced() {
             {/* Page Header */}
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-2">
-                <span className="text-3xl">{currentWorkspace?.logo || '🏢'}</span>
+                <span className="text-3xl">
+                  {currentWorkspace?.logo || "🏢"}
+                </span>
                 <div>
                   <h1 className="text-3xl sm:text-4xl font-black text-slate-900">
-                    {currentWorkspace?.name || 'Dashboard'}
+                    {currentWorkspace?.name || "Dashboard"}
                   </h1>
                   <p className="text-slate-600 text-sm mt-1">
                     Your social media command center
@@ -70,7 +72,7 @@ export default function DashboardEnhanced() {
                 <SeasonalDipInsurance
                   data={summerSlumpWarning}
                   onEnableOptimization={() => {
-                    console.log('Seasonal optimization enabled');
+                    console.log("Seasonal optimization enabled");
                   }}
                   onDismiss={() => setShowSeasonalAlert(false)}
                 />

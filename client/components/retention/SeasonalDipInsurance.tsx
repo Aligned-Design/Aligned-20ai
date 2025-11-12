@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   AlertTriangle,
   CheckCircle,
@@ -11,8 +11,8 @@ import {
   Zap,
   ChevronDown,
   ChevronUp,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SeasonalStrategy {
   name: string;
@@ -22,8 +22,8 @@ interface SeasonalStrategy {
 }
 
 interface SeasonalDipData {
-  season: 'summer' | 'winter' | 'spring' | 'fall';
-  type: 'warning' | 'active' | 'recovery';
+  season: "summer" | "winter" | "spring" | "fall";
+  type: "warning" | "active" | "recovery";
   title: string;
   description: string;
   expectedDrop?: string;
@@ -63,7 +63,7 @@ export function SeasonalDipInsurance({
 
     // Track analytics
     if (window.posthog) {
-      window.posthog.capture('seasonal_optimization_enabled', {
+      window.posthog.capture("seasonal_optimization_enabled", {
         season: data.season,
       });
     }
@@ -71,42 +71,38 @@ export function SeasonalDipInsurance({
 
   const getAlertColor = () => {
     switch (data.type) {
-      case 'warning':
-        return 'border-amber-500 bg-amber-50';
-      case 'active':
-        return 'border-blue-500 bg-blue-50';
-      case 'recovery':
-        return 'border-green-500 bg-green-50';
+      case "warning":
+        return "border-amber-500 bg-amber-50";
+      case "active":
+        return "border-blue-500 bg-blue-50";
+      case "recovery":
+        return "border-green-500 bg-green-50";
     }
   };
 
   const getIcon = () => {
     switch (data.type) {
-      case 'warning':
+      case "warning":
         return <AlertTriangle className="h-6 w-6 text-amber-600" />;
-      case 'active':
+      case "active":
         return <TrendingDown className="h-6 w-6 text-blue-600" />;
-      case 'recovery':
+      case "recovery":
         return <TrendingUp className="h-6 w-6 text-green-600" />;
     }
   };
 
   return (
-    <Alert className={cn('border-2', getAlertColor(), className)}>
+    <Alert className={cn("border-2", getAlertColor(), className)}>
       <AlertDescription>
         <div className="space-y-4">
           {/* Header */}
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0">
-              {getIcon()}
-            </div>
+            <div className="flex-shrink-0">{getIcon()}</div>
             <div className="flex-1">
               <h3 className="font-bold text-lg text-slate-900 mb-1">
                 {data.title}
               </h3>
-              <p className="text-slate-700">
-                {data.description}
-              </p>
+              <p className="text-slate-700">{data.description}</p>
             </div>
             {onDismiss && (
               <Button variant="ghost" size="sm" onClick={onDismiss}>
@@ -116,7 +112,7 @@ export function SeasonalDipInsurance({
           </div>
 
           {/* Warning Type Content */}
-          {data.type === 'warning' && data.expectedDrop && data.reason && (
+          {data.type === "warning" && data.expectedDrop && data.reason && (
             <>
               {/* Expected Impact */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -139,9 +135,7 @@ export function SeasonalDipInsurance({
                     <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
                       Why This Happens
                     </p>
-                    <p className="text-sm text-slate-700">
-                      {data.reason}
-                    </p>
+                    <p className="text-sm text-slate-700">{data.reason}</p>
                   </CardContent>
                 </Card>
               </div>
@@ -197,9 +191,7 @@ export function SeasonalDipInsurance({
                         <h5 className="font-bold text-green-900 text-sm mb-1">
                           Your Goal
                         </h5>
-                        <p className="text-green-800 text-sm">
-                          {data.goal}
-                        </p>
+                        <p className="text-green-800 text-sm">{data.goal}</p>
                       </div>
                     </div>
                   </div>
@@ -232,7 +224,10 @@ export function SeasonalDipInsurance({
                   size="lg"
                 >
                   <Zap className="h-5 w-5" />
-                  Enable {data.season.charAt(0).toUpperCase() + data.season.slice(1)} Optimization
+                  Enable{" "}
+                  {data.season.charAt(0).toUpperCase() +
+                    data.season.slice(1)}{" "}
+                  Optimization
                 </Button>
               )}
 
@@ -245,7 +240,9 @@ export function SeasonalDipInsurance({
                         Optimization Enabled!
                       </h5>
                       <p className="text-green-800 text-sm">
-                        We've adjusted your content strategy for the seasonal period. You'll see optimized posting times and content types in your queue.
+                        We've adjusted your content strategy for the seasonal
+                        period. You'll see optimized posting times and content
+                        types in your queue.
                       </p>
                     </div>
                   </div>
@@ -255,7 +252,7 @@ export function SeasonalDipInsurance({
           )}
 
           {/* Recovery Type Content */}
-          {data.type === 'recovery' && data.actualPerformance && (
+          {data.type === "recovery" && data.actualPerformance && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="border-green-200 bg-green-50">
@@ -264,10 +261,12 @@ export function SeasonalDipInsurance({
                       Your Performance
                     </p>
                     <p className="text-3xl font-black text-green-600 mb-1">
-                      {data.actualPerformance.engagementDrop > 0 ? '+' : ''}{data.actualPerformance.engagementDrop}%
+                      {data.actualPerformance.engagementDrop > 0 ? "+" : ""}
+                      {data.actualPerformance.engagementDrop}%
                     </p>
                     <p className="text-xs text-green-700">
-                      Engagement change | {data.actualPerformance.followerChange} followers lost
+                      Engagement change |{" "}
+                      {data.actualPerformance.followerChange} followers lost
                     </p>
                   </CardContent>
                 </Card>
@@ -310,55 +309,52 @@ export function SeasonalDipInsurance({
 
 // Example data
 export const summerSlumpWarning: SeasonalDipData = {
-  season: 'summer',
-  type: 'warning',
-  title: 'Summer slump incoming',
-  description: 'Heads up: Engagement typically drops during summer months',
-  expectedDrop: '15-25%',
-  reason: 'Audiences are traveling, less time on social',
+  season: "summer",
+  type: "warning",
+  title: "Summer slump incoming",
+  description: "Heads up: Engagement typically drops during summer months",
+  expectedDrop: "15-25%",
+  reason: "Audiences are traveling, less time on social",
   strategies: [
     {
-      name: 'Increase posting frequency',
-      description: 'More touchpoints = more engagement',
+      name: "Increase posting frequency",
+      description: "More touchpoints = more engagement",
       icon: <CheckCircle className="h-4 w-4" />,
       enabled: true,
     },
     {
       name: 'Shift to "aspirational" content',
-      description: 'Vacations, leisure, summer themes',
+      description: "Vacations, leisure, summer themes",
       icon: <CheckCircle className="h-4 w-4" />,
       enabled: true,
     },
     {
-      name: 'Optimize timing with AI',
-      description: 'Post when your audience IS online',
+      name: "Optimize timing with AI",
+      description: "Post when your audience IS online",
       icon: <CheckCircle className="h-4 w-4" />,
       enabled: true,
     },
     {
-      name: 'Focus on conversion',
-      description: 'Engagement may dip, but leads should stay stable',
+      name: "Focus on conversion",
+      description: "Engagement may dip, but leads should stay stable",
       icon: <CheckCircle className="h-4 w-4" />,
       enabled: true,
     },
   ],
-  goal: 'Maintain growth vs. seasonal decline',
-  cantControl: [
-    'Global trends',
-    'Competitor actions',
-    'Algorithm changes',
-  ],
+  goal: "Maintain growth vs. seasonal decline",
+  cantControl: ["Global trends", "Competitor actions", "Algorithm changes"],
 };
 
 export const summerRecovery: SeasonalDipData = {
-  season: 'summer',
-  type: 'recovery',
+  season: "summer",
+  type: "recovery",
   title: "Summer's over, let's bounce back",
-  description: 'Great news! You outperformed during the slow season',
+  description: "Great news! You outperformed during the slow season",
   actualPerformance: {
     engagementDrop: -18,
     followerChange: 0,
     industryAverage: -3,
   },
-  recoveryMessage: 'Your Aligned AI content kept your audience engaged during the slow period. While engagement was down 18%, you lost 0 followers (vs. competitors who lost 3%). Back-to-school season is incoming—preparing optimized content plan...',
+  recoveryMessage:
+    "Your Aligned AI content kept your audience engaged during the slow period. While engagement was down 18%, you lost 0 followers (vs. competitors who lost 3%). Back-to-school season is incoming—preparing optimized content plan...",
 };
