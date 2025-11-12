@@ -568,27 +568,47 @@ export default function ContentQueue() {
             </div>
           )}
 
-          {/* Section Carousels */}
+          {/* Section Carousels or Filtered Grid View */}
           {viewMode === "grid" && (
-            <div className="mb-12 space-y-8">
-              {statusOrder.map((status) => {
-                const posts = postsByStatus[status];
-                const config = statusConfig[status];
+            <div className="mb-12">
+              {statusFilter ? (
+                // Filtered status view: show as grid
+                filteredPosts.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {filteredPosts.map((post) => (
+                      <PostCard key={post.id} post={post} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">No posts found</h3>
+                    <p className="text-slate-600">No posts in {getStatusLabel(statusFilter).toLowerCase()} status.</p>
+                  </div>
+                )
+              ) : (
+                // Full grid view: show all statuses
+                <div className="space-y-8">
+                  {statusOrder.map((status) => {
+                    const posts = postsByStatus[status];
+                    const config = statusConfig[status];
 
-                return (
-                  <SectionCarousel
-                    key={status}
-                    title={config.label}
-                    icon={config.icon}
-                    posts={posts}
-                    onPostClick={(post) => {
-                      setPreviewPost(post);
-                      setShowPreview(true);
-                    }}
-                    hasError={status === "draft" && posts.some((p) => p.errorMessage)}
-                  />
-                );
-              })}
+                    return (
+                      <SectionCarousel
+                        key={status}
+                        title={config.label}
+                        icon={config.icon}
+                        posts={posts}
+                        onPostClick={(post) => {
+                          setPreviewPost(post);
+                          setShowPreview(true);
+                        }}
+                        hasError={status === "draft" && posts.some((p) => p.errorMessage)}
+                      />
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 
