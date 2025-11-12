@@ -93,7 +93,7 @@ export function TrendAreaChart({
 // Mini Sparkline (small trend indicator)
 export function Sparkline({
   data,
-  color = "#8b5cf6",
+  color = CHART_COLORS.primary,
   className,
 }: {
   data: number[];
