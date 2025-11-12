@@ -104,6 +104,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Load from localStorage on mount (defensive parsing to avoid crashes from corrupted values)
   useEffect(() => {
     try {
+      // DEMO MODE: Use mock user
+      const demoMode = import.meta.env.VITE_DEMO_MODE === "true";
+      if (demoMode) {
+        const mockUser: OnboardingUser = {
+          id: "demo-user-123",
+          name: "Demo User",
+          email: "demo@aligned-by-design.com",
+          password: "",
+          role: "agency",
+          plan: "agency",
+        };
+        setUser(mockUser);
+        console.log("[DEMO MODE] Using mock auth user");
+        return;
+      }
+
       // DEV ONLY: Check for dev auth toggle
       const devAuthEnabled = localStorage.getItem("aligned_dev_auth");
       if (devAuthEnabled === "true" && !localStorage.getItem("aligned_user")) {
