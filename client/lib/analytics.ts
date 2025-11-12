@@ -19,11 +19,18 @@ interface AnalyticsEvent {
 
 class Analytics {
   track<T extends EventName>(eventName: T, properties: AnalyticsEvent[T]) {
+    // Add demo_mode context to all events
+    const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
+    const enrichedProps = {
+      ...properties,
+      demo_mode: isDemoMode,
+    };
+
     // For now, log to console
-    console.log(`[Analytics] ${eventName}:`, properties);
+    console.log(`[Analytics] ${eventName}:`, enrichedProps);
 
     // TODO: Replace with real analytics provider
-    // Example: segment.track(eventName, properties);
+    // Example: segment.track(eventName, enrichedProps);
   }
 }
 
