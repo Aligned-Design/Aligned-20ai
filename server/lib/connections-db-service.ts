@@ -5,7 +5,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { Platform } from "@shared/publishing";
-import { parsePlatformConnection } from "@/types/guards";
+import { parsePlatformConnection } from "../types/guards";
 
 const supabaseUrl =
   process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";

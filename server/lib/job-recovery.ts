@@ -7,7 +7,7 @@ import { createClient } from "@supabase/supabase-js";
 import { publishingDBService } from "./publishing-db-service";
 import { publishingQueue } from "./publishing-queue";
 import { PublishingJob, Platform } from "@shared/publishing";
-import { parsePublishingJobRow } from "@/types/guards";
+import { parsePublishingJobRow } from "../types/guards";
 
 const supabaseUrl =
   process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
