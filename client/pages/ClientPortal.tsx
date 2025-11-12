@@ -9,6 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { ClientAnalyticsDashboard } from "@/components/analytics";
 import {
+  FeedbackImpactTimeline,
+  CollaborativeApprovalFlow,
+  ClientQAChat,
+  ApprovalSLATracker,
+} from "@/components/collaboration";
+import {
   Select,
   SelectContent,
   SelectItem,
