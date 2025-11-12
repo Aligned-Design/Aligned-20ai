@@ -18,32 +18,49 @@ export function PostPreviewModal({ post, isOpen, onClose }: PostPreviewModalProp
     switch (post.platform) {
       case "linkedin":
         return (
-          <div className="bg-white p-6 rounded-lg space-y-4">
-            {/* LinkedIn post header */}
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-400 to-blue-400"></div>
-              <div>
-                <p className="font-bold text-slate-900">Your Company</p>
-                <p className="text-xs text-slate-600">2nd degree connection · 30m ago</p>
+          <div className="bg-white rounded-lg border border-slate-300 overflow-hidden w-full">
+            {/* LinkedIn header */}
+            <div className="p-4 border-b border-slate-200">
+              <div className="flex items-start gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex-shrink-0"></div>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="font-bold text-slate-900 text-sm">Your Company</p>
+                      <p className="text-xs text-slate-600">
+                        {post.brand || "Company Page"} • {post.scheduledDate || "Just now"}
+                      </p>
+                    </div>
+                    <button className="text-slate-400 text-lg">•••</button>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Content */}
-            <p className="text-slate-900 font-medium">{post.title}</p>
-            <p className="text-slate-700 text-sm">{post.excerpt}</p>
+            <div className="p-4 space-y-3">
+              <p className="text-slate-900 text-sm leading-relaxed">{post.title}</p>
+              <p className="text-slate-700 text-sm leading-relaxed">{post.excerpt}</p>
+            </div>
 
             {/* Image */}
             <img
               src={`https://images.unsplash.com/photo-1611532736579-6b16e2b50449?w=500&h=300&fit=crop`}
               alt="preview"
-              className="w-full rounded-lg"
+              className="w-full"
             />
 
             {/* Engagement */}
-            <div className="flex justify-around text-xs text-slate-600 border-t pt-3">
-              <button className="hover:text-blue-600 font-bold">👍 Like</button>
-              <button className="hover:text-blue-600 font-bold">💬 Comment</button>
-              <button className="hover:text-blue-600 font-bold">↗️ Share</button>
+            <div className="px-4 py-3 border-t border-slate-200">
+              <div className="flex items-center gap-1 text-xs text-slate-600 mb-3">
+                <span>👍 123</span>
+                <span className="ml-auto">45 comments • 12 shares</span>
+              </div>
+              <div className="flex gap-0 text-slate-600 text-sm font-semibold">
+                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">👍 Like</button>
+                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">💬 Comment</button>
+                <button className="flex-1 py-2 hover:bg-slate-50 transition rounded">↗️ Share</button>
+              </div>
             </div>
           </div>
         );
