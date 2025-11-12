@@ -212,9 +212,9 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
-  // Register route routers
-  app.use("/api/agents", agentsRouter);
-  app.use("/api/ai-metrics", aiMetricsRouter);
+  // Register route routers - temporarily disabled to isolate error
+  // app.use("/api/agents", agentsRouter);
+  // app.use("/api/ai-metrics", aiMetricsRouter);
   // app.use("/api/builder", builderRouter);
   // app.use("/api/crawler", crawlerRouter);
   // app.use("/api/escalations", escalationsRouter);
@@ -222,7 +222,7 @@ export function createServer() {
   // app.use("/api/media-management", mediaManagementRouter);
   // app.use("/api/publishing", publishingRouter);
   // app.use("/api/orchestration", orchestrationRouter);
-  app.use("/api/milestones", milestonesRouter);
+  // app.use("/api/milestones", milestonesRouter);
   // app.use("/api/trial", trialRouter);
   // app.use("/api/billing", billingRouter);
   // app.use("/api/billing", billingReactivationRouter);
