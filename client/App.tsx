@@ -58,10 +58,15 @@ function ProtectedRoutes() {
     <Routes>
       {/* Onboarding Route - explicitly accessible at /onboarding */}
       <Route path="/onboarding" element={<Onboarding />} />
+      {/* Auth Routes - redirect to onboarding or dashboard */}
+      <Route path="/login" element={<Onboarding />} />
+      <Route path="/signup" element={<Onboarding />} />
       {/* Core Navigation */}
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/" element={<Dashboard />} />
       <Route path="/calendar" element={<Calendar />} />
       <Route path="/content-queue" element={<ContentQueue />} />
+      <Route path="/queue" element={<ContentQueue />} />
       <Route path="/approvals" element={<Approvals />} />
       <Route path="/creative-studio" element={<CreativeStudio />} />
       <Route path="/content-generator" element={<ContentGenerator />} />
@@ -74,7 +79,9 @@ function ProtectedRoutes() {
       <Route path="/brand-intelligence" element={<BrandIntelligence />} />
       <Route path="/analytics" element={<Analytics />} />
       <Route path="/reporting" element={<Reporting />} />
+      <Route path="/reports" element={<Reporting />} />
       <Route path="/paid-ads" element={<PaidAds />} />
+      <Route path="/ads" element={<PaidAds />} />
       {/* Assets Navigation */}
       <Route path="/library" element={<LibraryPage />} />
       <Route path="/client-portal" element={<ClientPortal />} />
