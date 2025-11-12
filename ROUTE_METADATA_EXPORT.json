@@ -2,9 +2,10 @@
   {
     "path": "/",
     "visibility": "public",
-    "title": "Aligned AI - AI-Powered Content Creation for Agencies & Brands",
+    "title": "Aligned AI - AI Content Creation for Agencies & Brands",
     "description": "Transform your content workflow with AI. Aligned AI handles planning, writing, scheduling, and reporting so you can focus on what matters.",
-    "noindex": false
+    "noindex": false,
+    "ogImage": "https://www.aligned-bydesign.com/og-home.jpg"
   },
   {
     "path": "/about",
@@ -18,7 +19,8 @@
     "visibility": "public",
     "title": "Features - AI Content, Scheduling & Analytics | Aligned AI",
     "description": "Explore AI content generation, smart scheduling, real-time analytics, collaboration tools, and more.",
-    "noindex": false
+    "noindex": false,
+    "ogImage": "https://www.aligned-bydesign.com/og-features.jpg"
   },
   {
     "path": "/integrations",
@@ -52,15 +54,17 @@
     "path": "/terms",
     "visibility": "public",
     "title": "Terms of Service | Aligned AI",
-    "description": "Read our terms of service and usage agreement.",
-    "noindex": false
+    "description": "Read our complete terms of service, usage agreement, and legal policies for using Aligned AI.",
+    "noindex": false,
+    "ogImage": "https://www.aligned-bydesign.com/og-default.jpg"
   },
   {
     "path": "/pricing",
     "visibility": "public",
     "title": "Pricing - Simple, Scalable Plans | Aligned AI",
     "description": "Start at $199/mo per brand. Scale smarter with agency pricing. No hidden fees.",
-    "noindex": false
+    "noindex": false,
+    "ogImage": "https://www.aligned-bydesign.com/og-pricing.jpg"
   },
   {
     "path": "/onboarding",

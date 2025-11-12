@@ -1,12 +1,12 @@
 Path,Visibility,Title,Description,Noindex,White Label
-/,public,"Aligned AI - AI-Powered Content Creation for Agencies & Brands","Transform your content workflow with AI. Aligned AI handles planning, writing, scheduling, and reporting so you can focus on what matters.",NO,NO
+/,public,"Aligned AI - AI Content Creation for Agencies & Brands","Transform your content workflow with AI. Aligned AI handles planning, writing, scheduling, and reporting so you can focus on what matters.",NO,NO
 /about,public,"About Aligned AI - Built by Marketers, for Marketers","Learn about our mission to make content creation feel less like a grind and more like a superpower.",NO,NO
 /features,public,"Features - AI Content, Scheduling & Analytics | Aligned AI","Explore AI content generation, smart scheduling, real-time analytics, collaboration tools, and more.",NO,NO
 /integrations,public,"Integrations - Connect All Your Channels | Aligned AI","Integrate with Facebook, Instagram, LinkedIn, Twitter, TikTok, Google Business Profile, and more.",NO,NO
 /help,public,"Help Center - Support & FAQs | Aligned AI","Find answers, explore resources, and get the most out of Aligned AI.",NO,NO
 /contact,public,"Contact Us - Get in Touch | Aligned AI","Have questions? Want a demo? We're here to help you get Aligned.",NO,NO
 /privacy,public,"Privacy Policy | Aligned AI","Learn how we protect and handle your data at Aligned AI.",NO,NO
-/terms,public,"Terms of Service | Aligned AI","Read our terms of service and usage agreement.",NO,NO
+/terms,public,"Terms of Service | Aligned AI","Read our complete terms of service, usage agreement, and legal policies for using Aligned AI.",NO,NO
 /pricing,public,"Pricing - Simple, Scalable Plans | Aligned AI","Start at $199/mo per brand. Scale smarter with agency pricing. No hidden fees.",NO,NO
 /onboarding,user,"Onboarding - Get Started | Aligned AI","Set up your workspace and brand profile.",YES,NO
 /dashboard,user,"Dashboard | Aligned AI","Your content command center.",YES,NO
