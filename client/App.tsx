@@ -360,14 +360,16 @@ export const App = () => (
     <WorkspaceProvider>
       <UserProvider>
         <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <MilestoneCelebrator />
-            <BrowserRouter>
-              <ProtectedRoutes />
-            </BrowserRouter>
-          </TooltipProvider>
+          <BrandProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <MilestoneCelebrator />
+              <BrowserRouter>
+                <ProtectedRoutes />
+              </BrowserRouter>
+            </TooltipProvider>
+          </BrandProvider>
         </AuthProvider>
       </UserProvider>
     </WorkspaceProvider>
