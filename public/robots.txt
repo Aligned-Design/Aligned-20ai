@@ -1,14 +1,47 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+# Aligned AI - Robots.txt
+# Public marketing site
 
 User-agent: *
+
+# Allow all public pages
 Allow: /
+Allow: /about
+Allow: /features
+Allow: /integrations
+Allow: /help
+Allow: /contact
+Allow: /privacy
+Allow: /terms
+Allow: /pricing
+
+# Disallow app routes (protected by noindex meta tags)
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /calendar
+Disallow: /content-queue
+Disallow: /queue
+Disallow: /approvals
+Disallow: /creative-studio
+Disallow: /content-generator
+Disallow: /campaigns
+Disallow: /brands
+Disallow: /brand-intake
+Disallow: /brand-guide
+Disallow: /brand-snapshot
+Disallow: /brand-intelligence
+Disallow: /analytics
+Disallow: /reporting
+Disallow: /reports
+Disallow: /paid-ads
+Disallow: /ads
+Disallow: /library
+Disallow: /client-portal
+Disallow: /events
+Disallow: /reviews
+Disallow: /linked-accounts
+Disallow: /settings
+Disallow: /client-settings
+Disallow: /billing
+
+# Sitemap
+Sitemap: https://www.aligned-bydesign.com/sitemap.xml
