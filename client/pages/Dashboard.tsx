@@ -6,6 +6,7 @@
 
 import { useAuth } from '@/lib/auth';
 import { useCan } from '@/lib/auth';
+import { useNavigate, Link } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import ActionButtonsHeader from '@/components/dashboard/ActionButtonsHeader';
 import DashboardWidgets from '@/components/dashboard/DashboardWidgets';
@@ -13,13 +14,14 @@ import AlignedAISummary from '@/components/dashboard/AlignedAISummary';
 import SmartDashboard from '@/components/analytics/SmartDashboard';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { user, role, logout } = useAuth();
   const canCreateContent = useCan('content:create');
   const canManageBrand = useCan('brand:manage');
 
   const handleLogout = () => {
     logout();
-    window.location.href = '/';
+    navigate('/');
   };
 
   return (
@@ -40,8 +42,8 @@ export default function Dashboard() {
         {canCreateContent && (
           <div>
             <ActionButtonsHeader
-              onCreateContent={() => window.location.href = '/creative-studio'}
-              onSchedulePost={() => window.location.href = '/content-queue'}
+              onCreateContent={() => navigate('/creative-studio')}
+              onSchedulePost={() => navigate('/content-queue')}
               onPublishNow={() => {/* Handle publish */}}
               onBestTimeSuggestions={() => {/* Handle suggestions */}}
             />
@@ -95,12 +97,12 @@ export default function Dashboard() {
             <p className="text-gray-700 mb-4">
               As an administrator, you have access to brand management tools.
             </p>
-            <a 
-              href="/brand-guide"
+            <Link
+              to="/brand-guide"
               className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Manage Brand
-            </a>
+            </Link>
           </div>
         )}
       </div>
