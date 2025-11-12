@@ -267,9 +267,11 @@ export function MonthCalendarView({
                         ? "🔲"
                         : post.status === "reviewing"
                           ? "🔄"
-                          : post.status === "approved"
+                          : post.status === "published"
                             ? "✓"
-                            : "📅";
+                            : post.status === "scheduled"
+                              ? "📅"
+                              : "⚠️";
                     return (
                       <button
                         key={post.id}
