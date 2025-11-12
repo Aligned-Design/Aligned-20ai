@@ -320,6 +320,13 @@ export function MonthCalendarView({
           ))}
         </div>
       </div>
+
+      {/* Post Preview Modal */}
+      <PostPreviewModal
+        post={previewPost}
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+      />
     </div>
   );
 }
