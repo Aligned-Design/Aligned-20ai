@@ -69,7 +69,7 @@ export interface AuthContextType {
   login?: (email: string, password: string) => Promise<boolean>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Normalize legacy role to canonical role
 function normalizeRole(legacyRole?: string): CanonicalRole {
