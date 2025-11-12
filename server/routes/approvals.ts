@@ -17,6 +17,9 @@ import {
 /**
  * POST /api/approvals/bulk
  * Approve or reject multiple posts in a single request
+ *
+ * RBAC: Requires 'content:approve' scope
+ * Roles allowed: BRAND_MANAGER, CLIENT_APPROVER, AGENCY_ADMIN, SUPERADMIN
  */
 export const bulkApproveContent: RequestHandler = async (req, res, next) => {
   try {
@@ -24,7 +27,6 @@ export const bulkApproveContent: RequestHandler = async (req, res, next) => {
     const userId = ((req as any)).user?.id || ((req as any)).userId;
     const userEmail = ((req as any)).user?.email || req.headers['x-user-email'] as string;
     const brandId = ((req as any)).user?.brandId || req.headers['x-brand-id'] as string;
-    const userRole = ((req as any)).user?.role || req.headers['x-user-role'] as string;
 
     // Validate required fields
     if (!userId || !brandId) {
@@ -32,16 +34,6 @@ export const bulkApproveContent: RequestHandler = async (req, res, next) => {
         ErrorCode.UNAUTHORIZED,
         'User ID and Brand ID are required',
         HTTP_STATUS.UNAUTHORIZED,
-        'warning'
-      );
-    }
-
-    // Validate permissions
-    if (!['client', 'agency', 'admin'].includes(userRole)) {
-      throw new AppError(
-        ErrorCode.FORBIDDEN,
-        'Invalid user role',
-        HTTP_STATUS.FORBIDDEN,
         'warning'
       );
     }
@@ -65,19 +57,8 @@ export const bulkApproveContent: RequestHandler = async (req, res, next) => {
       );
     }
 
-    // Check role permissions
-    const canApprove =
-      userRole === 'client' || userRole === 'admin' ||
-      (userRole === 'agency' && action === 'approve');
-
-    if (!canApprove) {
-      throw new AppError(
-        ErrorCode.FORBIDDEN,
-        `User role '${userRole}' cannot ${action} content`,
-        HTTP_STATUS.FORBIDDEN,
-        'warning'
-      );
-    }
+    // NOTE: Permission check (content:approve) is now enforced by middleware
+    // This handler only executes if user has required scope
 
     // Process bulk action via database
     const results: BulkApprovalResult = {
