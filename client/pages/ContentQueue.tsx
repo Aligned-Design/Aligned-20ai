@@ -165,6 +165,7 @@ const statusConfig: Record<PostStatus, { label: string; color: string; icon: Rea
 
 export default function ContentQueue() {
   const { currentWorkspace } = useWorkspace();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
@@ -174,6 +175,9 @@ export default function ContentQueue() {
   const [previewPost, setPreviewPost] = useState<Post | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "carousel">("grid");
+
+  // Get status filter from URL query params
+  const statusFilter = searchParams.get("status") as PostStatus | null;
 
   const brands = Array.from(new Set(allPosts.map((p) => p.brand)));
   const platforms = Array.from(new Set(allPosts.map((p) => p.platform)));
