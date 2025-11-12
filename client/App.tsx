@@ -78,17 +78,12 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function OnboardingRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, onboardingStep } = useAuth();
 
-  // Not authenticated - redirect to landing page
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-
-  // Authenticated but onboarding not started - redirect to onboarding
-  if (!onboardingStep) {
+  // Authenticated but onboarding is complete - redirect to dashboard
+  if (isAuthenticated && !onboardingStep) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // In onboarding - show onboarding content
+  // Allow unauthenticated users OR users in onboarding to access /onboarding
   return children as React.ReactElement;
 }
 
