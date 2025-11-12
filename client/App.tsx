@@ -12,6 +12,7 @@ import { WorkspaceProvider } from "@/contexts/WorkspaceContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { BrandProvider } from "@/contexts/BrandContext";
 import MilestoneCelebrator from "@/components/MilestoneCelebrator";
+import { SEOHead } from "@/components/seo";
 import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
@@ -100,7 +101,10 @@ function OnboardingRoute({ children }: { children: React.ReactNode }) {
 // Protected route wrapper - handles authentication and routing
 function ProtectedRoutes() {
   return (
-    <Routes>
+    <>
+      {/* SEO Head - dynamically manages meta tags based on route */}
+      <SEOHead />
+      <Routes>
       {/* Public Routes - landing page */}
       <Route
         path="/"
@@ -111,15 +115,71 @@ function ProtectedRoutes() {
         }
       />
 
-      {/* Public pages - accessible to everyone */}
-      <Route path="/pricing" element={<Pricing />} />
-      <Route path="/features" element={<Features />} />
-      <Route path="/integrations" element={<Integrations />} />
-      <Route path="/help" element={<Help />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/privacy" element={<Privacy />} />
-      <Route path="/terms" element={<Terms />} />
+      {/* Public pages - wrap with PublicRoute to redirect authed users */}
+      <Route
+        path="/pricing"
+        element={
+          <PublicRoute>
+            <Pricing />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/features"
+        element={
+          <PublicRoute>
+            <Features />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/integrations"
+        element={
+          <PublicRoute>
+            <Integrations />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/help"
+        element={
+          <PublicRoute>
+            <Help />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/contact"
+        element={
+          <PublicRoute>
+            <Contact />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/about"
+        element={
+          <PublicRoute>
+            <About />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/privacy"
+        element={
+          <PublicRoute>
+            <Privacy />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/terms"
+        element={
+          <PublicRoute>
+            <Terms />
+          </PublicRoute>
+        }
+      />
 
       {/* Auth Routes - redirect to onboarding or show onboarding */}
       <Route
@@ -366,6 +426,7 @@ function ProtectedRoutes() {
       {/* Catch-all - show 404 page */}
       <Route path="*" element={<NotFound />} />
     </Routes>
+    </>
   );
 }
 
