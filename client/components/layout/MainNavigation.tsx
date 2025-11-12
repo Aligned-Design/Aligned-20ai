@@ -67,9 +67,9 @@ export function MainNavigation({
       {/* Nav items */}
       <div className="flex-1 overflow-y-auto">
         {navItems.map((item) => (
-          <a
+          <Link
             key={item.path}
-            href={item.path}
+            to={item.path}
             className={`flex items-center gap-3 px-4 py-3 text-sm ${
               location.pathname === item.path
                 ? "bg-purple-100 text-purple-900 border-r-2 border-purple-600"
@@ -78,7 +78,7 @@ export function MainNavigation({
           >
             <span className="text-lg">{item.icon}</span>
             {item.label}
-          </a>
+          </Link>
         ))}
       </div>
 
