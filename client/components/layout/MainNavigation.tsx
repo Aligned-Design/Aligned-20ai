@@ -3,7 +3,7 @@
  * Displays different nav items based on user role
  */
 
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useCan } from "@/lib/auth/useCan";
 
