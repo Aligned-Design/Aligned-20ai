@@ -71,13 +71,18 @@ export function StatusOverviewBanner({ onStatusClick, navigateToQueue = false }:
   ];
 
   const handleClick = (statusId: string) => {
-    if (onStatusClick) {
-      onStatusClick(statusId);
-    }
-    // Scroll to section with ID
-    const element = document.getElementById(`status-${statusId}`);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (navigateToQueue) {
+      // Navigate to content queue with status filter
+      navigate(`/content-queue?status=${statusId}`);
+    } else {
+      // Original behavior: scroll to section
+      if (onStatusClick) {
+        onStatusClick(statusId);
+      }
+      const element = document.getElementById(`status-${statusId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   };
 
