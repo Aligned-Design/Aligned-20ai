@@ -44,20 +44,51 @@ export interface BrandSnapshot {
 
 export type OnboardingStep = 1 | 2 | 3 | 3.5 | 4 | 4.5 | 5 | null;
 
+// Canonical role type (matches config/permissions.json)
+export type CanonicalRole = 
+  | 'SUPERADMIN'
+  | 'AGENCY_ADMIN'
+  | 'BRAND_MANAGER'
+  | 'CREATOR'
+  | 'ANALYST'
+  | 'CLIENT_APPROVER'
+  | 'VIEWER';
+
 export interface AuthContextType {
   user: OnboardingUser | null;
   brandSnapshot: BrandSnapshot | null;
   onboardingStep: OnboardingStep;
   isAuthenticated: boolean;
+  role: CanonicalRole | null;
   signUp: (user: Partial<OnboardingUser>) => void;
   updateUser: (updates: Partial<OnboardingUser>) => void;
   setBrandSnapshot: (snapshot: BrandSnapshot) => void;
   setOnboardingStep: (step: OnboardingStep) => void;
   completeOnboarding: () => void;
   logout: () => void;
+  login?: (email: string, password: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Normalize legacy role to canonical role
+function normalizeRole(legacyRole?: string): CanonicalRole {
+  if (!legacyRole) return 'VIEWER';
+  
+  const roleMap: Record<string, CanonicalRole> = {
+    'agency': 'AGENCY_ADMIN',
+    'single_business': 'BRAND_MANAGER',
+    'superadmin': 'SUPERADMIN',
+    'admin': 'AGENCY_ADMIN',
+    'manager': 'BRAND_MANAGER',
+    'creator': 'CREATOR',
+    'client': 'CLIENT_APPROVER',
+    'viewer': 'VIEWER',
+    'analyst': 'ANALYST',
+  };
+  
+  return roleMap[legacyRole.toLowerCase()] || 'VIEWER';
+}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -151,73 +182,81 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [onboardingStep]);
 
-  const signUp = (newUser: Partial<OnboardingUser>) => {
-    // Check for trial mode from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const isTrial = urlParams.get("trial") === "7";
-
-    const userData: OnboardingUser = {
-      id: Date.now().toString(),
-      name: newUser.name || "",
+  const handleSignUp = (newUser: Partial<OnboardingUser>) => {
+    const completeUser: OnboardingUser = {
+      id: newUser.id || `user_${Date.now()}`,
+      name: newUser.name || "New User",
       email: newUser.email || "",
       password: newUser.password || "",
-      role: newUser.role || "single_business",
-      plan: isTrial ? "trial" : "base",
-      ...(isTrial && {
-        trial_published_count: 0,
-        trial_started_at: new Date().toISOString(),
-        trial_expires_at: new Date(
-          Date.now() + 7 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-      }),
+      role: (newUser.role || "agency") as "agency" | "single_business",
       ...newUser,
     };
-
-    setUser(userData);
-    setOnboardingStep(2);
+    setUser(completeUser);
   };
 
-  const updateUser = (updates: Partial<OnboardingUser>) => {
+  const handleUpdateUser = (updates: Partial<OnboardingUser>) => {
     setUser((prev) => (prev ? { ...prev, ...updates } : null));
   };
 
-  const completeOnboarding = () => {
+  const handleCompleteOnboarding = () => {
     setOnboardingStep(null);
   };
 
-  const logout = () => {
+  const handleLogout = () => {
     setUser(null);
     setBrandSnapshot(null);
     setOnboardingStep(null);
-    localStorage.removeItem("aligned_user");
-    localStorage.removeItem("aligned_brand");
-    localStorage.removeItem("aligned_onboarding_step");
+    localStorage.clear();
+  };
+
+  const handleLogin = async (
+    email: string,
+    password: string,
+  ): Promise<boolean> => {
+    try {
+      // Mock login for demo purposes
+      const mockUser: OnboardingUser = {
+        id: `user_${email.split("@")[0]}`,
+        name: email.split("@")[0],
+        email,
+        password, // In real app, never store this
+        role: email.includes("client") ? "single_business" : "agency",
+      };
+      setUser(mockUser);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const canonicalRole = normalizeRole(user?.role);
+
+  const value: AuthContextType = {
+    user,
+    brandSnapshot,
+    onboardingStep,
+    isAuthenticated: !!user,
+    role: canonicalRole,
+    signUp: handleSignUp,
+    updateUser: handleUpdateUser,
+    setBrandSnapshot,
+    setOnboardingStep,
+    completeOnboarding: handleCompleteOnboarding,
+    logout: handleLogout,
+    login: handleLogin,
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        brandSnapshot,
-        onboardingStep,
-        isAuthenticated: !!user,
-        signUp,
-        updateUser,
-        setBrandSnapshot,
-        setOnboardingStep,
-        completeOnboarding,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
-};
+}
