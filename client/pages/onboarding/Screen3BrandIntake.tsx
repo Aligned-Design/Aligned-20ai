@@ -329,23 +329,66 @@ export default function Screen3BrandIntake() {
           {/* Q6: Colors */}
           <div className="bg-white/50 backdrop-blur-xl rounded-2xl border border-white/60 p-6">
             <label className="block text-sm font-black text-slate-900 mb-4">
-              6️⃣ Choose your colors or let AI pick from logo
+              6️⃣ Choose a color theme (Optional)
             </label>
-            <div className="flex flex-wrap gap-3">
-              {COLOR_PRESETS.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => toggleColor(color)}
-                  className={`w-12 h-12 rounded-lg border-3 transition-all ${
-                    form.colors.includes(color)
-                      ? "border-slate-900 shadow-md"
-                      : "border-slate-200 hover:border-slate-400"
-                  }`}
-                  style={{ backgroundColor: color }}
-                  title={color}
-                />
-              ))}
+            <p className="text-xs text-slate-600 mb-4">
+              Pick a pre-made palette, upload a logo for AI color extraction, or manually select colors
+            </p>
+
+            {/* Theme Palettes */}
+            <div className="space-y-3 mb-6">
+              <p className="text-xs font-bold text-slate-700">Theme Palettes:</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {COLOR_THEMES.map((theme) => (
+                  <button
+                    key={theme.name}
+                    onClick={() => setForm({ ...form, colors: theme.colors })}
+                    className={`p-3 rounded-lg border-2 transition-all text-center ${
+                      form.colors.length === theme.colors.length &&
+                      theme.colors.every((c) => form.colors.includes(c))
+                        ? "bg-indigo-100 border-indigo-500"
+                        : "bg-white/50 border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="text-xl mb-2">{theme.emoji}</div>
+                    <p className="text-xs font-bold text-slate-700 mb-2">{theme.name}</p>
+                    <div className="flex gap-1 justify-center">
+                      {theme.colors.map((color) => (
+                        <div
+                          key={color}
+                          className="w-4 h-4 rounded border border-slate-300"
+                          style={{ backgroundColor: color }}
+                        />
+                      ))}
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {/* Manual Color Selection */}
+            {form.colors.length > 0 && (
+              <div className="border-t pt-4">
+                <p className="text-xs font-bold text-slate-700 mb-3">Selected Colors:</p>
+                <div className="flex flex-wrap gap-3">
+                  {form.colors.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => toggleColor(color)}
+                      className="w-12 h-12 rounded-lg border-3 border-slate-900 shadow-md transition-all hover:opacity-75"
+                      style={{ backgroundColor: color }}
+                      title={`Remove ${color}`}
+                    />
+                  ))}
+                </div>
+                <button
+                  onClick={() => setForm({ ...form, colors: [] })}
+                  className="text-xs text-slate-600 hover:text-slate-900 mt-3 font-medium"
+                >
+                  Clear selection
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
