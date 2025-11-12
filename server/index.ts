@@ -3,6 +3,10 @@ import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
 
+// Import RBAC middleware
+import { authenticateUser } from "./middleware/security";
+import { requireScope } from "./middleware/requireScope";
+
 // Import route routers
 import agentsRouter from "./routes/agents";
 import aiMetricsRouter from "./routes/ai-metrics";
@@ -233,31 +237,33 @@ export function createServer() {
   app.post("/api/ai/generate", generateBuilderContent);
   app.post("/api/ai/webhook", builderWebhook);
 
-  // Analytics routes
-  app.get("/api/analytics/:brandId", getAnalytics);
-  app.get("/api/analytics/:brandId/insights", getInsights);
-  app.get("/api/analytics/:brandId/forecast", getForecast);
-  app.post("/api/analytics/:brandId/voice-query", processVoiceQuery);
-  app.post("/api/analytics/:brandId/feedback", provideFeedback);
-  app.get("/api/analytics/:brandId/goals", getGoals);
-  app.post("/api/analytics/:brandId/goals", createGoal);
-  app.post("/api/analytics/:brandId/sync", syncPlatformData);
-  app.post("/api/analytics/:brandId/offline-metric", addOfflineMetric);
-  app.get("/api/analytics/:brandId/heatmap", getEngagementHeatmap);
-  app.get("/api/analytics/:brandId/alerts", getAlerts);
+  // Analytics routes - with RBAC enforcement
+  app.get("/api/analytics/:brandId", authenticateUser, requireScope('analytics:read'), getAnalytics);
+  app.get("/api/analytics/:brandId/insights", authenticateUser, requireScope('analytics:read'), getInsights);
+  app.get("/api/analytics/:brandId/forecast", authenticateUser, requireScope('analytics:read'), getForecast);
+  app.post("/api/analytics/:brandId/voice-query", authenticateUser, requireScope('analytics:read'), processVoiceQuery);
+  app.post("/api/analytics/:brandId/feedback", authenticateUser, requireScope('analytics:read'), provideFeedback);
+  app.get("/api/analytics/:brandId/goals", authenticateUser, requireScope('analytics:read'), getGoals);
+  app.post("/api/analytics/:brandId/goals", authenticateUser, requireScope('analytics:read'), createGoal);
+  app.post("/api/analytics/:brandId/sync", authenticateUser, requireScope('analytics:read'), syncPlatformData);
+  app.post("/api/analytics/:brandId/offline-metric", authenticateUser, requireScope('analytics:read'), addOfflineMetric);
+  app.get("/api/analytics/:brandId/heatmap", authenticateUser, requireScope('analytics:read'), getEngagementHeatmap);
+  app.get("/api/analytics/:brandId/alerts", authenticateUser, requireScope('analytics:read'), getAlerts);
   app.post(
     "/api/analytics/:brandId/alerts/:alertId/acknowledge",
+    authenticateUser,
+    requireScope('analytics:read'),
     acknowledgeAlert,
   );
 
-  // Approvals routes
-  app.post("/api/approvals/bulk", bulkApproveContent);
-  app.post("/api/approvals/single", approveSingleContent);
-  app.post("/api/approvals/reject", rejectContent);
-  app.get("/api/approvals/history/:brandId", getApprovalHistory);
-  app.post("/api/approvals/request", requestApproval);
-  app.get("/api/approvals/pending/:brandId", getPendingApprovals);
-  app.post("/api/approvals/:approvalId/remind", sendApprovalReminder);
+  // Approvals routes - with RBAC enforcement
+  app.post("/api/approvals/bulk", authenticateUser, requireScope('content:approve'), bulkApproveContent);
+  app.post("/api/approvals/single", authenticateUser, requireScope('content:approve'), approveSingleContent);
+  app.post("/api/approvals/reject", authenticateUser, requireScope('content:approve'), rejectContent);
+  app.get("/api/approvals/history/:brandId", authenticateUser, requireScope('content:view'), getApprovalHistory);
+  app.post("/api/approvals/request", authenticateUser, requireScope('content:view'), requestApproval);
+  app.get("/api/approvals/pending/:brandId", authenticateUser, requireScope('content:view'), getPendingApprovals);
+  app.post("/api/approvals/:approvalId/remind", authenticateUser, requireScope('content:approve'), sendApprovalReminder);
 
   // Audit routes
   app.get("/api/audit/logs/:brandId", getAuditLogs);
