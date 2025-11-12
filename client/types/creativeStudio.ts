@@ -60,6 +60,18 @@ export interface Design {
   scheduledPlatforms?: string[];
   autoPublish?: boolean;
   lastSaveAction?: "saveToLibrary" | "saveAsDraft" | "saveCreateVariant" | "sendToQueue" | "sendPublishNow" | "sendMultiplePlatforms" | "schedule" | "scheduleAutoPublish" | "viewCalendar" | "download";
+  // Approval workflow
+  approvalStatus?: "draft" | "pending_approval" | "approved" | "rejected" | "scheduled";
+  approvalRequestedBy?: string;
+  approvalRequestedAt?: string;
+  approvedBy?: string;
+  approvedAt?: string;
+  rejectedBy?: string;
+  rejectedAt?: string;
+  rejectionReason?: string;
+  // Comments and collaboration
+  commentCount?: number;
+  versionNumber?: number;
 }
 
 export interface CreativeStudioState {
