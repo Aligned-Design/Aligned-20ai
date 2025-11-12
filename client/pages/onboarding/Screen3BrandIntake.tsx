@@ -275,7 +275,7 @@ export default function Screen3BrandIntake() {
           {/* Q4: Goal */}
           <div className="bg-white/50 backdrop-blur-xl rounded-2xl border border-white/60 p-6">
             <label className="block text-sm font-black text-slate-900 mb-4">
-              4️⃣ What's your key goal?
+              4️⃣ What's your key goal? (Optional)
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {GOAL_OPTIONS.map((option) => (
