@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useState } from "react";
 import {
   Facebook,
   Twitter,
@@ -109,7 +108,7 @@ const MONTH_DATA: DayData[] = [
         title: "TikTok Challenge",
         platform: "tiktok",
         status: "scheduled",
-        excerpt: "Join the #CreativeChallenge and show us your best content! 🎬",
+        excerpt: "Join the #CreativeChallenge and show us your best content! ���",
         brand: "Aligned-20AI",
         campaign: "Product Launch",
         createdDate: "2024-11-06",
