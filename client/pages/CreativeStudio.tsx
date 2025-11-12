@@ -36,6 +36,20 @@ import { generateCaptions } from "@/lib/generateCaption";
 import { isFeatureEnabled } from "@/lib/featureFlags";
 import { ElementSidebar } from "@/components/dashboard/ElementSidebar";
 
+// New Creative Studio Components
+import { TabbedRightSidebar } from "@/components/creative-studio/TabbedRightSidebar";
+import { CanvasZoomControls } from "@/components/creative-studio/CanvasZoomControls";
+import { TextFormattingToolbar } from "@/components/creative-studio/TextFormattingToolbar";
+import { ApprovalStatusBadge } from "@/components/creative-studio/ApprovalStatusBadge";
+import { RequestApprovalModal } from "@/components/creative-studio/RequestApprovalModal";
+import { ApprovalButtons } from "@/components/creative-studio/ApprovalButtons";
+import { ApprovalHistoryPanel } from "@/components/creative-studio/ApprovalHistoryPanel";
+import { CommentThreadPanel } from "@/components/creative-studio/CommentThreadPanel";
+import { VersionHistoryTimeline } from "@/components/creative-studio/VersionHistoryTimeline";
+import { LiveEditingIndicators } from "@/components/creative-studio/LiveEditingIndicators";
+import { KeyboardShortcutsPanel } from "@/components/creative-studio/KeyboardShortcutsPanel";
+import { MobileToolbar } from "@/components/creative-studio/MobileToolbar";
+
 const AUTOSAVE_DELAY = 3000; // 3 seconds
 
 export default function CreativeStudio() {
@@ -78,6 +92,14 @@ export default function CreativeStudio() {
 
   // Track unsaved changes
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // New features state
+  const [showRequestApproval, setShowRequestApproval] = useState(false);
+  const [showApprovalHistory, setShowApprovalHistory] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
+  const [activeUsers, setActiveUsers] = useState<Array<{ userId: string; userName: string; isEditing: boolean }>>([]);
 
   const { toast } = useToast();
 
