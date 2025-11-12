@@ -612,10 +612,12 @@ export default function ContentQueue() {
             </div>
           )}
 
-          {/* Queue Advisor */}
-          <div className="mb-12">
-            <QueueAdvisor />
-          </div>
+          {/* Queue Advisor - hidden when status filtered */}
+          {!statusFilter && (
+            <div className="mb-12">
+              <QueueAdvisor />
+            </div>
+          )}
         </div>
       </div>
 
