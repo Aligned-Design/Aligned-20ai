@@ -234,11 +234,11 @@ export function GrowthLineChart({
   const chartConfig: ChartConfig = {
     current: {
       label: "Current Period",
-      color: "#8b5cf6",
+      color: CHART_COLORS.primary,
     },
     previous: {
       label: "Previous Period",
-      color: "#d1d5db",
+      color: CHART_COLORS.muted,
     },
   };
 
