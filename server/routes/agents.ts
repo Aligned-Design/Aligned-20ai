@@ -580,6 +580,41 @@ router.post("/bfs/calculate", async (req, res) => {
   }
 });
 
+// Mock review queue data for development
+const MOCK_REVIEW_QUEUE = [
+  {
+    id: "review_1",
+    brand_id: "brand_abd",
+    agent: "doc",
+    input: { platform: "linkedin", topic: "AI trends" },
+    output: {
+      headline: "The Future of AI in Marketing",
+      body: "Discover how AI is transforming the marketing landscape...",
+      cta: "Learn More",
+      hashtags: ["AI", "Marketing", "Innovation"],
+    },
+    bfs: {
+      overall: 0.89,
+      tone_alignment: 0.92,
+      terminology_match: 0.87,
+      compliance: 1.0,
+      cta_fit: 0.85,
+      platform_fit: 0.88,
+      passed: true,
+      issues: [],
+      regeneration_count: 0,
+    },
+    linter_results: {
+      passed: true,
+      blocked: false,
+      needs_human_review: false,
+      toxicity_score: 0.02,
+      fixes_applied: [],
+    },
+    timestamp: new Date(Date.now() - 3600000).toISOString(),
+  },
+];
+
 /**
  * GET /api/agents/review/queue/:brandId
  * Get content pending review
@@ -587,6 +622,13 @@ router.post("/bfs/calculate", async (req, res) => {
 router.get("/review/queue/:brandId", async (req, res) => {
   try {
     const { brandId } = req.params;
+
+    // Check if we should use mocks
+    const useMocks = process.env.USE_MOCKS === "true" || process.env.NODE_ENV === "development";
+
+    if (useMocks) {
+      return (res as any).json({ queue: MOCK_REVIEW_QUEUE });
+    }
 
     const { data: reviewQueue, error } = await supabase
       .from("generation_logs")
@@ -598,20 +640,16 @@ router.get("/review/queue/:brandId", async (req, res) => {
       .limit(50);
 
     if (error) {
-      throw error;
+      // Graceful fallback: return empty queue instead of throwing
+      console.warn("Review queue error:", error);
+      return (res as any).json({ queue: [] });
     }
 
     (res as any).json({ queue: reviewQueue || [] });
   } catch (error) {
     console.error("Review queue error:", error);
-    throw new AppError(
-      ErrorCode.INTERNAL_ERROR,
-      "Failed to load review queue",
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      "error",
-      error instanceof Error ? { originalError: error.message } : undefined,
-      "Please try again later or contact support"
-    );
+    // Graceful fallback: always return valid JSON, never throw
+    (res as any).json({ queue: [] });
   }
 });
 

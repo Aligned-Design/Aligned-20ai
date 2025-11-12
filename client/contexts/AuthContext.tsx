@@ -102,6 +102,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Load from localStorage on mount (defensive parsing to avoid crashes from corrupted values)
   useEffect(() => {
     try {
+      // DEV ONLY: Check for dev auth toggle
+      const devAuthEnabled = localStorage.getItem("aligned_dev_auth");
+      if (devAuthEnabled === "true" && !localStorage.getItem("aligned_user")) {
+        const mockUser: OnboardingUser = {
+          id: "user-dev-mock",
+          name: "Lauren",
+          email: "lauren@aligned-bydesign.com",
+          password: "",
+          role: "agency",
+          plan: "agency",
+        };
+        setUser(mockUser);
+        return;
+      }
+
       const stored = localStorage.getItem("aligned_user");
       if (stored) {
         try {
