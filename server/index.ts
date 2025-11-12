@@ -15,6 +15,7 @@ import publishingRouter from "./routes/publishing-router";
 import orchestrationRouter from "./routes/orchestration";
 import milestonesRouter from "./routes/milestones";
 import trialRouter from "./routes/trial";
+import billingRouter from "./routes/billing";
 
 // Import route handlers
 import {
@@ -217,6 +218,7 @@ export function createServer() {
   app.use("/api/orchestration", orchestrationRouter);
   app.use("/api/milestones", milestonesRouter);
   app.use("/api/trial", trialRouter);
+  app.use("/api/billing", billingRouter);
 
   // Register individual route handlers with appropriate paths
 
