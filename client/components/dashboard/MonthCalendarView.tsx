@@ -1,6 +1,15 @@
 import { Facebook, Twitter, Instagram, Linkedin, Music, Youtube, MapPin } from "lucide-react";
 
 import { useState } from "react";
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Music,
+  Youtube,
+  MapPin,
+} from "lucide-react";
 import { PostPreviewModal } from "./PostPreviewModal";
 import { Post } from "@/types/post";
 
