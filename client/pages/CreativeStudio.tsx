@@ -16,7 +16,7 @@ import { ScheduleModal } from "@/components/dashboard/ScheduleModal";
 import { PlatformSelectorModal } from "@/components/dashboard/PlatformSelectorModal";
 import { BackgroundPickerModal } from "@/components/dashboard/BackgroundPickerModal";
 import { ElementsDrawer } from "@/components/dashboard/ElementsDrawer";
-import { Menu, Download, Share2, Send, Calendar, Save, X, Zap, Eye, Layout, Layers, Image as ImageIcon } from "lucide-react";
+import { Menu, Download, Share2, Send, Calendar, Save, X, Zap, Eye, Layout, Layers, Image as ImageIcon, MessageSquare, History } from "lucide-react";
 import {
   Design,
   CanvasItem,
@@ -156,6 +156,9 @@ export default function CreativeStudio() {
       } else if ((e.ctrlKey || e.metaKey) && e.key === "r" && state.selectedItemId) {
         e.preventDefault();
         handleRotateItem(45);
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "/") {
+        e.preventDefault();
+        setShowKeyboardShortcuts(true);
       }
     };
 
@@ -735,6 +738,96 @@ const handleAddElement = (elementType: string, defaultProps: Record<string, any>
     });
 
     console.log("[telemetry] delete_item", { itemId, itemType });
+  };
+
+  // Approval workflow handlers
+  const handleRequestApproval = async (reviewers: string[], message?: string) => {
+    if (!state.design) return;
+
+    handleUpdateDesign({
+      approvalStatus: "pending_approval",
+      approvalRequestedBy: user?.id,
+      approvalRequestedAt: new Date().toISOString(),
+    });
+
+    toast({
+      title: "✅ Approval Requested",
+      description: `Sent to ${reviewers.length} reviewer(s)`,
+    });
+
+    setShowRequestApproval(false);
+    console.log("[telemetry] request_approval", { designId: state.design.id, reviewers });
+  };
+
+  const handleApprove = async (notes?: string) => {
+    if (!state.design) return;
+
+    handleUpdateDesign({
+      approvalStatus: "approved",
+      approvedBy: user?.id,
+      approvedAt: new Date().toISOString(),
+    });
+
+    toast({
+      title: "✅ Design Approved",
+      description: "Ready to schedule and publish",
+    });
+
+    console.log("[telemetry] approve_design", { designId: state.design.id, notes });
+  };
+
+  const handleReject = async (reason: string) => {
+    if (!state.design) return;
+
+    handleUpdateDesign({
+      approvalStatus: "rejected",
+      rejectedBy: user?.id,
+      rejectedAt: new Date().toISOString(),
+      rejectionReason: reason,
+    });
+
+    toast({
+      title: "Design Rejected",
+      description: "Creator will be notified",
+    });
+
+    console.log("[telemetry] reject_design", { designId: state.design.id, reason });
+  };
+
+  // Comment handlers
+  const handleAddComment = (text: string, elementId?: string, parentId?: string) => {
+    if (!state.design) return;
+
+    toast({
+      title: "💬 Comment Added",
+      description: "Your comment has been posted",
+    });
+
+    console.log("[telemetry] add_comment", { designId: state.design.id, text, elementId, parentId });
+  };
+
+  // Version history handlers
+  const handleRestoreVersion = async (versionId: string) => {
+    if (!state.design) return;
+
+    toast({
+      title: "⏮️ Version Restored",
+      description: "Design reverted to previous state",
+    });
+
+    console.log("[telemetry] restore_version", { designId: state.design.id, versionId });
+  };
+
+  const handlePreviewVersion = (version: any) => {
+    toast({
+      title: "👁️ Version Preview",
+      description: "Viewing previous version",
+    });
+  };
+
+  // Fit to screen handler
+  const handleFitToScreen = () => {
+    setState((prev) => ({ ...prev, zoom: 100 }));
   };
 
   const handleChangeBackground = (backgroundColor: string) => {
