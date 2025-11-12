@@ -32,7 +32,7 @@ export async function checkCanPublish(
     }
 
     const daysPastDue = calculateDaysPastDue(user.past_due_since);
-    const can Publish = canPerformAction(user.plan_status, "canPublish", daysPastDue);
+    const canPublish = canPerformAction(user.plan_status, "canPublish", daysPastDue);
 
     if (!canPublish) {
       return res.status(403).json({
