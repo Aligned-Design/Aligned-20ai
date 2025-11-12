@@ -231,7 +231,8 @@ export function createServer() {
   // app.use("/api/webhooks/stripe", stripeWebhookRouter);
 
   // Register individual route handlers with appropriate paths
-
+  // Temporarily commented out - causing server startup issues
+  /*
   // AI Generation routes
   app.post("/api/ai/generate/content", generateAIContent);
   app.post("/api/ai/generate/design", generateDesign);
@@ -362,6 +363,7 @@ export function createServer() {
   app.post("/api/workflow/:workflowId/cancel", authenticateUser, requireScope('workflow:manage'), cancelWorkflow);
   app.get("/api/workflow/:workflowId", getWorkflow);
   app.get("/api/workflow/content/:contentId", getWorkflowsForContent);
+  */
 
   return app;
 }
