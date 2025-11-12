@@ -256,7 +256,7 @@ export default function Screen3BrandIntake() {
           {/* Q3: Audience */}
           <div className="bg-white/50 backdrop-blur-xl rounded-2xl border border-white/60 p-6">
             <label className="block text-sm font-black text-slate-900 mb-3">
-              3️⃣ Who's your audience?
+              3️⃣ Who's your audience? (Optional)
             </label>
             <select
               value={form.audience}
