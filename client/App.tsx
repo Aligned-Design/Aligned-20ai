@@ -9,7 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "@/contexts/UserContext";
 import { WorkspaceProvider } from "@/contexts/WorkspaceContext";
-import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth as useOnboardingAuth } from "@/contexts/AuthContext";
 import { BrandProvider } from "@/contexts/BrandContext";
 import MilestoneCelebrator from "@/components/MilestoneCelebrator";
 import { SEOHead } from "@/components/seo";
@@ -71,7 +71,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, onboardingStep } = useAuth();
+  const { isAuthenticated, onboardingStep } = useOnboardingAuth();
 
   // Not authenticated - redirect to landing page
   if (!isAuthenticated) {
@@ -88,7 +88,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function OnboardingRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, onboardingStep } = useAuth();
+  const { isAuthenticated, onboardingStep } = useOnboardingAuth();
 
   // Authenticated but onboarding is complete - redirect to dashboard
   if (isAuthenticated && !onboardingStep) {
