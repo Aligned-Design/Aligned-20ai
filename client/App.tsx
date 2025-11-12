@@ -54,7 +54,7 @@ const queryClient = new QueryClient();
 
 // Route guard components
 function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, onboardingStep } = useAuth();
+  const { isAuthenticated, onboardingStep } = useOnboardingAuth();
 
   // If authenticated and onboarding is in progress, show onboarding
   if (isAuthenticated && onboardingStep) {
