@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useWorkspace } from "@/contexts/WorkspaceContext";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { StatusOverviewBanner } from "@/components/dashboard/StatusOverviewBanner";
@@ -16,6 +17,7 @@ import {
   CheckCircle2,
   RefreshCw,
   AlertCircle,
+  ChevronLeft,
 } from "lucide-react";
 
 const allPosts: Post[] = [
