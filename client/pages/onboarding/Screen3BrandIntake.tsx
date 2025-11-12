@@ -164,7 +164,8 @@ export default function Screen3BrandIntake() {
     setOnboardingStep(3.5);
   };
 
-  const isComplete = form.businessDescription.trim() && form.tone.length > 0 && form.audience && form.goal;
+  // All fields are optional - user can proceed with or without filling anything
+  const isComplete = true;
 
   // Show palette preview if in palette step and swatches exist
   if (screenState.step === "palette" && form.extractedSwatches) {
