@@ -1,5 +1,5 @@
-import { MainLayout } from '@/components/layout/MainLayout';
-import { MultiClientApprovalDashboard } from '@/components/collaboration';
+import { MainLayout } from "@/components/layout/MainLayout";
+import { MultiClientApprovalDashboard } from "@/components/collaboration";
 
 export default function ApprovalsEnhanced() {
   return (

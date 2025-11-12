@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { useState, useRef, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   MessageCircle,
   Send,
@@ -10,12 +10,12 @@ import {
   ChevronDown,
   Check,
   CheckCheck,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Message {
   id: string;
-  sender: 'client' | 'agency';
+  sender: "client" | "agency";
   content: string;
   timestamp: string;
   read: boolean;
@@ -25,7 +25,7 @@ interface Message {
 interface QAThread {
   id: string;
   question: string;
-  status: 'answered' | 'pending';
+  status: "answered" | "pending";
   messages: Message[];
   createdAt: string;
   category?: string;
@@ -37,27 +37,32 @@ interface ClientQAChatProps {
   className?: string;
 }
 
-export function ClientQAChat({ clientId, agencyName, className }: ClientQAChatProps) {
+export function ClientQAChat({
+  clientId,
+  agencyName,
+  className,
+}: ClientQAChatProps) {
   const [threads, setThreads] = useState<QAThread[]>([
     {
-      id: '1',
-      question: 'Why posting at 2 PM? I thought morning is better?',
-      status: 'answered',
-      category: 'Strategy',
-      createdAt: '2024-11-10T10:00:00Z',
+      id: "1",
+      question: "Why posting at 2 PM? I thought morning is better?",
+      status: "answered",
+      category: "Strategy",
+      createdAt: "2024-11-10T10:00:00Z",
       messages: [
         {
-          id: 'm1',
-          sender: 'client',
-          content: 'Why posting at 2 PM? I thought morning is better?',
-          timestamp: '2024-11-10T10:00:00Z',
+          id: "m1",
+          sender: "client",
+          content: "Why posting at 2 PM? I thought morning is better?",
+          timestamp: "2024-11-10T10:00:00Z",
           read: true,
         },
         {
-          id: 'm2',
-          sender: 'agency',
-          content: "Great question! Our data shows 2 PM = +40% engagement for your audience. Here's why: Your followers are most active during lunch breaks and early afternoon. We analyzed 3 months of data and found peak engagement windows at 2-3 PM on weekdays.",
-          timestamp: '2024-11-10T14:30:00Z',
+          id: "m2",
+          sender: "agency",
+          content:
+            "Great question! Our data shows 2 PM = +40% engagement for your audience. Here's why: Your followers are most active during lunch breaks and early afternoon. We analyzed 3 months of data and found peak engagement windows at 2-3 PM on weekdays.",
+          timestamp: "2024-11-10T14:30:00Z",
           read: true,
           isAnswer: true,
         },
@@ -66,12 +71,12 @@ export function ClientQAChat({ clientId, agencyName, className }: ClientQAChatPr
   ]);
 
   const [activeThread, setActiveThread] = useState<string | null>(null);
-  const [newQuestion, setNewQuestion] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [newQuestion, setNewQuestion] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeThread, threads]);
 
   const handleAskQuestion = () => {
@@ -80,12 +85,12 @@ export function ClientQAChat({ clientId, agencyName, className }: ClientQAChatPr
     const newThread: QAThread = {
       id: `thread-${Date.now()}`,
       question: newQuestion,
-      status: 'pending',
+      status: "pending",
       createdAt: new Date().toISOString(),
       messages: [
         {
           id: `msg-${Date.now()}`,
-          sender: 'client',
+          sender: "client",
           content: newQuestion,
           timestamp: new Date().toISOString(),
           read: false,
@@ -95,23 +100,25 @@ export function ClientQAChat({ clientId, agencyName, className }: ClientQAChatPr
 
     setThreads([newThread, ...threads]);
     setActiveThread(newThread.id);
-    setNewQuestion('');
+    setNewQuestion("");
 
     // Track analytics
     if (window.posthog) {
-      window.posthog.capture('client_question_asked', { question: newQuestion });
+      window.posthog.capture("client_question_asked", {
+        question: newQuestion,
+      });
     }
   };
 
   const filteredThreads = threads.filter((thread) =>
-    thread.question.toLowerCase().includes(searchQuery.toLowerCase())
+    thread.question.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const activeThreadData = threads.find((t) => t.id === activeThread);
-  const pendingCount = threads.filter((t) => t.status === 'pending').length;
+  const pendingCount = threads.filter((t) => t.status === "pending").length;
 
   return (
-    <div className={cn('h-full flex flex-col', className)}>
+    <div className={cn("h-full flex flex-col", className)}>
       <Card className="flex-1 flex flex-col h-full">
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -152,7 +159,7 @@ export function ClientQAChat({ clientId, agencyName, className }: ClientQAChatPr
                 <Input
                   value={newQuestion}
                   onChange={(e) => setNewQuestion(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAskQuestion()}
+                  onKeyPress={(e) => e.key === "Enter" && handleAskQuestion()}
                   placeholder="Ask a question..."
                   className="flex-1"
                 />
@@ -180,20 +187,23 @@ export function ClientQAChat({ clientId, agencyName, className }: ClientQAChatPr
                     key={thread.id}
                     onClick={() => setActiveThread(thread.id)}
                     className={cn(
-                      'w-full text-left p-3 rounded-lg border transition-all',
+                      "w-full text-left p-3 rounded-lg border transition-all",
                       activeThread === thread.id
-                        ? 'border-indigo-500 bg-indigo-50'
-                        : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                        ? "border-indigo-500 bg-indigo-50"
+                        : "border-slate-200 hover:border-slate-300 hover:bg-slate-50",
                     )}
                   >
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <p className="font-medium text-sm text-slate-900 line-clamp-2">
                         {thread.question}
                       </p>
-                      {thread.status === 'answered' ? (
+                      {thread.status === "answered" ? (
                         <CheckCheck className="h-4 w-4 text-green-600 flex-shrink-0" />
                       ) : (
-                        <Badge variant="secondary" className="text-xs flex-shrink-0">
+                        <Badge
+                          variant="secondary"
+                          className="text-xs flex-shrink-0"
+                        >
                           Pending
                         </Badge>
                       )}
@@ -226,9 +236,12 @@ export function ClientQAChat({ clientId, agencyName, className }: ClientQAChatPr
                   </h3>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-slate-500">
-                      Asked {new Date(activeThreadData.createdAt).toLocaleDateString()}
+                      Asked{" "}
+                      {new Date(
+                        activeThreadData.createdAt,
+                      ).toLocaleDateString()}
                     </span>
-                    {activeThreadData.status === 'answered' && (
+                    {activeThreadData.status === "answered" && (
                       <Badge className="gap-1 bg-green-100 text-green-700 border-green-200">
                         <Check className="h-3 w-3" />
                         Answered
@@ -243,48 +256,58 @@ export function ClientQAChat({ clientId, agencyName, className }: ClientQAChatPr
                     <div
                       key={message.id}
                       className={cn(
-                        'flex',
-                        message.sender === 'client' ? 'justify-end' : 'justify-start'
+                        "flex",
+                        message.sender === "client"
+                          ? "justify-end"
+                          : "justify-start",
                       )}
                     >
                       <div
                         className={cn(
-                          'max-w-[80%] rounded-lg p-4',
-                          message.sender === 'client'
-                            ? 'bg-indigo-600 text-white'
+                          "max-w-[80%] rounded-lg p-4",
+                          message.sender === "client"
+                            ? "bg-indigo-600 text-white"
                             : message.isAnswer
-                            ? 'bg-green-50 border border-green-200'
-                            : 'bg-slate-100'
+                              ? "bg-green-50 border border-green-200"
+                              : "bg-slate-100",
                         )}
                       >
                         {message.isAnswer && (
-                          <Badge className="mb-2 bg-green-600">
-                            Answer
-                          </Badge>
+                          <Badge className="mb-2 bg-green-600">Answer</Badge>
                         )}
-                        <p className={cn(
-                          'text-sm leading-relaxed',
-                          message.sender === 'client' ? 'text-white' : 'text-slate-900'
-                        )}>
+                        <p
+                          className={cn(
+                            "text-sm leading-relaxed",
+                            message.sender === "client"
+                              ? "text-white"
+                              : "text-slate-900",
+                          )}
+                        >
                           {message.content}
                         </p>
-                        <div className={cn(
-                          'flex items-center justify-between mt-2 text-xs',
-                          message.sender === 'client' ? 'text-indigo-200' : 'text-slate-500'
-                        )}>
+                        <div
+                          className={cn(
+                            "flex items-center justify-between mt-2 text-xs",
+                            message.sender === "client"
+                              ? "text-indigo-200"
+                              : "text-slate-500",
+                          )}
+                        >
                           <span>
-                            {new Date(message.timestamp).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
+                            {new Date(message.timestamp).toLocaleTimeString(
+                              [],
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              },
+                            )}
                           </span>
-                          {message.sender === 'client' && (
-                            message.read ? (
+                          {message.sender === "client" &&
+                            (message.read ? (
                               <CheckCheck className="h-3 w-3" />
                             ) : (
                               <Check className="h-3 w-3" />
-                            )
-                          )}
+                            ))}
                         </div>
                       </div>
                     </div>
@@ -293,11 +316,11 @@ export function ClientQAChat({ clientId, agencyName, className }: ClientQAChatPr
                 </div>
 
                 {/* Status Message */}
-                {activeThreadData.status === 'pending' && (
+                {activeThreadData.status === "pending" && (
                   <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
                     <p className="text-amber-900 text-sm">
-                      💬 Your question has been sent to {agencyName}. They'll respond within
-                      24 hours.
+                      💬 Your question has been sent to {agencyName}. They'll
+                      respond within 24 hours.
                     </p>
                   </div>
                 )}
@@ -306,8 +329,12 @@ export function ClientQAChat({ clientId, agencyName, className }: ClientQAChatPr
               <div className="flex-1 flex items-center justify-center text-slate-500">
                 <div className="text-center">
                   <MessageCircle className="h-12 w-12 mx-auto mb-3 text-slate-300" />
-                  <p className="font-medium">Select a question to view the conversation</p>
-                  <p className="text-sm mt-1">Or ask a new question to get started</p>
+                  <p className="font-medium">
+                    Select a question to view the conversation
+                  </p>
+                  <p className="text-sm mt-1">
+                    Or ask a new question to get started
+                  </p>
                 </div>
               </div>
             )}
@@ -323,18 +350,27 @@ export function ClientQAChat({ clientId, agencyName, className }: ClientQAChatPr
         <CardContent>
           <div className="space-y-2">
             {[
-              { q: 'How often will you post?', a: 'We post 3-5 times per week based on your plan.' },
-              { q: 'Can I see analytics?', a: 'Yes! Check the Analytics tab for detailed metrics.' },
-              { q: 'How do I upload my own images?', a: 'Go to Upload Assets tab to add media.' },
+              {
+                q: "How often will you post?",
+                a: "We post 3-5 times per week based on your plan.",
+              },
+              {
+                q: "Can I see analytics?",
+                a: "Yes! Check the Analytics tab for detailed metrics.",
+              },
+              {
+                q: "How do I upload my own images?",
+                a: "Go to Upload Assets tab to add media.",
+              },
             ].map((faq, idx) => (
               <details key={idx} className="group">
                 <summary className="flex items-center justify-between cursor-pointer p-3 hover:bg-slate-50 rounded-lg">
-                  <span className="font-medium text-sm text-slate-900">{faq.q}</span>
+                  <span className="font-medium text-sm text-slate-900">
+                    {faq.q}
+                  </span>
                   <ChevronDown className="h-4 w-4 text-slate-500 group-open:rotate-180 transition-transform" />
                 </summary>
-                <p className="text-sm text-slate-600 p-3 pt-0">
-                  {faq.a}
-                </p>
+                <p className="text-sm text-slate-600 p-3 pt-0">{faq.a}</p>
               </details>
             ))}
           </div>

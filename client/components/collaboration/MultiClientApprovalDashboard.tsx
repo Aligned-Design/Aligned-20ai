@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   CheckCircle,
   X,
@@ -19,8 +19,8 @@ import {
   AlertTriangle,
   Search,
   Filter,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ApprovalCard {
   id: string;
@@ -32,127 +32,137 @@ interface ApprovalCard {
     caption: string;
     platform: string;
   };
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   timePending: number; // hours
   slaHours: number;
 }
 
-type ColumnType = 'pending' | 'approved' | 'rejected';
+type ColumnType = "pending" | "approved" | "rejected";
 
 interface MultiClientApprovalDashboardProps {
   className?: string;
 }
 
-export function MultiClientApprovalDashboard({ className }: MultiClientApprovalDashboardProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterClient, setFilterClient] = useState<string>('all');
-  const [filterTime, setFilterTime] = useState<string>('all');
+export function MultiClientApprovalDashboard({
+  className,
+}: MultiClientApprovalDashboardProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterClient, setFilterClient] = useState<string>("all");
+  const [filterTime, setFilterTime] = useState<string>("all");
 
   const [approvals, setApprovals] = useState<ApprovalCard[]>([
     {
-      id: '1',
-      clientName: 'Acme Corp',
-      clientAvatar: '🏢',
-      brandName: 'Acme Products',
+      id: "1",
+      clientName: "Acme Corp",
+      clientAvatar: "🏢",
+      brandName: "Acme Products",
       postPreview: {
-        thumbnail: '/placeholder.svg',
-        caption: 'New product launch coming next week! Stay tuned...',
-        platform: 'Instagram',
+        thumbnail: "/placeholder.svg",
+        caption: "New product launch coming next week! Stay tuned...",
+        platform: "Instagram",
       },
-      status: 'pending',
+      status: "pending",
       timePending: 28,
       slaHours: 24,
     },
     {
-      id: '2',
-      clientName: 'TechStart Inc',
-      clientAvatar: '💻',
-      brandName: 'TechStart',
+      id: "2",
+      clientName: "TechStart Inc",
+      clientAvatar: "💻",
+      brandName: "TechStart",
       postPreview: {
-        thumbnail: '/placeholder.svg',
-        caption: 'Join us for our webinar on AI trends in 2025',
-        platform: 'LinkedIn',
+        thumbnail: "/placeholder.svg",
+        caption: "Join us for our webinar on AI trends in 2025",
+        platform: "LinkedIn",
       },
-      status: 'pending',
+      status: "pending",
       timePending: 6,
       slaHours: 24,
     },
     {
-      id: '3',
-      clientName: 'FoodCo',
-      clientAvatar: '🍔',
-      brandName: 'FoodCo Restaurants',
+      id: "3",
+      clientName: "FoodCo",
+      clientAvatar: "🍔",
+      brandName: "FoodCo Restaurants",
       postPreview: {
-        thumbnail: '/placeholder.svg',
+        thumbnail: "/placeholder.svg",
         caption: "Today's special: Our famous burger with house sauce!",
-        platform: 'Facebook',
+        platform: "Facebook",
       },
-      status: 'approved',
+      status: "approved",
       timePending: 2,
       slaHours: 24,
     },
   ]);
 
-  const clients = Array.from(new Set(approvals.map(a => a.clientName)));
+  const clients = Array.from(new Set(approvals.map((a) => a.clientName)));
 
   const filteredApprovals = approvals.filter((approval) => {
     const matchesSearch =
       approval.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       approval.brandName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      approval.postPreview.caption.toLowerCase().includes(searchQuery.toLowerCase());
+      approval.postPreview.caption
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
 
-    const matchesClient = filterClient === 'all' || approval.clientName === filterClient;
+    const matchesClient =
+      filterClient === "all" || approval.clientName === filterClient;
 
     const matchesTime =
-      filterTime === 'all' ||
-      (filterTime === '24h' && approval.timePending > 24) ||
-      (filterTime === '48h' && approval.timePending > 48);
+      filterTime === "all" ||
+      (filterTime === "24h" && approval.timePending > 24) ||
+      (filterTime === "48h" && approval.timePending > 48);
 
     return matchesSearch && matchesClient && matchesTime;
   });
 
-  const columns: { type: ColumnType; title: string; icon: React.ReactNode }[] = [
-    {
-      type: 'pending',
-      title: 'Pending Approval',
-      icon: <Clock className="h-4 w-4" />,
-    },
-    {
-      type: 'approved',
-      title: 'Approved',
-      icon: <CheckCircle className="h-4 w-4" />,
-    },
-    {
-      type: 'rejected',
-      title: 'Rejected',
-      icon: <X className="h-4 w-4" />,
-    },
-  ];
+  const columns: { type: ColumnType; title: string; icon: React.ReactNode }[] =
+    [
+      {
+        type: "pending",
+        title: "Pending Approval",
+        icon: <Clock className="h-4 w-4" />,
+      },
+      {
+        type: "approved",
+        title: "Approved",
+        icon: <CheckCircle className="h-4 w-4" />,
+      },
+      {
+        type: "rejected",
+        title: "Rejected",
+        icon: <X className="h-4 w-4" />,
+      },
+    ];
 
   const moveCard = (cardId: string, newStatus: ColumnType) => {
     setApprovals(
       approvals.map((approval) =>
-        approval.id === cardId ? { ...approval, status: newStatus } : approval
-      )
+        approval.id === cardId ? { ...approval, status: newStatus } : approval,
+      ),
     );
   };
 
   const handleBulkApprove = () => {
-    const pendingIds = filteredApprovals.filter(a => a.status === 'pending').map(a => a.id);
+    const pendingIds = filteredApprovals
+      .filter((a) => a.status === "pending")
+      .map((a) => a.id);
     setApprovals(
       approvals.map((approval) =>
-        pendingIds.includes(approval.id) ? { ...approval, status: 'approved' } : approval
-      )
+        pendingIds.includes(approval.id)
+          ? { ...approval, status: "approved" }
+          : approval,
+      ),
     );
 
     // Track analytics
     if (window.posthog) {
-      window.posthog.capture('bulk_approve', { count: pendingIds.length });
+      window.posthog.capture("bulk_approve", { count: pendingIds.length });
     }
   };
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn("space-y-6", className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -166,7 +176,9 @@ export function MultiClientApprovalDashboard({ className }: MultiClientApprovalD
         <Button
           onClick={handleBulkApprove}
           className="gap-2"
-          disabled={filteredApprovals.filter(a => a.status === 'pending').length === 0}
+          disabled={
+            filteredApprovals.filter((a) => a.status === "pending").length === 0
+          }
         >
           <CheckCircle className="h-4 w-4" />
           Auto-Approve All Pending
@@ -228,7 +240,7 @@ export function MultiClientApprovalDashboard({ className }: MultiClientApprovalD
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {columns.map((column) => {
           const columnApprovals = filteredApprovals.filter(
-            (a) => a.status === column.type
+            (a) => a.status === column.type,
           );
 
           return (
@@ -274,14 +286,17 @@ interface ApprovalCardComponentProps {
   onMove: (cardId: string, newStatus: ColumnType) => void;
 }
 
-function ApprovalCardComponent({ approval, onMove }: ApprovalCardComponentProps) {
+function ApprovalCardComponent({
+  approval,
+  onMove,
+}: ApprovalCardComponentProps) {
   const isOverdue = approval.timePending > approval.slaHours;
 
   return (
     <Card
       className={cn(
-        'cursor-pointer transition-all hover:shadow-lg',
-        isOverdue && 'border-red-300 bg-red-50'
+        "cursor-pointer transition-all hover:shadow-lg",
+        isOverdue && "border-red-300 bg-red-50",
       )}
     >
       <CardContent className="p-4">
@@ -320,7 +335,7 @@ function ApprovalCardComponent({ approval, onMove }: ApprovalCardComponentProps)
         {/* Time Badge */}
         <div className="flex items-center justify-between mb-3">
           <Badge
-            variant={isOverdue ? 'destructive' : 'secondary'}
+            variant={isOverdue ? "destructive" : "secondary"}
             className="gap-1 text-xs"
           >
             {isOverdue && <AlertTriangle className="h-3 w-3" />}
@@ -331,11 +346,11 @@ function ApprovalCardComponent({ approval, onMove }: ApprovalCardComponentProps)
 
         {/* Actions */}
         <div className="flex gap-2">
-          {approval.status === 'pending' && (
+          {approval.status === "pending" && (
             <>
               <Button
                 size="sm"
-                onClick={() => onMove(approval.id, 'approved')}
+                onClick={() => onMove(approval.id, "approved")}
                 className="flex-1 gap-1 bg-green-600 hover:bg-green-700"
               >
                 <CheckCircle className="h-3 w-3" />
@@ -344,7 +359,9 @@ function ApprovalCardComponent({ approval, onMove }: ApprovalCardComponentProps)
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => window.location.href = `/client-portal/${approval.id}`}
+                onClick={() =>
+                  (window.location.href = `/client-portal/${approval.id}`)
+                }
                 className="gap-1"
               >
                 <Eye className="h-3 w-3" />
@@ -352,11 +369,13 @@ function ApprovalCardComponent({ approval, onMove }: ApprovalCardComponentProps)
               </Button>
             </>
           )}
-          {approval.status !== 'pending' && (
+          {approval.status !== "pending" && (
             <Button
               size="sm"
               variant="outline"
-              onClick={() => window.location.href = `/client-portal/${approval.id}`}
+              onClick={() =>
+                (window.location.href = `/client-portal/${approval.id}`)
+              }
               className="w-full gap-1"
             >
               <Eye className="h-3 w-3" />

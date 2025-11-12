@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Clock,
   AlertTriangle,
@@ -10,8 +10,8 @@ import {
   History,
   ChevronDown,
   ChevronUp,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ChangeLogEntry {
   field: string;
@@ -24,7 +24,7 @@ interface ApprovalSLATrackerProps {
   contentId: string;
   submittedAt: string;
   slaHours: number;
-  status: 'pending' | 'approved' | 'rejected' | 'auto_approved';
+  status: "pending" | "approved" | "rejected" | "auto_approved";
   changeLog?: ChangeLogEntry[];
   versionNumber?: number;
   onAutoApprove?: () => void;
@@ -69,30 +69,38 @@ export function ApprovalSLATracker({
     return `${minutes}m`;
   };
 
-  const getUrgencyLevel = (): 'normal' | 'warning' | 'critical' => {
-    const percentRemaining = (timeRemaining / (slaHours * 60 * 60 * 1000)) * 100;
-    
-    if (percentRemaining === 0) return 'critical';
-    if (percentRemaining < 25) return 'warning';
-    return 'normal';
+  const getUrgencyLevel = (): "normal" | "warning" | "critical" => {
+    const percentRemaining =
+      (timeRemaining / (slaHours * 60 * 60 * 1000)) * 100;
+
+    if (percentRemaining === 0) return "critical";
+    if (percentRemaining < 25) return "warning";
+    return "normal";
   };
 
   const urgency = getUrgencyLevel();
 
-  if (status !== 'pending') {
+  if (status !== "pending") {
     return (
-      <Card className={cn('border-green-200 bg-green-50', className)}>
+      <Card className={cn("border-green-200 bg-green-50", className)}>
         <CardContent className="pt-4 pb-4">
           <div className="flex items-center gap-3">
             <CheckCircle className="h-5 w-5 text-green-600" />
             <div>
               <p className="font-bold text-green-900">
-                {status === 'approved' ? 'Approved' : status === 'rejected' ? 'Changes Requested' : 'Auto-Approved'}
+                {status === "approved"
+                  ? "Approved"
+                  : status === "rejected"
+                    ? "Changes Requested"
+                    : "Auto-Approved"}
               </p>
               <p className="text-sm text-green-700">
-                {status === 'approved' && 'This content has been approved and is ready to publish'}
-                {status === 'rejected' && 'Agency is working on the requested changes'}
-                {status === 'auto_approved' && 'Automatically approved due to SLA deadline'}
+                {status === "approved" &&
+                  "This content has been approved and is ready to publish"}
+                {status === "rejected" &&
+                  "Agency is working on the requested changes"}
+                {status === "auto_approved" &&
+                  "Automatically approved due to SLA deadline"}
               </p>
             </div>
           </div>
@@ -102,46 +110,54 @@ export function ApprovalSLATracker({
   }
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn("space-y-4", className)}>
       {/* SLA Timer */}
-      <Card className={cn(
-        'border-2',
-        urgency === 'critical' && 'border-red-500 bg-red-50',
-        urgency === 'warning' && 'border-amber-500 bg-amber-50',
-        urgency === 'normal' && 'border-blue-200 bg-blue-50'
-      )}>
+      <Card
+        className={cn(
+          "border-2",
+          urgency === "critical" && "border-red-500 bg-red-50",
+          urgency === "warning" && "border-amber-500 bg-amber-50",
+          urgency === "normal" && "border-blue-200 bg-blue-50",
+        )}
+      >
         <CardContent className="pt-4 pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={cn(
-                'w-10 h-10 rounded-full flex items-center justify-center',
-                urgency === 'critical' && 'bg-red-100',
-                urgency === 'warning' && 'bg-amber-100',
-                urgency === 'normal' && 'bg-blue-100'
-              )}>
-                {urgency === 'critical' ? (
+              <div
+                className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center",
+                  urgency === "critical" && "bg-red-100",
+                  urgency === "warning" && "bg-amber-100",
+                  urgency === "normal" && "bg-blue-100",
+                )}
+              >
+                {urgency === "critical" ? (
                   <AlertTriangle className="h-5 w-5 text-red-600" />
                 ) : (
                   <Clock className="h-5 w-5 text-blue-600" />
                 )}
               </div>
               <div>
-                <p className={cn(
-                  'font-bold',
-                  urgency === 'critical' && 'text-red-900',
-                  urgency === 'warning' && 'text-amber-900',
-                  urgency === 'normal' && 'text-blue-900'
-                )}>
-                  {timeRemaining === 0 ? 'SLA Expired' : 'Time to Approve'}
+                <p
+                  className={cn(
+                    "font-bold",
+                    urgency === "critical" && "text-red-900",
+                    urgency === "warning" && "text-amber-900",
+                    urgency === "normal" && "text-blue-900",
+                  )}
+                >
+                  {timeRemaining === 0 ? "SLA Expired" : "Time to Approve"}
                 </p>
-                <p className={cn(
-                  'text-sm',
-                  urgency === 'critical' && 'text-red-700',
-                  urgency === 'warning' && 'text-amber-700',
-                  urgency === 'normal' && 'text-blue-700'
-                )}>
-                  {timeRemaining === 0 
-                    ? 'Approval deadline has passed'
+                <p
+                  className={cn(
+                    "text-sm",
+                    urgency === "critical" && "text-red-700",
+                    urgency === "warning" && "text-amber-700",
+                    urgency === "normal" && "text-blue-700",
+                  )}
+                >
+                  {timeRemaining === 0
+                    ? "Approval deadline has passed"
                     : `${formatTimeRemaining(timeRemaining)} remaining`}
                 </p>
               </div>
@@ -164,10 +180,10 @@ export function ApprovalSLATracker({
             <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
               <div
                 className={cn(
-                  'h-full transition-all duration-1000',
-                  urgency === 'critical' && 'bg-red-600',
-                  urgency === 'warning' && 'bg-amber-600',
-                  urgency === 'normal' && 'bg-blue-600'
+                  "h-full transition-all duration-1000",
+                  urgency === "critical" && "bg-red-600",
+                  urgency === "warning" && "bg-amber-600",
+                  urgency === "normal" && "bg-blue-600",
                 )}
                 style={{
                   width: `${Math.max(0, Math.min(100, (timeRemaining / (slaHours * 60 * 60 * 1000)) * 100))}%`,
@@ -179,22 +195,22 @@ export function ApprovalSLATracker({
       </Card>
 
       {/* Escalation Alert */}
-      {urgency === 'warning' && (
+      {urgency === "warning" && (
         <Alert className="border-amber-500 bg-amber-50">
           <AlertTriangle className="h-4 w-4 text-amber-600" />
           <AlertDescription className="text-amber-900">
-            <strong>Less than 6 hours remaining.</strong> If no action is taken, this content
-            will be auto-approved to maintain publishing schedule.
+            <strong>Less than 6 hours remaining.</strong> If no action is taken,
+            this content will be auto-approved to maintain publishing schedule.
           </AlertDescription>
         </Alert>
       )}
 
-      {urgency === 'critical' && (
+      {urgency === "critical" && (
         <Alert className="border-red-500 bg-red-50">
           <AlertTriangle className="h-4 w-4 text-red-600" />
           <AlertDescription className="text-red-900">
-            <strong>SLA deadline reached.</strong> Your agency may auto-approve this content
-            to stay on schedule. Review now to provide feedback.
+            <strong>SLA deadline reached.</strong> Your agency may auto-approve
+            this content to stay on schedule. Review now to provide feedback.
           </AlertDescription>
         </Alert>
       )}
@@ -213,7 +229,8 @@ export function ApprovalSLATracker({
                   Version {versionNumber} - Change Log
                 </span>
                 <Badge variant="outline" className="text-xs">
-                  {changeLog.length} {changeLog.length === 1 ? 'change' : 'changes'}
+                  {changeLog.length}{" "}
+                  {changeLog.length === 1 ? "change" : "changes"}
                 </Badge>
               </div>
               {showChangeLog ? (
@@ -238,9 +255,7 @@ export function ApprovalSLATracker({
                         </span>
                       </div>
                       <div className="bg-green-50 border border-green-200 rounded-lg p-2">
-                        <span className="text-green-900">
-                          {entry.newValue}
-                        </span>
+                        <span className="text-green-900">{entry.newValue}</span>
                       </div>
                       <p className="text-xs text-slate-500 mt-1">
                         {new Date(entry.timestamp).toLocaleString()}
@@ -264,8 +279,9 @@ export function ApprovalSLATracker({
                 Approval SLA: {slaHours} hours
               </h4>
               <p className="text-slate-700 text-sm">
-                Please review within {slaHours} hours to provide feedback. After the deadline,
-                your agency may auto-approve to maintain publishing schedule.
+                Please review within {slaHours} hours to provide feedback. After
+                the deadline, your agency may auto-approve to maintain
+                publishing schedule.
               </p>
             </div>
           </div>

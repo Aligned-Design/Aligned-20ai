@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   CheckCircle,
   Clock,
@@ -10,15 +10,15 @@ import {
   MessageCircle,
   ChevronRight,
   ExternalLink,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface FeedbackItem {
   id: string;
   postId: string;
   date: string;
   feedback: string;
-  status: 'acted_on' | 'pending' | 'planned';
+  status: "acted_on" | "pending" | "planned";
   agencyResponse?: string;
   result?: {
     metric: string;
@@ -39,87 +39,94 @@ interface FeedbackImpactTimelineProps {
   className?: string;
 }
 
-export function FeedbackImpactTimeline({ clientId, className }: FeedbackImpactTimelineProps) {
+export function FeedbackImpactTimeline({
+  clientId,
+  className,
+}: FeedbackImpactTimelineProps) {
   const [feedbackHistory] = useState<FeedbackItem[]>([
     {
-      id: '1',
-      postId: 'post-123',
-      date: '2024-11-10',
-      feedback: 'Make it more casual',
-      status: 'acted_on',
-      agencyResponse: 'Updated tone + posted Nov 12',
+      id: "1",
+      postId: "post-123",
+      date: "2024-11-10",
+      feedback: "Make it more casual",
+      status: "acted_on",
+      agencyResponse: "Updated tone + posted Nov 12",
       result: {
-        metric: 'Engagement',
-        improvement: '+42%',
-        comparison: 'vs similar posts',
+        metric: "Engagement",
+        improvement: "+42%",
+        comparison: "vs similar posts",
       },
       preview: {
-        thumbnail: '/placeholder.svg',
-        caption: 'Behind the scenes... (casual tone applied)',
-        platform: 'Instagram',
-        date: '2024-11-12',
+        thumbnail: "/placeholder.svg",
+        caption: "Behind the scenes... (casual tone applied)",
+        platform: "Instagram",
+        date: "2024-11-12",
       },
     },
     {
-      id: '2',
-      postId: 'post-124',
-      date: '2024-11-08',
-      feedback: 'Add more data',
-      status: 'acted_on',
+      id: "2",
+      postId: "post-124",
+      date: "2024-11-08",
+      feedback: "Add more data",
+      status: "acted_on",
       agencyResponse: "Noted! This is in our content plan for next week",
-      nextWeekPreviewUrl: '/content-queue?filter=data-driven',
+      nextWeekPreviewUrl: "/content-queue?filter=data-driven",
     },
     {
-      id: '3',
-      postId: 'post-125',
-      date: '2024-11-06',
-      feedback: 'Too promotional',
-      status: 'acted_on',
-      agencyResponse: 'Reduced promotional posts from 50% to 30% of mix',
+      id: "3",
+      postId: "post-125",
+      date: "2024-11-06",
+      feedback: "Too promotional",
+      status: "acted_on",
+      agencyResponse: "Reduced promotional posts from 50% to 30% of mix",
       result: {
-        metric: 'Positive Sentiment',
-        improvement: '+18%',
-        comparison: 'since change',
+        metric: "Positive Sentiment",
+        improvement: "+18%",
+        comparison: "since change",
       },
     },
     {
-      id: '4',
-      postId: 'post-126',
-      date: '2024-11-15',
-      feedback: 'Love the storytelling approach',
-      status: 'pending',
-      agencyResponse: 'Thank you! We\'ll incorporate more storytelling in upcoming posts',
+      id: "4",
+      postId: "post-126",
+      date: "2024-11-15",
+      feedback: "Love the storytelling approach",
+      status: "pending",
+      agencyResponse:
+        "Thank you! We'll incorporate more storytelling in upcoming posts",
     },
   ]);
 
-  const getStatusIcon = (status: FeedbackItem['status']) => {
+  const getStatusIcon = (status: FeedbackItem["status"]) => {
     switch (status) {
-      case 'acted_on':
+      case "acted_on":
         return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case 'pending':
+      case "pending":
         return <Clock className="h-5 w-5 text-amber-600" />;
-      case 'planned':
+      case "planned":
         return <MessageCircle className="h-5 w-5 text-blue-600" />;
     }
   };
 
-  const getStatusBadge = (status: FeedbackItem['status']) => {
+  const getStatusBadge = (status: FeedbackItem["status"]) => {
     switch (status) {
-      case 'acted_on':
+      case "acted_on":
         return (
           <Badge className="gap-1 bg-green-100 text-green-700 border-green-200">
             <CheckCircle className="h-3 w-3" />
             Acted On
           </Badge>
         );
-      case 'pending':
+      case "pending":
         return (
-          <Badge variant="outline" className="gap-1 text-amber-700 border-amber-200">
+          <Badge
+            variant="outline"
+            className="gap-1 text-amber-700 border-amber-200"
+          >
             <Clock className="h-3 w-3" />
             Under Review
           </Badge>
         );
-      case 'planned':
+      case "planned":
         return (
           <Badge variant="secondary" className="gap-1">
             <MessageCircle className="h-3 w-3" />
@@ -130,16 +137,18 @@ export function FeedbackImpactTimeline({ clientId, className }: FeedbackImpactTi
   };
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn("space-y-6", className)}>
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-black text-slate-900">Feedback Impact</h2>
+          <h2 className="text-2xl font-black text-slate-900">
+            Feedback Impact
+          </h2>
           <p className="text-sm text-slate-600 mt-1">
             See how your feedback shaped our content strategy
           </p>
         </div>
         <Badge variant="outline" className="gap-1">
-          {feedbackHistory.filter(f => f.status === 'acted_on').length} /
+          {feedbackHistory.filter((f) => f.status === "acted_on").length} /
           {feedbackHistory.length} Acted On
         </Badge>
       </div>
@@ -164,10 +173,10 @@ export function FeedbackImpactTimeline({ clientId, className }: FeedbackImpactTi
                     <div className="flex items-center gap-2 mb-2">
                       {getStatusBadge(item.status)}
                       <span className="text-sm text-slate-500">
-                        {new Date(item.date).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric',
+                        {new Date(item.date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
                         })}
                       </span>
                     </div>
@@ -241,14 +250,19 @@ export function FeedbackImpactTimeline({ clientId, className }: FeedbackImpactTi
                           </Badge>
                           {item.preview.date && (
                             <span className="text-xs text-slate-500">
-                              Posted {new Date(item.preview.date).toLocaleDateString()}
+                              Posted{" "}
+                              {new Date(item.preview.date).toLocaleDateString()}
                             </span>
                           )}
                         </div>
                         <p className="text-sm text-slate-700 line-clamp-2">
                           {item.preview.caption}
                         </p>
-                        <Button variant="link" size="sm" className="p-0 h-auto mt-2 gap-1">
+                        <Button
+                          variant="link"
+                          size="sm"
+                          className="p-0 h-auto mt-2 gap-1"
+                        >
                           <Eye className="h-3 w-3" />
                           View Full Post
                         </Button>
@@ -263,7 +277,9 @@ export function FeedbackImpactTimeline({ clientId, className }: FeedbackImpactTi
                     variant="outline"
                     size="sm"
                     className="mt-4 gap-2"
-                    onClick={() => window.location.href = item.nextWeekPreviewUrl!}
+                    onClick={() =>
+                      (window.location.href = item.nextWeekPreviewUrl!)
+                    }
                   >
                     <ExternalLink className="h-4 w-4" />
                     View Next Week's Preview
@@ -277,7 +293,7 @@ export function FeedbackImpactTimeline({ clientId, className }: FeedbackImpactTi
       </div>
 
       {/* Summary Card */}
-      {feedbackHistory.filter(f => f.status === 'acted_on').length > 0 && (
+      {feedbackHistory.filter((f) => f.status === "acted_on").length > 0 && (
         <Card className="border-indigo-200 bg-indigo-50">
           <CardContent className="pt-6">
             <div className="flex gap-3">
@@ -291,12 +307,16 @@ export function FeedbackImpactTimeline({ clientId, className }: FeedbackImpactTi
                   Your Voice Shapes Our Strategy
                 </h3>
                 <p className="text-indigo-800 text-sm leading-relaxed">
-                  We've acted on{' '}
+                  We've acted on{" "}
                   <strong>
-                    {feedbackHistory.filter(f => f.status === 'acted_on').length} of your{' '}
-                    {feedbackHistory.length} feedback items
+                    {
+                      feedbackHistory.filter((f) => f.status === "acted_on")
+                        .length
+                    }{" "}
+                    of your {feedbackHistory.length} feedback items
                   </strong>
-                  . Your insights directly improve content performance and audience engagement.
+                  . Your insights directly improve content performance and
+                  audience engagement.
                 </p>
               </div>
             </div>
