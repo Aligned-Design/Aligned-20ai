@@ -8,20 +8,24 @@
 ## ✅ What Was Delivered
 
 ### 1. **Noindex Policy** (24 routes protected)
+
 - File: `client/lib/route-metadata.ts`
 - File: `client/components/seo/SEOHead.tsx`
 - **Result:** Search engines blocked from all app pages
 
 ### 2. **PublicRoute Wrapper** (9 routes wrapped)
+
 - File: `client/App.tsx`
 - **Result:** Authenticated users can't access marketing pages
 
 ### 3. **XML Sitemap** (9 public URLs only)
+
 - File: `public/sitemap.xml`
 - File: `public/robots.txt`
 - **Result:** Search engines find only public content
 
 ### 4. **Dynamic Titles** (33 routes configured)
+
 - File: `client/lib/route-metadata.ts`
 - **Result:** No more "Hello world project"
 
@@ -58,6 +62,7 @@ Client (noindex):       1 route
 ## 🧪 Quick Tests
 
 ### Test Noindex:
+
 ```bash
 # Visit any app page and view source
 curl https://yoursite.com/dashboard | grep "noindex"
@@ -65,6 +70,7 @@ curl https://yoursite.com/dashboard | grep "noindex"
 ```
 
 ### Test Public Redirect:
+
 ```
 1. Log in
 2. Visit /features
@@ -72,12 +78,14 @@ curl https://yoursite.com/dashboard | grep "noindex"
 ```
 
 ### Test Sitemap:
+
 ```
 Visit: /sitemap.xml
 Should show: 9 public URLs only ✅
 ```
 
 ### Test Titles:
+
 ```
 Visit any page → Check browser tab
 Should NOT show "Hello world project" ✅
@@ -88,20 +96,25 @@ Should NOT show "Hello world project" ✅
 ## 📁 Key Files
 
 **Route Configuration:**
+
 - `client/lib/route-metadata.ts` - Single source of truth
 
 **SEO Component:**
+
 - `client/components/seo/SEOHead.tsx` - Auto meta tags
 
 **Sitemap:**
+
 - `public/sitemap.xml` - Public routes only
 - `public/robots.txt` - Blocks app pages
 
 **Scripts:**
+
 - `scripts/generate-sitemap.ts` - Regenerate sitemap
 - `scripts/export-route-metadata.ts` - Export CSV/JSON
 
 **Exports:**
+
 - `ROUTE_METADATA_EXPORT.csv` - All routes in CSV
 - `ROUTE_METADATA_EXPORT.json` - All routes in JSON
 
@@ -112,6 +125,7 @@ Should NOT show "Hello world project" ✅
 ### Add a New Public Page
 
 1. Add to `route-metadata.ts`:
+
 ```typescript
 '/new-page': {
   path: '/new-page',
@@ -123,15 +137,20 @@ Should NOT show "Hello world project" ✅
 ```
 
 2. Add to `App.tsx`:
+
 ```tsx
-<Route path="/new-page" element={
-  <PublicRoute>
-    <NewPage />
-  </PublicRoute>
-} />
+<Route
+  path="/new-page"
+  element={
+    <PublicRoute>
+      <NewPage />
+    </PublicRoute>
+  }
+/>
 ```
 
 3. Regenerate sitemap:
+
 ```bash
 npx tsx scripts/generate-sitemap.ts
 ```
@@ -139,6 +158,7 @@ npx tsx scripts/generate-sitemap.ts
 ### Add a New Protected Page
 
 1. Add to `route-metadata.ts`:
+
 ```typescript
 '/new-feature': {
   path: '/new-feature',
@@ -150,12 +170,16 @@ npx tsx scripts/generate-sitemap.ts
 ```
 
 2. Add to `App.tsx`:
+
 ```tsx
-<Route path="/new-feature" element={
-  <ProtectedRoute>
-    <NewFeature />
-  </ProtectedRoute>
-} />
+<Route
+  path="/new-feature"
+  element={
+    <ProtectedRoute>
+      <NewFeature />
+    </ProtectedRoute>
+  }
+/>
 ```
 
 (SEOHead automatically applies noindex)
@@ -182,6 +206,7 @@ npx tsx scripts/generate-sitemap.ts
 **Focus:** Client Portal Token Authentication
 
 **Goals:**
+
 - Replace ProtectedRoute with token-based auth
 - Add `/:token` dynamic route
 - Enforce single-brand scoping

@@ -23,13 +23,13 @@ export interface TokenValidationResponse {
  * Validate client portal access token
  */
 export async function validateClientToken(
-  token: string
+  token: string,
 ): Promise<TokenValidationResponse> {
   try {
     const response = await fetch(`/api/client-portal/validate-token`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ token }),
     });
@@ -38,18 +38,18 @@ export async function validateClientToken(
       if (response.status === 401) {
         return {
           valid: false,
-          error: 'expired',
+          error: "expired",
         };
       }
       if (response.status === 404) {
         return {
           valid: false,
-          error: 'invalid',
+          error: "invalid",
         };
       }
       return {
         valid: false,
-        error: 'server_error',
+        error: "server_error",
       };
     }
 
@@ -59,10 +59,10 @@ export async function validateClientToken(
       token: data.token,
     };
   } catch (error) {
-    console.error('Token validation failed:', error);
+    console.error("Token validation failed:", error);
     return {
       valid: false,
-      error: 'network_error',
+      error: "network_error",
     };
   }
 }
@@ -71,14 +71,14 @@ export async function validateClientToken(
  * Store token in sessionStorage (not localStorage for security)
  */
 export function storeClientToken(token: ClientPortalToken): void {
-  sessionStorage.setItem('client_portal_token', JSON.stringify(token));
+  sessionStorage.setItem("client_portal_token", JSON.stringify(token));
 }
 
 /**
  * Get stored token
  */
 export function getStoredClientToken(): ClientPortalToken | null {
-  const stored = sessionStorage.getItem('client_portal_token');
+  const stored = sessionStorage.getItem("client_portal_token");
   if (!stored) return null;
 
   try {
@@ -102,7 +102,7 @@ export function getStoredClientToken(): ClientPortalToken | null {
  * Clear stored token
  */
 export function clearClientToken(): void {
-  sessionStorage.removeItem('client_portal_token');
+  sessionStorage.removeItem("client_portal_token");
 }
 
 /**

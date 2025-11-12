@@ -1,1 +1,1 @@
-export { SEOHead } from './SEOHead';
+export { SEOHead } from "./SEOHead";

@@ -23,7 +23,7 @@ export function MainNavigation({
   // Get navigation items based on user context and permissions
   const navItems = getContextualNavItems({
     isAuthenticated: !!user,
-    isClient: role === 'CLIENT',
+    isClient: role === "CLIENT",
     canCheck: (scope: string) => canCheck(scope),
   });
 

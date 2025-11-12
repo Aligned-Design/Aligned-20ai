@@ -9,6 +9,7 @@
 ## Executive Summary
 
 All Phase 2 objectives successfully implemented:
+
 - ✅ **Token-based authentication** for client portal
 - ✅ **Dynamic route pattern** (`/client-portal/:token`)
 - ✅ **Brand scoping** enforced (single-brand isolation)
@@ -23,6 +24,7 @@ All Phase 2 objectives successfully implemented:
 ### What Was Built
 
 **Authentication System:**
+
 - **File:** `client/lib/client-portal-auth.ts`
   - Token validation logic
   - Session storage (not localStorage for security)
@@ -30,6 +32,7 @@ All Phase 2 objectives successfully implemented:
   - Brand ID extraction from token
 
 **Route Guard:**
+
 - **File:** `client/components/auth/ClientPortalRoute.tsx`
   - Token-based route protection
   - Replaces `ProtectedRoute` for client portal
@@ -37,6 +40,7 @@ All Phase 2 objectives successfully implemented:
   - Removes token from URL after validation (security)
 
 **Server-Side Validation:**
+
 - **File:** `server/routes/client-portal-auth.ts`
   - `POST /api/client-portal/validate-token` - Token validation
   - `POST /api/client-portal/generate-token` - Token generation (admin)
@@ -74,6 +78,7 @@ All Phase 2 objectives successfully implemented:
 ### Route Configuration
 
 **Added Routes:**
+
 ```tsx
 // With token parameter (for magic link access)
 /client-portal/:token
@@ -83,6 +88,7 @@ All Phase 2 objectives successfully implemented:
 ```
 
 **Route Metadata:**
+
 ```typescript
 '/client-portal/:token': {
   path: '/client-portal/:token',
@@ -97,6 +103,7 @@ All Phase 2 objectives successfully implemented:
 ### Behavior
 
 **First Visit (with token):**
+
 1. User clicks: `https://app.../client-portal/demo_client_token_123`
 2. `ClientPortalRoute` validates token
 3. Token stored in session
@@ -104,11 +111,13 @@ All Phase 2 objectives successfully implemented:
 5. Portal loads
 
 **Subsequent Visits (same session):**
+
 1. User visits: `https://app.../client-portal`
 2. `ClientPortalRoute` finds token in session
 3. Portal loads immediately (no validation needed)
 
 **No Token / Expired:**
+
 1. User visits without token
 2. Shows friendly error screen
 3. Options: "Request New Link" or "Contact Support"
@@ -120,19 +129,21 @@ All Phase 2 objectives successfully implemented:
 ### Single-Brand Isolation
 
 **Token Structure:**
+
 ```typescript
 interface ClientPortalToken {
   token: string;
-  brandId: string;        // LOCKED to single brand
+  brandId: string; // LOCKED to single brand
   brandName: string;
   clientId: string;
   clientEmail: string;
   expiresAt: string;
-  permissions: string[];  // 'view', 'approve', 'comment', 'upload'
+  permissions: string[]; // 'view', 'approve', 'comment', 'upload'
 }
 ```
 
 **API Integration:**
+
 ```typescript
 // ClientPortal.tsx now uses brand ID from token
 const brandId = getBrandIdFromToken();
@@ -140,6 +151,7 @@ const response = await fetch(`/api/client/dashboard?brandId=${brandId}`);
 ```
 
 **Server-Side Validation:**
+
 - All client portal API calls verify `brandId` matches token
 - Cross-brand data access blocked
 - Token can ONLY access the brand it was issued for
@@ -147,6 +159,7 @@ const response = await fetch(`/api/client/dashboard?brandId=${brandId}`);
 ### Brand Context Validation
 
 **Enforcement Points:**
+
 1. ✅ Token generation (admin must specify brand)
 2. ✅ Token validation (server checks brand exists)
 3. ✅ API calls (brand ID extracted from token)
@@ -159,14 +172,16 @@ const response = await fetch(`/api/client/dashboard?brandId=${brandId}`);
 ### Labels Applied
 
 **Route Metadata Updated:**
+
 ```typescript
 // Both client portal routes tagged
-visibility: 'client'
-noindex: true
-whiteLabel: true
+visibility: "client";
+noindex: true;
+whiteLabel: true;
 ```
 
 **Total Routes by Visibility:**
+
 ```
 Total Routes: 34
 ├─ Public (indexable):   9 routes
@@ -175,6 +190,7 @@ Total Routes: 34
 ```
 
 **SEO Head Component:**
+
 - Automatically applies `noindex, nofollow` to client routes
 - Search engines blocked from client portal
 
@@ -207,6 +223,7 @@ Total Routes: 34
    - Action: "Try Again" (retry button)
 
 **All error states include:**
+
 - Clear, non-technical language
 - Email link to support@aligned.ai
 - Security explanation
@@ -219,6 +236,7 @@ Total Routes: 34
 ### Test Token Created
 
 **Token Details:**
+
 ```
 Token: demo_client_token_123
 Brand ID: brand_aligned_by_design
@@ -229,6 +247,7 @@ Permissions: view, approve, comment, upload
 ```
 
 **Access URL:**
+
 ```
 https://d3613ea4155540d8a091d17b8a1bcf45-579f8f2444f54e2382a8c6ca2.fly.dev/client-portal/demo_client_token_123
 ```
@@ -278,6 +297,7 @@ server/
 ## 8. QA Checklist ✅
 
 ### Token Authentication
+
 - [x] Valid token grants portal access
 - [x] Invalid token shows error screen
 - [x] Expired token shows error screen
@@ -287,12 +307,14 @@ server/
 - [x] Token validates on server
 
 ### Brand Scoping
+
 - [x] Token maps to single brand only
 - [x] API calls use brand ID from token
 - [x] Cross-brand access blocked
 - [x] Client can only see their brand's data
 
 ### Route Configuration
+
 - [x] `/client-portal/:token` route works
 - [x] `/client-portal` route works (session)
 - [x] Both routes use ClientPortalRoute guard
@@ -300,6 +322,7 @@ server/
 - [x] Both routes have noindex meta tag
 
 ### Error Handling
+
 - [x] Expired token error is user-friendly
 - [x] Invalid token error is user-friendly
 - [x] Missing token error is user-friendly
@@ -307,6 +330,7 @@ server/
 - [x] All errors are branded
 
 ### Security
+
 - [x] Tokens expire after configurable period
 - [x] Tokens can be revoked
 - [x] Session-only storage
@@ -320,6 +344,7 @@ server/
 ### Test 1: Valid Token Access
 
 **Steps:**
+
 1. Visit: `https://yoursite.com/client-portal/demo_client_token_123`
 2. Page should validate token (loading spinner)
 3. URL should change to: `https://yoursite.com/client-portal`
@@ -330,6 +355,7 @@ server/
 ### Test 2: Invalid Token
 
 **Steps:**
+
 1. Visit: `https://yoursite.com/client-portal/invalid_token_999`
 2. Should show "Invalid Access Link" error
 3. Should provide "Request New Link" button
@@ -339,6 +365,7 @@ server/
 ### Test 3: Missing Token
 
 **Steps:**
+
 1. Clear session storage: `sessionStorage.clear()`
 2. Visit: `https://yoursite.com/client-portal`
 3. Should show "Access Required" error
@@ -348,6 +375,7 @@ server/
 ### Test 4: Session Persistence
 
 **Steps:**
+
 1. Visit with valid token (from Test 1)
 2. Navigate away to `/`
 3. Navigate back to `/client-portal` (no token in URL)
@@ -358,6 +386,7 @@ server/
 ### Test 5: Token Expiry Check
 
 **Steps:**
+
 1. Generate token with 1-day expiry
 2. Manually change system date to 2 days later
 3. Try to access portal
@@ -368,6 +397,7 @@ server/
 ### Test 6: Brand Scoping
 
 **Steps:**
+
 1. Access portal with demo token (brand: Aligned By Design)
 2. Check network tab for API calls
 3. Verify all calls include `brandId=brand_aligned_by_design`
@@ -384,6 +414,7 @@ server/
 **POST `/api/client-portal/validate-token`**
 
 **Request:**
+
 ```json
 {
   "token": "demo_client_token_123"
@@ -391,6 +422,7 @@ server/
 ```
 
 **Response (Valid):**
+
 ```json
 {
   "valid": true,
@@ -407,6 +439,7 @@ server/
 ```
 
 **Response (Invalid):**
+
 ```json
 {
   "error": "Token not found",
@@ -415,6 +448,7 @@ server/
 ```
 
 **Response (Expired):**
+
 ```json
 {
   "error": "Token expired",
@@ -427,6 +461,7 @@ server/
 **POST `/api/client-portal/generate-token`**
 
 **Request:**
+
 ```json
 {
   "brandId": "brand_123",
@@ -438,6 +473,7 @@ server/
 ```
 
 **Response:**
+
 ```json
 {
   "token": "cpt_1705356800000_abc123",
@@ -453,6 +489,7 @@ server/
 **POST `/api/client-portal/revoke-token`**
 
 **Request:**
+
 ```json
 {
   "token": "cpt_1705356800000_abc123"
@@ -460,6 +497,7 @@ server/
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -524,6 +562,7 @@ With Phase 2 complete, the client portal now has:
 ✅ Production-ready token system
 
 **Ready for Phase 3:**
+
 - OpenGraph meta tags for all public pages
 - Social sharing optimization
 - Enhanced SEO metadata
@@ -547,21 +586,25 @@ Before deploying to production:
 ## 14. Evidence & Artifacts
 
 **Generated Files:**
+
 - ✅ `client/lib/client-portal-auth.ts` - Token auth system
 - ✅ `client/components/auth/ClientPortalRoute.tsx` - Route guard
 - ✅ `server/routes/client-portal-auth.ts` - Server endpoints
 
 **Modified Files:**
+
 - ✅ `client/App.tsx` - Added /:token route
 - ✅ `client/pages/ClientPortal.tsx` - Uses token for API calls
 - ✅ `client/lib/route-metadata.ts` - Added /:token metadata
 - ✅ `server/index-v2.ts` - Mounted auth router
 
 **Exports:**
+
 - ✅ `ROUTE_METADATA_EXPORT.csv` - Updated with 34 routes
 - ✅ `ROUTE_METADATA_EXPORT.json` - Updated metadata
 
 **Documentation:**
+
 - ✅ This delivery report
 - ✅ Updated ROUTING_VISIBILITY_AUDIT.md
 
@@ -572,6 +615,7 @@ Before deploying to production:
 ✅ **Phase 2 is COMPLETE and PRODUCTION-READY**
 
 All client portal authentication objectives achieved:
+
 - Token-based access replaces standard auth
 - Magic link pattern (`/client-portal/:token`)
 - Single-brand isolation enforced

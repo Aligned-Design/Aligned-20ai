@@ -5,9 +5,11 @@ import { getNavItems } from "@/lib/navigation-helpers";
 
 export default function SiteHeader() {
   // Get public navigation items from metadata
-  const publicNavItems = getNavItems('public').filter(item => 
+  const publicNavItems = getNavItems("public").filter((item) =>
     // Only show specific items in header (not home)
-    ['/features', '/integrations', '/pricing', '/help', '/contact'].includes(item.path)
+    ["/features", "/integrations", "/pricing", "/help", "/contact"].includes(
+      item.path,
+    ),
   );
 
   return (

@@ -3,7 +3,7 @@
  * Detects current domain and determines app context (public, app, portal)
  */
 
-export type DomainContext = 'public' | 'app' | 'portal';
+export type DomainContext = "public" | "app" | "portal";
 
 export interface DomainConfig {
   context: DomainContext;
@@ -17,14 +17,18 @@ export interface DomainConfig {
  */
 export function getDomainContext(): DomainConfig {
   const hostname = window.location.hostname;
-  const isProduction = !hostname.includes('localhost') && !hostname.includes('127.0.0.1');
+  const isProduction =
+    !hostname.includes("localhost") && !hostname.includes("127.0.0.1");
 
   // Production domain detection
   if (isProduction) {
     // Public marketing site
-    if (hostname === 'www.aligned-bydesign.com' || hostname === 'aligned-bydesign.com') {
+    if (
+      hostname === "www.aligned-bydesign.com" ||
+      hostname === "aligned-bydesign.com"
+    ) {
       return {
-        context: 'public',
+        context: "public",
         domain: hostname,
         isProduction: true,
         isWhiteLabel: false,
@@ -32,9 +36,9 @@ export function getDomainContext(): DomainConfig {
     }
 
     // App subdomain
-    if (hostname === 'app.aligned-bydesign.com') {
+    if (hostname === "app.aligned-bydesign.com") {
       return {
-        context: 'app',
+        context: "app",
         domain: hostname,
         isProduction: true,
         isWhiteLabel: false,
@@ -42,9 +46,12 @@ export function getDomainContext(): DomainConfig {
     }
 
     // Client portal subdomains or custom domains
-    if (hostname.includes('portal.aligned-bydesign.com') || isCustomDomain(hostname)) {
+    if (
+      hostname.includes("portal.aligned-bydesign.com") ||
+      isCustomDomain(hostname)
+    ) {
       return {
-        context: 'portal',
+        context: "portal",
         domain: hostname,
         isProduction: true,
         isWhiteLabel: isCustomDomain(hostname),
@@ -54,7 +61,7 @@ export function getDomainContext(): DomainConfig {
 
   // Development/localhost - default to app context
   return {
-    context: 'app',
+    context: "app",
     domain: hostname,
     isProduction: false,
     isWhiteLabel: false,
@@ -66,7 +73,7 @@ export function getDomainContext(): DomainConfig {
  */
 function isCustomDomain(hostname: string): boolean {
   // Custom domains are anything NOT aligned-bydesign.com
-  return !hostname.includes('aligned-bydesign.com');
+  return !hostname.includes("aligned-bydesign.com");
 }
 
 /**
@@ -74,17 +81,17 @@ function isCustomDomain(hostname: string): boolean {
  */
 export function getBaseUrl(): string {
   const config = getDomainContext();
-  
+
   if (!config.isProduction) {
     return window.location.origin;
   }
 
   switch (config.context) {
-    case 'public':
-      return 'https://www.aligned-bydesign.com';
-    case 'app':
-      return 'https://app.aligned-bydesign.com';
-    case 'portal':
+    case "public":
+      return "https://www.aligned-bydesign.com";
+    case "app":
+      return "https://app.aligned-bydesign.com";
+    case "portal":
       return `https://${config.domain}`;
     default:
       return window.location.origin;
@@ -99,24 +106,44 @@ export function isRouteAllowedOnDomain(routePath: string): boolean {
 
   // Import route metadata to check visibility
   // This is a simple check - can be enhanced with route metadata
-  
+
   // Public domain: only show public routes
-  if (context === 'public') {
-    const publicRoutes = ['/', '/about', '/features', '/integrations', '/help', '/contact', '/privacy', '/terms', '/pricing'];
+  if (context === "public") {
+    const publicRoutes = [
+      "/",
+      "/about",
+      "/features",
+      "/integrations",
+      "/help",
+      "/contact",
+      "/privacy",
+      "/terms",
+      "/pricing",
+    ];
     return publicRoutes.includes(routePath);
   }
 
   // App domain: show all user routes (but not public marketing)
-  if (context === 'app') {
-    const publicRoutes = ['/', '/about', '/features', '/integrations', '/help', '/contact', '/privacy', '/terms', '/pricing'];
+  if (context === "app") {
+    const publicRoutes = [
+      "/",
+      "/about",
+      "/features",
+      "/integrations",
+      "/help",
+      "/contact",
+      "/privacy",
+      "/terms",
+      "/pricing",
+    ];
     // Allow all routes except standalone public pages on app domain
     // Users on app domain should see the app, not marketing pages
-    return !publicRoutes.includes(routePath) || routePath === '/';
+    return !publicRoutes.includes(routePath) || routePath === "/";
   }
 
   // Portal domain: only show client portal routes
-  if (context === 'portal') {
-    return routePath.startsWith('/client-portal');
+  if (context === "portal") {
+    return routePath.startsWith("/client-portal");
   }
 
   return true;
@@ -142,13 +169,13 @@ export function isWhiteLabelMode(): boolean {
  */
 export function getOgImageUrl(image?: string): string {
   const baseUrl = getBaseUrl();
-  
+
   if (!image) {
     return `${baseUrl}/og-default.jpg`;
   }
 
   // If image is already a full URL, use it
-  if (image.startsWith('http')) {
+  if (image.startsWith("http")) {
     return image;
   }
 

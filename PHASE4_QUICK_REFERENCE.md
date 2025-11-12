@@ -5,15 +5,17 @@
 ## Core Files
 
 ### 📋 Route Metadata
+
 **File:** `client/lib/route-metadata.ts`
+
 - **Purpose:** Single source of truth for all route configurations
 - **Usage:** Import `ROUTE_METADATA` to access route visibility, SEO, and white-label settings
 
 ```typescript
-import { ROUTE_METADATA, getRouteMetadata } from '@/lib/route-metadata';
+import { ROUTE_METADATA, getRouteMetadata } from "@/lib/route-metadata";
 
 // Get metadata for a specific route
-const metadata = getRouteMetadata('/dashboard');
+const metadata = getRouteMetadata("/dashboard");
 console.log(metadata.visibility); // 'user'
 console.log(metadata.noindex); // true
 ```
@@ -21,23 +23,25 @@ console.log(metadata.noindex); // true
 ---
 
 ### 🧭 Navigation Helpers
+
 **File:** `client/lib/navigation-helpers.ts`
+
 - **Purpose:** Utilities for filtering and displaying navigation based on visibility and permissions
 
 ```typescript
-import { getContextualNavItems, getNavItems } from '@/lib/navigation-helpers';
+import { getContextualNavItems, getNavItems } from "@/lib/navigation-helpers";
 
 // Get navigation for current user context
 const navItems = getContextualNavItems({
   isAuthenticated: !!user,
-  isClient: role === 'CLIENT',
+  isClient: role === "CLIENT",
   canCheck: (scope) => useCan(scope),
 });
 
 // Get navigation for specific visibility level
-const publicNav = getNavItems('public');
-const userNav = getNavItems('user');
-const clientNav = getNavItems('client');
+const publicNav = getNavItems("public");
+const userNav = getNavItems("user");
+const clientNav = getNavItems("client");
 ```
 
 ---
@@ -45,6 +49,7 @@ const clientNav = getNavItems('client');
 ## Route Visibility Labels
 
 ### Public Routes (9 total)
+
 **Visibility:** `public` | **SEO:** Indexable | **Auth:** Optional
 
 ```
@@ -60,6 +65,7 @@ const clientNav = getNavItems('client');
 ```
 
 ### User Routes (23 total)
+
 **Visibility:** `user` | **SEO:** Noindex | **Auth:** Required
 
 ```
@@ -89,6 +95,7 @@ const clientNav = getNavItems('client');
 ```
 
 ### Client Routes (2 total)
+
 **Visibility:** `client` | **SEO:** Noindex | **Auth:** Token-based
 
 ```
@@ -101,41 +108,97 @@ const clientNav = getNavItems('client');
 ## Navigation Configurations
 
 ### Public Navigation (SiteHeader)
+
 ```typescript
 [
-  { path: '/', label: 'Home' },
-  { path: '/features', label: 'Features' },
-  { path: '/integrations', label: 'Integrations' },
-  { path: '/pricing', label: 'Pricing' },
-  { path: '/help', label: 'Help' },
-  { path: '/contact', label: 'Contact' },
-]
+  { path: "/", label: "Home" },
+  { path: "/features", label: "Features" },
+  { path: "/integrations", label: "Integrations" },
+  { path: "/pricing", label: "Pricing" },
+  { path: "/help", label: "Help" },
+  { path: "/contact", label: "Contact" },
+];
 ```
 
 ### User Navigation (MainNavigation - Agency)
+
 ```typescript
 [
-  { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-  { path: '/creative-studio', label: 'Creative Studio', icon: '✨', requiredScope: 'content:create' },
-  { path: '/content-queue', label: 'Content Queue', icon: '📝', requiredScope: 'content:view' },
-  { path: '/approvals', label: 'Approvals', icon: '✓', requiredScope: 'approval:view' },
-  { path: '/campaigns', label: 'Campaigns', icon: '📢', requiredScope: 'campaign:view' },
-  { path: '/analytics', label: 'Analytics', icon: '📈', requiredScope: 'analytics:view' },
-  { path: '/calendar', label: 'Calendar', icon: '📅', requiredScope: 'content:view' },
-  { path: '/brand-guide', label: 'Brand Guide', icon: '🎨', requiredScope: 'brand:view' },
-  { path: '/library', label: 'Library', icon: '📚', requiredScope: 'media:view' },
-  { path: '/brands', label: 'Brands', icon: '🏢', requiredScope: 'brand:manage' },
-  { path: '/reporting', label: 'Reporting', icon: '📋', requiredScope: 'analytics:view' },
-  { path: '/linked-accounts', label: 'Linked Accounts', icon: '🔗', requiredScope: 'integration:manage' },
-  { path: '/settings', label: 'Settings', icon: '⚙️' },
-]
+  { path: "/dashboard", label: "Dashboard", icon: "📊" },
+  {
+    path: "/creative-studio",
+    label: "Creative Studio",
+    icon: "✨",
+    requiredScope: "content:create",
+  },
+  {
+    path: "/content-queue",
+    label: "Content Queue",
+    icon: "📝",
+    requiredScope: "content:view",
+  },
+  {
+    path: "/approvals",
+    label: "Approvals",
+    icon: "✓",
+    requiredScope: "approval:view",
+  },
+  {
+    path: "/campaigns",
+    label: "Campaigns",
+    icon: "📢",
+    requiredScope: "campaign:view",
+  },
+  {
+    path: "/analytics",
+    label: "Analytics",
+    icon: "📈",
+    requiredScope: "analytics:view",
+  },
+  {
+    path: "/calendar",
+    label: "Calendar",
+    icon: "📅",
+    requiredScope: "content:view",
+  },
+  {
+    path: "/brand-guide",
+    label: "Brand Guide",
+    icon: "🎨",
+    requiredScope: "brand:view",
+  },
+  {
+    path: "/library",
+    label: "Library",
+    icon: "📚",
+    requiredScope: "media:view",
+  },
+  {
+    path: "/brands",
+    label: "Brands",
+    icon: "🏢",
+    requiredScope: "brand:manage",
+  },
+  {
+    path: "/reporting",
+    label: "Reporting",
+    icon: "📋",
+    requiredScope: "analytics:view",
+  },
+  {
+    path: "/linked-accounts",
+    label: "Linked Accounts",
+    icon: "🔗",
+    requiredScope: "integration:manage",
+  },
+  { path: "/settings", label: "Settings", icon: "⚙️" },
+];
 ```
 
 ### Client Navigation (MainNavigation - Client)
+
 ```typescript
-[
-  { path: '/client-portal', label: 'Overview', icon: '📊' },
-]
+[{ path: "/client-portal", label: "Overview", icon: "📊" }];
 ```
 
 ---
@@ -143,15 +206,17 @@ const clientNav = getNavItems('client');
 ## Helper Functions
 
 ### getNavItems(visibility)
+
 Get navigation items for a specific visibility level.
 
 ```typescript
-const publicNav = getNavItems('public');
-const userNav = getNavItems('user');
-const clientNav = getNavItems('client');
+const publicNav = getNavItems("public");
+const userNav = getNavItems("user");
+const clientNav = getNavItems("client");
 ```
 
 ### filterNavByPermissions(items, canCheck)
+
 Filter navigation items based on user permissions.
 
 ```typescript
@@ -159,44 +224,47 @@ const filteredNav = filterNavByPermissions(userNav, (scope) => useCan(scope));
 ```
 
 ### getContextualNavItems(options)
+
 Get appropriate navigation based on user context.
 
 ```typescript
 const navItems = getContextualNavItems({
   isAuthenticated: !!user,
-  isClient: role === 'CLIENT',
+  isClient: role === "CLIENT",
   canCheck: (scope) => useCan(scope),
 });
 ```
 
 ### isRouteAccessible(path, isAuthenticated, isClient)
+
 Check if a route is accessible based on auth state.
 
 ```typescript
-const canAccess = isRouteAccessible('/dashboard', true, false);
+const canAccess = isRouteAccessible("/dashboard", true, false);
 ```
 
 ---
 
 ## Permission Scopes Used in Navigation
 
-| Scope                  | Routes That Require It                             |
-| ---------------------- | -------------------------------------------------- |
-| `content:create`       | Creative Studio                                    |
-| `content:view`         | Content Queue, Calendar                            |
-| `approval:view`        | Approvals                                          |
-| `campaign:view`        | Campaigns                                          |
-| `analytics:view`       | Analytics, Reporting                               |
-| `brand:view`           | Brand Guide                                        |
-| `brand:manage`         | Brands                                             |
-| `media:view`           | Library                                            |
-| `integration:manage`   | Linked Accounts                                    |
+| Scope                | Routes That Require It  |
+| -------------------- | ----------------------- |
+| `content:create`     | Creative Studio         |
+| `content:view`       | Content Queue, Calendar |
+| `approval:view`      | Approvals               |
+| `campaign:view`      | Campaigns               |
+| `analytics:view`     | Analytics, Reporting    |
+| `brand:view`         | Brand Guide             |
+| `brand:manage`       | Brands                  |
+| `media:view`         | Library                 |
+| `integration:manage` | Linked Accounts         |
 
 ---
 
 ## Usage Examples
 
 ### Example 1: Add New Public Page
+
 ```typescript
 // 1. Add to route-metadata.ts
 '/blog': {
@@ -217,6 +285,7 @@ public: [
 ```
 
 ### Example 2: Add New User Page with Permission
+
 ```typescript
 // 1. Add to route-metadata.ts
 '/workflows': {
@@ -230,9 +299,9 @@ public: [
 // 2. Add to navigation-helpers.ts
 user: [
   // ... existing items
-  { 
-    path: '/workflows', 
-    label: 'Workflows', 
+  {
+    path: '/workflows',
+    label: 'Workflows',
     icon: '⚙️',
     requiredScope: 'workflow:manage'
   },
@@ -242,17 +311,18 @@ user: [
 ```
 
 ### Example 3: Check Route Access
+
 ```typescript
-import { isRouteAccessible } from '@/lib/navigation-helpers';
+import { isRouteAccessible } from "@/lib/navigation-helpers";
 
 const canAccessDashboard = isRouteAccessible(
-  '/dashboard',
-  !!user,        // isAuthenticated
-  false          // isClient
+  "/dashboard",
+  !!user, // isAuthenticated
+  false, // isClient
 );
 
 if (!canAccessDashboard) {
-  navigate('/');
+  navigate("/");
 }
 ```
 
@@ -261,16 +331,19 @@ if (!canAccessDashboard) {
 ## Key Concepts
 
 ### Visibility Levels
+
 - **public**: Marketing and legal pages (indexable, no auth required)
 - **user**: Authenticated app pages (noindex, auth required)
 - **client**: White-label client portal (noindex, token auth)
 
 ### SEO Policy
+
 - **public routes**: `noindex: false` (indexable)
 - **user routes**: `noindex: true` (not indexable)
 - **client routes**: `noindex: true` (not indexable)
 
 ### White-Label Flag
+
 - **client routes**: `whiteLabel: true` (supports custom branding)
 - **other routes**: `whiteLabel: false` or undefined
 
@@ -288,12 +361,14 @@ if (!canAccessDashboard) {
 ## Troubleshooting
 
 ### Navigation item not showing?
+
 1. Check visibility label in `route-metadata.ts`
 2. Check nav config in `navigation-helpers.ts`
 3. Check `requiredScope` - user may not have permission
 4. Check `isClient` flag - client users see limited nav
 
 ### Route not accessible?
+
 1. Check `visibility` label
 2. Check auth guard in `App.tsx`
 3. Check user authentication status

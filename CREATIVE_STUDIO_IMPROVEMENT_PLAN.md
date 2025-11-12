@@ -11,6 +11,7 @@
 This document outlines **5 improvement options** (A–E) to transform the Creative Studio into a best-in-class Canva-style experience. Each option builds on the strong existing foundation while addressing critical UX and collaboration gaps.
 
 **Choose your path:**
+
 - **Option A:** Quick wins for immediate impact (1-2 hours)
 - **Option B:** Complete approval workflow (2-3 hours)
 - **Option C:** Collaboration features (3-4 hours)
@@ -24,21 +25,25 @@ This document outlines **5 improvement options** (A–E) to transform the Creati
 All improvements will follow these core principles:
 
 ### 1. Canva-Style UX
+
 - **Visual focus:** Canvas takes center stage, minimal chrome
 - **Intuitive controls:** Drag-and-drop, contextual toolbars
 - **Zero-clutter:** One sidebar at a time, collapsible panels
 
 ### 2. Brand-Safe Content
+
 - **Auto-apply brand kit:** Colors, fonts, logos default to brand guide
 - **Brand compliance:** Advisor panel flags off-brand elements
 - **Asset library:** All images and templates pre-approved
 
 ### 3. Collaborative Flow
+
 - **Real-time comments:** Side-by-side with canvas
 - **Approval workflow:** Request → Review → Approve/Reject
 - **Version history:** Timeline of changes with restore
 
 ### 4. Polish & Performance
+
 - **Sub-300ms interactions:** Instant feedback on all actions
 - **Smooth animations:** Purposeful, not distracting
 - **Autosave feedback:** Clear "Saved" indicators
@@ -79,6 +84,7 @@ All improvements will follow these core principles:
 ### Components Affected
 
 **Modified:**
+
 - `client/pages/CreativeStudio.tsx` - Header and sidebar layout
 - `client/components/dashboard/CreativeStudioBrandKit.tsx` - Tabbed panel
 - `client/components/dashboard/CreativeStudioAdvisor.tsx` - Tabbed panel
@@ -86,6 +92,7 @@ All improvements will follow these core principles:
 - `client/components/dashboard/ActionButtonsHeader.tsx` - Button reduction
 
 **New:**
+
 - `client/components/creative-studio/TextFormattingToolbar.tsx` - Floating toolbar
 - `client/components/creative-studio/CanvasZoomControls.tsx` - Zoom widget
 - `client/components/creative-studio/ApprovalStatusBadge.tsx` - Status indicator
@@ -97,12 +104,14 @@ None - All UI-only changes
 ### Expected UX Behaviors
 
 **Before:**
+
 - Users confused by 3 sidebars open simultaneously
 - Text formatting buried in brand kit panel
 - Zoom controls hidden in icon sidebar
 - Too many buttons in header
 
 **After:**
+
 - Single right sidebar with tabs (Brand Kit | Advisor)
 - Text formatting toolbar floats on selection
 - Zoom always visible in canvas corner
@@ -148,7 +157,7 @@ None - All UI-only changes
 />
 
 // 4. Status badge
-<ApprovalStatusBadge 
+<ApprovalStatusBadge
   status={design.approvalStatus || 'draft'}
   className="ml-4"
 />
@@ -213,11 +222,13 @@ None - All UI-only changes
 ### Components Affected
 
 **Modified:**
+
 - `client/types/creativeStudio.ts` - Add approval fields to Design interface
 - `client/pages/CreativeStudio.tsx` - Add approval handlers
 - `client/components/dashboard/ActionButtonsHeader.tsx` - Add Request Approval button
 
 **New:**
+
 - `client/components/creative-studio/RequestApprovalModal.tsx` - Approval request dialog
 - `client/components/creative-studio/ApprovalButtons.tsx` - Approve/Reject buttons
 - `client/components/creative-studio/ApprovalStatusBadge.tsx` - Status indicator
@@ -264,6 +275,7 @@ Response: {
 ### Expected UX Behaviors
 
 **Creator Flow:**
+
 1. Create design
 2. Click "Request Approval"
 3. Select reviewer(s) from team dropdown
@@ -272,6 +284,7 @@ Response: {
 6. Reviewer gets notification (email/in-app)
 
 **Reviewer Flow:**
+
 1. Receive notification of approval request
 2. Navigate to Creative Studio
 3. See "Pending Approval" badge
@@ -281,6 +294,7 @@ Response: {
 7. Submit → Creator gets notification
 
 **Status Tracking:**
+
 - Draft → Pending Approval → Approved/Rejected
 - Approved designs can be scheduled/published
 - Rejected designs return to draft with feedback
@@ -291,7 +305,7 @@ Response: {
 // 1. Update Design type
 export interface Design {
   // ... existing fields
-  approvalStatus?: 'draft' | 'pending_approval' | 'approved' | 'rejected';
+  approvalStatus?: "draft" | "pending_approval" | "approved" | "rejected";
   approvalRequestedBy?: string;
   approvalRequestedAt?: string;
   approvedBy?: string;
@@ -306,29 +320,32 @@ const handleRequestApproval = async (reviewers: string[], message?: string) => {
   if (!state.design) return;
 
   try {
-    const response = await fetch(`/api/creative-studio/designs/${state.design.id}/request-approval`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reviewers, message }),
-    });
+    const response = await fetch(
+      `/api/creative-studio/designs/${state.design.id}/request-approval`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviewers, message }),
+      },
+    );
 
     if (response.ok) {
       handleUpdateDesign({
-        approvalStatus: 'pending_approval',
+        approvalStatus: "pending_approval",
         approvalRequestedBy: user?.id,
         approvalRequestedAt: new Date().toISOString(),
       });
 
       toast({
-        title: '✅ Approval Requested',
+        title: "✅ Approval Requested",
         description: `Sent to ${reviewers.length} reviewer(s)`,
       });
     }
   } catch (error) {
     toast({
-      title: 'Request Failed',
-      description: 'Could not request approval',
-      variant: 'destructive',
+      title: "Request Failed",
+      description: "Could not request approval",
+      variant: "destructive",
     });
   }
 };
@@ -338,29 +355,32 @@ const handleApprove = async (notes?: string) => {
   if (!state.design) return;
 
   try {
-    const response = await fetch(`/api/creative-studio/designs/${state.design.id}/approve`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes }),
-    });
+    const response = await fetch(
+      `/api/creative-studio/designs/${state.design.id}/approve`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notes }),
+      },
+    );
 
     if (response.ok) {
       handleUpdateDesign({
-        approvalStatus: 'approved',
+        approvalStatus: "approved",
         approvedBy: user?.id,
         approvedAt: new Date().toISOString(),
       });
 
       toast({
-        title: '✅ Design Approved',
-        description: 'Ready to schedule and publish',
+        title: "✅ Design Approved",
+        description: "Ready to schedule and publish",
       });
     }
   } catch (error) {
     toast({
-      title: 'Approval Failed',
-      description: 'Could not approve design',
-      variant: 'destructive',
+      title: "Approval Failed",
+      description: "Could not approve design",
+      variant: "destructive",
     });
   }
 };
@@ -369,38 +389,41 @@ const handleApprove = async (notes?: string) => {
 const handleReject = async (reason: string) => {
   if (!state.design || !reason.trim()) {
     toast({
-      title: 'Reason Required',
-      description: 'Please explain why you\'re rejecting this design',
-      variant: 'destructive',
+      title: "Reason Required",
+      description: "Please explain why you're rejecting this design",
+      variant: "destructive",
     });
     return;
   }
 
   try {
-    const response = await fetch(`/api/creative-studio/designs/${state.design.id}/reject`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reason }),
-    });
+    const response = await fetch(
+      `/api/creative-studio/designs/${state.design.id}/reject`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason }),
+      },
+    );
 
     if (response.ok) {
       handleUpdateDesign({
-        approvalStatus: 'rejected',
+        approvalStatus: "rejected",
         rejectedBy: user?.id,
         rejectedAt: new Date().toISOString(),
         rejectionReason: reason,
       });
 
       toast({
-        title: 'Design Rejected',
-        description: 'Creator will be notified',
+        title: "Design Rejected",
+        description: "Creator will be notified",
       });
     }
   } catch (error) {
     toast({
-      title: 'Rejection Failed',
-      description: 'Could not reject design',
-      variant: 'destructive',
+      title: "Rejection Failed",
+      description: "Could not reject design",
+      variant: "destructive",
     });
   }
 };
@@ -471,10 +494,12 @@ const handleReject = async (reason: string) => {
 ### Components Affected
 
 **Modified:**
+
 - `client/pages/CreativeStudio.tsx` - Add comment panel, version history
 - `client/types/creativeStudio.ts` - Add comment and version types
 
 **New:**
+
 - `client/components/creative-studio/CommentThreadPanel.tsx` - Comment UI
 - `client/components/creative-studio/CommentItem.tsx` - Individual comment
 - `client/components/creative-studio/AddCommentForm.tsx` - Comment input
@@ -552,6 +577,7 @@ Events:
 ### Expected UX Behaviors
 
 **Commenting:**
+
 1. User clicks "Comment" button
 2. Comment panel slides in from right
 3. User types comment, clicks Post
@@ -560,6 +586,7 @@ Events:
 6. @ mentions send notifications
 
 **Version History:**
+
 1. User clicks "History" button
 2. Timeline shows v1, v2, v3 with thumbnails
 3. Click version → Preview opens
@@ -568,6 +595,7 @@ Events:
 6. Creates new version (v4) with restored content
 
 **Live Editing:**
+
 1. User A opens design
 2. Avatar appears in header "Currently editing"
 3. User B opens same design
@@ -600,12 +628,14 @@ const useRealtimeComments = (designId: string) => {
   const [comments, setComments] = useState<Comment[]>([]);
 
   useEffect(() => {
-    const ws = new WebSocket(`wss://api.example.com/creative-studio/designs/${designId}/presence`);
+    const ws = new WebSocket(
+      `wss://api.example.com/creative-studio/designs/${designId}/presence`,
+    );
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if (data.type === 'comment_added') {
-        setComments(prev => [...prev, data.comment]);
+      if (data.type === "comment_added") {
+        setComments((prev) => [...prev, data.comment]);
       }
     };
 
@@ -629,20 +659,23 @@ const handleCreateVersion = async (changes: string) => {
   if (!state.design) return;
 
   try {
-    const response = await fetch(`/api/creative-studio/designs/${state.design.id}/versions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ changes }),
-    });
+    const response = await fetch(
+      `/api/creative-studio/designs/${state.design.id}/versions`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ changes }),
+      },
+    );
 
     if (response.ok) {
       toast({
-        title: '✅ Version Saved',
-        description: 'Design snapshot created',
+        title: "✅ Version Saved",
+        description: "Design snapshot created",
       });
     }
   } catch (error) {
-    console.error('Version creation failed', error);
+    console.error("Version creation failed", error);
   }
 };
 
@@ -650,15 +683,18 @@ const handleRestoreVersion = async (versionId: string) => {
   if (!state.design) return;
 
   try {
-    const response = await fetch(`/api/creative-studio/designs/${state.design.id}/restore`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ versionId }),
-    });
+    const response = await fetch(
+      `/api/creative-studio/designs/${state.design.id}/restore`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ versionId }),
+      },
+    );
 
     if (response.ok) {
       const { design } = await response.json();
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         design,
         history: [design],
@@ -666,38 +702,51 @@ const handleRestoreVersion = async (versionId: string) => {
       }));
 
       toast({
-        title: '⏮️ Version Restored',
-        description: 'Design reverted to previous state',
+        title: "⏮️ Version Restored",
+        description: "Design reverted to previous state",
       });
     }
   } catch (error) {
-    console.error('Version restore failed', error);
+    console.error("Version restore failed", error);
   }
 };
 
 // 4. Live editing indicators
-const [activeUsers, setActiveUsers] = useState<Array<{ userId: string, userName: string }>>([]);
+const [activeUsers, setActiveUsers] = useState<
+  Array<{ userId: string; userName: string }>
+>([]);
 
 useEffect(() => {
   if (!state.design) return;
 
-  const ws = new WebSocket(`wss://api.example.com/creative-studio/designs/${state.design.id}/presence`);
+  const ws = new WebSocket(
+    `wss://api.example.com/creative-studio/designs/${state.design.id}/presence`,
+  );
 
   ws.onopen = () => {
-    ws.send(JSON.stringify({ type: 'user_joined', userId: user?.id, userName: user?.name }));
+    ws.send(
+      JSON.stringify({
+        type: "user_joined",
+        userId: user?.id,
+        userName: user?.name,
+      }),
+    );
   };
 
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    if (data.type === 'user_joined') {
-      setActiveUsers(prev => [...prev, { userId: data.userId, userName: data.userName }]);
-    } else if (data.type === 'user_left') {
-      setActiveUsers(prev => prev.filter(u => u.userId !== data.userId));
+    if (data.type === "user_joined") {
+      setActiveUsers((prev) => [
+        ...prev,
+        { userId: data.userId, userName: data.userName },
+      ]);
+    } else if (data.type === "user_left") {
+      setActiveUsers((prev) => prev.filter((u) => u.userId !== data.userId));
     }
   };
 
   return () => {
-    ws.send(JSON.stringify({ type: 'user_left', userId: user?.id }));
+    ws.send(JSON.stringify({ type: "user_left", userId: user?.id }));
     ws.close();
   };
 }, [state.design?.id, user?.id]);
@@ -736,6 +785,7 @@ useEffect(() => {
 ### Deliverables
 
 **Phase 1: UX Overhaul (Day 1)**
+
 1. All Quick Wins from Option A
 2. Responsive mobile layout (iPad/iPhone)
 3. Accessibility compliance (WCAG AA)
@@ -743,18 +793,14 @@ useEffect(() => {
 5. Animations and transitions
 6. Loading states and skeletons
 
-**Phase 2: Collaboration Suite (Day 2)**
-7. All Approval Workflow from Option B
-8. All Collaboration Features from Option C
-9. Dashboard improvements (hover actions, filters)
-10. Performance optimization (React.memo, lazy loading)
-11. Integration testing (E2E flows)
+**Phase 2: Collaboration Suite (Day 2)** 7. All Approval Workflow from Option B 8. All Collaboration Features from Option C 9. Dashboard improvements (hover actions, filters) 10. Performance optimization (React.memo, lazy loading) 11. Integration testing (E2E flows)
 
 ### Components Affected
 
 **All components from Options A, B, C plus:**
 
 **New:**
+
 - `client/components/creative-studio/MobileToolbar.tsx` - Touch-optimized
 - `client/components/creative-studio/KeyboardShortcutsPanel.tsx` - Shortcuts reference
 - `client/components/creative-studio/AlignmentGuides.tsx` - Smart guides
@@ -763,6 +809,7 @@ useEffect(() => {
 - `client/components/creative-studio/DesignCard.tsx` - Dashboard card with hover
 
 **Enhanced:**
+
 - All existing components get accessibility improvements
 - All modals get smooth animations
 - All buttons get loading states
@@ -788,6 +835,7 @@ Body: { designIds: string[] }
 ### Expected UX Behaviors
 
 **Desktop Experience:**
+
 - Clean, spacious canvas
 - Single right sidebar (tabbed)
 - Floating toolbars on selection
@@ -796,6 +844,7 @@ Body: { designIds: string[] }
 - Keyboard shortcuts work everywhere
 
 **Mobile/Tablet Experience:**
+
 - Full-width canvas
 - Bottom toolbar (touch-optimized)
 - Swipe gestures (delete, undo)
@@ -803,6 +852,7 @@ Body: { designIds: string[] }
 - Responsive modals (full-screen on mobile)
 
 **Accessibility:**
+
 - Tab navigation through all UI
 - Arrow keys move canvas elements
 - Screen reader announcements
@@ -810,6 +860,7 @@ Body: { designIds: string[] }
 - Keyboard shortcuts panel (Cmd+/)
 
 **Performance:**
+
 - < 3s initial load
 - < 300ms canvas interactions
 - Smooth 60fps animations
@@ -944,6 +995,7 @@ const MemoizedCanvasItem = React.memo(CanvasItem, (prev, next) => {
 ### Testing Checklist
 
 **Desktop:**
+
 - [ ] All Option A tests pass
 - [ ] All Option B tests pass
 - [ ] All Option C tests pass
@@ -953,6 +1005,7 @@ const MemoizedCanvasItem = React.memo(CanvasItem, (prev, next) => {
 - [ ] Screen reader compatible
 
 **Mobile:**
+
 - [ ] Canvas responsive on iPad
 - [ ] Canvas responsive on iPhone
 - [ ] Touch gestures work (drag, pinch)
@@ -962,6 +1015,7 @@ const MemoizedCanvasItem = React.memo(CanvasItem, (prev, next) => {
 - [ ] Virtual keyboard doesn't break layout
 
 **Performance:**
+
 - [ ] Initial load < 3s (Lighthouse)
 - [ ] Canvas interactions < 300ms
 - [ ] No jank on scroll
@@ -969,6 +1023,7 @@ const MemoizedCanvasItem = React.memo(CanvasItem, (prev, next) => {
 - [ ] Large canvases (50+ elements) perform well
 
 **Accessibility:**
+
 - [ ] WCAG AA contrast (4.5:1)
 - [ ] Keyboard navigation complete
 - [ ] ARIA labels on all interactive elements
@@ -1009,12 +1064,14 @@ const MemoizedCanvasItem = React.memo(CanvasItem, (prev, next) => {
 ### Example Custom Plans
 
 **Example 1: "Approval + Comments Only"**
+
 - Approval workflow (Option B)
 - Comment system (from Option C)
 - Skip version history and live editing
 - Timeline: 4-5 hours
 
 **Example 2: "Mobile-First Redesign"**
+
 - Responsive layout for iPad/iPhone
 - Touch gestures
 - Bottom toolbar
@@ -1022,6 +1079,7 @@ const MemoizedCanvasItem = React.memo(CanvasItem, (prev, next) => {
 - Timeline: 1 day
 
 **Example 3: "Accessibility Sprint"**
+
 - Keyboard navigation
 - ARIA labels
 - Focus indicators
@@ -1030,6 +1088,7 @@ const MemoizedCanvasItem = React.memo(CanvasItem, (prev, next) => {
 - Timeline: 6-8 hours
 
 **Example 4: "Performance Boost"**
+
 - React.memo optimization
 - Lazy loading
 - Image optimization
@@ -1040,12 +1099,14 @@ const MemoizedCanvasItem = React.memo(CanvasItem, (prev, next) => {
 ### How to Request
 
 Simply tell me:
+
 - "I want Option E with [X, Y, Z features]"
 - "Timeline: [hours/days]"
 - "Must-haves: [list]"
 - "Nice-to-haves: [list]"
 
 I'll create a custom plan with:
+
 - Exact deliverables
 - Components affected
 - Backend endpoints needed
@@ -1060,18 +1121,21 @@ I'll create a custom plan with:
 Before marking any option as complete, I will:
 
 ### 1. Verify No Duplicate Components Created
+
 - [ ] Run file search for duplicate names
 - [ ] Check for duplicate routes
 - [ ] Verify no copy-paste duplication
 - [ ] Ensure consistent naming conventions
 
 ### 2. Ensure No Breaking Route Changes
+
 - [ ] `/creative-studio` route still works
 - [ ] All existing component imports valid
 - [ ] No breaking API changes
 - [ ] Backward compatible with existing data
 
 ### 3. Run All Tests
+
 - [ ] Unit tests pass (`npm test`)
 - [ ] Integration tests pass
 - [ ] Build successful (`npm run build`)
@@ -1079,6 +1143,7 @@ Before marking any option as complete, I will:
 - [ ] No console errors in browser
 
 ### 4. Manually Test Flows
+
 - [ ] **Public flow:** Unauthenticated user redirected
 - [ ] **User flow:** Creator can create → edit → save design
 - [ ] **Client flow:** (If applicable) Client portal access
@@ -1087,12 +1152,14 @@ Before marking any option as complete, I will:
 - [ ] **Collaboration:** Comments and versions work
 
 ### 5. Performance Check
+
 - [ ] Canvas renders in < 300ms
 - [ ] Autosave doesn't lag UI
 - [ ] No memory leaks (check DevTools)
 - [ ] Smooth animations (60fps)
 
 ### 6. Accessibility Audit
+
 - [ ] Tab navigation works
 - [ ] Keyboard shortcuts work
 - [ ] ARIA labels present
@@ -1102,20 +1169,20 @@ Before marking any option as complete, I will:
 
 ## Comparison Matrix
 
-| Feature | Option A | Option B | Option C | Option D | Option E |
-|---------|----------|----------|----------|----------|----------|
-| **Time** | 1-2 hrs | 2-3 hrs | 3-4 hrs | 1-2 days | Custom |
-| **Simplified Sidebar** | ✅ | ✅ | ✅ | ✅ | ? |
-| **Text Toolbar** | ✅ | ✅ | ✅ | ✅ | ? |
-| **Zoom Controls** | ✅ | ✅ | ✅ | ✅ | ? |
-| **Status Badge** | ✅ | ✅ | ✅ | ✅ | ? |
-| **Approval Workflow** | ❌ | ✅ | ✅ | ✅ | ? |
-| **Comment System** | ❌ | ❌ | ✅ | ✅ | ? |
-| **Version History** | ❌ | ❌ | ✅ | ✅ | ? |
-| **Mobile Responsive** | ❌ | ❌ | ❌ | ✅ | ? |
-| **Accessibility** | ��� | ❌ | ❌ | ✅ | ? |
-| **Animations** | ❌ | ❌ | ❌ | ✅ | ? |
-| **Performance Opts** | ❌ | ❌ | ❌ | ✅ | ? |
+| Feature                | Option A | Option B | Option C | Option D | Option E |
+| ---------------------- | -------- | -------- | -------- | -------- | -------- |
+| **Time**               | 1-2 hrs  | 2-3 hrs  | 3-4 hrs  | 1-2 days | Custom   |
+| **Simplified Sidebar** | ✅       | ✅       | ✅       | ✅       | ?        |
+| **Text Toolbar**       | ✅       | ✅       | ✅       | ✅       | ?        |
+| **Zoom Controls**      | ✅       | ✅       | ✅       | ✅       | ?        |
+| **Status Badge**       | ✅       | ✅       | ✅       | ✅       | ?        |
+| **Approval Workflow**  | ❌       | ✅       | ✅       | ✅       | ?        |
+| **Comment System**     | ❌       | ❌       | ✅       | ✅       | ?        |
+| **Version History**    | ❌       | ❌       | ✅       | ✅       | ?        |
+| **Mobile Responsive**  | ❌       | ❌       | ❌       | ✅       | ?        |
+| **Accessibility**      | ���      | ❌       | ❌       | ✅       | ?        |
+| **Animations**         | ❌       | ❌       | ❌       | ✅       | ?        |
+| **Performance Opts**   | ❌       | ❌       | ❌       | ✅       | ?        |
 
 ---
 
@@ -1124,36 +1191,44 @@ Before marking any option as complete, I will:
 Based on the audit, here's my recommendation:
 
 ### **Phase 1: Option A (Quick Wins)** - 1-2 hours
+
 Start here for immediate UX improvement with zero risk.
 
 **Why:**
+
 - Low effort, high impact
 - No backend dependencies
 - Easy to test and validate
 - Builds user confidence
 
 ### **Phase 2: Option B (Approval Workflow)** - 2-3 hours
+
 Add critical approval system once UX is cleaner.
 
 **Why:**
+
 - Fills biggest functional gap
 - Enables collaboration
 - Unblocks scheduling/publishing
 - Requires backend, but simple endpoints
 
 ### **Phase 3: Option C (Collaboration)** - 3-4 hours
+
 Complete the collaboration suite.
 
 **Why:**
+
 - Comments and versions highly requested
 - Differentiates from competitors
 - Requires WebSocket (more complex)
 - Best done after approval workflow exists
 
 ### **Phase 4: Option D (Polish)** - 1-2 days
+
 Final polish pass for production readiness.
 
 **Why:**
+
 - Mobile/accessibility are table stakes
 - Performance optimization prevents tech debt
 - Animations add professional touch
@@ -1176,6 +1251,7 @@ Please select one of the following:
 5. **"Custom: [your specific request]"** - Option E
 
 I will then:
+
 - Create a task list with milestones
 - Implement the selected improvements
 - Run all validation tests

@@ -8,22 +8,26 @@
 ## ✅ What Was Delivered
 
 ### 1. **Token-Based Authentication**
+
 - File: `client/lib/client-portal-auth.ts`
 - File: `client/components/auth/ClientPortalRoute.tsx`
 - File: `server/routes/client-portal-auth.ts`
 - **Result:** Client portal uses magic links instead of login
 
 ### 2. **Dynamic Route with Token**
+
 - Route: `/client-portal/:token`
 - Route: `/client-portal` (session fallback)
 - **Result:** Clients access portal via email link
 
 ### 3. **Single-Brand Scoping**
+
 - Token maps to one brand only
 - API calls filtered by brand ID
 - **Result:** Clients see ONLY their brand data
 
 ### 4. **Friendly Error Handling**
+
 - Expired token → "Request New Link"
 - Invalid token → "Check Your Email"
 - Missing token → "Request Access"
@@ -34,6 +38,7 @@
 ## 🔑 Demo Token (Development)
 
 **Access Link:**
+
 ```
 /client-portal/demo_client_token_123
 ```
@@ -49,6 +54,7 @@
 ## 🧪 Quick Tests
 
 ### Test Valid Token:
+
 ```
 1. Visit: /client-portal/demo_client_token_123
 2. Should validate → redirect to /client-portal
@@ -56,6 +62,7 @@
 ```
 
 ### Test Invalid Token:
+
 ```
 1. Visit: /client-portal/invalid_token
 2. Should show error screen
@@ -63,6 +70,7 @@
 ```
 
 ### Test Session Persistence:
+
 ```
 1. Access with valid token
 2. Navigate away
@@ -71,6 +79,7 @@
 ```
 
 ### Test Brand Scoping:
+
 ```
 1. Check network tab API calls
 2. All should include brandId param
@@ -82,22 +91,23 @@
 ## 🔧 How It Works
 
 ### Token Flow:
+
 ```
 1. Admin generates token:
    POST /api/client-portal/generate-token
-   
+
 2. Client receives email:
    https://app.../client-portal/:token
-   
+
 3. ClientPortalRoute validates:
    POST /api/client-portal/validate-token
-   
+
 4. Token stored in session:
    sessionStorage.setItem('client_portal_token', ...)
-   
+
 5. URL cleaned:
    /client-portal/:token → /client-portal
-   
+
 6. Portal loads:
    Uses brandId from token for all API calls
 ```
@@ -107,13 +117,16 @@
 ## 📁 Key Files
 
 **Client Auth:**
+
 - `client/lib/client-portal-auth.ts` - Token validation
 - `client/components/auth/ClientPortalRoute.tsx` - Route guard
 
 **Server:**
+
 - `server/routes/client-portal-auth.ts` - Token endpoints
 
 **Integration:**
+
 - `client/App.tsx` - Routes updated
 - `client/pages/ClientPortal.tsx` - Uses token
 - `server/index-v2.ts` - Router mounted
@@ -123,6 +136,7 @@
 ## 🎯 API Endpoints
 
 ### Validate Token
+
 ```
 POST /api/client-portal/validate-token
 Body: { "token": "demo_client_token_123" }
@@ -130,6 +144,7 @@ Returns: { valid: true, token: {...} }
 ```
 
 ### Generate Token (Admin)
+
 ```
 POST /api/client-portal/generate-token
 Body: {
@@ -142,6 +157,7 @@ Returns: { token, portalUrl, expiresAt }
 ```
 
 ### Revoke Token (Admin)
+
 ```
 POST /api/client-portal/revoke-token
 Body: { "token": "demo_client_token_123" }
@@ -178,6 +194,7 @@ Client (noindex):     2 routes ← NEW
 ## 🚀 Production Deployment
 
 **Before deploying:**
+
 1. Replace in-memory token store with database
 2. Set up email templates for token distribution
 3. Create admin UI for token generation

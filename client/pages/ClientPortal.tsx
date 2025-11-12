@@ -62,7 +62,10 @@ import {
 } from "@shared/client-portal";
 import { WorkflowTracker } from "@/components/workflow/WorkflowTracker";
 import { WorkflowAction } from "@shared/workflow";
-import { getStoredClientToken, getBrandIdFromToken } from "@/lib/client-portal-auth";
+import {
+  getStoredClientToken,
+  getBrandIdFromToken,
+} from "@/lib/client-portal-auth";
 
 export default function ClientPortal() {
   const [dashboardData, setDashboardData] =

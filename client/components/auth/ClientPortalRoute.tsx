@@ -3,19 +3,19 @@
  * Protects client portal routes with token-based authentication
  */
 
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   validateClientToken,
   storeClientToken,
   getStoredClientToken,
   clearClientToken,
   type ClientPortalToken,
-} from '@/lib/client-portal-auth';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Clock, Shield, Mail } from 'lucide-react';
+} from "@/lib/client-portal-auth";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Clock, Shield, Mail } from "lucide-react";
 
 interface ClientPortalRouteProps {
   children: React.ReactNode;
@@ -57,15 +57,15 @@ export function ClientPortalRoute({ children }: ClientPortalRouteProps) {
         setValidating(false);
 
         // Remove token from URL for security
-        navigate('/client-portal', { replace: true });
+        navigate("/client-portal", { replace: true });
       } else {
         // Token is invalid or expired
-        setError(result.error || 'invalid');
+        setError(result.error || "invalid");
         setValidating(false);
       }
     } else {
       // No token in URL and no stored token
-      setError('missing');
+      setError("missing");
       setValidating(false);
     }
   };
@@ -108,40 +108,40 @@ function ClientPortalErrorState({
 }) {
   const getErrorConfig = () => {
     switch (error) {
-      case 'expired':
+      case "expired":
         return {
           icon: <Clock className="h-16 w-16 text-orange-500 mb-4" />,
-          title: 'Access Link Expired',
+          title: "Access Link Expired",
           message:
-            'This portal link has expired for security reasons. Please request a new access link from your agency.',
-          action: 'Request New Link',
+            "This portal link has expired for security reasons. Please request a new access link from your agency.",
+          action: "Request New Link",
           actionEmail: true,
         };
-      case 'invalid':
+      case "invalid":
         return {
           icon: <AlertCircle className="h-16 w-16 text-red-500 mb-4" />,
-          title: 'Invalid Access Link',
+          title: "Invalid Access Link",
           message:
-            'This portal link is not valid. Please check your email for the correct link or request a new one.',
-          action: 'Request New Link',
+            "This portal link is not valid. Please check your email for the correct link or request a new one.",
+          action: "Request New Link",
           actionEmail: true,
         };
-      case 'missing':
+      case "missing":
         return {
           icon: <Shield className="h-16 w-16 text-gray-500 mb-4" />,
-          title: 'Access Required',
+          title: "Access Required",
           message:
-            'You need a special access link to view this portal. Please check your email or contact your agency.',
-          action: 'Request Access',
+            "You need a special access link to view this portal. Please check your email or contact your agency.",
+          action: "Request Access",
           actionEmail: true,
         };
       default:
         return {
           icon: <AlertCircle className="h-16 w-16 text-gray-500 mb-4" />,
-          title: 'Access Error',
+          title: "Access Error",
           message:
-            'Unable to validate your access. Please try again or contact your agency.',
-          action: 'Try Again',
+            "Unable to validate your access. Please try again or contact your agency.",
+          action: "Try Again",
           actionEmail: false,
         };
     }
@@ -185,7 +185,7 @@ function ClientPortalErrorState({
             )}
 
             <p className="text-sm text-gray-600 text-center">
-              Need help?{' '}
+              Need help?{" "}
               <a
                 href="mailto:support@aligned.ai"
                 className="text-primary hover:underline"

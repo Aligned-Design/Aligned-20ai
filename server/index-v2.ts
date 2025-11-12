@@ -16,7 +16,9 @@ import agentsRouter from "./routes/agents";
 import analyticsRouter from "./routes/analytics-v2";
 import approvalsRouter from "./routes/approvals-v2";
 import mediaRouter from "./routes/media-v2";
-import clientPortalAuthRouter, { initializeDemoTokens } from "./routes/client-portal-auth";
+import clientPortalAuthRouter, {
+  initializeDemoTokens,
+} from "./routes/client-portal-auth";
 
 export function createServer() {
   const app = express();
@@ -81,7 +83,7 @@ export function createServer() {
   app.use("/api/client-portal", clientPortalAuthRouter);
 
   // Initialize demo tokens for development
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     initializeDemoTokens();
   }
 
