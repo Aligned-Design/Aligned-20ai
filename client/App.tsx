@@ -40,73 +40,103 @@ import Billing from "./pages/Billing";
 
 const queryClient = new QueryClient();
 
-// Protected route wrapper - handles authentication and routing
-function ProtectedRoutes() {
+// Route guard components
+function PublicRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, onboardingStep } = useAuth();
 
+  // If authenticated and onboarding is in progress, show onboarding
+  if (isAuthenticated && onboardingStep) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  // If authenticated and onboarding is complete, show dashboard
+  if (isAuthenticated && !onboardingStep) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // Not authenticated - show public content
+  return children as React.ReactElement;
+}
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, onboardingStep } = useAuth();
+
+  // Not authenticated - redirect to landing page
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Authenticated but in onboarding - redirect to onboarding
+  if (onboardingStep) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  // Authenticated and onboarding complete - show protected content
+  return children as React.ReactElement;
+}
+
+function OnboardingRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, onboardingStep } = useAuth();
+
+  // Not authenticated - redirect to landing page
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Authenticated but onboarding not started - redirect to onboarding
+  if (!onboardingStep) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // In onboarding - show onboarding content
+  return children as React.ReactElement;
+}
+
+// Protected route wrapper - handles authentication and routing
+function ProtectedRoutes() {
   return (
     <Routes>
-      {/* Landing page - accessible to all, shown when not authenticated */}
-      <Route path="/" element={isAuthenticated ? <Dashboard /> : <Index />} />
+      {/* Public Routes - landing page */}
+      <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />
 
-      {/* Onboarding flow - shown when authenticated but onboarding not complete */}
-      <Route
-        path="/onboarding"
-        element={
-          isAuthenticated && onboardingStep ? <Onboarding /> : <Index />
-        }
-      />
+      {/* Auth Routes - redirect to onboarding or show onboarding */}
+      <Route path="/login" element={<PublicRoute><Index /></PublicRoute>} />
+      <Route path="/signup" element={<PublicRoute><Index /></PublicRoute>} />
+      <Route path="/onboarding" element={<OnboardingRoute><Onboarding /></OnboardingRoute>} />
 
-      {/* Auth aliases */}
-      <Route
-        path="/login"
-        element={
-          isAuthenticated && onboardingStep ? <Onboarding /> : <Index />
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          isAuthenticated && onboardingStep ? <Onboarding /> : <Index />
-        }
-      />
-
-      {/* Protected routes - only show when authenticated and onboarding complete */}
-      <Route
-        path="/dashboard"
-        element={isAuthenticated && !onboardingStep ? <Dashboard /> : <Index />}
-      />
-      <Route path="/calendar" element={<Calendar />} />
-      <Route path="/content-queue" element={<ContentQueue />} />
-      <Route path="/queue" element={<ContentQueue />} />
-      <Route path="/approvals" element={<Approvals />} />
-      <Route path="/creative-studio" element={<CreativeStudio />} />
-      <Route path="/content-generator" element={<ContentGenerator />} />
+      {/* Protected Routes - only accessible when authenticated and onboarding complete */}
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
+      <Route path="/content-queue" element={<ProtectedRoute><ContentQueue /></ProtectedRoute>} />
+      <Route path="/queue" element={<ProtectedRoute><ContentQueue /></ProtectedRoute>} />
+      <Route path="/approvals" element={<ProtectedRoute><Approvals /></ProtectedRoute>} />
+      <Route path="/creative-studio" element={<ProtectedRoute><CreativeStudio /></ProtectedRoute>} />
+      <Route path="/content-generator" element={<ProtectedRoute><ContentGenerator /></ProtectedRoute>} />
 
       {/* Strategy Navigation */}
-      <Route path="/campaigns" element={<Campaigns />} />
-      <Route path="/brands" element={<Brands />} />
-      <Route path="/brand-intake" element={<BrandIntake />} />
-      <Route path="/brand-guide" element={<BrandGuide />} />
-      <Route path="/brand-snapshot" element={<BrandSnapshot />} />
-      <Route path="/brand-intelligence" element={<BrandIntelligence />} />
-      <Route path="/analytics" element={<Analytics />} />
-      <Route path="/reporting" element={<Reporting />} />
-      <Route path="/reports" element={<Reporting />} />
-      <Route path="/paid-ads" element={<PaidAds />} />
-      <Route path="/ads" element={<PaidAds />} />
+      <Route path="/campaigns" element={<ProtectedRoute><Campaigns /></ProtectedRoute>} />
+      <Route path="/brands" element={<ProtectedRoute><Brands /></ProtectedRoute>} />
+      <Route path="/brand-intake" element={<ProtectedRoute><BrandIntake /></ProtectedRoute>} />
+      <Route path="/brand-guide" element={<ProtectedRoute><BrandGuide /></ProtectedRoute>} />
+      <Route path="/brand-snapshot" element={<ProtectedRoute><BrandSnapshot /></ProtectedRoute>} />
+      <Route path="/brand-intelligence" element={<ProtectedRoute><BrandIntelligence /></ProtectedRoute>} />
+      <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+      <Route path="/reporting" element={<ProtectedRoute><Reporting /></ProtectedRoute>} />
+      <Route path="/reports" element={<ProtectedRoute><Reporting /></ProtectedRoute>} />
+      <Route path="/paid-ads" element={<ProtectedRoute><PaidAds /></ProtectedRoute>} />
+      <Route path="/ads" element={<ProtectedRoute><PaidAds /></ProtectedRoute>} />
 
       {/* Assets Navigation */}
-      <Route path="/library" element={<LibraryPage />} />
-      <Route path="/client-portal" element={<ClientPortal />} />
-      <Route path="/events" element={<Events />} />
-      <Route path="/reviews" element={<Reviews />} />
-      <Route path="/linked-accounts" element={<LinkedAccounts />} />
+      <Route path="/library" element={<ProtectedRoute><LibraryPage /></ProtectedRoute>} />
+      <Route path="/client-portal" element={<ProtectedRoute><ClientPortal /></ProtectedRoute>} />
+      <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
+      <Route path="/reviews" element={<ProtectedRoute><Reviews /></ProtectedRoute>} />
+      <Route path="/linked-accounts" element={<ProtectedRoute><LinkedAccounts /></ProtectedRoute>} />
 
       {/* Settings */}
-      <Route path="/settings" element={<Settings />} />
-      <Route path="/client-settings" element={<ClientSettings />} />
-      <Route path="/billing" element={<Billing />} />
+      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+      <Route path="/client-settings" element={<ProtectedRoute><ClientSettings /></ProtectedRoute>} />
+      <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
 
       {/* Catch-all - show 404 page */}
       <Route path="*" element={<NotFound />} />
