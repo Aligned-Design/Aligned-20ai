@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { isDemoMode } from "./mockData";
 
 const rawSupabaseUrl = (import.meta.env.VITE_SUPABASE_URL ?? "").toString();
 const supabaseAnonKey = (
@@ -25,19 +26,29 @@ function isValidHttpUrl(url: string): boolean {
 
 const supabaseUrl = normalizeUrl(rawSupabaseUrl);
 
-if (!supabaseUrl || !supabaseAnonKey) {
+// In demo mode, use placeholder values to bypass Supabase (for quick demos/testing)
+const DEMO_URL = "https://demo.supabase.co";
+const DEMO_KEY = "demo-anon-key";
+
+if (!isDemoMode() && (!supabaseUrl || !supabaseAnonKey)) {
+  console.warn(
+    "⚠️ Missing Supabase credentials. Set VITE_DEMO_MODE=true to use mock data.",
+  );
   throw new Error(
-    "Missing Supabase environment variables: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY. Please check your .env and runtime environment.",
+    "Missing Supabase environment variables: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY. Please check your .env and runtime environment, or enable VITE_DEMO_MODE=true for testing.",
   );
 }
 
-if (!isValidHttpUrl(supabaseUrl)) {
+if (!isDemoMode() && !isValidHttpUrl(supabaseUrl)) {
   throw new Error(
     `Invalid VITE_SUPABASE_URL: "${supabaseUrl}". Must be a valid HTTP or HTTPS URL.`,
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(
+  isDemoMode() ? DEMO_URL : supabaseUrl,
+  isDemoMode() ? DEMO_KEY : supabaseAnonKey
+);
 
 export type Brand = {
   id: string;
