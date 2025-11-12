@@ -212,9 +212,9 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
-  // Register route routers
-  app.use("/api/agents", agentsRouter);
-  app.use("/api/milestones", milestonesRouter);
+  // Register route routers - all temporarily disabled
+  // app.use("/api/agents", agentsRouter);
+  // app.use("/api/milestones", milestonesRouter);
 
   // Temporarily disabled routers due to configuration issues
   // app.use("/api/ai-metrics", aiMetricsRouter);
