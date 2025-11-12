@@ -5,7 +5,7 @@
  */
 
 import { useAuth, Role } from "./useAuth";
-import permissionsMap from "@/config/permissions.json";
+import permissionsMap from "../../../config/permissions.json";
 
 export type Scope =
   | "brand:manage"
