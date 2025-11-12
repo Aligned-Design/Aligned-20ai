@@ -220,9 +220,7 @@ export default function Pricing() {
                 </div>
                 <div className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                  <span className="text-slate-700">
-                    Multi-brand dashboard
-                  </span>
+                  <span className="text-slate-700">Multi-brand dashboard</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
@@ -230,9 +228,7 @@ export default function Pricing() {
                 </div>
                 <div className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                  <span className="text-slate-700">
-                    Team analytics roll-up
-                  </span>
+                  <span className="text-slate-700">Team analytics roll-up</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
@@ -368,8 +364,8 @@ export default function Pricing() {
                 Can I cancel anytime?
               </AccordionTrigger>
               <AccordionContent className="text-slate-700 leading-relaxed">
-                Absolutely. Cancel or adjust any plan with 30 days' notice so
-                we can wrap up active projects.
+                Absolutely. Cancel or adjust any plan with 30 days' notice so we
+                can wrap up active projects.
               </AccordionContent>
             </AccordionItem>
 

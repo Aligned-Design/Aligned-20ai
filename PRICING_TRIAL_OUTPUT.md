@@ -112,32 +112,32 @@ Status: Live
 
 ## 🎨 Design Specifications Met
 
-| Element | Specification | Implementation | ✓ |
-|---------|--------------|----------------|---|
-| Font | Inter 400-700 | Inherited from design system | ✅ |
-| Primary Color | `#3D0FD6` | `bg-purple-600` | ✅ |
-| Secondary Color | `#7C3AED` | `bg-purple-700` | ✅ |
-| Background | `#F9FAFB` | `bg-gray-50` | ✅ |
-| Button Radius | 8px | `rounded-xl` | ✅ |
-| Card Radius | 16px | `rounded-2xl` | ✅ |
-| Hover Effects | Fade transitions | All buttons | ✅ |
-| Icons | Lucide React | Check, ArrowRight, Sparkles, HelpCircle | ✅ |
-| Confetti | On publish | `canvas-confetti` library | ✅ |
-| Responsive | 2-col → stack | `md:grid-cols-2` | ✅ |
+| Element         | Specification    | Implementation                          | ✓   |
+| --------------- | ---------------- | --------------------------------------- | --- |
+| Font            | Inter 400-700    | Inherited from design system            | ✅  |
+| Primary Color   | `#3D0FD6`        | `bg-purple-600`                         | ✅  |
+| Secondary Color | `#7C3AED`        | `bg-purple-700`                         | ✅  |
+| Background      | `#F9FAFB`        | `bg-gray-50`                            | ✅  |
+| Button Radius   | 8px              | `rounded-xl`                            | ✅  |
+| Card Radius     | 16px             | `rounded-2xl`                           | ✅  |
+| Hover Effects   | Fade transitions | All buttons                             | ✅  |
+| Icons           | Lucide React     | Check, ArrowRight, Sparkles, HelpCircle | ✅  |
+| Confetti        | On publish       | `canvas-confetti` library               | ✅  |
+| Responsive      | 2-col → stack    | `md:grid-cols-2`                        | ✅  |
 
 ---
 
 ## 🧪 Acceptance Criteria Validation
 
-| Criterion | Expected | Actual | Status |
-|-----------|----------|--------|--------|
-| Pricing grid renders | 2 columns, responsive | ✅ Grid with mobile stack | ✅ |
-| Free Trial CTA active | `/signup?trial=7` | ✅ All CTAs functional | ✅ |
-| Publish limit works | ≤2 posts per trial | ✅ Middleware enforced | ✅ |
-| Banner visible | Trial dashboard only | ✅ Conditional render | ✅ |
-| Confetti animation | On publish success | ✅ Hook implemented | ✅ |
-| FAQ accordion | 5 entries | ✅ All 5 questions | ✅ |
-| Mobile view tested | Stacked layout | ✅ Responsive classes | ✅ |
+| Criterion             | Expected              | Actual                    | Status |
+| --------------------- | --------------------- | ------------------------- | ------ |
+| Pricing grid renders  | 2 columns, responsive | ✅ Grid with mobile stack | ✅     |
+| Free Trial CTA active | `/signup?trial=7`     | ✅ All CTAs functional    | ✅     |
+| Publish limit works   | ≤2 posts per trial    | ✅ Middleware enforced    | ✅     |
+| Banner visible        | Trial dashboard only  | ✅ Conditional render     | ✅     |
+| Confetti animation    | On publish success    | ✅ Hook implemented       | ✅     |
+| FAQ accordion         | 5 entries             | ✅ All 5 questions        | ✅     |
+| Mobile view tested    | Stacked layout        | ✅ Responsive classes     | ✅     |
 
 ---
 
@@ -194,6 +194,7 @@ router.post("/api/posts/publish", checkTrialLimit, handler);
 ## 🔍 Quality Assurance
 
 ### Typecheck Status
+
 ```bash
 npm run typecheck
 # ✅ No new errors introduced
@@ -201,11 +202,13 @@ npm run typecheck
 ```
 
 ### Responsive Testing
+
 - ✅ Desktop (≥1024px) - 2-column layout
 - ✅ Tablet (768-1024px) - 2-column adjusted
 - ✅ Mobile (<768px) - Single column stack
 
 ### Cross-Browser Compatibility
+
 - ✅ Chrome/Edge (Chromium)
 - ✅ Firefox
 - ✅ Safari
@@ -224,11 +227,11 @@ import { useAuth } from "@/contexts/AuthContext";
 
 function Dashboard() {
   const { user } = useAuth();
-  
+
   return (
     <>
       {user?.plan === "trial" && (
-        <TrialBanner 
+        <TrialBanner
           publishedCount={user.trial_published_count || 0}
         />
       )}
@@ -243,12 +246,12 @@ import { useTrialStatus } from "@/hooks/use-trial-status";
 
 function PublishSection() {
   const { trialStatus } = useTrialStatus();
-  
+
   return (
     <div className="flex items-center gap-3">
       <h2>Publish Content</h2>
       {trialStatus?.isTrial && (
-        <PostCounterPill 
+        <PostCounterPill
           publishedCount={trialStatus.publishedCount}
           maxPosts={trialStatus.maxPosts}
         />

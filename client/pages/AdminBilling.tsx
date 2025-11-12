@@ -163,7 +163,10 @@ export default function AdminBilling() {
         <div className="h-8 w-64 bg-gray-200 rounded animate-pulse mb-6" />
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
+            <div
+              key={i}
+              className="h-32 bg-gray-200 rounded-lg animate-pulse"
+            />
           ))}
         </div>
       </div>

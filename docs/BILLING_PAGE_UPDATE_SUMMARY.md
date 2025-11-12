@@ -17,6 +17,7 @@ The Billing page has been completely redesigned to integrate with the new pricin
 ### 1. **Trial-Specific Experience**
 
 **Conditional View for Trial Users:**
+
 - ✅ Trial status banner (reuses `TrialBanner` component)
 - ✅ Remaining trial days display
 - ✅ Remaining posts counter (2 - published_count)
@@ -26,13 +27,16 @@ The Billing page has been completely redesigned to integrate with the new pricin
 - ✅ Trial features showcase card
 
 **Components Used:**
+
 ```tsx
-{isTrial && trialStatus && (
-  <TrialBanner
-    publishedCount={trialStatus.publishedCount}
-    maxPosts={trialStatus.maxPosts}
-  />
-)}
+{
+  isTrial && trialStatus && (
+    <TrialBanner
+      publishedCount={trialStatus.publishedCount}
+      maxPosts={trialStatus.maxPosts}
+    />
+  );
+}
 ```
 
 ---
@@ -40,10 +44,12 @@ The Billing page has been completely redesigned to integrate with the new pricin
 ### 2. **Dynamic Plan Tier Display**
 
 **Auto-Switching Logic:**
+
 - Base Plan: `$199/mo per business` (< 5 brands)
 - Agency Tier: `$99/mo per business` (≥ 5 brands)
 
 **Pricing Calculation:**
+
 ```typescript
 const calculateMonthlyTotal = () => {
   const rate = brands >= 5 ? 99 : 199;
@@ -52,6 +58,7 @@ const calculateMonthlyTotal = () => {
 ```
 
 **Display Example:**
+
 - 3 brands × $199 = $597/mo
 - 7 brands × $99 = $693/mo (Agency Tier)
 
@@ -62,6 +69,7 @@ const calculateMonthlyTotal = () => {
 **Two-Column Layout:**
 
 **Card 1: Current Plan (Highlighted)**
+
 - Plan name (Base Plan / Agency Tier)
 - Rate per brand
 - Active brands count
@@ -71,6 +79,7 @@ const calculateMonthlyTotal = () => {
 - Action buttons (View Plans, Update Payment)
 
 **Card 2: Upgrade Opportunity**
+
 - For Base users: Agency tier benefits
 - For Agency users: Confirmation + pro tips
 - Tooltip: "Your pricing automatically adjusts at 5 brands"
@@ -81,11 +90,13 @@ const calculateMonthlyTotal = () => {
 ### 4. **Enhanced Usage Tracking**
 
 **Metrics Displayed:**
+
 - Posts Published This Month (unlimited for paid)
 - Brands Managed (tied to pricing)
 - AI Insights Used (if available)
 
 **Progress Bars:**
+
 - Trial users: 0/2 posts limit shown
 - Paid users: "Unlimited" messaging
 
@@ -94,6 +105,7 @@ const calculateMonthlyTotal = () => {
 ### 5. **Billing History & Invoices**
 
 **For Paid Plans Only:**
+
 - Invoice ID and date
 - Amount charged
 - Status badge (Paid/Pending/Failed)
@@ -101,6 +113,7 @@ const calculateMonthlyTotal = () => {
 - Next billing projection
 
 **Example:**
+
 ```
 Next charge: $597 on Dec 15, 2025 (3 brands × $199)
 ```
@@ -110,12 +123,15 @@ Next charge: $597 on Dec 15, 2025 (3 brands × $199)
 ### 6. **Upgrade Prompts & CTAs**
 
 **Trial Users:**
+
 > ✨ Enjoying your trial? Unlock unlimited publishing, analytics, and multi-brand tools today.
 
 **Base Plan Users (< 5 brands):**
+
 > 🎯 Managing 5 or more brands? You're eligible for Agency Pricing at $99/mo per brand.
 
 **Agency Tier Users:**
+
 > 💡 Pro Tip: Add more brands to maximize your savings. Each additional brand is just $99/mo.
 
 ---
@@ -124,12 +140,13 @@ Next charge: $597 on Dec 15, 2025 (3 brands × $199)
 
 **Matches Pricing Page:**
 
-| Add-on | Description | Price | Action |
-|--------|-------------|-------|--------|
-| Onboarding Concierge | Full setup & brand alignment | $299/client | Add Add-on |
-| Custom Domain + White-Label | Agency-branded interface | $49/mo | Add Add-on |
+| Add-on                      | Description                  | Price       | Action     |
+| --------------------------- | ---------------------------- | ----------- | ---------- |
+| Onboarding Concierge        | Full setup & brand alignment | $299/client | Add Add-on |
+| Custom Domain + White-Label | Agency-branded interface     | $49/mo      | Add Add-on |
 
 **Trial Restriction:**
+
 - Buttons show "Upgrade First" when `user.plan === 'trial'`
 
 ---
@@ -137,6 +154,7 @@ Next charge: $597 on Dec 15, 2025 (3 brands × $199)
 ### 8. **Design & UX**
 
 **Visual Parity with `/pricing`:**
+
 - ✅ Inter font family
 - ✅ Purple accents (#3D0FD6, #7C3AED)
 - ✅ Lime highlights (#A3E635)
@@ -145,6 +163,7 @@ Next charge: $597 on Dec 15, 2025 (3 brands × $199)
 - ✅ Smooth transitions and hover states
 
 **Confetti Animation:**
+
 - Triggers when user upgrades from trial → paid
 - Uses `usePublishCelebration` hook
 
@@ -180,15 +199,12 @@ Next charge: $597 on Dec 15, 2025 (3 brands × $199)
    - Authenticated endpoint
 
 **Hook Usage:**
+
 ```typescript
 import { useBillingStatus } from "@/hooks/use-billing-status";
 
-const { 
-  billingStatus, 
-  billingHistory,
-  isLoading,
-  upgradePlan 
-} = useBillingStatus();
+const { billingStatus, billingHistory, isLoading, upgradePlan } =
+  useBillingStatus();
 ```
 
 ---
@@ -223,25 +239,26 @@ const {
 
 ## 🧪 Testing Checklist
 
-| Test Case | Expected Behavior | Status |
-|-----------|-------------------|--------|
-| Trial user views billing | Shows trial banner + remaining days/posts | ✅ |
-| Trial user sees upgrade CTA | "Upgrade to Unlock Unlimited Publishing" | ✅ |
-| Trial user sees no invoices | Billing history hidden | ✅ |
-| Base plan user sees pricing | $199/mo × brand count | ✅ |
-| Agency tier user sees pricing | $99/mo × brand count | ✅ |
-| 5+ brands auto-switch tier | Agency pricing applied | ✅ |
-| Add-ons disabled for trial | "Upgrade First" button state | ✅ |
-| Monthly total calculated | Brands × rate = total | ✅ |
-| Next charge date shown | Current period end + amount | ✅ |
-| Invoice download works | PDF link/button functional | ✅ |
-| Responsive layout | Mobile stack, desktop 2-col | ✅ |
+| Test Case                     | Expected Behavior                         | Status |
+| ----------------------------- | ----------------------------------------- | ------ |
+| Trial user views billing      | Shows trial banner + remaining days/posts | ✅     |
+| Trial user sees upgrade CTA   | "Upgrade to Unlock Unlimited Publishing"  | ✅     |
+| Trial user sees no invoices   | Billing history hidden                    | ✅     |
+| Base plan user sees pricing   | $199/mo × brand count                     | ✅     |
+| Agency tier user sees pricing | $99/mo × brand count                      | ✅     |
+| 5+ brands auto-switch tier    | Agency pricing applied                    | ✅     |
+| Add-ons disabled for trial    | "Upgrade First" button state              | ✅     |
+| Monthly total calculated      | Brands × rate = total                     | ✅     |
+| Next charge date shown        | Current period end + amount               | ✅     |
+| Invoice download works        | PDF link/button functional                | ✅     |
+| Responsive layout             | Mobile stack, desktop 2-col               | ✅     |
 
 ---
 
 ## 🎨 Visual Comparison
 
 ### Before
+
 - Generic "Growth Plan" display
 - Static $149/mo pricing
 - No trial support
@@ -249,6 +266,7 @@ const {
 - Basic invoice list
 
 ### After
+
 - **Trial View:** Trial banner, remaining days/posts, upgrade prompts
 - **Paid View:** Dynamic pricing based on brand count
 - **Agency Tier:** Auto-switch at 5 brands, $99/mo rate
@@ -262,16 +280,19 @@ const {
 ## 🚀 Integration Points
 
 ### With Pricing Page
+
 - Upgrade CTAs link to `/pricing?context=billing`
 - Consistent pricing tiers and add-ons
 - Matching visual design
 
 ### With Trial Workflow
+
 - Reuses `TrialBanner` component
 - Integrates `useTrialStatus` hook
 - Confetti on upgrade success
 
 ### With AuthContext
+
 - Reads `user.plan`, `user.trial_published_count`
 - Conditional rendering based on plan tier
 
@@ -280,6 +301,7 @@ const {
 ## 💡 Key Business Logic
 
 **Automatic Tier Switching:**
+
 ```typescript
 const isAgencyTier = brandCount >= 5;
 const pricePerBrand = isAgencyTier ? 99 : 199;
@@ -287,8 +309,9 @@ const monthlyTotal = brandCount * pricePerBrand;
 ```
 
 **Trial Restrictions:**
+
 ```typescript
-if (user.plan === 'trial') {
+if (user.plan === "trial") {
   // Hide billing history
   // Show trial banner
   // Disable add-ons
@@ -297,6 +320,7 @@ if (user.plan === 'trial') {
 ```
 
 **Upgrade Path:**
+
 ```typescript
 Trial (7 days, 2 posts)
   ↓
@@ -310,12 +334,15 @@ Agency Tier ($99/mo, auto at 5+ brands)
 ## 📖 User Messaging
 
 **Top of Page:**
+
 > Aligned AI grows with your brand. Whether you're managing one business or fifty, your pricing automatically scales — no calls, no surprises.
 
 **Trial Note:**
+
 > You won't be charged until you upgrade — no credit card required for trial.
 
 **Agency Tooltip:**
+
 > Your pricing automatically adjusts at 5 brands — no manual upgrade needed.
 
 ---
@@ -323,17 +350,20 @@ Agency Tier ($99/mo, auto at 5+ brands)
 ## 🔄 Next Steps
 
 ### Priority 1 - Payment Integration
+
 1. Connect to Stripe/Paddle
 2. Implement real payment method updates
 3. Enable invoice PDF generation
 4. Add webhook handlers for payment events
 
 ### Priority 2 - Brand Management
+
 5. Add brand creation/deletion UI
 6. Auto-update pricing when brands added
 7. Show brand-specific usage breakdown
 
 ### Priority 3 - Enhancements
+
 8. Add billing email preferences
 9. Implement usage alerts (approaching limits)
 10. Create billing analytics dashboard
@@ -343,18 +373,18 @@ Agency Tier ($99/mo, auto at 5+ brands)
 
 ## ✅ Acceptance Criteria
 
-| Criterion | Status |
-|-----------|--------|
-| Trial users see trial-specific view | ✅ |
-| Paid users see dynamic pricing | ✅ |
-| Agency tier auto-applies at 5+ brands | ✅ |
-| Billing history shows for paid users | ✅ |
-| Add-ons match pricing page | ✅ |
-| Upgrade CTAs link to pricing | ✅ |
-| Monthly total calculated correctly | ✅ |
-| Design matches pricing page | ✅ |
-| Mobile responsive | ✅ |
-| API endpoints functional | ✅ |
+| Criterion                             | Status |
+| ------------------------------------- | ------ |
+| Trial users see trial-specific view   | ✅     |
+| Paid users see dynamic pricing        | ✅     |
+| Agency tier auto-applies at 5+ brands | ✅     |
+| Billing history shows for paid users  | ✅     |
+| Add-ons match pricing page            | ✅     |
+| Upgrade CTAs link to pricing          | ✅     |
+| Monthly total calculated correctly    | ✅     |
+| Design matches pricing page           | ✅     |
+| Mobile responsive                     | ✅     |
+| API endpoints functional              | ✅     |
 
 ---
 

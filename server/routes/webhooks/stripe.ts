@@ -244,7 +244,11 @@ async function handleUpcomingInvoice(event: StripeWebhookEvent) {
  */
 async function sendPaymentFailedEmail(
   userId: string,
-  type: "soft_reminder" | "second_attempt" | "final_warning" | "grace_period_end",
+  type:
+    | "soft_reminder"
+    | "second_attempt"
+    | "final_warning"
+    | "grace_period_end",
 ) {
   const templates = {
     soft_reminder: {
@@ -292,9 +296,7 @@ async function sendSubscriptionCanceledEmail(userId: string) {
 }
 
 async function sendUpcomingChargeEmail(userId: string, amount: number) {
-  console.log(
-    `[Email] Sending upcoming charge ($${amount}) to user ${userId}`,
-  );
+  console.log(`[Email] Sending upcoming charge ($${amount}) to user ${userId}`);
   // Send via email service
 }
 

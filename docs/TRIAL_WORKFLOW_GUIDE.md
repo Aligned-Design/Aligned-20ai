@@ -66,6 +66,7 @@ supabase/migrations/
 **Description:** Fetch current trial status for authenticated user
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -86,6 +87,7 @@ supabase/migrations/
 **Description:** Initialize trial period (sets trial_started_at and trial_expires_at)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -118,6 +120,7 @@ ADD COLUMN trial_expires_at TIMESTAMP WITH TIME ZONE;
 ```
 
 **Columns:**
+
 - `trial_published_count` - Number of posts published during trial (max 2)
 - `plan` - User subscription tier: `trial`, `base`, or `agency`
 - `trial_started_at` - Timestamp when trial began
@@ -196,11 +199,7 @@ function PublishButton() {
     }
   };
 
-  return (
-    <button onClick={handlePublish}>
-      Publish
-    </button>
-  );
+  return <button onClick={handlePublish}>Publish</button>;
 }
 ```
 
@@ -231,9 +230,11 @@ router.post("/api/posts/publish", checkTrialLimit, async (req, res) => {
 ## Pricing Page
 
 ### Route
+
 - `/pricing` - Public pricing page accessible to everyone
 
 ### Sections
+
 1. **Hero** - Headline, subheadline, 3 CTAs (Get Started, Book Demo, Start Trial)
 2. **Pricing Tiers** - Base Plan ($199/mo) and Agency Tier ($99/mo for 5+)
 3. **Add-Ons Table** - Onboarding Concierge, White-Label Portal
@@ -241,6 +242,7 @@ router.post("/api/posts/publish", checkTrialLimit, async (req, res) => {
 5. **Footer CTA** - Final conversion section
 
 ### CTA Flow
+
 - **Get Started** → `/signup`
 - **Start Trial** → `/signup?trial=7`
 - **Book Demo** → `/contact`
@@ -253,16 +255,16 @@ All components follow the Aligned AI design system:
 
 ```css
 /* Primary Colors */
---color-purple-600: #3D0FD6;
---color-purple-700: #7C3AED;
---color-indigo-600: #4F46E5;
+--color-purple-600: #3d0fd6;
+--color-purple-700: #7c3aed;
+--color-indigo-600: #4f46e5;
 
 /* Accent Colors */
---color-lime-400: #A3E635;
---color-lime-500: #84CC16;
+--color-lime-400: #a3e635;
+--color-lime-500: #84cc16;
 
 /* Background */
---color-gray-50: #F9FAFB;
+--color-gray-50: #f9fafb;
 
 /* Typography */
 --font-family: "Inter", sans-serif;
@@ -301,6 +303,7 @@ All components follow the Aligned AI design system:
 ## Support
 
 For questions or issues with the trial workflow, contact the development team or reference:
+
 - `/docs/AGENT_REVALIDATION_REPORT.md` - Testing and validation
 - `/docs/ARCHITECTURE.md` - System architecture
 - `/API_DOCUMENTATION.md` - API reference

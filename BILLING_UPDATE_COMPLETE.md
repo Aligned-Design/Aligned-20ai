@@ -11,6 +11,7 @@
 The `/billing` page has been **completely redesigned** with all requested features:
 
 ### ✅ Trial-Specific Experience
+
 - Trial status banner with remaining days/posts
 - Upgrade prompts → `/pricing`
 - Hidden billing history (until upgraded)
@@ -18,46 +19,57 @@ The `/billing` page has been **completely redesigned** with all requested featur
 - Trial features showcase
 
 ### ✅ Dynamic Plan Tier Display
+
 - Base Plan: **$199/mo per business** (< 5 brands)
 - Agency Tier: **$99/mo per business** (≥ 5 brands)
 - Auto-switching at 5 brands
 - Real-time pricing calculator
 
 ### ✅ Plan Overview Cards
+
 - Current Plan card (highlighted)
 - Upgrade Opportunity card
 - Tooltip: "Pricing automatically adjusts at 5 brands"
 - Action buttons (View Plans, Update Payment)
 
 ### ✅ Enhanced Usage Tracking
+
 - Posts Published This Month
 - Brands Managed (tied to pricing)
 - AI Insights Used
 - Unlimited messaging for paid users
 
 ### ✅ Billing History & Invoices
+
 - Invoice list with download buttons
 - Next billing date + projected cost
 - Status badges (Paid/Pending/Failed)
 - Example: "Next charge: $597 on Dec 15, 2025 (3 brands × $199)"
 
 ### ✅ Upgrade Prompts
+
 **Trial Users:**
+
 > ✨ Enjoying your trial? Unlock unlimited publishing, analytics, and multi-brand tools today.
 
 **Base Plan Users:**
+
 > 🎯 Managing 5 or more brands? You're eligible for Agency Pricing at $99/mo per brand.
 
 **Agency Tier Users:**
+
 > 💡 Pro Tip: Add more brands to maximize your savings. Each additional brand is just $99/mo.
 
 ### ✅ Add-ons Section
+
 Matches pricing page exactly:
+
 - Onboarding Concierge: $299/client
 - Custom Domain + White-Label Portal: $49/mo
 - Disabled for trial users with "Upgrade First" state
 
 ### ✅ Design & UX
+
 - Consistent with `/pricing` page
 - Inter font, purple/lime colors
 - Rounded cards with shadows
@@ -65,6 +77,7 @@ Matches pricing page exactly:
 - Confetti on upgrade 🎉
 
 ### ✅ API Integration
+
 - `GET /api/billing/status` - Subscription details
 - `GET /api/billing/history` - Invoice list
 - `POST /api/billing/upgrade` - Trial → paid upgrade
@@ -126,7 +139,7 @@ const monthlyTotal = brandCount * pricePerBrand;
 ### Trial Restrictions
 
 ```typescript
-if (user.plan === 'trial') {
+if (user.plan === "trial") {
   // Show trial banner
   // Hide billing history
   // Disable add-ons
@@ -138,6 +151,7 @@ if (user.plan === 'trial') {
 ### Conditional Views
 
 **Trial Users See:**
+
 - Trial status cards
 - Remaining days (0-7)
 - Remaining posts (0-2)
@@ -146,6 +160,7 @@ if (user.plan === 'trial') {
 - Usage tracking (limited)
 
 **Paid Users See:**
+
 - Current plan overview
 - Dynamic pricing breakdown
 - Upgrade opportunity card
@@ -159,12 +174,14 @@ if (user.plan === 'trial') {
 ## 🎨 Visual Design
 
 ### Color Scheme (Matches `/pricing`)
+
 - Primary: `#3D0FD6` (Purple)
 - Secondary: `#7C3AED` (Purple)
 - Accent: `#A3E635` (Lime)
 - Background: `#F9FAFB` (Gray)
 
 ### Components
+
 - Cards: `rounded-2xl shadow-xl`
 - Buttons: `rounded-xl` with hover transitions
 - Badges: Color-coded status indicators
@@ -176,15 +193,18 @@ if (user.plan === 'trial') {
 ## 📱 Responsive Design
 
 **Desktop (≥1024px):**
+
 - 2-column card layout
 - Full-width tables
 - Side-by-side plan comparison
 
 **Tablet (768-1024px):**
+
 - 2-column with adjusted spacing
 - Stacked sections
 
 **Mobile (<768px):**
+
 - Single column stack
 - Full-width cards
 - Collapsible sections
@@ -195,18 +215,18 @@ if (user.plan === 'trial') {
 
 All acceptance criteria met:
 
-| Test | Result |
-|------|--------|
-| Trial view renders | ✅ Pass |
-| Paid view renders | ✅ Pass |
-| Dynamic pricing calculation | ✅ Pass |
-| Agency tier auto-switch | ✅ Pass |
-| Add-ons disabled for trial | ✅ Pass |
+| Test                            | Result  |
+| ------------------------------- | ------- |
+| Trial view renders              | ✅ Pass |
+| Paid view renders               | ✅ Pass |
+| Dynamic pricing calculation     | ✅ Pass |
+| Agency tier auto-switch         | ✅ Pass |
+| Add-ons disabled for trial      | ✅ Pass |
 | Billing history shows correctly | ✅ Pass |
-| Upgrade CTAs functional | ✅ Pass |
-| Mobile responsive | ✅ Pass |
-| API endpoints respond | ✅ Pass |
-| Design matches pricing page | ✅ Pass |
+| Upgrade CTAs functional         | ✅ Pass |
+| Mobile responsive               | ✅ Pass |
+| API endpoints respond           | ✅ Pass |
+| Design matches pricing page     | ✅ Pass |
 
 ---
 
@@ -240,6 +260,7 @@ Agency Tier ($99/mo per brand)
 ### Auto-Tier Switching
 
 When a user adds their **5th brand**:
+
 1. System detects `brandCount >= 5`
 2. Rate automatically changes to `$99/mo`
 3. Next invoice reflects new pricing
@@ -251,6 +272,7 @@ When a user adds their **5th brand**:
 ## 🔗 Integration Points
 
 ### With Pricing Page (`/pricing`)
+
 - Shared pricing tiers
 - Matching add-ons table
 - Consistent CTAs
@@ -258,6 +280,7 @@ When a user adds their **5th brand**:
 - Cross-linking with `?context=billing`
 
 ### With Trial Workflow
+
 - Reuses `TrialBanner` component
 - Integrates `useTrialStatus` hook
 - Shows trial days/posts remaining
@@ -265,6 +288,7 @@ When a user adds their **5th brand**:
 - Confetti on successful upgrade
 
 ### With Auth Context
+
 - Reads `user.plan`
 - Checks `user.trial_published_count`
 - Validates `user.role` (agency/single_business)
@@ -278,10 +302,10 @@ When a user adds their **5th brand**:
 
 ```typescript
 // Navigate to billing
-navigate('/billing');
+navigate("/billing");
 
 // With context param
-navigate('/billing?from=pricing');
+navigate("/billing?from=pricing");
 ```
 
 ### Check Billing Status
@@ -291,13 +315,13 @@ import { useBillingStatus } from "@/hooks/use-billing-status";
 
 function MyComponent() {
   const { billingStatus, isLoading } = useBillingStatus();
-  
+
   if (isLoading) return <Spinner />;
-  
-  const monthlyTotal = 
-    billingStatus.subscription.brands * 
+
+  const monthlyTotal =
+    billingStatus.subscription.brands *
     billingStatus.subscription.price;
-    
+
   return <div>Total: ${monthlyTotal}/mo</div>;
 }
 ```
@@ -311,7 +335,7 @@ import { usePublishCelebration } from "@/hooks/use-publish-celebration";
 function UpgradeButton() {
   const { upgradePlan, isUpgrading } = useBillingStatus();
   const { celebrate } = usePublishCelebration();
-  
+
   const handleUpgrade = async () => {
     await upgradePlan({
       plan: 'base',
@@ -319,7 +343,7 @@ function UpgradeButton() {
     });
     celebrate(true); // 🎉 Confetti!
   };
-  
+
   return (
     <button onClick={handleUpgrade} disabled={isUpgrading}>
       {isUpgrading ? 'Processing...' : 'Upgrade Now'}
@@ -350,18 +374,21 @@ function UpgradeButton() {
 ## 📝 Next Steps (Post-Launch)
 
 ### Immediate (Week 1)
+
 1. Connect to real payment provider (Stripe/Paddle)
 2. Implement webhook handlers
 3. Enable real invoice generation
 4. Add email notifications
 
 ### Short-term (Month 1)
+
 5. Add billing analytics dashboard
 6. Implement usage alerts
 7. Create subscription pause/cancel flow
 8. Add billing history export (CSV)
 
 ### Long-term (Quarter 1)
+
 9. Multi-currency support
 10. Custom billing cycles
 11. Volume discounts
@@ -372,6 +399,7 @@ function UpgradeButton() {
 ## 📖 Documentation
 
 Full details available in:
+
 - `/docs/BILLING_PAGE_UPDATE_SUMMARY.md` - Complete guide
 - `/docs/TRIAL_WORKFLOW_GUIDE.md` - Trial integration
 - `/docs/PRICING_PAGE_COMPLETION_REPORT.md` - Pricing page

@@ -464,7 +464,11 @@ function PaidPlanView({
 
             <div className="pt-4 border-t">
               <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={onUpgrade}>
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={onUpgrade}
+                >
                   View Plans
                 </Button>
                 <Button variant="outline" className="flex-1">
@@ -479,7 +483,9 @@ function PaidPlanView({
         <Card>
           <CardHeader>
             <CardTitle>
-              {isAgencyTier ? "You're on Agency Pricing!" : "Unlock Agency Pricing"}
+              {isAgencyTier
+                ? "You're on Agency Pricing!"
+                : "Unlock Agency Pricing"}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -507,7 +513,10 @@ function PaidPlanView({
               <>
                 <p className="text-slate-700 mb-4">
                   🎯 Managing 5 or more brands? You're eligible for{" "}
-                  <strong>Agency Pricing at {formatCurrency(99)}/mo per brand</strong>.
+                  <strong>
+                    Agency Pricing at {formatCurrency(99)}/mo per brand
+                  </strong>
+                  .
                 </p>
                 <div className="space-y-2 mb-4">
                   <div className="flex items-start gap-2">
@@ -561,15 +570,21 @@ function PaidPlanView({
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Posts Published</span>
-                <span className="font-semibold">{data.usage.postsPublished}</span>
+                <span className="font-semibold">
+                  {data.usage.postsPublished}
+                </span>
               </div>
-              <div className="text-xs text-slate-500">Unlimited on paid plans</div>
+              <div className="text-xs text-slate-500">
+                Unlimited on paid plans
+              </div>
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Brands Managed</span>
-                <span className="font-semibold">{data.usage.brandsManaged}</span>
+                <span className="font-semibold">
+                  {data.usage.brandsManaged}
+                </span>
               </div>
               <div className="text-xs text-slate-500">
                 Tied to pricing at {formatCurrency(getPlanRate())}/brand
@@ -580,7 +595,9 @@ function PaidPlanView({
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>AI Insights Used</span>
-                  <span className="font-semibold">{data.usage.aiInsightsUsed}</span>
+                  <span className="font-semibold">
+                    {data.usage.aiInsightsUsed}
+                  </span>
                 </div>
                 <div className="text-xs text-slate-500">Unlimited access</div>
               </div>
@@ -590,7 +607,9 @@ function PaidPlanView({
           <div className="pt-4 border-t">
             <p className="text-sm text-slate-600">
               Usage resets on{" "}
-              {new Date(data.subscription.currentPeriodEnd).toLocaleDateString()}
+              {new Date(
+                data.subscription.currentPeriodEnd,
+              ).toLocaleDateString()}
             </p>
           </div>
         </CardContent>

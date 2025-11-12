@@ -32,7 +32,11 @@ export async function checkCanPublish(
     }
 
     const daysPastDue = calculateDaysPastDue(user.past_due_since);
-    const canPublish = canPerformAction(user.plan_status, "canPublish", daysPastDue);
+    const canPublish = canPerformAction(
+      user.plan_status,
+      "canPublish",
+      daysPastDue,
+    );
 
     if (!canPublish) {
       return res.status(403).json({
@@ -113,7 +117,8 @@ export async function checkCanGenerateContent(
       return res.status(403).json({
         error: "Content generation is disabled",
         code: "CONTENT_GENERATION_DISABLED",
-        message: "AI content generation is not available for archived accounts.",
+        message:
+          "AI content generation is not available for archived accounts.",
         accountStatus: user.plan_status,
       });
     }

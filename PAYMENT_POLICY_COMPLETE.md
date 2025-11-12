@@ -126,18 +126,21 @@ Day 90: Permanent Deletion
 ## 🚦 Functional Restrictions
 
 ### Active Users
+
 - ✅ Full access to all features
 - ✅ Unlimited publishing
 - ✅ Unlimited AI generation
 - ✅ Complete analytics access
 
 ### Trial Users
+
 - ✅ Full feature access
 - ⚠️ 2 post publishing limit
 - ⚠️ 10 AI generations/day
 - ✅ Complete analytics access
 
 ### Past Due (Days 1-13)
+
 - ✅ Publishing enabled
 - ✅ Approvals enabled
 - ✅ AI generation enabled
@@ -145,6 +148,7 @@ Day 90: Permanent Deletion
 - ⚠️ Payment banners visible
 
 ### Past Due (Days 14+)
+
 - ❌ Publishing **disabled**
 - ❌ Approvals **disabled**
 - ⚠️ AI generation limited (2/day)
@@ -153,12 +157,14 @@ Day 90: Permanent Deletion
 - ⚠️ Red critical banners
 
 ### Archived (Days 30-89)
+
 - ❌ All features **disabled**
 - ✅ Analytics viewable (frozen)
 - ✅ Data retained for 90 days
 - ✅ Can reactivate anytime
 
 ### Deleted (Day 90+)
+
 - ❌ Account **permanently deleted**
 - ❌ No data recovery possible
 
@@ -167,14 +173,17 @@ Day 90: Permanent Deletion
 ## 📊 API Endpoints
 
 ### Webhooks
+
 - `POST /api/webhooks/stripe` - Stripe event handler
 
 ### Billing
+
 - `GET /api/billing/account-status` - Current status + permissions
 - `POST /api/billing/reactivate` - Restore after payment
 - `POST /api/billing/extend-grace-period` - Admin grace extension
 
 ### Middleware
+
 - `checkCanPublish` - Publishing permission check
 - `checkCanApprove` - Approval permission check
 - `checkCanGenerateContent` - AI generation check + limits
@@ -194,14 +203,11 @@ import { useAuth } from "@/contexts/AuthContext";
 function Dashboard() {
   const { user } = useAuth();
   const daysPastDue = calculateDaysPastDue(user.past_due_since);
-  
+
   return (
     <>
-      {user.plan_status === 'past_due' && (
-        <PastDueBanner
-          daysPastDue={daysPastDue}
-          accountStatus="past_due"
-        />
+      {user.plan_status === "past_due" && (
+        <PastDueBanner daysPastDue={daysPastDue} accountStatus="past_due" />
       )}
       {/* Rest of dashboard */}
     </>
@@ -220,28 +226,28 @@ const [showModal, setShowModal] = useState(true);
   open={showModal}
   onClose={() => setShowModal(false)}
   onReactivate={async (paymentMethodId) => {
-    await fetch('/api/billing/reactivate', {
-      method: 'POST',
-      body: JSON.stringify({ paymentMethodId })
+    await fetch("/api/billing/reactivate", {
+      method: "POST",
+      body: JSON.stringify({ paymentMethodId }),
     });
   }}
   accountStatus={user.plan_status}
-/>
+/>;
 ```
 
 ---
 
 ## 📧 Email Schedule
 
-| Day | Event | Template | Subject |
-|-----|-------|----------|---------|
-| 1 | First failure | Soft Reminder | "Heads up — your payment didn't go through 💳" |
-| 3 | Second failure | Second Attempt | "Payment reminder — update needed 💳" |
-| 7 | Third failure | Final Warning | "⚠️ Action required to keep your content live" |
-| 10/14 | Suspension | Grace End | "Your Aligned AI account is now paused" |
-| 30 | Archival | Archive Notice | "Your account has been archived (reactivate anytime)" |
-| 83 | Pre-deletion | Final Warning | "⚠️ Final reminder: Account will be deleted in 7 days" |
-| Success | Payment | Celebration | "Welcome back! Your account is active 🎉" |
+| Day     | Event          | Template       | Subject                                                |
+| ------- | -------------- | -------------- | ------------------------------------------------------ |
+| 1       | First failure  | Soft Reminder  | "Heads up — your payment didn't go through 💳"         |
+| 3       | Second failure | Second Attempt | "Payment reminder — update needed 💳"                  |
+| 7       | Third failure  | Final Warning  | "⚠️ Action required to keep your content live"         |
+| 10/14   | Suspension     | Grace End      | "Your Aligned AI account is now paused"                |
+| 30      | Archival       | Archive Notice | "Your account has been archived (reactivate anytime)"  |
+| 83      | Pre-deletion   | Final Warning  | "⚠️ Final reminder: Account will be deleted in 7 days" |
+| Success | Payment        | Celebration    | "Welcome back! Your account is active 🎉"              |
 
 ---
 
@@ -252,13 +258,14 @@ const [showModal, setShowModal] = useState(true);
 ✅ Encrypted data at rest (archived data)  
 ✅ Admin action logging  
 ✅ PII scrubbing before deletion  
-✅ GDPR compliance maintained  
+✅ GDPR compliance maintained
 
 ---
 
 ## 🧪 Testing Checklist
 
 ### Backend
+
 - [x] Stripe webhook handlers created
 - [x] Payment retry logic implemented
 - [x] Account status transitions coded
@@ -269,6 +276,7 @@ const [showModal, setShowModal] = useState(true);
 - [ ] Integration tests pass
 
 ### Frontend
+
 - [x] PastDueBanner component created
 - [x] ReactivationModal component created
 - [x] Admin dashboard built
@@ -277,6 +285,7 @@ const [showModal, setShowModal] = useState(true);
 - [ ] E2E flow tested
 
 ### Email
+
 - [x] Templates documented
 - [ ] SendGrid/Postmark integrated
 - [ ] Email delivery tested
@@ -340,6 +349,7 @@ psql -d aligned_ai -f supabase/migrations/20250201_payment_status_tracking.sql
 ### Alerts
 
 Set up alerts for:
+
 - Payment failure spike (>10% daily)
 - Archival rate increase (>5% weekly)
 - Webhook delivery failures
@@ -380,23 +390,23 @@ docs/
 
 ## ✅ Completion Status
 
-| Component | Status |
-|-----------|--------|
-| Database Schema | ✅ Complete |
-| Stripe Webhooks | ✅ Complete |
-| Account Status Service | ✅ Complete |
-| Reactivation API | ✅ Complete |
-| Middleware Restrictions | ✅ Complete |
-| PastDueBanner Component | ✅ Complete |
+| Component                   | Status      |
+| --------------------------- | ----------- |
+| Database Schema             | ✅ Complete |
+| Stripe Webhooks             | ✅ Complete |
+| Account Status Service      | ✅ Complete |
+| Reactivation API            | ✅ Complete |
+| Middleware Restrictions     | ✅ Complete |
+| PastDueBanner Component     | ✅ Complete |
 | ReactivationModal Component | ✅ Complete |
-| Admin Dashboard | ✅ Complete |
-| Email Templates | ✅ Complete |
-| Documentation | ✅ Complete |
-| Unit Tests | ⏳ Pending |
-| Integration Tests | ⏳ Pending |
-| Email Integration | ⏳ Pending |
-| Stripe Configuration | ⏳ Pending |
-| Cron Jobs | ⏳ Pending |
+| Admin Dashboard             | ✅ Complete |
+| Email Templates             | ✅ Complete |
+| Documentation               | ✅ Complete |
+| Unit Tests                  | ⏳ Pending  |
+| Integration Tests           | ⏳ Pending  |
+| Email Integration           | ⏳ Pending  |
+| Stripe Configuration        | ⏳ Pending  |
+| Cron Jobs                   | ⏳ Pending  |
 
 ---
 
@@ -410,13 +420,14 @@ docs/
 ✅ **5 middleware** functions  
 ✅ **3 frontend components**  
 ✅ **2 admin tools**  
-✅ **1 comprehensive policy**  
+✅ **1 comprehensive policy**
 
 **Total lines of code:** ~2,800 lines
 
 **Status:** ✅ **Production Ready** (pending integration testing)
 
 **Next steps:**
+
 1. Run database migration
 2. Configure Stripe webhooks
 3. Set up email service (SendGrid/Postmark)

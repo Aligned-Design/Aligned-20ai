@@ -3,7 +3,12 @@
  * Manages account restrictions and permissions based on payment status
  */
 
-export type PlanStatus = "active" | "trial" | "past_due" | "archived" | "deleted";
+export type PlanStatus =
+  | "active"
+  | "trial"
+  | "past_due"
+  | "archived"
+  | "deleted";
 
 export interface AccountPermissions {
   canPublish: boolean;

@@ -14,17 +14,17 @@ This document covers the complete implementation of Aligned AI's billing, paymen
 
 ## 📊 Payment Timeline
 
-| Stage | Day | System Behavior | User Experience | Email |
-|-------|-----|-----------------|-----------------|-------|
-| **Billing Date** | Day 0 | Stripe attempts charge | Banner: "Payment processing…" | N/A |
-| **Failed Attempt 1** | Day 1 | Auto-retry within 24 hrs | Soft reminder email | Day 1 Email |
-| **Failed Attempt 2** | Day 3 | Retry again | Banner + email | Day 3 Email |
-| **Failed Attempt 3** | Day 7 | Final retry | Final warning email | Day 7 Email |
-| **Grace Period End** | Day 10 | Status → `past_due` | Dashboard notice | Day 10 Email |
-| **Account Suspension** | Day 14 | Lock publishing/approvals | Read-only mode | Day 14 Email |
-| **Account Archived** | Day 30 | Archive data, pause | Data retention notice | Day 30 Email |
-| **Pre-Deletion Warning** | Day 83 | Email warning | Final chance | Day 83 Email |
-| **Permanent Deletion** | Day 90 | Delete all data | Account closed | N/A |
+| Stage                    | Day    | System Behavior           | User Experience               | Email        |
+| ------------------------ | ------ | ------------------------- | ----------------------------- | ------------ |
+| **Billing Date**         | Day 0  | Stripe attempts charge    | Banner: "Payment processing…" | N/A          |
+| **Failed Attempt 1**     | Day 1  | Auto-retry within 24 hrs  | Soft reminder email           | Day 1 Email  |
+| **Failed Attempt 2**     | Day 3  | Retry again               | Banner + email                | Day 3 Email  |
+| **Failed Attempt 3**     | Day 7  | Final retry               | Final warning email           | Day 7 Email  |
+| **Grace Period End**     | Day 10 | Status → `past_due`       | Dashboard notice              | Day 10 Email |
+| **Account Suspension**   | Day 14 | Lock publishing/approvals | Read-only mode                | Day 14 Email |
+| **Account Archived**     | Day 30 | Archive data, pause       | Data retention notice         | Day 30 Email |
+| **Pre-Deletion Warning** | Day 83 | Email warning             | Final chance                  | Day 83 Email |
+| **Permanent Deletion**   | Day 90 | Delete all data           | Account closed                | N/A          |
 
 ---
 
@@ -43,6 +43,7 @@ ADD COLUMN grace_extension_days INT DEFAULT 0;
 ```
 
 **Status Values:**
+
 - `active` - Paid, full access
 - `trial` - 7-day trial
 - `past_due` - Payment failed, restricted access
@@ -94,6 +95,7 @@ CREATE TABLE archived_data (
 Handles Stripe webhook events:
 
 **Events Handled:**
+
 - `invoice.payment_failed` - Payment failure
 - `invoice.payment_succeeded` - Payment success
 - `customer.subscription.deleted` - Cancellation
@@ -101,10 +103,11 @@ Handles Stripe webhook events:
 - `invoice.upcoming` - 7-day billing reminder
 
 **Implementation:**
+
 ```typescript
 router.post("/webhooks/stripe", async (req, res) => {
   const event = req.body;
-  
+
   switch (event.type) {
     case "invoice.payment_failed":
       await handlePaymentFailed(event);
@@ -114,7 +117,7 @@ router.post("/webhooks/stripe", async (req, res) => {
       break;
     // ... other handlers
   }
-  
+
   res.json({ received: true });
 });
 ```
@@ -126,6 +129,7 @@ router.post("/webhooks/stripe", async (req, res) => {
 Get current account status and permissions.
 
 **Response:**
+
 ```json
 {
   "planStatus": "past_due",
@@ -136,10 +140,7 @@ Get current account status and permissions.
     "canGenerateContent": true,
     "maxDailyAIGenerations": 2
   },
-  "restrictions": [
-    "Publishing disabled",
-    "Approvals disabled"
-  ],
+  "restrictions": ["Publishing disabled", "Approvals disabled"],
   "nextAction": "Update payment to restore access"
 }
 ```
@@ -149,6 +150,7 @@ Get current account status and permissions.
 Reactivate account after payment.
 
 **Request:**
+
 ```json
 {
   "paymentMethodId": "pm_123456"
@@ -156,6 +158,7 @@ Reactivate account after payment.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -169,6 +172,7 @@ Reactivate account after payment.
 Admin-only: extend grace period.
 
 **Request:**
+
 ```json
 {
   "userId": "user-uuid",
@@ -183,23 +187,25 @@ Admin-only: extend grace period.
 ### Publishing (Days 14+)
 
 When `daysPastDue >= 14`:
+
 - Publish button disabled
 - Queue shows "Upgrade to publish" message
 - Drafts can be created but not published
 - Scheduled posts auto-unscheduled
 
 **Middleware:**
+
 ```typescript
 export async function checkCanPublish(req, res, next) {
   const { planStatus, daysPastDue } = req.user;
-  
-  if (planStatus === 'past_due' && daysPastDue >= 14) {
+
+  if (planStatus === "past_due" && daysPastDue >= 14) {
     return res.status(403).json({
       error: "Publishing disabled",
-      message: "Update payment to resume"
+      message: "Update payment to resume",
     });
   }
-  
+
   next();
 }
 ```
@@ -213,25 +219,27 @@ export async function checkCanPublish(req, res, next) {
 ### AI Generation
 
 **Restricted Access:**
+
 - Trial: 10/day
 - Past Due (< 14 days): Unlimited
 - Past Due (≥ 14 days): 2/day
 - Archived: 0/day
 
 **Middleware:**
+
 ```typescript
 export async function checkCanGenerateContent(req, res, next) {
   const permissions = getAccountPermissions(
     req.user.planStatus,
-    req.user.daysPastDue
+    req.user.daysPastDue,
   );
-  
+
   if (permissions.maxDailyAIGenerations === 0) {
     return res.status(403).json({
-      error: "Content generation disabled for archived accounts"
+      error: "Content generation disabled for archived accounts",
     });
   }
-  
+
   // Check daily limit...
   next();
 }
@@ -240,6 +248,7 @@ export async function checkCanGenerateContent(req, res, next) {
 ### Analytics
 
 **Read-Only Mode (Days 14+):**
+
 - Historical data visible
 - Live updates frozen
 - No new tracking
@@ -254,17 +263,15 @@ export async function checkCanGenerateContent(req, res, next) {
 Shows payment status banner at top of dashboard.
 
 **Usage:**
+
 ```tsx
 import { PastDueBanner } from "@/components/billing/PastDueBanner";
 
-<PastDueBanner
-  daysPastDue={8}
-  accountStatus="past_due"
-  dismissible={false}
-/>
+<PastDueBanner daysPastDue={8} accountStatus="past_due" dismissible={false} />;
 ```
 
 **Severity Levels:**
+
 - `info` - Days 1-6 (yellow)
 - `warning` - Days 7-13 (orange)
 - `critical` - Days 14+ (red)
@@ -274,6 +281,7 @@ import { PastDueBanner } from "@/components/billing/PastDueBanner";
 Modal for account reactivation with payment.
 
 **Usage:**
+
 ```tsx
 import { ReactivationModal } from "@/components/billing/ReactivationModal";
 
@@ -282,10 +290,11 @@ import { ReactivationModal } from "@/components/billing/ReactivationModal";
   onClose={() => setShowModal(false)}
   onReactivate={handleReactivate}
   accountStatus="past_due"
-/>
+/>;
 ```
 
 **Features:**
+
 - Payment form (card, expiry, CVC)
 - Confetti on success 🎉
 - Auto-close after reactivation
@@ -300,6 +309,7 @@ import { ReactivationModal } from "@/components/billing/ReactivationModal";
 Route: `/admin/billing`
 
 **Features:**
+
 - Active vs. past_due vs. archived counts
 - Total revenue + lost revenue
 - User list with filters
@@ -307,6 +317,7 @@ Route: `/admin/billing`
 - Bulk reactivation tools
 
 **Metrics Displayed:**
+
 - Active users count
 - Past due users (with days count)
 - Archived users
@@ -314,6 +325,7 @@ Route: `/admin/billing`
 - Lost MRR (from unpaid accounts)
 
 **User Actions:**
+
 - Extend grace period (+7 days)
 - Bulk reactivate
 - View payment history
@@ -326,6 +338,7 @@ Route: `/admin/billing`
 See `/docs/PAYMENT_EMAIL_TEMPLATES.md` for complete templates.
 
 **Email Schedule:**
+
 - Day 1: Soft reminder
 - Day 3: Second attempt
 - Day 7: Final warning
@@ -335,10 +348,11 @@ See `/docs/PAYMENT_EMAIL_TEMPLATES.md` for complete templates.
 - On success: Reactivation celebration
 
 **Email Service Integration:**
+
 ```typescript
 async function sendPaymentFailedEmail(userId, type) {
   const template = templates[type];
-  
+
   // Send via SendGrid/Postmark/Mailgun
   await emailService.send({
     to: user.email,
@@ -346,9 +360,9 @@ async function sendPaymentFailedEmail(userId, type) {
     html: renderTemplate(template.body, user),
     track: true,
   });
-  
+
   // Log in database
-  await db.from('payment_notifications').insert({
+  await db.from("payment_notifications").insert({
     user_id: userId,
     notification_type: type,
     sent_at: new Date(),
@@ -365,6 +379,7 @@ async function sendPaymentFailedEmail(userId, type) {
 When account reaches Day 30 past due:
 
 1. **Move to archived status:**
+
 ```sql
 UPDATE users
 SET plan_status = 'archived', archived_at = NOW()
@@ -373,17 +388,18 @@ AND past_due_since < NOW() - INTERVAL '30 days';
 ```
 
 2. **Archive user data:**
+
 ```typescript
 async function archiveUserData(userId) {
   // Archive posts
-  const posts = await db.from('posts').where('user_id', userId);
-  await db.from('archived_data').insert({
+  const posts = await db.from("posts").where("user_id", userId);
+  await db.from("archived_data").insert({
     user_id: userId,
-    data_type: 'posts',
+    data_type: "posts",
     data: posts,
-    delete_after: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+    delete_after: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
   });
-  
+
   // Archive assets, settings, etc...
 }
 ```
@@ -396,16 +412,17 @@ Automated cron job:
 
 ```typescript
 async function permanentlyDeleteAccounts() {
-  const accountsToDelete = await db.from('users')
-    .where('plan_status', 'archived')
-    .where('archived_at', '<', new Date(Date.now() - 90 * 24 * 60 * 60 * 1000));
-  
+  const accountsToDelete = await db
+    .from("users")
+    .where("plan_status", "archived")
+    .where("archived_at", "<", new Date(Date.now() - 90 * 24 * 60 * 60 * 1000));
+
   for (const account of accountsToDelete) {
     // Delete from archived_data
-    await db.from('archived_data').where('user_id', account.id).delete();
-    
+    await db.from("archived_data").where("user_id", account.id).delete();
+
     // Delete user and all associated data
-    await db.from('users').where('id', account.id).delete();
+    await db.from("users").where("id", account.id).delete();
   }
 }
 ```
@@ -472,6 +489,7 @@ EMAIL_FROM=noreply@aligned.ai
 ### 3. Stripe Webhook Configuration
 
 In Stripe Dashboard:
+
 1. Go to Developers → Webhooks
 2. Add endpoint: `https://aligned.ai/api/webhooks/stripe`
 3. Select events:
@@ -486,12 +504,14 @@ In Stripe Dashboard:
 Set up automated tasks:
 
 **Daily at 2 AM UTC:**
+
 ```bash
 0 2 * * * /usr/bin/node /app/scripts/archive-past-due-accounts.js
 0 2 * * * /usr/bin/node /app/scripts/delete-archived-accounts.js
 ```
 
 **Daily at 10 AM (user timezone):**
+
 ```bash
 0 10 * * * /usr/bin/node /app/scripts/send-payment-reminders.js
 ```
@@ -511,6 +531,7 @@ Set up automated tasks:
 ### Alerts
 
 Set up alerts for:
+
 - Payment failure spike (>10% daily)
 - Archival rate increase (>5% weekly)
 - Webhook delivery failures
@@ -525,11 +546,11 @@ Set up alerts for:
 Always verify Stripe signatures:
 
 ```typescript
-const signature = req.headers['stripe-signature'];
+const signature = req.headers["stripe-signature"];
 const event = stripe.webhooks.constructEvent(
   req.body,
   signature,
-  process.env.STRIPE_WEBHOOK_SECRET
+  process.env.STRIPE_WEBHOOK_SECRET,
 );
 ```
 
@@ -547,12 +568,14 @@ const event = stripe.webhooks.constructEvent(
 ### Customer Support Flows
 
 **User contacts support about payment:**
+
 1. Check account status in admin dashboard
 2. View payment attempt history
 3. Optionally extend grace period (+7 days)
 4. Send manual reactivation link if needed
 
 **Admin actions available:**
+
 - Extend grace period
 - Manual reactivation (without payment)
 - View full payment history
@@ -563,6 +586,7 @@ const event = stripe.webhooks.constructEvent(
 ## ✅ Implementation Checklist
 
 ### Backend
+
 - [x] Database migration created
 - [x] Stripe webhook handler
 - [x] Account status service
@@ -572,6 +596,7 @@ const event = stripe.webhooks.constructEvent(
 - [x] Data archival functions
 
 ### Frontend
+
 - [x] PastDueBanner component
 - [x] ReactivationModal component
 - [x] Admin billing dashboard
@@ -580,6 +605,7 @@ const event = stripe.webhooks.constructEvent(
 - [x] Approval workflow blocks
 
 ### Documentation
+
 - [x] Email templates
 - [x] Implementation guide
 - [x] API documentation
@@ -587,6 +613,7 @@ const event = stripe.webhooks.constructEvent(
 - [x] Deployment guide
 
 ### Testing
+
 - [ ] Unit tests written
 - [ ] Integration tests pass
 - [ ] E2E payment flow tested
@@ -594,6 +621,7 @@ const event = stripe.webhooks.constructEvent(
 - [ ] Webhook handling tested
 
 ### Deployment
+
 - [ ] Database migrated
 - [ ] Environment variables set
 - [ ] Stripe webhooks configured
