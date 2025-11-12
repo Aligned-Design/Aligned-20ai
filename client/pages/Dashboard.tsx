@@ -1,64 +1,109 @@
-import { MainLayout } from "@/components/layout/MainLayout";
-import { GoodNews } from "@/components/dashboard/GoodNews";
-import { CalendarAccordion } from "@/components/dashboard/CalendarAccordion";
-import { InsightsFeed } from "@/components/dashboard/InsightsFeed";
-import { AnalyticsPanel } from "@/components/dashboard/AnalyticsPanel";
-import { FirstVisitTooltip } from "@/components/dashboard/FirstVisitTooltip";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useWorkspace } from "@/contexts/WorkspaceContext";
+/**
+ * Dashboard Page
+ * Main entry point after authentication
+ * Displays role-based content and actions
+ */
+
+import { useAuth } from '@/lib/auth';
+import { useCan } from '@/lib/auth';
+import AppLayout from '@/components/layout/AppLayout';
+import ActionButtonsHeader from '@/components/dashboard/ActionButtonsHeader';
+import DashboardWidgets from '@/components/dashboard/DashboardWidgets';
+import AlignedAISummary from '@/components/dashboard/AlignedAISummary';
+import SmartDashboard from '@/components/analytics/SmartDashboard';
 
 export default function Dashboard() {
-  const { currentWorkspace } = useWorkspace();
+  const { user, role, logout } = useAuth();
+  const canCreateContent = useCan('content:create');
+  const canManageBrand = useCan('brand:manage');
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = '/';
+  };
 
   return (
-    <MainLayout>
-      <FirstVisitTooltip page="dashboard">
-        <div className="min-h-screen bg-gradient-to-b from-indigo-50/30 via-white to-blue-50/20">
-          <div className="p-4 sm:p-6 md:p-8">
-            {/* Page Header */}
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4 sm:mb-6 pb-4 border-b border-slate-200">
-              <div className="min-w-0">
-                <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-1 sm:mb-2">
-                  Dashboard
-                </h1>
-                <p className="text-slate-600 text-xs sm:text-sm font-medium">
-                  {currentWorkspace?.logo} {currentWorkspace?.name} — Your daily
-                  command center
-                </p>
-              </div>
-              <Button className="bg-lime-400 hover:bg-lime-300 text-indigo-950 font-black gap-2 shadow-lg shadow-lime-400/30 hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 whitespace-nowrap flex-shrink-0">
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">New Content</span>
-                <span className="sm:hidden">New</span>
-              </Button>
-            </div>
+    <AppLayout 
+      brandName={user?.name || 'Aligned AI'}
+      onLogout={handleLogout}
+    >
+      <div className="space-y-8">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-2">
+            Welcome back, {user?.name}! You're logged in as <span className="font-medium">{role}</span>
+          </p>
+        </div>
 
-            {/* ZONE 1: STRATEGIC OVERVIEW - "Today's Pulse" */}
-            <div className="mb-10 sm:mb-14">
-              <GoodNews />
-            </div>
+        {/* Action Buttons */}
+        {canCreateContent && (
+          <div>
+            <ActionButtonsHeader
+              onCreateContent={() => window.location.href = '/creative-studio'}
+              onSchedulePost={() => window.location.href = '/content-queue'}
+              onPublishNow={() => {/* Handle publish */}}
+              onBestTimeSuggestions={() => {/* Handle suggestions */}}
+            />
+          </div>
+        )}
 
-            {/* ZONE 2: OPERATIONAL WORKFLOW - Two Column Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-14">
-              {/* Left: Calendar Accordion (2/3 width) */}
-              <div className="lg:col-span-2">
-                <CalendarAccordion />
-              </div>
-
-              {/* Right: Insights Feed (1/3 width, sticky on desktop) */}
-              <div className="lg:sticky lg:top-20 lg:h-fit">
-                <InsightsFeed />
-              </div>
-            </div>
-
-            {/* ZONE 3: INTELLIGENCE & DATA */}
+        {/* Good News Section */}
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-8 border border-green-200">
+          <div className="flex items-start gap-4">
+            <span className="text-4xl">🎉</span>
             <div>
-              <AnalyticsPanel />
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Good News!</h2>
+              <p className="text-gray-700 mb-4">
+                Your content is performing well. Here's a quick summary of your metrics:
+              </p>
+              <ul className="space-y-2 text-sm text-gray-700">
+                <li>✨ 5 new pieces of content created</li>
+                <li>📈 3.2K impressions this week</li>
+                <li>💬 256 engagements</li>
+                <li>⏰ Best posting time: 9 AM EST</li>
+              </ul>
             </div>
           </div>
         </div>
-      </FirstVisitTooltip>
-    </MainLayout>
+
+        {/* AI Summary */}
+        {canCreateContent && (
+          <AlignedAISummary />
+        )}
+
+        {/* Dashboard Widgets */}
+        <DashboardWidgets
+          items={[
+            { id: '1', title: 'LinkedIn Post Review', status: 'pending', date: '2025-11-12' },
+            { id: '2', title: 'Twitter Thread Approval', status: 'pending', date: '2025-11-11' },
+          ]}
+          onApprove={(id) => console.log('Approved:', id)}
+          onReject={(id) => console.log('Rejected:', id)}
+        />
+
+        {/* Analytics */}
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Analytics Overview</h2>
+          <SmartDashboard hasGoals={true} />
+        </div>
+
+        {/* Brand Management Section - Admin only */}
+        {canManageBrand && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4">Brand Management</h3>
+            <p className="text-gray-700 mb-4">
+              As an administrator, you have access to brand management tools.
+            </p>
+            <a 
+              href="/brand-guide"
+              className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Manage Brand
+            </a>
+          </div>
+        )}
+      </div>
+    </AppLayout>
   );
 }
