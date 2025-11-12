@@ -1,25 +1,25 @@
 /**
  * Milestone Trigger Helpers
- * 
+ *
  * This module provides helper functions to trigger milestones
  * from various parts of the application.
- * 
+ *
  * Usage:
  * - Call these functions after key events complete
  * - They are idempotent and safe to call multiple times
  * - Failures are logged but don't throw to avoid breaking main flows
  */
 
-import { unlockMilestone } from './milestones';
+import { unlockMilestone } from "./milestones";
 
 /**
  * Trigger when user completes onboarding
  */
 export async function triggerOnboardingComplete(workspaceId: string) {
   try {
-    await unlockMilestone(workspaceId, 'onboarding_complete');
+    await unlockMilestone(workspaceId, "onboarding_complete");
   } catch (err) {
-    console.error('[Milestone] Failed to trigger onboarding_complete:', err);
+    console.error("[Milestone] Failed to trigger onboarding_complete:", err);
   }
 }
 
@@ -28,9 +28,9 @@ export async function triggerOnboardingComplete(workspaceId: string) {
  */
 export async function triggerFirstIntegration(workspaceId: string) {
   try {
-    await unlockMilestone(workspaceId, 'first_integration');
+    await unlockMilestone(workspaceId, "first_integration");
   } catch (err) {
-    console.error('[Milestone] Failed to trigger first_integration:', err);
+    console.error("[Milestone] Failed to trigger first_integration:", err);
   }
 }
 
@@ -39,9 +39,9 @@ export async function triggerFirstIntegration(workspaceId: string) {
  */
 export async function triggerFirstApproval(workspaceId: string) {
   try {
-    await unlockMilestone(workspaceId, 'first_approval');
+    await unlockMilestone(workspaceId, "first_approval");
   } catch (err) {
-    console.error('[Milestone] Failed to trigger first_approval:', err);
+    console.error("[Milestone] Failed to trigger first_approval:", err);
   }
 }
 
@@ -50,9 +50,9 @@ export async function triggerFirstApproval(workspaceId: string) {
  */
 export async function triggerFirstPublish(workspaceId: string) {
   try {
-    await unlockMilestone(workspaceId, 'first_publish');
+    await unlockMilestone(workspaceId, "first_publish");
   } catch (err) {
-    console.error('[Milestone] Failed to trigger first_publish:', err);
+    console.error("[Milestone] Failed to trigger first_publish:", err);
   }
 }
 
@@ -61,9 +61,9 @@ export async function triggerFirstPublish(workspaceId: string) {
  */
 export async function triggerGoalMet(workspaceId: string) {
   try {
-    await unlockMilestone(workspaceId, 'goal_met');
+    await unlockMilestone(workspaceId, "goal_met");
   } catch (err) {
-    console.error('[Milestone] Failed to trigger goal_met:', err);
+    console.error("[Milestone] Failed to trigger goal_met:", err);
   }
 }
 
@@ -72,9 +72,9 @@ export async function triggerGoalMet(workspaceId: string) {
  */
 export async function triggerAgencyScale5(workspaceId: string) {
   try {
-    await unlockMilestone(workspaceId, 'agency_scale_5');
+    await unlockMilestone(workspaceId, "agency_scale_5");
   } catch (err) {
-    console.error('[Milestone] Failed to trigger agency_scale_5:', err);
+    console.error("[Milestone] Failed to trigger agency_scale_5:", err);
   }
 }
 
@@ -83,16 +83,19 @@ export async function triggerAgencyScale5(workspaceId: string) {
  */
 export async function triggerMonth1Anniversary(workspaceId: string) {
   try {
-    await unlockMilestone(workspaceId, 'month_1_anniversary');
+    await unlockMilestone(workspaceId, "month_1_anniversary");
   } catch (err) {
-    console.error('[Milestone] Failed to trigger month_1_anniversary:', err);
+    console.error("[Milestone] Failed to trigger month_1_anniversary:", err);
   }
 }
 
 /**
  * Check and trigger agency scale milestone based on brand count
  */
-export async function checkAgencyScale(workspaceId: string, brandCount: number) {
+export async function checkAgencyScale(
+  workspaceId: string,
+  brandCount: number,
+) {
   if (brandCount >= 5) {
     await triggerAgencyScale5(workspaceId);
   }

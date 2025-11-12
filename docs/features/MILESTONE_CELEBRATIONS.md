@@ -14,15 +14,15 @@ The Milestone Celebrations system provides delightful user feedback through conf
 
 ## Milestones
 
-| Milestone Key | Trigger Event | Animation |
-|--------------|---------------|-----------|
-| `onboarding_complete` | User finishes Brand Guide | Burst |
-| `first_integration` | First OAuth connection success | Fire |
-| `first_approval` | First content approved | Fire |
-| `first_publish` | First post published successfully | Burst |
-| `goal_met` | Analytics goal achieved | Fire |
-| `agency_scale_5` | Workspace reaches 5 brands | Burst |
-| `month_1_anniversary` | 30 days after signup | Burst |
+| Milestone Key         | Trigger Event                     | Animation |
+| --------------------- | --------------------------------- | --------- |
+| `onboarding_complete` | User finishes Brand Guide         | Burst     |
+| `first_integration`   | First OAuth connection success    | Fire      |
+| `first_approval`      | First content approved            | Fire      |
+| `first_publish`       | First post published successfully | Burst     |
+| `goal_met`            | Analytics goal achieved           | Fire      |
+| `agency_scale_5`      | Workspace reaches 5 brands        | Burst     |
+| `month_1_anniversary` | 30 days after signup              | Burst     |
 
 ## Architecture
 
@@ -70,7 +70,7 @@ UNIQUE(workspace_id, key)
 ### 1. Trigger a Milestone
 
 ```typescript
-import { triggerFirstPublish } from '@/server/lib/milestone-triggers';
+import { triggerFirstPublish } from "@/server/lib/milestone-triggers";
 
 // After successful publish
 await publishContent(content);
@@ -90,20 +90,20 @@ import {
   triggerAgencyScale5,
   triggerMonth1Anniversary,
   checkAgencyScale, // Auto-checks brand count
-} from '@/server/lib/milestone-triggers';
+} from "@/server/lib/milestone-triggers";
 ```
 
 ### 3. Add New Milestone
 
 #### Step 1: Add to type
+
 ```typescript
 // client/lib/milestones.ts
-export type MilestoneKey =
-  | 'existing_milestone'
-  | 'new_milestone'; // Add here
+export type MilestoneKey = "existing_milestone" | "new_milestone"; // Add here
 ```
 
 #### Step 2: Add copy
+
 ```typescript
 // client/lib/milestones.ts
 export const milestoneCopy: Record<MilestoneKey, {...}> = {
@@ -116,21 +116,23 @@ export const milestoneCopy: Record<MilestoneKey, {...}> = {
 ```
 
 #### Step 3: Add trigger helper
+
 ```typescript
 // server/lib/milestone-triggers.ts
 export async function triggerNewMilestone(workspaceId: string) {
   try {
-    await unlockMilestone(workspaceId, 'new_milestone');
+    await unlockMilestone(workspaceId, "new_milestone");
   } catch (err) {
-    console.error('[Milestone] Failed to trigger new_milestone:', err);
+    console.error("[Milestone] Failed to trigger new_milestone:", err);
   }
 }
 ```
 
 #### Step 4: Call trigger
+
 ```typescript
 // In your route/handler
-import { triggerNewMilestone } from '@/server/lib/milestone-triggers';
+import { triggerNewMilestone } from "@/server/lib/milestone-triggers";
 
 await performAction();
 await triggerNewMilestone(workspaceId);
@@ -139,9 +141,11 @@ await triggerNewMilestone(workspaceId);
 ## API Endpoints
 
 ### GET /api/milestones
+
 Fetch all milestones for current workspace
 
 **Response:**
+
 ```json
 [
   {
@@ -155,9 +159,11 @@ Fetch all milestones for current workspace
 ```
 
 ### POST /api/milestones/:key/ack
+
 Acknowledge a milestone (user has seen it)
 
 **Response:**
+
 ```json
 { "success": true }
 ```
@@ -194,22 +200,22 @@ VITE_FEATURE_CONFETTI=true
 
 ```typescript
 // In browser console
-fetch('/api/milestones/onboarding_complete/ack', { method: 'POST' });
+fetch("/api/milestones/onboarding_complete/ack", { method: "POST" });
 ```
 
 ### Integration Test Example
 
 ```typescript
-import { triggerFirstPublish } from '@/server/lib/milestone-triggers';
+import { triggerFirstPublish } from "@/server/lib/milestone-triggers";
 
-test('first publish unlocks milestone', async () => {
-  const workspaceId = 'test-workspace';
-  
+test("first publish unlocks milestone", async () => {
+  const workspaceId = "test-workspace";
+
   await triggerFirstPublish(workspaceId);
-  
+
   const milestones = await getMilestones(workspaceId);
   expect(milestones).toContainEqual(
-    expect.objectContaining({ key: 'first_publish' })
+    expect.objectContaining({ key: "first_publish" }),
   );
 });
 ```
@@ -226,16 +232,19 @@ test('first publish unlocks milestone', async () => {
 ## Troubleshooting
 
 ### Confetti not showing
+
 - Check browser console for `prefers-reduced-motion`
 - Verify `canvas-confetti` is installed
 - Check rate limiting (max 2 per minute)
 
 ### Milestone fires multiple times
+
 - Verify database unique constraint is active
 - Check `acknowledged_at` is being set
 - Ensure idempotent unlock logic
 
 ### WebSocket not connecting
+
 - Set `VITE_WS_URL` environment variable
 - Falls back to polling if not configured
 - Check server WebSocket endpoint
@@ -243,6 +252,7 @@ test('first publish unlocks milestone', async () => {
 ## Credits
 
 Built with:
+
 - [canvas-confetti](https://github.com/catdad/canvas-confetti) - Confetti animations
 - React Query - Data synchronization
 - Supabase - Database & real-time

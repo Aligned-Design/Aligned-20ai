@@ -1,5 +1,5 @@
-import { supabase } from './dbClient';
-import type { MilestoneKey } from '../../client/lib/milestones';
+import { supabase } from "./dbClient";
+import type { MilestoneKey } from "../../client/lib/milestones";
 
 interface MilestoneRecord {
   id: string;
@@ -21,13 +21,13 @@ export async function unlockMilestone(workspaceId: string, key: MilestoneKey) {
   try {
     // Check if already unlocked
     const { data: existing, error: checkError } = await supabase
-      .from('milestones')
-      .select('*')
-      .eq('workspace_id', workspaceId)
-      .eq('key', key)
+      .from("milestones")
+      .select("*")
+      .eq("workspace_id", workspaceId)
+      .eq("key", key)
       .maybeSingle();
 
-    if (checkError && checkError.code !== 'PGRST116') {
+    if (checkError && checkError.code !== "PGRST116") {
       throw checkError;
     }
 
@@ -37,7 +37,7 @@ export async function unlockMilestone(workspaceId: string, key: MilestoneKey) {
 
     // Create new milestone
     const { data: milestone, error } = await supabase
-      .from('milestones')
+      .from("milestones")
       .insert({
         workspace_id: workspaceId,
         key,
@@ -67,17 +67,17 @@ export async function unlockMilestone(workspaceId: string, key: MilestoneKey) {
  */
 export async function isMilestoneUnlocked(
   workspaceId: string,
-  key: MilestoneKey
+  key: MilestoneKey,
 ): Promise<boolean> {
   try {
     const { data, error } = await supabase
-      .from('milestones')
-      .select('id')
-      .eq('workspace_id', workspaceId)
-      .eq('key', key)
+      .from("milestones")
+      .select("id")
+      .eq("workspace_id", workspaceId)
+      .eq("key", key)
       .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') {
+    if (error && error.code !== "PGRST116") {
       throw error;
     }
 
@@ -92,19 +92,21 @@ export async function isMilestoneUnlocked(
  * Get all milestones for a workspace
  * @param workspaceId - The workspace ID
  */
-export async function getMilestones(workspaceId: string): Promise<MilestoneRecord[]> {
+export async function getMilestones(
+  workspaceId: string,
+): Promise<MilestoneRecord[]> {
   try {
     const { data, error } = await supabase
-      .from('milestones')
-      .select('*')
-      .eq('workspace_id', workspaceId)
-      .order('unlocked_at', { ascending: false });
+      .from("milestones")
+      .select("*")
+      .eq("workspace_id", workspaceId)
+      .order("unlocked_at", { ascending: false });
 
     if (error) throw error;
 
     return data || [];
   } catch (err) {
-    console.error('[Milestone] Failed to fetch milestones:', err);
+    console.error("[Milestone] Failed to fetch milestones:", err);
     return [];
   }
 }
@@ -114,13 +116,16 @@ export async function getMilestones(workspaceId: string): Promise<MilestoneRecor
  * @param workspaceId - The workspace ID
  * @param key - The milestone key
  */
-export async function acknowledgeMilestone(workspaceId: string, key: MilestoneKey) {
+export async function acknowledgeMilestone(
+  workspaceId: string,
+  key: MilestoneKey,
+) {
   try {
     const { error } = await supabase
-      .from('milestones')
+      .from("milestones")
       .update({ acknowledged_at: new Date().toISOString() })
-      .eq('workspace_id', workspaceId)
-      .eq('key', key);
+      .eq("workspace_id", workspaceId)
+      .eq("key", key);
 
     if (error) throw error;
 

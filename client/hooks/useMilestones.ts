@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from 'react';
-import { useQueryClient, useQuery } from '@tanstack/react-query';
-import type { MilestoneKey } from '@/lib/milestones';
+import { useEffect, useState, useRef } from "react";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import type { MilestoneKey } from "@/lib/milestones";
 
 interface Milestone {
   id: number;
@@ -17,10 +17,10 @@ export function useMilestones() {
 
   // Fetch existing milestones
   const { data: milestones = [] } = useQuery<Milestone[]>({
-    queryKey: ['milestones'],
+    queryKey: ["milestones"],
     queryFn: async () => {
       try {
-        const res = await fetch('/api/milestones');
+        const res = await fetch("/api/milestones");
         if (!res.ok) return [];
         return await res.json();
       } catch {
@@ -34,7 +34,9 @@ export function useMilestones() {
     // Skip WebSocket in development if not configured
     const wsUrl = import.meta.env.VITE_WS_URL;
     if (!wsUrl) {
-      console.log('WebSocket URL not configured - milestone updates will be polling-based');
+      console.log(
+        "WebSocket URL not configured - milestone updates will be polling-based",
+      );
       return;
     }
 
@@ -50,22 +52,22 @@ export function useMilestones() {
             const { key } = JSON.parse(e.data);
             if (key && !acknowledgedRef.current.has(key)) {
               setNewlyUnlocked((prev) => [...prev, key]);
-              qc.invalidateQueries({ queryKey: ['milestones'] });
+              qc.invalidateQueries({ queryKey: ["milestones"] });
             }
           } catch (err) {
-            console.error('Failed to parse milestone message:', err);
+            console.error("Failed to parse milestone message:", err);
           }
         };
 
         ws.onerror = () => {
-          console.log('Milestone WebSocket error - will reconnect');
+          console.log("Milestone WebSocket error - will reconnect");
         };
 
         ws.onclose = () => {
           reconnectTimeout = setTimeout(connect, 5000);
         };
       } catch (err) {
-        console.error('Failed to connect to milestone WebSocket:', err);
+        console.error("Failed to connect to milestone WebSocket:", err);
       }
     };
 
@@ -83,10 +85,10 @@ export function useMilestones() {
     setNewlyUnlocked((prev) => prev.filter((k) => k !== key));
 
     try {
-      await fetch(`/api/milestones/${key}/ack`, { method: 'POST' });
-      qc.invalidateQueries({ queryKey: ['milestones'] });
+      await fetch(`/api/milestones/${key}/ack`, { method: "POST" });
+      qc.invalidateQueries({ queryKey: ["milestones"] });
     } catch (err) {
-      console.error('Failed to acknowledge milestone:', err);
+      console.error("Failed to acknowledge milestone:", err);
     }
   };
 

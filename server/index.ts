@@ -176,13 +176,13 @@ export function createServer() {
     // Content Security Policy
     res.setHeader(
       "Content-Security-Policy",
-      "default-src 'self'; script-src 'self' 'unsafe-inline' cdn.example.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;"
+      "default-src 'self'; script-src 'self' 'unsafe-inline' cdn.example.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;",
     );
     // HSTS (HTTP Strict Transport Security) - only for production
     if (process.env.NODE_ENV === "production") {
       res.setHeader(
         "Strict-Transport-Security",
-        "max-age=31536000; includeSubDomains; preload"
+        "max-age=31536000; includeSubDomains; preload",
       );
     }
     next();
@@ -237,7 +237,10 @@ export function createServer() {
   app.post("/api/analytics/:brandId/offline-metric", addOfflineMetric);
   app.get("/api/analytics/:brandId/heatmap", getEngagementHeatmap);
   app.get("/api/analytics/:brandId/alerts", getAlerts);
-  app.post("/api/analytics/:brandId/alerts/:alertId/acknowledge", acknowledgeAlert);
+  app.post(
+    "/api/analytics/:brandId/alerts/:alertId/acknowledge",
+    acknowledgeAlert,
+  );
 
   // Approvals routes
   app.post("/api/approvals/bulk", bulkApproveContent);
@@ -258,7 +261,10 @@ export function createServer() {
 
   // Brand Intelligence routes
   app.get("/api/brand-intelligence/:brandId", getBrandIntelligence);
-  app.post("/api/brand-intelligence/:brandId/feedback", submitRecommendationFeedback);
+  app.post(
+    "/api/brand-intelligence/:brandId/feedback",
+    submitRecommendationFeedback,
+  );
 
   // Bulk Approvals routes
   app.post("/api/bulk-approvals", bulkApproveOrReject);
@@ -275,13 +281,22 @@ export function createServer() {
   app.post("/api/client-portal/media/upload", uploadClientMedia);
   app.get("/api/client-portal/:clientId/media", getClientMedia);
   app.get("/api/client-portal/:clientId/content", getPortalContent);
-  app.get("/api/client-portal/content/:contentId/with-comments", getContentWithComments);
+  app.get(
+    "/api/client-portal/content/:contentId/with-comments",
+    getContentWithComments,
+  );
 
   // Client Settings routes
   app.get("/api/client-settings/:clientId", getClientSettings);
   app.put("/api/client-settings/:clientId", updateClientSettings);
-  app.put("/api/client-settings/:clientId/email-preferences", updateEmailPreferences);
-  app.post("/api/client-settings/:clientId/unsubscribe-link", generateUnsubscribeLink);
+  app.put(
+    "/api/client-settings/:clientId/email-preferences",
+    updateEmailPreferences,
+  );
+  app.post(
+    "/api/client-settings/:clientId/unsubscribe-link",
+    generateUnsubscribeLink,
+  );
   app.post("/api/client-settings/unsubscribe", unsubscribeFromEmails);
   app.post("/api/client-settings/resubscribe", resubscribeToEmails);
   app.post("/api/client-settings/verify-unsubscribe", verifyUnsubscribeToken);
@@ -320,7 +335,10 @@ export function createServer() {
   app.post("/api/workflow/start/:brandId", startWorkflow);
   app.post("/api/workflow/:workflowId/action", processWorkflowAction);
   app.get("/api/workflow/:brandId/notifications", getWorkflowNotifications);
-  app.put("/api/workflow/notifications/:notificationId/read", markNotificationRead);
+  app.put(
+    "/api/workflow/notifications/:notificationId/read",
+    markNotificationRead,
+  );
   app.post("/api/workflow/:workflowId/cancel", cancelWorkflow);
   app.get("/api/workflow/:workflowId", getWorkflow);
   app.get("/api/workflow/content/:contentId", getWorkflowsForContent);

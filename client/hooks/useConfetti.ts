@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useRef } from 'react';
-import confetti from 'canvas-confetti';
+import { useCallback, useEffect, useRef } from "react";
+import confetti from "canvas-confetti";
 
 export function useConfetti() {
   const prefersReduced = useRef(false);
 
   useEffect(() => {
-    prefersReduced.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    prefersReduced.current = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
   }, []);
 
   const fire = useCallback((opts?: confetti.Options) => {
@@ -27,14 +29,14 @@ export function useConfetti() {
         angle: 60,
         spread: 55,
         origin: { x: 0 },
-        colors: ['#4F46E5', '#818CF8', '#C7D2FE'],
+        colors: ["#4F46E5", "#818CF8", "#C7D2FE"],
       });
       confetti({
         particleCount: 2,
         angle: 120,
         spread: 55,
         origin: { x: 1 },
-        colors: ['#4F46E5', '#818CF8', '#C7D2FE'],
+        colors: ["#4F46E5", "#818CF8", "#C7D2FE"],
       });
       if (Date.now() < end) requestAnimationFrame(frame);
     };

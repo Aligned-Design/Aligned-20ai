@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
-import { useConfetti } from '@/hooks/useConfetti';
-import { useMilestones } from '@/hooks/useMilestones';
-import { toast } from '@/hooks/use-toast';
-import { milestoneCopy, type MilestoneKey } from '@/lib/milestones';
+import { useEffect, useRef } from "react";
+import { useConfetti } from "@/hooks/useConfetti";
+import { useMilestones } from "@/hooks/useMilestones";
+import { toast } from "@/hooks/use-toast";
+import { milestoneCopy, type MilestoneKey } from "@/lib/milestones";
 
 // Frequency cap: max 2 celebrations per minute
 const CELEBRATION_RATE_LIMIT = 2;
@@ -19,7 +19,7 @@ export default function MilestoneCelebrator() {
     // Clean up old timestamps outside the window
     const now = Date.now();
     celebrationTimestamps.current = celebrationTimestamps.current.filter(
-      (timestamp) => now - timestamp < CELEBRATION_WINDOW_MS
+      (timestamp) => now - timestamp < CELEBRATION_WINDOW_MS,
     );
 
     // Process each newly unlocked milestone
@@ -35,10 +35,10 @@ export default function MilestoneCelebrator() {
 
       // 1) Fire confetti
       const burstMilestones: MilestoneKey[] = [
-        'onboarding_complete',
-        'first_publish',
-        'agency_scale_5',
-        'month_1_anniversary',
+        "onboarding_complete",
+        "first_publish",
+        "agency_scale_5",
+        "month_1_anniversary",
       ];
 
       if (burstMilestones.includes(key)) {
@@ -57,7 +57,7 @@ export default function MilestoneCelebrator() {
 
       // 3) Track analytics
       if (window.posthog) {
-        window.posthog.capture('milestone_unlocked', { milestone: key });
+        window.posthog.capture("milestone_unlocked", { milestone: key });
       }
 
       // 4) Acknowledge milestone so it doesn't show again
