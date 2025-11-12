@@ -4,17 +4,17 @@
  * Replaces dual implementations: AuthContext + useAuth hook
  */
 
-import { useContext } from 'react';
-import { AuthContext } from '@/contexts/AuthContext';
+import { useContext } from "react";
+import { AuthContext } from "@/contexts/AuthContext";
 
-export type Role = 
-  | 'SUPERADMIN'
-  | 'AGENCY_ADMIN'
-  | 'BRAND_MANAGER'
-  | 'CREATOR'
-  | 'ANALYST'
-  | 'CLIENT_APPROVER'
-  | 'VIEWER';
+export type Role =
+  | "SUPERADMIN"
+  | "AGENCY_ADMIN"
+  | "BRAND_MANAGER"
+  | "CREATOR"
+  | "ANALYST"
+  | "CLIENT_APPROVER"
+  | "VIEWER";
 
 export interface AuthUser {
   id: string;
@@ -46,37 +46,39 @@ export function useAuth(): UseAuthReturn {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
 
   // Normalize the user data to canonical format
   const normalizeRole = (role: string | undefined): Role => {
     const roleMap: Record<string, Role> = {
-      'SUPERADMIN': 'SUPERADMIN',
-      'AGENCY_ADMIN': 'AGENCY_ADMIN',
-      'agency': 'AGENCY_ADMIN',
-      'BRAND_MANAGER': 'BRAND_MANAGER',
-      'manager': 'BRAND_MANAGER',
-      'CREATOR': 'CREATOR',
-      'creator': 'CREATOR',
-      'ANALYST': 'ANALYST',
-      'CLIENT_APPROVER': 'CLIENT_APPROVER',
-      'client': 'CLIENT_APPROVER',
-      'VIEWER': 'VIEWER',
-      'viewer': 'VIEWER',
+      SUPERADMIN: "SUPERADMIN",
+      AGENCY_ADMIN: "AGENCY_ADMIN",
+      agency: "AGENCY_ADMIN",
+      BRAND_MANAGER: "BRAND_MANAGER",
+      manager: "BRAND_MANAGER",
+      CREATOR: "CREATOR",
+      creator: "CREATOR",
+      ANALYST: "ANALYST",
+      CLIENT_APPROVER: "CLIENT_APPROVER",
+      client: "CLIENT_APPROVER",
+      VIEWER: "VIEWER",
+      viewer: "VIEWER",
     };
-    return roleMap[role || ''] || 'VIEWER';
+    return roleMap[role || ""] || "VIEWER";
   };
 
-  const normalizedUser: AuthUser | null = context.user ? {
-    id: context.user.id,
-    email: context.user.email,
-    name: context.user.name,
-    role: normalizeRole(context.user.role),
-    organization_id: context.user.organization_id,
-    brand_ids: context.user.brand_ids,
-    account_type: context.user.accountType,
-  } : null;
+  const normalizedUser: AuthUser | null = context.user
+    ? {
+        id: context.user.id,
+        email: context.user.email,
+        name: context.user.name,
+        role: normalizeRole(context.user.role),
+        organization_id: context.user.organization_id,
+        brand_ids: context.user.brand_ids,
+        account_type: context.user.accountType,
+      }
+    : null;
 
   return {
     user: normalizedUser,

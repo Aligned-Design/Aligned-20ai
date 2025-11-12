@@ -11,6 +11,7 @@
 Consolidate **5+ overlapping role systems** into **one canonical RBAC model** with scope-based permissions.
 
 **Benefits:**
+
 - ✅ Single source of truth (`config/permissions.json`)
 - ✅ Consistent enforcement (DB → API → UI)
 - ✅ Easier auditing and compliance
@@ -54,7 +55,6 @@ Consolidate **5+ overlapping role systems** into **one canonical RBAC model** wi
 - [x] Fix `authenticateUser` import (broken in billing/trial routes)
   - **File:** `server/middleware/security.ts` / `server/middleware/authenticateUser.ts`
   - **Action:** Export function; routes no longer fail
-  
 - [x] Complete milestones RLS
   - **File:** `supabase/migrations/20250112_milestones_rls.sql`
   - **Action:** Replace `USING (true)` with org/brand checks; deploy migration
@@ -64,7 +64,7 @@ Consolidate **5+ overlapping role systems** into **one canonical RBAC model** wi
   - **Action:** Define 7 roles + 24 scopes; single source of truth
 
 - [x] Create unified client hooks
-  - **Files:** 
+  - **Files:**
     - `client/lib/auth/useAuth.ts` (single auth hook)
     - `client/lib/auth/useCan.ts` (permission checks)
   - **Action:** Provide API for UI to check permissions
@@ -125,17 +125,18 @@ Consolidate **5+ overlapping role systems** into **one canonical RBAC model** wi
 - [ ] **Update TypeScript types**
   - **Remove:** `client/types/user.ts` local role union
   - **Use:** `import type { Role } from '@/lib/auth'`
-  - **Files:** 
+  - **Files:**
     - `shared/workflow.ts`
     - `shared/analytics.ts`
     - `client/types/dashboard.ts`
 
 - [ ] **Update components to use useCan**
   - **Examples:**
+
     ```typescript
     // Before
     if (userRole === 'agency') { <GenerateButton /> }
-    
+
     // After
     if (useCan('content:create')) { <GenerateButton /> }
     ```
@@ -204,10 +205,11 @@ grep -r "role.*==\|role.*!=\|=== 'agency'\|=== 'client'" client --include="*.tsx
   - Ensure `authenticateUser` called before `requireScope`
   - Example:
     ```typescript
-    router.post('/approve',
+    router.post(
+      "/approve",
       authenticateUser,
-      requireScope('content:approve'),
-      handler
+      requireScope("content:approve"),
+      handler,
     );
     ```
 
@@ -233,22 +235,22 @@ grep -r "role.*==\|role.*!=\|=== 'agency'\|=== 'client'" client --include="*.tsx
 
 ```typescript
 // server/__tests__/rbac-enforcement.test.ts
-describe('RBAC Enforcement', () => {
-  it('CREATOR cannot publish content (403)', async () => {
+describe("RBAC Enforcement", () => {
+  it("CREATOR cannot publish content (403)", async () => {
     const res = await request(app)
-      .post('/api/posts/publish')
-      .set('Authorization', `Bearer ${creatorToken}`)
-      .send({ postId: '123' });
-    
+      .post("/api/posts/publish")
+      .set("Authorization", `Bearer ${creatorToken}`)
+      .send({ postId: "123" });
+
     expect(res.status).toBe(403);
   });
 
-  it('BRAND_MANAGER can publish content (200)', async () => {
+  it("BRAND_MANAGER can publish content (200)", async () => {
     const res = await request(app)
-      .post('/api/posts/publish')
-      .set('Authorization', `Bearer ${managerToken}`)
-      .send({ postId: '123' });
-    
+      .post("/api/posts/publish")
+      .set("Authorization", `Bearer ${managerToken}`)
+      .send({ postId: "123" });
+
     expect(res.status).toBe(200);
   });
 });
@@ -306,6 +308,7 @@ describe('RBAC Enforcement', () => {
   - **After Phase 4:** Set to `true` (enforcement)
 
 - [ ] **Implement log-only mode**
+
   ```typescript
   // server/middleware/requireScope.ts
   if (!process.env.ENFORCE_STRICT_RBAC) {
@@ -391,13 +394,13 @@ describe('RBAC Enforcement', () => {
 
 ## Risk & Mitigation
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|-----------|
-| **Breaking change** | High | High | Feature flag (log-only first) |
-| **Forgot to apply middleware** | Medium | Medium | Code review checklist |
-| **RLS locks data** | Medium | High | Pre-test migrations in staging |
-| **Token payload mismatch** | Low | High | Integration tests |
-| **Performance regression** | Low | Medium | Latency tests before cutover |
+| Risk                           | Probability | Impact | Mitigation                     |
+| ------------------------------ | ----------- | ------ | ------------------------------ |
+| **Breaking change**            | High        | High   | Feature flag (log-only first)  |
+| **Forgot to apply middleware** | Medium      | Medium | Code review checklist          |
+| **RLS locks data**             | Medium      | High   | Pre-test migrations in staging |
+| **Token payload mismatch**     | Low         | High   | Integration tests              |
+| **Performance regression**     | Low         | Medium | Latency tests before cutover   |
 
 ---
 
@@ -406,11 +409,13 @@ describe('RBAC Enforcement', () => {
 If a new role is needed (e.g., `SUPERVISOR`):
 
 1. **Update `config/permissions.json`:**
+
    ```json
    "SUPERVISOR": ["brand:view", "content:view", "analytics:read"]
    ```
 
 2. **Update role type in `client/lib/auth/useAuth.ts`:**
+
    ```typescript
    export type Role = 'SUPERADMIN' | ... | 'SUPERVISOR';
    ```

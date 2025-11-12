@@ -10,29 +10,31 @@ This document shows how to apply the new RBAC enforcement to your Express routes
 
 ```typescript
 // server/routes/approvals.ts
-import { Router } from 'express';
+import { Router } from "express";
 
 const router = Router();
 
-router.post('/bulk', bulkApproveContent);
+router.post("/bulk", bulkApproveContent);
 ```
 
 **Problem:** No permission enforcement; handler contains inline role checks
 
 ```typescript
 export const bulkApproveContent = async (req, res, next) => {
-  const userRole = req.user?.role || req.headers['x-user-role'];
-  
+  const userRole = req.user?.role || req.headers["x-user-role"];
+
   // ❌ Brittle string check
-  if (!['client', 'agency', 'admin'].includes(userRole)) {
-    throw new AppError(ErrorCode.FORBIDDEN, 'Invalid role');
+  if (!["client", "agency", "admin"].includes(userRole)) {
+    throw new AppError(ErrorCode.FORBIDDEN, "Invalid role");
   }
-  
+
   // ❌ Ad-hoc permission logic
-  const canApprove = userRole === 'client' || userRole === 'admin' ||
-                     (userRole === 'agency' && action === 'approve');
+  const canApprove =
+    userRole === "client" ||
+    userRole === "admin" ||
+    (userRole === "agency" && action === "approve");
   if (!canApprove) throw error;
-  
+
   // ... rest of handler
 };
 ```
@@ -41,26 +43,26 @@ export const bulkApproveContent = async (req, res, next) => {
 
 ```typescript
 // server/routes/approvals.ts
-import { Router } from 'express';
-import { authenticateUser } from '../middleware/security';
-import { requireScope } from '../middleware/requireScope';
+import { Router } from "express";
+import { authenticateUser } from "../middleware/security";
+import { requireScope } from "../middleware/requireScope";
 
 const router = Router();
 
 // ✅ Clear middleware stack
 router.post(
-  '/bulk',
-  authenticateUser,           // Verify JWT, attach req.auth
-  requireScope('content:approve'), // Enforce scope
-  bulkApproveContent          // Handler (permission guaranteed)
+  "/bulk",
+  authenticateUser, // Verify JWT, attach req.auth
+  requireScope("content:approve"), // Enforce scope
+  bulkApproveContent, // Handler (permission guaranteed)
 );
 
 // Or multiple scopes (user needs at least one)
 router.post(
-  '/single/:postId',
+  "/single/:postId",
   authenticateUser,
-  requireScope(['content:approve', 'content:manage']),
-  approveSingleContent
+  requireScope(["content:approve", "content:manage"]),
+  approveSingleContent,
 );
 ```
 
@@ -76,7 +78,7 @@ export const bulkApproveContent = async (req, res, next) => {
     // ✅ Permission already checked by middleware
     // Just validate input
     if (!postIds?.length) {
-      throw new AppError(ErrorCode.MISSING_REQUIRED_FIELD, '...');
+      throw new AppError(ErrorCode.MISSING_REQUIRED_FIELD, "...");
     }
 
     // ... rest of handler (no role checks)
@@ -93,14 +95,14 @@ export const bulkApproveContent = async (req, res, next) => {
 Some routes require multiple permissions:
 
 ```typescript
-import { requireAllScopes } from '../middleware/requireScope';
+import { requireAllScopes } from "../middleware/requireScope";
 
 // Route requires BOTH publishing AND scheduling
 router.post(
-  '/schedule-and-publish',
+  "/schedule-and-publish",
   authenticateUser,
-  requireAllScopes(['publish:schedule', 'publish:now']),
-  scheduleAndPublish
+  requireAllScopes(["publish:schedule", "publish:now"]),
+  scheduleAndPublish,
 );
 ```
 
@@ -115,10 +117,10 @@ Some scopes also require resource ownership (e.g., user can only edit own conten
 // Then check ownership (in handler)
 
 router.put(
-  '/posts/:postId',
+  "/posts/:postId",
   authenticateUser,
-  requireScope('content:edit'),
-  editPost
+  requireScope("content:edit"),
+  editPost,
 );
 
 export const editPost = async (req, res, next) => {
@@ -128,10 +130,10 @@ export const editPost = async (req, res, next) => {
 
     // Get post
     const post = await postDB.getPost(postId);
-    
+
     // ✅ Now check ownership (beyond scope)
-    if (post.created_by !== userId && !useCan('content:manage')) {
-      throw new AppError(ErrorCode.FORBIDDEN, 'Cannot edit others\' content');
+    if (post.created_by !== userId && !useCan("content:manage")) {
+      throw new AppError(ErrorCode.FORBIDDEN, "Cannot edit others' content");
     }
 
     // ... update post
@@ -151,9 +153,9 @@ Some routes need to verify the user belongs to the organization/brand:
 // Check scope AND brand access
 
 router.put(
-  '/brands/:brandId/settings',
+  "/brands/:brandId/settings",
   authenticateUser,
-  requireScope('brand:edit'),
+  requireScope("brand:edit"),
   (req, res, next) => {
     // Additional check: user belongs to brand
     const brandId = req.params.brandId;
@@ -161,14 +163,14 @@ router.put(
 
     if (!userBrandIds.includes(brandId)) {
       return res.status(403).json({
-        error: 'Access denied',
-        message: 'User does not have access to this brand'
+        error: "Access denied",
+        message: "User does not have access to this brand",
       });
     }
 
     next();
   },
-  updateBrandSettings
+  updateBrandSettings,
 );
 ```
 
@@ -181,16 +183,16 @@ router.put(
 **File:** `server/routes/approvals.ts`
 
 ```typescript
-import { Router, RequestHandler } from 'express';
-import { authenticateUser } from '../middleware/security';
-import { requireScope } from '../middleware/requireScope';
+import { Router, RequestHandler } from "express";
+import { authenticateUser } from "../middleware/security";
+import { requireScope } from "../middleware/requireScope";
 import {
   bulkApproveContent,
   approveSingleContent,
   rejectContent,
   getReminderStatus,
   sendApprovalReminder,
-} from './handlers/approvals';
+} from "./handlers/approvals";
 
 const router = Router();
 
@@ -199,10 +201,10 @@ const router = Router();
  * Bulk approve or reject posts
  */
 router.post(
-  '/bulk',
+  "/bulk",
   authenticateUser,
-  requireScope('content:approve'),
-  bulkApproveContent
+  requireScope("content:approve"),
+  bulkApproveContent,
 );
 
 /**
@@ -210,10 +212,10 @@ router.post(
  * Approve single post
  */
 router.post(
-  '/:postId/approve',
+  "/:postId/approve",
   authenticateUser,
-  requireScope('content:approve'),
-  approveSingleContent
+  requireScope("content:approve"),
+  approveSingleContent,
 );
 
 /**
@@ -221,10 +223,10 @@ router.post(
  * Reject single post
  */
 router.post(
-  '/:postId/reject',
+  "/:postId/reject",
   authenticateUser,
-  requireScope('content:approve'),
-  rejectContent
+  requireScope("content:approve"),
+  rejectContent,
 );
 
 /**
@@ -232,10 +234,10 @@ router.post(
  * Get approval reminder status
  */
 router.get(
-  '/reminders/:brandId',
+  "/reminders/:brandId",
   authenticateUser,
-  requireScope('content:view'), // Can view related content
-  getReminderStatus
+  requireScope("content:view"), // Can view related content
+  getReminderStatus,
 );
 
 /**
@@ -243,10 +245,10 @@ router.get(
  * Send approval reminder email
  */
 router.post(
-  '/reminders/send',
+  "/reminders/send",
   authenticateUser,
-  requireScope('content:approve'), // Must be able to approve
-  sendApprovalReminder
+  requireScope("content:approve"), // Must be able to approve
+  sendApprovalReminder,
 );
 
 export default router;
@@ -259,14 +261,14 @@ export default router;
 **File:** `server/routes/publishing.ts`
 
 ```typescript
-import { Router } from 'express';
-import { authenticateUser } from '../middleware/security';
-import { requireScope, requireAllScopes } from '../middleware/requireScope';
+import { Router } from "express";
+import { authenticateUser } from "../middleware/security";
+import { requireScope, requireAllScopes } from "../middleware/requireScope";
 import {
   publishPost,
   schedulePost,
   unpublishPost,
-} from './handlers/publishing';
+} from "./handlers/publishing";
 
 const router = Router();
 
@@ -275,10 +277,10 @@ const router = Router();
  * Publish post immediately
  */
 router.post(
-  '/:postId/publish',
+  "/:postId/publish",
   authenticateUser,
-  requireScope('publish:now'), // Must have publish permission
-  publishPost
+  requireScope("publish:now"), // Must have publish permission
+  publishPost,
 );
 
 /**
@@ -286,10 +288,10 @@ router.post(
  * Schedule post for future publishing
  */
 router.post(
-  '/:postId/schedule',
+  "/:postId/schedule",
   authenticateUser,
-  requireScope('publish:schedule'),
-  schedulePost
+  requireScope("publish:schedule"),
+  schedulePost,
 );
 
 /**
@@ -297,10 +299,10 @@ router.post(
  * Unpublish a post
  */
 router.post(
-  '/:postId/unpublish',
+  "/:postId/unpublish",
   authenticateUser,
-  requireAllScopes(['publish:now']), // Can publish (implies unpublish)
-  unpublishPost
+  requireAllScopes(["publish:now"]), // Can publish (implies unpublish)
+  unpublishPost,
 );
 
 export default router;
@@ -313,14 +315,14 @@ export default router;
 **File:** `server/routes/billing.ts`
 
 ```typescript
-import { Router } from 'express';
-import { authenticateUser } from '../middleware/security';
-import { requireScope } from '../middleware/requireScope';
+import { Router } from "express";
+import { authenticateUser } from "../middleware/security";
+import { requireScope } from "../middleware/requireScope";
 import {
   getBillingStatus,
   updatePlan,
   extendGracePeriod,
-} from './handlers/billing';
+} from "./handlers/billing";
 
 const router = Router();
 
@@ -329,9 +331,9 @@ const router = Router();
  * Get billing status (all users can view their own)
  */
 router.get(
-  '/status',
+  "/status",
   authenticateUser,
-  getBillingStatus // No scope required; checks ownership in handler
+  getBillingStatus, // No scope required; checks ownership in handler
 );
 
 /**
@@ -339,10 +341,10 @@ router.get(
  * Upgrade subscription plan
  */
 router.post(
-  '/plans/:planId/upgrade',
+  "/plans/:planId/upgrade",
   authenticateUser,
-  requireScope('billing:manage'), // AGENCY_ADMIN only
-  updatePlan
+  requireScope("billing:manage"), // AGENCY_ADMIN only
+  updatePlan,
 );
 
 /**
@@ -350,10 +352,10 @@ router.post(
  * Extend payment grace period (admin only)
  */
 router.post(
-  '/grace-period/extend',
+  "/grace-period/extend",
   authenticateUser,
-  requireScope('billing:manage'), // AGENCY_ADMIN only
-  extendGracePeriod
+  requireScope("billing:manage"), // AGENCY_ADMIN only
+  extendGracePeriod,
 );
 
 export default router;
@@ -373,22 +375,26 @@ export default router;
 ```
 
 **Bad order (Don't do this):**
+
 ```typescript
 // ❌ Wrong
-router.post('/content', 
-  requireScope('content:create'),  // Middleware expects req.user!
-  authenticateUser,                // Too late
-  createContent
+router.post(
+  "/content",
+  requireScope("content:create"), // Middleware expects req.user!
+  authenticateUser, // Too late
+  createContent,
 );
 ```
 
 **Good order:**
+
 ```typescript
 // ✅ Correct
-router.post('/content',
-  authenticateUser,                // Sets req.user/req.auth
-  requireScope('content:create'),  // Uses req.user
-  createContent
+router.post(
+  "/content",
+  authenticateUser, // Sets req.user/req.auth
+  requireScope("content:create"), // Uses req.user
+  createContent,
 );
 ```
 
@@ -398,45 +404,45 @@ router.post('/content',
 
 ```typescript
 // server/__tests__/approvals.test.ts
-import request from 'supertest';
-import { app } from '../index';
+import request from "supertest";
+import { app } from "../index";
 
-describe('Approvals Routes', () => {
-  it('CREATOR cannot approve content (403)', async () => {
-    const creatorToken = generateToken({ role: 'CREATOR' });
+describe("Approvals Routes", () => {
+  it("CREATOR cannot approve content (403)", async () => {
+    const creatorToken = generateToken({ role: "CREATOR" });
 
     const res = await request(app)
-      .post('/api/approvals/bulk')
-      .set('Authorization', `Bearer ${creatorToken}`)
+      .post("/api/approvals/bulk")
+      .set("Authorization", `Bearer ${creatorToken}`)
       .send({
-        postIds: ['post1', 'post2'],
-        action: 'approve'
+        postIds: ["post1", "post2"],
+        action: "approve",
       });
 
     expect(res.status).toBe(403);
-    expect(res.body.error).toContain('Forbidden');
+    expect(res.body.error).toContain("Forbidden");
   });
 
-  it('BRAND_MANAGER can approve content (200)', async () => {
-    const managerToken = generateToken({ role: 'BRAND_MANAGER' });
+  it("BRAND_MANAGER can approve content (200)", async () => {
+    const managerToken = generateToken({ role: "BRAND_MANAGER" });
 
     const res = await request(app)
-      .post('/api/approvals/bulk')
-      .set('Authorization', `Bearer ${managerToken}`)
+      .post("/api/approvals/bulk")
+      .set("Authorization", `Bearer ${managerToken}`)
       .send({
-        postIds: ['post1', 'post2'],
-        action: 'approve'
+        postIds: ["post1", "post2"],
+        action: "approve",
       });
 
     expect(res.status).toBe(200);
   });
 
-  it('Missing auth header returns 401', async () => {
+  it("Missing auth header returns 401", async () => {
     const res = await request(app)
-      .post('/api/approvals/bulk')
+      .post("/api/approvals/bulk")
       .send({
-        postIds: ['post1'],
-        action: 'approve'
+        postIds: ["post1"],
+        action: "approve",
       });
 
     expect(res.status).toBe(401);
@@ -454,10 +460,15 @@ describe('Approvals Routes', () => {
 
 ```typescript
 // ❌ Wrong
-router.post('/api/approvals', requireScope('content:approve'), handler);
+router.post("/api/approvals", requireScope("content:approve"), handler);
 
 // ✅ Correct
-router.post('/api/approvals', authenticateUser, requireScope('content:approve'), handler);
+router.post(
+  "/api/approvals",
+  authenticateUser,
+  requireScope("content:approve"),
+  handler,
+);
 ```
 
 ### Issue: "requireScope doesn't recognize role"
@@ -511,10 +522,10 @@ For each route that needs RBAC:
 
 ## Summary
 
-| Aspect | Before | After |
-|--------|--------|-------|
-| **Permission Logic** | In handler | In middleware |
-| **Role Checks** | Inline strings | requireScope() |
-| **Consistency** | Variable | Guaranteed by middleware |
-| **Testability** | Hard (mixed concerns) | Easy (separate layers) |
-| **Clarity** | Implicit | Explicit in route definition |
+| Aspect               | Before                | After                        |
+| -------------------- | --------------------- | ---------------------------- |
+| **Permission Logic** | In handler            | In middleware                |
+| **Role Checks**      | Inline strings        | requireScope()               |
+| **Consistency**      | Variable              | Guaranteed by middleware     |
+| **Testability**      | Hard (mixed concerns) | Easy (separate layers)       |
+| **Clarity**          | Implicit              | Explicit in route definition |

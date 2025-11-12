@@ -72,10 +72,5 @@
     "comment:view",
     "analytics:read"
   ],
-  "VIEWER": [
-    "brand:view",
-    "content:view",
-    "analytics:read",
-    "comment:view"
-  ]
+  "VIEWER": ["brand:view", "content:view", "analytics:read", "comment:view"]
 }

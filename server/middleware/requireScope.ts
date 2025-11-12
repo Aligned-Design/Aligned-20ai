@@ -3,20 +3,20 @@
  * Enforces permission checks based on canonical RBAC system
  */
 
-import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../lib/error-middleware';
-import { ErrorCode, HTTP_STATUS } from '../lib/error-responses';
-import permissionsMap from '../../config/permissions.json';
+import { Request, Response, NextFunction } from "express";
+import { AppError } from "../lib/error-middleware";
+import { ErrorCode, HTTP_STATUS } from "../lib/error-responses";
+import permissionsMap from "../../config/permissions.json";
 
 export type Scope = string; // String type to allow flexibility
 
 /**
  * Middleware factory to require specific scope(s)
  * User role must have at least one of the required scopes
- * 
+ *
  * @param scopes - Single scope or array of scopes. User must have at least one.
  * @returns Express middleware function
- * 
+ *
  * @example
  * router.post('/approve', requireScope('content:approve'), handler);
  * router.post('/publish', requireScope(['publish:now', 'publish:schedule']), handler);
@@ -32,9 +32,9 @@ export function requireScope(scopes: Scope | Scope[]) {
       if (!user) {
         throw new AppError(
           ErrorCode.UNAUTHORIZED,
-          'Authentication required',
+          "Authentication required",
           HTTP_STATUS.UNAUTHORIZED,
-          'warning',
+          "warning",
         );
       }
 
@@ -44,9 +44,9 @@ export function requireScope(scopes: Scope | Scope[]) {
       if (!userRole) {
         throw new AppError(
           ErrorCode.FORBIDDEN,
-          'User role not found',
+          "User role not found",
           HTTP_STATUS.FORBIDDEN,
-          'warning',
+          "warning",
         );
       }
 
@@ -58,26 +58,26 @@ export function requireScope(scopes: Scope | Scope[]) {
           ErrorCode.FORBIDDEN,
           `Unknown role: ${userRole}`,
           HTTP_STATUS.FORBIDDEN,
-          'warning',
+          "warning",
         );
       }
 
       // Check if user has wildcard permission (SUPERADMIN)
-      if (rolePermissions.includes('*')) {
+      if (rolePermissions.includes("*")) {
         return next();
       }
 
       // Check if user has at least one of the required scopes
-      const hasRequiredScope = requiredScopes.some(scope =>
+      const hasRequiredScope = requiredScopes.some((scope) =>
         rolePermissions.includes(scope),
       );
 
       if (!hasRequiredScope) {
         throw new AppError(
           ErrorCode.FORBIDDEN,
-          `Insufficient permissions. Required: ${requiredScopes.join(' or ')}`,
+          `Insufficient permissions. Required: ${requiredScopes.join(" or ")}`,
           HTTP_STATUS.FORBIDDEN,
-          'warning',
+          "warning",
           {
             userRole,
             requiredScopes,
@@ -96,10 +96,10 @@ export function requireScope(scopes: Scope | Scope[]) {
 /**
  * Middleware factory to require ALL scopes
  * User role must have all of the specified scopes
- * 
+ *
  * @param scopes - Array of scopes. User must have all.
  * @returns Express middleware function
- * 
+ *
  * @example
  * router.post('/admin-action', requireAllScopes(['billing:manage', 'user:manage']), handler);
  */
@@ -111,9 +111,9 @@ export function requireAllScopes(scopes: Scope[]) {
       if (!user) {
         throw new AppError(
           ErrorCode.UNAUTHORIZED,
-          'Authentication required',
+          "Authentication required",
           HTTP_STATUS.UNAUTHORIZED,
-          'warning',
+          "warning",
         );
       }
 
@@ -125,28 +125,28 @@ export function requireAllScopes(scopes: Scope[]) {
           ErrorCode.FORBIDDEN,
           `Unknown role: ${userRole}`,
           HTTP_STATUS.FORBIDDEN,
-          'warning',
+          "warning",
         );
       }
 
-      if (rolePermissions.includes('*')) {
+      if (rolePermissions.includes("*")) {
         return next();
       }
 
-      const hasAllScopes = scopes.every(scope =>
+      const hasAllScopes = scopes.every((scope) =>
         rolePermissions.includes(scope),
       );
 
       if (!hasAllScopes) {
         const missingScopes = scopes.filter(
-          scope => !rolePermissions.includes(scope),
+          (scope) => !rolePermissions.includes(scope),
         );
 
         throw new AppError(
           ErrorCode.FORBIDDEN,
-          `Insufficient permissions. Missing: ${missingScopes.join(', ')}`,
+          `Insufficient permissions. Missing: ${missingScopes.join(", ")}`,
           HTTP_STATUS.FORBIDDEN,
-          'warning',
+          "warning",
           {
             userRole,
             requiredScopes: scopes,
@@ -166,7 +166,7 @@ export function requireAllScopes(scopes: Scope[]) {
 /**
  * Get permissions for a specific role
  * Useful for checking permissions without middleware
- * 
+ *
  * @param role - The role to check
  * @returns Array of scopes the role has
  */
@@ -182,5 +182,5 @@ export function getRolePermissions(role: string): Scope[] {
  */
 export function roleHasScope(role: string, scope: Scope): boolean {
   const permissions = getRolePermissions(role);
-  return permissions.includes('*') || permissions.includes(scope);
+  return permissions.includes("*") || permissions.includes(scope);
 }

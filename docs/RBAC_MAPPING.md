@@ -62,15 +62,16 @@ Each role is mapped to scopes in `config/permissions.json`:
 
 ### server/lib/auth-context.ts (UserRole enum)
 
-| Legacy Role | Canonical Role | Notes |
-|-------------|----------------|-------|
-| `OWNER` | `SUPERADMIN` | Full system access |
-| `ADMIN` | `AGENCY_ADMIN` | Agency/organization level admin |
-| `EDITOR` | `BRAND_MANAGER` | Brand-level management |
-| `VIEWER` | `VIEWER` | Read-only access |
-| `GUEST` | `VIEWER` | Least privileged role |
+| Legacy Role | Canonical Role  | Notes                           |
+| ----------- | --------------- | ------------------------------- |
+| `OWNER`     | `SUPERADMIN`    | Full system access              |
+| `ADMIN`     | `AGENCY_ADMIN`  | Agency/organization level admin |
+| `EDITOR`    | `BRAND_MANAGER` | Brand-level management          |
+| `VIEWER`    | `VIEWER`        | Read-only access                |
+| `GUEST`     | `VIEWER`        | Least privileged role           |
 
 **Migration Path:**
+
 - `validateAuthContext(context, { minRole: UserRole.ADMIN })` → `requireScope('user:manage')`
 - `hasPermission(context, UserRole.EDITOR)` → `useCan('content:edit')`
 
@@ -81,15 +82,16 @@ Each role is mapped to scopes in `config/permissions.json`:
 
 ### server/middleware/rbac.ts (Role enum)
 
-| Legacy Role | Canonical Role | Notes |
-|-------------|----------------|-------|
-| `SUPERADMIN` | `SUPERADMIN` | Unchanged |
-| `AGENCY_ADMIN` | `AGENCY_ADMIN` | Unchanged |
-| `BRAND_MANAGER` | `BRAND_MANAGER` | Unchanged |
-| `CREATOR` | `CREATOR` | Unchanged (now also in canonical) |
-| `CLIENT_VIEWER` | `CLIENT_APPROVER` / `VIEWER` | Split based on approval rights |
+| Legacy Role     | Canonical Role               | Notes                             |
+| --------------- | ---------------------------- | --------------------------------- |
+| `SUPERADMIN`    | `SUPERADMIN`                 | Unchanged                         |
+| `AGENCY_ADMIN`  | `AGENCY_ADMIN`               | Unchanged                         |
+| `BRAND_MANAGER` | `BRAND_MANAGER`              | Unchanged                         |
+| `CREATOR`       | `CREATOR`                    | Unchanged (now also in canonical) |
+| `CLIENT_VIEWER` | `CLIENT_APPROVER` / `VIEWER` | Split based on approval rights    |
 
 **Migration Path:**
+
 - `requireRole(Role.CREATOR)` → `requireScope('content:create')`
 - `requirePermission(Permission.CREATE_CONTENT)` → `requireScope('content:create')`
 
@@ -100,30 +102,37 @@ Each role is mapped to scopes in `config/permissions.json`:
 ### client/contexts/AuthContext.tsx
 
 **Legacy Structure:**
+
 ```typescript
 interface OnboardingUser {
   role: "agency" | "single_business";
 }
 ```
 
-| Legacy Role | Canonical Role | Notes |
-|-------------|----------------|-------|
-| `"agency"` | `AGENCY_ADMIN` | If user is account owner |
-| `"agency"` | `BRAND_MANAGER` | If user is team member |
-| `"single_business"` | `BRAND_MANAGER` | Single business account |
+| Legacy Role         | Canonical Role  | Notes                    |
+| ------------------- | --------------- | ------------------------ |
+| `"agency"`          | `AGENCY_ADMIN`  | If user is account owner |
+| `"agency"`          | `BRAND_MANAGER` | If user is team member   |
+| `"single_business"` | `BRAND_MANAGER` | Single business account  |
 
 **Migration Path:**
+
 ```typescript
 // Before
 const { user } = useAuth(); // from context
-if (user.role === 'agency') { /* ... */ }
+if (user.role === "agency") {
+  /* ... */
+}
 
 // After
 const { role } = useAuth(); // from unified hook
-if (useCan('brand:manage')) { /* ... */ }
+if (useCan("brand:manage")) {
+  /* ... */
+}
 ```
 
-**File to Update:** 
+**File to Update:**
+
 - `client/contexts/AuthContext.tsx` - Store normalized `role` field
 - All components using this context - switch to `useCan()` hook
 
@@ -132,31 +141,37 @@ if (useCan('brand:manage')) { /* ... */ }
 ### client/hooks/useAuth.ts (Simple Hook)
 
 **Legacy Structure:**
+
 ```typescript
 interface User {
-  role: 'agency' | 'client';
+  role: "agency" | "client";
 }
 ```
 
-| Legacy Role | Canonical Role | Notes |
-|-------------|----------------|-------|
-| `"agency"` | `AGENCY_ADMIN` or `BRAND_MANAGER` | Context-dependent |
-| `"client"` | `CLIENT_APPROVER` or `VIEWER` | Approval rights dependent |
+| Legacy Role | Canonical Role                    | Notes                     |
+| ----------- | --------------------------------- | ------------------------- |
+| `"agency"`  | `AGENCY_ADMIN` or `BRAND_MANAGER` | Context-dependent         |
+| `"client"`  | `CLIENT_APPROVER` or `VIEWER`     | Approval rights dependent |
 
 **Migration Path:**
+
 ```typescript
 // This hook is being DEPRECATED
 // Use the new unified hook instead
-import { useAuth, useCan } from '@/lib/auth';
+import { useAuth, useCan } from "@/lib/auth";
 
 // Before
 const { userRole } = useAuth();
-if (userRole === 'agency') { /* ... */ }
+if (userRole === "agency") {
+  /* ... */
+}
 
 // After
 const { role } = useAuth();
-const canManageBrand = useCan('brand:manage');
-if (canManageBrand) { /* ... */ }
+const canManageBrand = useCan("brand:manage");
+if (canManageBrand) {
+  /* ... */
+}
 ```
 
 **File Status:** DEPRECATED - Remove after Phase 3 migration
@@ -166,28 +181,30 @@ if (canManageBrand) { /* ... */ }
 ### client/contexts/WorkspaceContext.tsx
 
 **Legacy Structure:**
+
 ```typescript
 interface WorkspaceMember {
   role: "Admin" | "Manager" | "Contributor" | "Viewer";
 }
 ```
 
-| Legacy Role | Canonical Role | Notes |
-|-------------|----------------|-------|
-| `"Admin"` | `BRAND_MANAGER` or `AGENCY_ADMIN` | Based on workspace scope |
-| `"Manager"` | `BRAND_MANAGER` | Team-level manager |
-| `"Contributor"` | `CREATOR` | Can create content |
-| `"Viewer"` | `VIEWER` | Read-only team member |
+| Legacy Role     | Canonical Role                    | Notes                    |
+| --------------- | --------------------------------- | ------------------------ |
+| `"Admin"`       | `BRAND_MANAGER` or `AGENCY_ADMIN` | Based on workspace scope |
+| `"Manager"`     | `BRAND_MANAGER`                   | Team-level manager       |
+| `"Contributor"` | `CREATOR`                         | Can create content       |
+| `"Viewer"`      | `VIEWER`                          | Read-only team member    |
 
 **Migration Path:**
+
 ```typescript
 // Before
 const { currentWorkspace } = useWorkspace();
-const isAdmin = currentWorkspace.members.some(m => m.role === 'Admin');
+const isAdmin = currentWorkspace.members.some((m) => m.role === "Admin");
 
 // After
 const { useCan } = useAuth();
-const canManage = useCan('workflow:manage');
+const canManage = useCan("workflow:manage");
 ```
 
 **File to Update:** Continue using for team collaboration; map to scopes
@@ -199,50 +216,58 @@ const canManage = useCan('workflow:manage');
 Several files define local `UserRole` types:
 
 #### shared/workflow.ts
+
 ```typescript
-type UserRole = 'creator' | 'internal_reviewer' | 'client' | 'admin';
+type UserRole = "creator" | "internal_reviewer" | "client" | "admin";
 ```
 
-| Legacy | Canonical |
-|--------|-----------|
-| `'creator'` | `CREATOR` |
-| `'internal_reviewer'` | `BRAND_MANAGER` |
-| `'client'` | `CLIENT_APPROVER` |
-| `'admin'` | `AGENCY_ADMIN` |
+| Legacy                | Canonical         |
+| --------------------- | ----------------- |
+| `'creator'`           | `CREATOR`         |
+| `'internal_reviewer'` | `BRAND_MANAGER`   |
+| `'client'`            | `CLIENT_APPROVER` |
+| `'admin'`             | `AGENCY_ADMIN`    |
 
 #### shared/analytics.ts
+
 ```typescript
-type UserRole = 'admin' | 'manager' | 'client';
+type UserRole = "admin" | "manager" | "client";
 ```
 
-| Legacy | Canonical |
-|--------|-----------|
-| `'admin'` | `AGENCY_ADMIN` |
+| Legacy      | Canonical       |
+| ----------- | --------------- |
+| `'admin'`   | `AGENCY_ADMIN`  |
 | `'manager'` | `BRAND_MANAGER` |
-| `'client'` | `VIEWER` |
+| `'client'`  | `VIEWER`        |
 
 #### client/types/dashboard.ts
+
 ```typescript
-type UserRole = "admin" | "strategy_manager" | "brand_manager" | "approver" | "viewer";
+type UserRole =
+  | "admin"
+  | "strategy_manager"
+  | "brand_manager"
+  | "approver"
+  | "viewer";
 ```
 
-| Legacy | Canonical |
-|--------|-----------|
-| `"admin"` | `AGENCY_ADMIN` |
-| `"strategy_manager"` | `BRAND_MANAGER` |
-| `"brand_manager"` | `BRAND_MANAGER` |
-| `"approver"` | `CLIENT_APPROVER` |
-| `"viewer"` | `VIEWER` |
+| Legacy               | Canonical         |
+| -------------------- | ----------------- |
+| `"admin"`            | `AGENCY_ADMIN`    |
+| `"strategy_manager"` | `BRAND_MANAGER`   |
+| `"brand_manager"`    | `BRAND_MANAGER`   |
+| `"approver"`         | `CLIENT_APPROVER` |
+| `"viewer"`           | `VIEWER`          |
 
 **Migration Path:** Replace all with imports from canonical system
 
 ```typescript
 // Before
-import type { UserRole } from '@/types/dashboard';
+import type { UserRole } from "@/types/dashboard";
 
 // After
-import type { Role } from '@/lib/auth';
-import { useCan } from '@/lib/auth';
+import type { Role } from "@/lib/auth";
+import { useCan } from "@/lib/auth";
 ```
 
 ---
@@ -259,12 +284,12 @@ WHERE brand_members.role IN ('owner', 'admin', 'editor', 'creator')
 
 ### Mapping to Canonical System
 
-| DB Role | Canonical Role |
-|---------|----------------|
-| `'owner'` | `AGENCY_ADMIN` or `SUPERADMIN` |
-| `'admin'` | `BRAND_MANAGER` |
-| `'editor'` | `CREATOR` |
-| `'creator'` | `CREATOR` |
+| DB Role     | Canonical Role                 |
+| ----------- | ------------------------------ |
+| `'owner'`   | `AGENCY_ADMIN` or `SUPERADMIN` |
+| `'admin'`   | `BRAND_MANAGER`                |
+| `'editor'`  | `CREATOR`                      |
+| `'creator'` | `CREATOR`                      |
 
 **Migration Strategy:**
 
@@ -278,6 +303,7 @@ WHERE brand_members.role IN ('owner', 'admin', 'editor', 'creator')
 ## Implementation Roadmap
 
 ### Phase 1: Setup (✅ Complete)
+
 - ✅ Define canonical roles in `config/permissions.json`
 - ✅ Create `client/lib/auth/useAuth.ts` (unified hook)
 - ✅ Create `client/lib/auth/useCan.ts` (permission check)
@@ -285,6 +311,7 @@ WHERE brand_members.role IN ('owner', 'admin', 'editor', 'creator')
 - ✅ Create this mapping document
 
 ### Phase 2: Client-Side Migration (Week 1-2)
+
 - [ ] Update `client/contexts/AuthContext.tsx` to normalize roles
 - [ ] Replace all inline role checks with `useCan(scope)`
 - [ ] Update UI components (AppLayout, Navigation, Dashboard)
@@ -292,6 +319,7 @@ WHERE brand_members.role IN ('owner', 'admin', 'editor', 'creator')
 - [ ] Fix TypeScript imports
 
 **Commands:**
+
 ```bash
 # Find all inline role checks
 grep -r "role.*==\|'agency'\|'client'" client --include="*.tsx" --include="*.ts"
@@ -301,6 +329,7 @@ grep -r "role.*==\|'agency'\|'client'" client --include="*.tsx" --include="*.ts"
 ```
 
 ### Phase 3: Server-Side Migration (Week 2-3)
+
 - [ ] Apply `requireScope` middleware to critical routes
 - [ ] Update `server/routes/approvals.ts` (done in Phase 1 example)
 - [ ] Update `server/routes/publishing.ts`
@@ -309,6 +338,7 @@ grep -r "role.*==\|'agency'\|'client'" client --include="*.tsx" --include="*.ts"
 - [ ] Deprecate `server/lib/auth-context.ts` in favor of `requireScope`
 
 **Priority Routes:**
+
 1. `approvals` - Replace with `requireScope('content:approve')`
 2. `publishing` - Replace with `requireScope('publish:now')`
 3. `workflow` - Replace with `requireScope('workflow:manage')`
@@ -316,12 +346,14 @@ grep -r "role.*==\|'agency'\|'client'" client --include="*.tsx" --include="*.ts"
 5. `integrations` - Replace with `requireScope('integrations:manage')`
 
 ### Phase 4: Database Alignment (Week 3-4)
+
 - [ ] Audit all RLS policies
 - [ ] Create normalization function for DB → API role mapping
 - [ ] Update critical tables' RLS policies
 - [ ] Add migrations for role standardization
 
 ### Phase 5: Testing & Cleanup (Week 4-5)
+
 - [ ] Unit tests for `useCan()` permission matrix
 - [ ] Integration tests for `requireScope` middleware
 - [ ] RLS smoke tests (cross-brand access blocked)
@@ -335,6 +367,7 @@ grep -r "role.*==\|'agency'\|'client'" client --include="*.tsx" --include="*.ts"
 ### Client-Side: Before & After
 
 **Before:**
+
 ```typescript
 // client/components/ApprovalButton.tsx
 const { user } = useAuth(); // from context
@@ -346,17 +379,18 @@ return null;
 ```
 
 **After:**
+
 ```typescript
 // client/components/ApprovalButton.tsx
 import { useCan } from '@/lib/auth';
 
 export function ApprovalButton({ post }: Props) {
   const canApprove = useCan('content:approve');
-  
+
   if (!canApprove || post.status !== 'pending') {
     return null;
   }
-  
+
   return <Button onClick={approve}>Approve</Button>;
 }
 ```
@@ -364,29 +398,34 @@ export function ApprovalButton({ post }: Props) {
 ### Server-Side: Before & After
 
 **Before:**
+
 ```typescript
 // server/routes/approvals.ts
-const userRole = req.user?.role || req.headers['x-user-role'];
-if (!['client', 'agency', 'admin'].includes(userRole)) {
-  throw new AppError(ErrorCode.FORBIDDEN, 'Invalid role');
+const userRole = req.user?.role || req.headers["x-user-role"];
+if (!["client", "agency", "admin"].includes(userRole)) {
+  throw new AppError(ErrorCode.FORBIDDEN, "Invalid role");
 }
 
-const canApprove = userRole === 'client' || userRole === 'admin' ||
-                   (userRole === 'agency' && action === 'approve');
+const canApprove =
+  userRole === "client" ||
+  userRole === "admin" ||
+  (userRole === "agency" && action === "approve");
 if (!canApprove) {
-  throw new AppError(ErrorCode.FORBIDDEN, 'Cannot approve');
+  throw new AppError(ErrorCode.FORBIDDEN, "Cannot approve");
 }
 ```
 
 **After:**
+
 ```typescript
 // server/routes/approvals.ts
-import { requireScope } from '../middleware/requireScope';
+import { requireScope } from "../middleware/requireScope";
 
-router.post('/bulk', 
+router.post(
+  "/bulk",
   authenticateUser,
-  requireScope('content:approve'),
-  bulkApproveContent
+  requireScope("content:approve"),
+  bulkApproveContent,
 );
 ```
 
