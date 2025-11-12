@@ -440,8 +440,8 @@ export default function ContentQueue() {
           {/* Status Overview Banner */}
           <StatusOverviewBanner navigateToQueue={!statusFilter} />
 
-          {/* Filter Controls */}
-          <div className="mb-8 flex items-center gap-4">
+          {/* Filter Controls & Status Actions */}
+          <div className="mb-8 flex flex-wrap items-center gap-3">
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/50 backdrop-blur-xl border border-white/60 hover:border-indigo-300/50 text-slate-700 font-bold text-sm transition-all"
@@ -464,6 +464,28 @@ export default function ContentQueue() {
             >
               {viewMode === "carousel" ? "Grid View" : "Browse Posts"}
             </button>
+
+            {/* Status-specific actions */}
+            {statusFilter === "reviewing" && filteredPosts.length > 0 && (
+              <button
+                onClick={handleBulkApprove}
+                disabled={bulkApprovingReviewing}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-400 hover:bg-lime-500 text-indigo-950 font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                {bulkApprovingReviewing ? "Approving..." : `Approve All (${filteredPosts.length})`}
+              </button>
+            )}
+            {statusFilter === "errored" && filteredPosts.length > 0 && (
+              <button
+                onClick={handleBulkRetry}
+                disabled={bulkRetryingErrored}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-400 hover:bg-lime-500 text-indigo-950 font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <RefreshCw className="w-4 h-4" />
+                {bulkRetryingErrored ? "Retrying..." : `Retry All (${filteredPosts.length})`}
+              </button>
+            )}
           </div>
 
           {/* Filter Panel */}
