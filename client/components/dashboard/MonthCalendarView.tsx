@@ -209,6 +209,9 @@ export function MonthCalendarView({
   filterPlatforms = [],
   filterCampaign = null,
 }: MonthCalendarViewProps) {
+  const [previewPost, setPreviewPost] = useState<Post | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+
   const filteredDays = MONTH_DATA.map((day) => ({
     ...day,
     posts: day.posts.filter((post) => {
