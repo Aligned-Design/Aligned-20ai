@@ -100,7 +100,7 @@ export async function searchStockImages(
   } = params;
 
   // Filter by query
-  let results = MOCK_STOCK_IMAGES.filter((img) => {
+  const results = MOCK_STOCK_IMAGES.filter((img) => {
     const matchesQuery =
       !query ||
       img.title.toLowerCase().includes(query.toLowerCase()) ||

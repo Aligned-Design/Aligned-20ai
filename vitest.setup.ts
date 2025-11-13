@@ -5,6 +5,9 @@ import { afterEach, beforeAll, afterAll, vi, beforeEach } from 'vitest';
 if (!process.env.VITE_SUPABASE_URL) {
   process.env.VITE_SUPABASE_URL = 'https://xpzvtvycjsccaosahmgz.supabase.co';
 }
+if (!process.env.SUPABASE_URL) {
+  process.env.SUPABASE_URL = 'https://xpzvtvycjsccaosahmgz.supabase.co';
+}
 if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
   process.env.SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwenZ0dnljanNjY2Fvc2FobWd6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MjEzODk4OCwiZXhwIjoyMDc3NzE0OTg4fQ.jhL2QsopL9_sK_2L2lKD4vMDHVya5aZskyDMtVUIEcU';
 }

@@ -746,7 +746,7 @@ describe('localStorage Corruption Resilience Tests', () => {
         localStorage.removeItem('auth-user');
       }
 
-      let completed = localStorage.getItem('onboarding-completed');
+      const completed = localStorage.getItem('onboarding-completed');
 
       expect(user).toBeNull();
       expect(localStorage.getItem('auth-user')).toBeNull();

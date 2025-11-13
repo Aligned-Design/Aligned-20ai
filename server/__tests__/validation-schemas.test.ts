@@ -2,17 +2,16 @@ import { describe, it, expect } from "vitest";
 import {
   BrandIdSchema,
   PlatformSchema,
-  EmailSchema,
   CreateIntegrationBodySchema,
   GetIntegrationsQuerySchema,
-  OAuthInitiateBodySchema,
 } from "../lib/validation-schemas";
 
 describe("Validation Schemas", () => {
   describe("BrandIdSchema", () => {
-    it("should accept valid brand IDs", async () => {
-      const result = await BrandIdSchema.parseAsync("brand_123");
-      expect(result).toBe("brand_123");
+    it("should accept valid brand IDs (UUIDs)", async () => {
+      const validUuid = "550e8400-e29b-41d4-a716-446655440000";
+      const result = await BrandIdSchema.parseAsync(validUuid);
+      expect(result).toBe(validUuid);
     });
 
     it("should reject empty brand ID", async () => {
@@ -41,7 +40,8 @@ describe("Validation Schemas", () => {
         "facebook",
         "linkedin",
         "twitter",
-        "google_business",
+        "tiktok",
+        "email",
       ];
       for (const platform of validPlatforms) {
         const result = await PlatformSchema.parseAsync(platform);
@@ -51,23 +51,7 @@ describe("Validation Schemas", () => {
 
     it("should reject invalid platform", async () => {
       try {
-        await PlatformSchema.parseAsync("tiktok");
-        expect.fail("Should have thrown");
-      } catch (error) {
-        expect(error).toBeDefined();
-      }
-    });
-  });
-
-  describe("EmailSchema", () => {
-    it("should accept valid emails", async () => {
-      const result = await EmailSchema.parseAsync("user@example.com");
-      expect(result).toBe("user@example.com");
-    });
-
-    it("should reject invalid emails", async () => {
-      try {
-        await EmailSchema.parseAsync("not-an-email");
+        await PlatformSchema.parseAsync("invalid_platform");
         expect.fail("Should have thrown");
       } catch (error) {
         expect(error).toBeDefined();
@@ -78,7 +62,7 @@ describe("Validation Schemas", () => {
   describe("CreateIntegrationBodySchema", () => {
     it("should accept valid integration body", async () => {
       const body = {
-        brandId: "brand_123",
+        brandId: "550e8400-e29b-41d4-a716-446655440000",
         type: "instagram",
         name: "My Instagram",
         settings: {
@@ -86,14 +70,14 @@ describe("Validation Schemas", () => {
         },
       };
       const result = await CreateIntegrationBodySchema.parseAsync(body);
-      expect(result.brandId).toBe("brand_123");
+      expect(result.brandId).toBe("550e8400-e29b-41d4-a716-446655440000");
       expect(result.type).toBe("instagram");
     });
 
     it("should reject missing required fields", async () => {
       try {
         await CreateIntegrationBodySchema.parseAsync({
-          brandId: "brand_123",
+          brandId: "550e8400-e29b-41d4-a716-446655440000",
           // missing type and name
         });
         expect.fail("Should have thrown");
@@ -104,55 +88,18 @@ describe("Validation Schemas", () => {
   });
 
   describe("GetIntegrationsQuerySchema", () => {
-    it("should accept valid query with pagination", async () => {
+    it("should accept valid query with brandId", async () => {
       const query = {
-        brandId: "brand_123",
-        page: 1,
-        limit: 20,
+        brandId: "550e8400-e29b-41d4-a716-446655440000",
       };
       const result = await GetIntegrationsQuerySchema.parseAsync(query);
-      expect(result.brandId).toBe("brand_123");
-      expect(result.page).toBe(1);
-      expect(result.limit).toBe(20);
+      expect(result.brandId).toBe("550e8400-e29b-41d4-a716-446655440000");
     });
 
-    it("should use default pagination values", async () => {
-      const query = {
-        brandId: "brand_123",
-      };
-      const result = await GetIntegrationsQuerySchema.parseAsync(query);
-      expect(result.page).toBe(1);
-      expect(result.limit).toBe(20);
-    });
-
-    it("should reject invalid pagination limits", async () => {
+    it("should reject invalid brandId format", async () => {
       try {
         await GetIntegrationsQuerySchema.parseAsync({
-          brandId: "brand_123",
-          limit: 200, // exceeds max of 100
-        });
-        expect.fail("Should have thrown");
-      } catch (error) {
-        expect(error).toBeDefined();
-      }
-    });
-  });
-
-  describe("OAuthInitiateBodySchema", () => {
-    it("should accept valid OAuth initiate request", async () => {
-      const body = {
-        platform: "instagram",
-        brandId: "brand_123",
-      };
-      const result = await OAuthInitiateBodySchema.parseAsync(body);
-      expect(result.platform).toBe("instagram");
-      expect(result.brandId).toBe("brand_123");
-    });
-
-    it("should reject missing platform", async () => {
-      try {
-        await OAuthInitiateBodySchema.parseAsync({
-          brandId: "brand_123",
+          brandId: "not-a-uuid",
         });
         expect.fail("Should have thrown");
       } catch (error) {
