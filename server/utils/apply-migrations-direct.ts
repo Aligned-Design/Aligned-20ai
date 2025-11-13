@@ -55,13 +55,15 @@ async function applyMigrations() {
       // If exec function doesn't exist, try a workaround
       if (error.code === "42883" || error.message.includes("exec")) {
         console.log("\n📌 Note: Supabase exec() function not available.");
+import { execSync } from "child_process";
+
         console.log("   Please apply migrations manually via SQL Editor:");
         console.log("   1. Go to Supabase Dashboard → SQL Editor");
         console.log("   2. Create new query and paste the combined migrations");
         console.log("   3. Click RUN\n");
 
         // Copy to clipboard
-        const copied = require("child_process").execSync(`echo "${allSQL.replace(/"/g, '\\"')}" | pbcopy`, { encoding: 'utf-8' });
+        const copied = execSync(`echo "${allSQL.replace(/"/g, '\\"')}" | pbcopy`, { encoding: 'utf-8' });
         console.log("✅ Migrations have been copied to clipboard!");
         return 0;
       }

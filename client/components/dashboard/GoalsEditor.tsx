@@ -101,7 +101,7 @@ export function GoalsEditor({ brand, onUpdate }: GoalsEditorProps) {
       );
     } else {
       const newGoal: BrandGoal = {
-        id: `goal-${Date.now()}`,
+        id: crypto.randomUUID(),
         ...formState.formData,
       };
       updatedGoals.push(newGoal);

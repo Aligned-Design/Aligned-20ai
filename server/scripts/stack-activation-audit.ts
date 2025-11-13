@@ -176,9 +176,11 @@ function searchInFile(filePath: string, patterns: string[]): boolean {
   return patterns.some(pattern => content.includes(pattern));
 }
 
+import { execSync } from 'child_process';
+
 function getGitCommit(): string {
   try {
-    return require('child_process').execSync('git rev-parse HEAD', { encoding: 'utf-8' }).trim().slice(0, 7);
+    return execSync('git rev-parse HEAD', { encoding: 'utf-8' }).trim().slice(0, 7);
   } catch {
     return 'unknown';
   }
