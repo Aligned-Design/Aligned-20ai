@@ -59,3 +59,4 @@ temp/
 
 # Package manager locks (pnpm-lock.yaml is tracked for CI builds)
 yarn.lock
+migrations-combined.sql

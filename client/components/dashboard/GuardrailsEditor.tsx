@@ -132,7 +132,7 @@ export function GuardrailsEditor({ brand, onUpdate }: GuardrailsEditorProps) {
       );
     } else {
       const newGuardrail: Guardrail = {
-        id: `guardrail-${Date.now()}`,
+        id: crypto.randomUUID(),
         ...formState.formData,
       };
       updatedGuardrails.push(newGuardrail);

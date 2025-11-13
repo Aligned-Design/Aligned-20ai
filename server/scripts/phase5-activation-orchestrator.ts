@@ -41,9 +41,11 @@ interface ActivationReport {
   };
 }
 
+import { execSync } from "child_process";
+
 function getGitCommit(): string {
   try {
-    const cmd = require("child_process").execSync("git rev-parse HEAD", {
+    const cmd = execSync("git rev-parse HEAD", {
       encoding: "utf-8",
     });
     return cmd.trim().substring(0, 7);
